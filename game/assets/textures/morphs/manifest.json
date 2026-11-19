@@ -1,0 +1,181 @@
+{
+ "note": "Colour-morph texture layers for DataArrayTexture (one array per model). Same UV layout as the model GLB; layer index = position in the list. 1024x1024 sRGB WebP; halve on Medium/Low. Layer 0 is the model's own texture re-exported so the array is self-contained.",
+ "size": 1024,
+ "arrays": {
+  "pigeon-plain": [
+   {
+    "layer": 0,
+    "morph": "blue-bar",
+    "file": "pigeon-plain-blue-bar.webp"
+   },
+   {
+    "layer": 1,
+    "morph": "blue-checker",
+    "file": "pigeon-plain-blue-checker.webp"
+   },
+   {
+    "layer": 2,
+    "morph": "dark-checker",
+    "file": "pigeon-plain-dark-checker.webp"
+   },
+   {
+    "layer": 3,
+    "morph": "melanistic",
+    "file": "pigeon-plain-melanistic.webp"
+   },
+   {
+    "layer": 4,
+    "morph": "mostly-white",
+    "file": "pigeon-plain-mostly-white.webp"
+   },
+   {
+    "layer": 5,
+    "morph": "ash-red",
+    "file": "pigeon-plain-ash-red.webp"
+   },
+   {
+    "layer": 6,
+    "morph": "red-checker",
+    "file": "pigeon-plain-red-checker.webp"
+   },
+   {
+    "layer": 7,
+    "morph": "pied",
+    "file": "pigeon-plain-pied.webp"
+   },
+   {
+    "layer": 8,
+    "morph": "pure-white",
+    "file": "pigeon-plain-pure-white.webp"
+   },
+   {
+    "layer": 9,
+    "morph": "silver-dun",
+    "file": "pigeon-plain-silver-dun.webp"
+   },
+   {
+    "layer": 10,
+    "morph": "grizzle",
+    "file": "pigeon-plain-grizzle.webp"
+   },
+   {
+    "layer": 11,
+    "morph": "brown-pied",
+    "file": "pigeon-plain-brown-pied.webp"
+   },
+   {
+    "layer": 12,
+    "morph": "mealy",
+    "file": "pigeon-plain-mealy.webp"
+   }
+  ],
+  "pigeon-plain-fly": [
+   {
+    "layer": 0,
+    "morph": "blue-bar",
+    "file": "pigeon-plain-fly-blue-bar.webp"
+   },
+   {
+    "layer": 1,
+    "morph": "blue-checker",
+    "file": "pigeon-plain-fly-blue-checker.webp"
+   },
+   {
+    "layer": 2,
+    "morph": "dark-checker",
+    "file": "pigeon-plain-fly-dark-checker.webp"
+   },
+   {
+    "layer": 3,
+    "morph": "melanistic",
+    "file": "pigeon-plain-fly-melanistic.webp"
+   },
+   {
+    "layer": 4,
+    "morph": "mostly-white",
+    "file": "pigeon-plain-fly-mostly-white.webp"
+   },
+   {
+    "layer": 5,
+    "morph": "ash-red",
+    "file": "pigeon-plain-fly-ash-red.webp"
+   },
+   {
+    "layer": 6,
+    "morph": "red-checker",
+    "file": "pigeon-plain-fly-red-checker.webp"
+   },
+   {
+    "layer": 7,
+    "morph": "pied",
+    "file": "pigeon-plain-fly-pied.webp"
+   },
+   {
+    "layer": 8,
+    "morph": "pure-white",
+    "file": "pigeon-plain-fly-pure-white.webp"
+   },
+   {
+    "layer": 9,
+    "morph": "silver-dun",
+    "file": "pigeon-plain-fly-silver-dun.webp"
+   },
+   {
+    "layer": 10,
+    "morph": "grizzle",
+    "file": "pigeon-plain-fly-grizzle.webp"
+   },
+   {
+    "layer": 11,
+    "morph": "brown-pied",
+    "file": "pigeon-plain-fly-brown-pied.webp"
+   },
+   {
+    "layer": 12,
+    "morph": "mealy",
+    "file": "pigeon-plain-fly-mealy.webp"
+   }
+  ],
+  "squirrel": [
+   {
+    "layer": 0,
+    "morph": "grey",
+    "file": "squirrel-grey.webp"
+   },
+   {
+    "layer": 1,
+    "morph": "cinnamon",
+    "file": "squirrel-cinnamon.webp"
+   },
+   {
+    "layer": 2,
+    "morph": "black",
+    "file": "squirrel-black.webp"
+   },
+   {
+    "layer": 3,
+    "morph": "near-white",
+    "file": "squirrel-near-white.webp"
+   }
+  ]
+ },
+ "cards": {
+  "blue-bar": "duchess",
+  "blue-checker": "bella",
+  "dark-checker": "knuckles",
+  "melanistic": "lou",
+  "mostly-white": "tiny",
+  "ash-red": "monty",
+  "red-checker": "encore",
+  "pied": "tuppence",
+  "pure-white": "dove",
+  "silver-dun": "bunting",
+  "grizzle": "lapcount",
+  "brown-pied": "wheezy",
+  "mealy": "feathers",
+  "grey": "hazel",
+  "cinnamon": "nutmeg",
+  "black": "twitch",
+  "near-white": "pecan"
+ }
+}

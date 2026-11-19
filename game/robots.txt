@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://centralparkpigeon.synapticnoise.com/sitemap.xml

@@ -1,0 +1,54 @@
+// World-anchored bubbles: speech ("Hey! Shoo!"), thoughts ("FEED the
+// birds…?"), clue marks ("…" over a human in the way, "!" over a wanted item)
+// and crowd barks. Each follows a point in the world (game coordinates) and
+// fades with distance. Timers run on the game clock.
+
+export class Bubbles {
+  constructor() {
+    this.el = document.createElement('div');
+    this.el.id = 'bubbles';
+    document.body.appendChild(this.el);
+    this.list = new Map();
+    this.seq = 0;
+  }
+
+  /** opts: { kind: 'speech'|'thought'|'clue', at: {x,y,z} | () => {x,y,z}, ttl: s (0 = until removed), range } */
+  add(text, { id = null, kind = 'speech', at, ttl = 2.5, range = 45, html = null } = {}) {
+    id = id || 'b' + ++this.seq;
+    let b = this.list.get(id);
+    if (!b) {
+      const el = document.createElement('div');
+      this.el.appendChild(el);
+      b = { el };
+      this.list.set(id, b);
+    }
+    b.el.className = 'bubble ' + (kind === 'speech' ? '' : kind);
+    if (html) b.el.innerHTML = html; else b.el.textContent = text;
+    Object.assign(b, { at, ttl, range, text });
+    return id;
+  }
+
+  remove(id) { const b = this.list.get(id); if (b) { b.el.remove(); this.list.delete(id); } }
+  has(id) { return this.list.has(id); }
+  clear() { for (const id of [...this.list.keys()]) this.remove(id); }
+
+  tick(dt) {
+    for (const [id, b] of this.list) {
+      if (b.ttl > 0) { b.ttl -= dt; if (b.ttl <= 0) this.remove(id); }
+    }
+  }
+
+  /** project(x, y, z) → { x, y, dist, visible } in CSS pixels. */
+  render(project) {
+    for (const b of this.list.values()) {
+      const p = typeof b.at === 'function' ? b.at() : b.at;
+      if (!p) { b.el.style.display = 'none'; continue; }
+      const s = project(p.x, p.y, p.z);
+      if (!s.visible || s.dist > b.range) { b.el.style.display = 'none'; continue; }
+      b.el.style.display = '';
+      b.el.style.left = `${s.x.toFixed(1)}px`;
+      b.el.style.top = `${s.y.toFixed(1)}px`;
+      b.el.classList.toggle('far', s.dist > b.range * 0.6);
+    }
+  }
+}

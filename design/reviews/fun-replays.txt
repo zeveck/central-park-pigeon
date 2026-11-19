@@ -1,0 +1,46 @@
+# Fun pass: full replay of every recorded solution (after the last code change)
+# 2026-11-19 17:46 container clock; game/tools/sf-run.mjs replay (HTTP cache off), one headless browser on port 8271, preset low.
+# Each solution replayed from its own fixture; 'completed' = the scheme's flag set at the end. Console errors counted per replay.
+
+den-biscuit.json completed=yes consoleErrors=0 "t": 1393.98 
+den-cats.alt.json completed=yes consoleErrors=0 "t": 689.78 
+den-cats.json completed=yes consoleErrors=0 "t": 622.88 
+den-choir.json completed=yes consoleErrors=0 "t": 2086.68 
+den-crows.json completed=yes consoleErrors=0 "t": 755.88 
+den-ducks.json completed=yes consoleErrors=0 "t": 196.38 
+den-geese.json completed=yes consoleErrors=0 "t": 3731.52 
+den-horses.alt.json completed=yes consoleErrors=0 "t": 4839 
+den-horses.json completed=yes consoleErrors=0 "t": 4839 
+den-meermob.alt.json completed=yes consoleErrors=0 "t": 6187.97 
+den-meermob.json completed=yes consoleErrors=0 "t": 6074 
+den-raccoons.alt.json completed=yes consoleErrors=0 "t": 1698.65 
+den-raccoons.json completed=yes consoleErrors=0 "t": 1693.82 
+den-racers.alt.json completed=yes consoleErrors=0 "t": 4147.45 
+den-racers.json completed=yes consoleErrors=0 "t": 2322 
+den-rats.json completed=yes consoleErrors=0 "t": 429.3 
+den-rhoda.json completed=yes consoleErrors=0 "t": 3726.97 
+den-songbirds.json completed=yes consoleErrors=0 "t": 2401.52 
+den-squirrels.json completed=yes consoleErrors=0 "t": 368.3 
+den-strix.json completed=yes consoleErrors=0 "t": 1504.4 
+den-turtles.json completed=yes consoleErrors=0 "t": 3129 
+finale.json completed=yes consoleErrors=0 "t": 5446.9 
+gear-headlamp.json completed=yes consoleErrors=0 "t": 1055.43 
+gear-pen.alt.json completed=yes consoleErrors=0 "t": 936.88 
+gear-pen.json completed=yes consoleErrors=0 "t": 955.88 
+gear-sunglasses.json completed=yes consoleErrors=0 "t": 874.88 
+part-beak.alt.json completed=yes consoleErrors=0 "t": 2337.23 
+part-beak.json completed=yes consoleErrors=0 "t": 2517.27 
+part-body.json completed=yes consoleErrors=0 "t": 1991.2 
+part-legs.json completed=yes consoleErrors=0 "t": 6739.52 
+part-power.json completed=yes consoleErrors=0 "t": 5274.9 
+part-talons.json completed=yes consoleErrors=0 "t": 5466.73 
+part-wings.alt.json completed=yes consoleErrors=0 "t": 1270.98 
+part-wings.json completed=yes consoleErrors=0 "t": 1292.98 
+prologue.json completed=yes consoleErrors=0 "t": 98.4 
+sab-middle.json completed=yes consoleErrors=0 "t": 1791.23 
+sab-north.json completed=yes consoleErrors=0 "t": 1734.23 
+truce-cats-rats.alt.json completed=yes consoleErrors=0 "t": 2696.82 
+truce-cats-rats.json completed=yes consoleErrors=0 "t": 2735.85 
+truce-dogs-squirrels.json completed=yes consoleErrors=0 "t": 3637 
+
+RESULT: 40/40 completed, 0 with console errors

@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Central Park Pigeon: a cosy open-world pigeon caper</title>
+  <meta name="description" content="Fly and waddle across a big 3D Central Park as Gus, a scruffy pigeon with a plan: win over seventeen crews of park animals, pull off clever schemes and build the Mecha-Pigeon. Free in your browser, on desktop and phone.">
+  <!-- Link previews (web-target.md "Sharing and search"). The image URL stays relative until publish, when the
+       canonical link, absolute URLs, robots.txt and sitemap.xml are added for the real address. -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Central Park Pigeon">
+  <meta property="og:title" content="Central Park Pigeon: a cosy open-world pigeon caper">
+  <meta property="og:description" content="Fly and waddle across a big 3D Central Park as Gus, a pigeon with a plan: win over seventeen crews of park animals, pull off clever schemes and build the Mecha-Pigeon.">
+  <meta property="og:url" content="https://centralparkpigeon.synapticnoise.com/">
+  <link rel="canonical" href="https://centralparkpigeon.synapticnoise.com/">
+  <meta property="og:image" content="https://centralparkpigeon.synapticnoise.com/social-card.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Central Park Pigeon: Gus the pigeon perched on a lamppost above autumn Central Park, with the Empire State Building behind him">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Central Park Pigeon: a cosy open-world pigeon caper">
+  <meta name="twitter:description" content="Fly and waddle across a big 3D Central Park as Gus, a pigeon with a plan: win over seventeen crews of park animals, pull off clever schemes and build the Mecha-Pigeon.">
+  <meta name="twitter:image" content="https://centralparkpigeon.synapticnoise.com/social-card.jpg">
+  <meta name="twitter:image:alt" content="Central Park Pigeon: Gus the pigeon perched on a lamppost above autumn Central Park, with the Empire State Building behind him">
+  <meta name="theme-color" content="#E07B39">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="preload" href="fonts/Fredoka.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="fonts/Nunito.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="assets/ui/key-art.jpg" as="image">
+  <link rel="stylesheet" href="src/ui/ui.css">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Park Pigeon">
+  <script>
+    // M4, before the game's code so a broken game can't stop it: the last few errors (for bug
+    // reports), Ctrl+Shift+L opens the report (feedback.md; L because F is Coo), and the offline
+    // service worker (web-target.md: off on localhost unless ?sw=1).
+    (function () {
+      var errs = window.__errors = [];
+      var keep = function (m) { errs.push(String(m).replace(/\s+/g, ' ').slice(0, 200)); errs.splice(0, errs.length - 5); };
+      addEventListener('error', function (e) { keep(e.message || (e.target && e.target.src) || 'error'); }, true);
+      addEventListener('unhandledrejection', function (e) { keep((e.reason && e.reason.message) || e.reason); });
+      addEventListener('keydown', function (e) {
+        if (!e.ctrlKey || !e.shiftKey || e.altKey || e.metaKey || e.key.toLowerCase() !== 'l') return;
+        var fb = document.getElementById('report');
+        if (!fb || !fb.getAttribute('repo') || document.activeElement === fb || !fb.open) return;
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        try { window.reportShortcut && window.reportShortcut(); } catch (err) { /* the game is stuck: open anyway */ }
+        fb.open();
+      }, true);
+      var local = ['localhost', '127.0.0.1'].indexOf(location.hostname) >= 0;
+      if ('serviceWorker' in navigator && (!local || new URLSearchParams(location.search).has('sw'))) {
+        navigator.serviceWorker.register('sw.js').catch(function (e) { keep('service worker: ' + e.message); });
+        // Fixes-1 (#7): a new version took over this page (it was already controlled, so this is an update, not the
+        // first install). Before the title is up, reload at once; after, ui/offline.js decides (G.onSwUpdate).
+        var had = !!navigator.serviceWorker.controller;
+        navigator.serviceWorker.addEventListener('controllerchange', function () {
+          if (!had) { had = true; return; }
+          window.__swUpdated = true;
+          if (window.__onSwUpdate) window.__onSwUpdate(); else location.reload();
+        });
+      }
+      // Fixes-1 (#9): the boot loads ~390 files; the default buffer keeps 250, and ui/offline.js reads it to tell
+      // the service worker what to cache first
+      if (performance.setResourceTimingBufferSize) performance.setResourceTimingBufferSize(2000);
+    })();
+  </script>
+  <style>
+    :root { --orange: #E07B39; --ink: #26351f; --cream: #f6efe2; --slate: #7A8597; }
+    html, body { margin: 0; height: 100%; overflow: hidden; background: #6fa7d6; touch-action: none; user-select: none; -webkit-user-select: none; }
+    body { font: 15px/1.4 'Nunito', system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--ink); }
+    body.fading::after { content: ''; position: fixed; inset: 0; background: #1d2433; opacity: 1; transition: opacity 0.3s; z-index: 70; }
+    canvas#game { display: block; position: fixed; inset: 0; width: 100vw; height: 100vh; outline: none; }
+
+    /* Polish (P6): the loading screen IS the title's layout (same art, crop, logo, tagline, place), so the title only swaps
+       the bar for its buttons; a tiny inline copy of the key art shows at once (no blank blue while the real one loads). */
+    #loading { position: fixed; inset: 0; z-index: 40; display: flex; flex-direction: column; align-items: flex-start; gap: clamp(12px, 4vh, 40px); padding: calc(6vh + env(safe-area-inset-top, 0px)) 0 0 calc(5vw + env(safe-area-inset-left, 0px)); box-sizing: border-box; background: url('assets/ui/key-art.jpg') 50% 5% / cover no-repeat, url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozv/wAARCAAWACgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDvoxb3EOUKSo4+8hB/I1Xl08D7p3Z9q43RNZfR412PHLbyON+ODu7D6da2P+Ez8xi4iMAUEbXGQfQ5rz6OMlDVNnrV8Em+hqNaBDhzt4LEnjAHWueu9Sji8SQxLeL9hj2+btxzkcn36iphq/m3eA0ssew+YjMMBmOen17VyerXkcsqC3topEQAF8Mcse2RjOOn1zXVDHSqS5Tnng1TV2dydRkksGubISRAuwQEhyVB4Ptn064ormrDUbeHTGjsolgmLZliyxb6kmivNq4mftH7t/U9ChheammjNtzFcOI0j8l0P8PK/h6Vp2emy36/u7goQQ5ZuuMdKKKqg3qia6V7hLbvYOpeQSDO0grnJ9aqS+MYNMtotOXT/MWGdJ0JYDCq27bj8xRRVRip1LSJq+7BtExuo9e8zUirW/2g7dow21V4A/PJ/Giiiua9pNLodtL+Gmf/2Q==') 50% 5% / cover no-repeat, #c9a27a; transition: opacity 0.5s; }
+    #loading.done { opacity: 0; pointer-events: none; }
+    #loading .load { transition: opacity 0.15s; }
+    #loading.done .load { opacity: 0; }   /* the bar steps aside at once, so it never overlaps the title buttons fading in */
+    #loading .shade { position: absolute; inset: 0; background: linear-gradient(100deg, rgba(25, 30, 45, 0.42) 0%, rgba(25, 30, 45, 0.12) 38%, rgba(0, 0, 0, 0) 60%); pointer-events: none; }
+    #loading .logo { position: relative; z-index: 1; color: #fff8ea; margin: 0; line-height: 0.92; font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: clamp(34px, min(8.2vw, 14vh), 104px); letter-spacing: 0.5px; text-shadow: 0 4px 0 #b85e25, 0 7px 0 rgba(70, 35, 10, 0.5), 0 14px 30px rgba(0, 0, 0, 0.35); }
+    #loading .logo small { display: block; max-width: 44vw; font-size: 0.32em; letter-spacing: 1.5px; margin-top: 0.55em; color: #ffe9c4; text-shadow: 0 2px 0 rgba(70, 35, 10, 0.55); font-weight: 600; text-wrap: balance; }
+    #loading .load { position: relative; z-index: 1; width: 250px; padding-top: 14px; }
+    #loading .bar { height: 12px; border-radius: 6px; background: rgba(255, 250, 240, 0.55); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25); overflow: hidden; }
+    #loading-bar { height: 100%; width: 3%; border-radius: 6px; background: #E07B39; transition: width 0.25s; }
+    #loading-label { margin-top: 8px; color: #fff7e8; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6); font: 600 16px 'Fredoka', sans-serif; }
+    #loading .credit { position: absolute; z-index: 1; right: calc(14px + env(safe-area-inset-right, 0px)); bottom: calc(10px + env(safe-area-inset-bottom, 0px)); color: rgba(255, 255, 255, 0.85); font-size: 13px; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6); }
+    @media (max-height: 500px) { #loading .load { width: 220px; } #loading .logo small { max-width: 60vw; } }
+    /* Fixes-1: the words wait for Fredoka (no font swap) */
+    #loading .logo, #loading-label, #loading .credit { visibility: hidden; }
+    html.fonts-in #loading .logo, html.fonts-in #loading-label, html.fonts-in #loading .credit { visibility: visible; }
+
+    #touch { position: fixed; inset: 0; z-index: 12; display: none; pointer-events: none; opacity: 0.55; }
+    #touch.on { display: block; }
+    #touch .stick, #touch .tb { pointer-events: auto; touch-action: none; }
+    #touch .stick { position: absolute; left: calc(18px + env(safe-area-inset-left)); bottom: calc(18px + env(safe-area-inset-bottom)); width: 140px; height: 140px; border-radius: 50%; background: rgba(255, 255, 255, 0.35); border: 2px solid rgba(255, 255, 255, 0.7); }
+    #touch .knob { position: absolute; left: 45px; top: 45px; width: 50px; height: 50px; border-radius: 50%; background: rgba(255, 255, 255, 0.9); }
+    #touch .tb { position: absolute; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.8); background: rgba(40, 40, 50, 0.45); color: #fff; font: 700 14px 'Fredoka', system-ui, sans-serif; }
+    #touch .tb.down { background: rgba(224, 123, 57, 0.8); }
+    #touch .flap { right: calc(20px + env(safe-area-inset-right)); bottom: calc(20px + env(safe-area-inset-bottom)); width: 96px; height: 96px; }
+    #touch .dive { right: calc(128px + env(safe-area-inset-right)); bottom: calc(24px + env(safe-area-inset-bottom)); width: 72px; height: 72px; }
+    #touch .peck { right: calc(28px + env(safe-area-inset-right)); bottom: calc(128px + env(safe-area-inset-bottom)); width: 80px; height: 80px; }
+    #touch .coo { right: calc(118px + env(safe-area-inset-right)); bottom: calc(112px + env(safe-area-inset-bottom)); width: 72px; height: 72px; }
+
+    #polaroid { position: fixed; left: 76%; top: 26%; z-index: 26; transform: translate(-50%, -20px) rotate(-3deg); opacity: 0; pointer-events: none; background: #fff; padding: 10px 10px 14px; border-radius: 4px; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35); display: flex; flex-direction: column; align-items: center; gap: 4px; transition: opacity 0.3s, transform 0.3s; }
+    #polaroid.on { opacity: 1; transform: translate(-50%, 0) rotate(-3deg); }
+    #polaroid img { width: 150px; height: 150px; object-fit: cover; background: #d8cfc0; }
+    #polaroid b { font: 700 26px 'Fredoka', sans-serif; color: var(--orange); }
+    #polaroid span { font: 600 15px 'Nunito', sans-serif; color: var(--ink); }
+  </style>
+  <script type="importmap">
+  { "imports": { "three": "./vendor/three.module.js", "three/addons/": "./vendor/addons/" } }
+  </script>
+</head>
+<body>
+  <div id="loading" aria-live="polite">
+    <div class="shade"></div>
+    <h1 class="logo">Central Park<br>Pigeon<small>ONE PIGEON. SEVENTEEN CREWS. ONE VERY LARGE ROBOT.</small></h1>
+    <div class="load"><div class="bar" role="progressbar" aria-label="Loading"><div id="loading-bar"></div></div><div id="loading-label">Unpacking the park</div></div>
+    <div class="credit">A game by Rich Conlan</div>
+  </div>
+  <script>
+    (function () {
+      var show = function () { document.documentElement.classList.add('fonts-in'); };
+      if (!document.fonts || !document.fonts.load) { show(); return; }
+      document.fonts.load('700 40px Fredoka').then(show, show);
+      setTimeout(show, 30000);   // never leave the loading screen wordless
+    })();
+  </script>
+  <div id="fade"><div class="msg"></div></div>
+  <div id="polaroid"></div>
+  <div id="turn"><div><img src="assets/portraits/gus.webp" alt="">Turn your phone sideways to play.</div></div>
+  <script type="module" src="./src/main.js"></script>
+  <script type="module" src="vendor/gh-feedback.js"></script>
+  <gh-feedback id="report" trigger="none" repo="zeveck/central-park-pigeon" template="bug.yml" types="bug,feature" theme="light" color="#E07B39"></gh-feedback>
+</body>
+</html>

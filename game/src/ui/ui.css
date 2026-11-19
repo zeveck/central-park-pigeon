@@ -1,0 +1,410 @@
+/* Central Park Pigeon: every screen and the HUD. HTML over the canvas so the
+   text scanner can read it. Fonts are bundled (game/fonts, OFL). */
+@font-face { font-family: 'Fredoka'; src: url('../../fonts/Fredoka.ttf') format('truetype'); font-weight: 300 700; font-display: block; }
+@font-face { font-family: 'Nunito'; src: url('../../fonts/Nunito.ttf') format('truetype'); font-weight: 200 1000; font-display: block; }
+
+:root {
+  --orange: #E07B39; --orange-d: #b85e25; --ink: #26351f; --cream: #f6efe2; --paper: #fbf6ec; --slate: #7A8597;
+  --gold: #f2c230; --green: #6F9A4A; --ranger: #3E5B3A; --red: #c4492d; --sky: #9FD0F0; --violet: #6A4C93; --cork: #b88a5a;
+  --shadow: 0 6px 18px rgba(30, 22, 12, 0.28);
+  --hud-ink: #fffaf0; --hud-bg: rgba(34, 30, 26, 0.55);
+  --safe-t: env(safe-area-inset-top, 0px); --safe-r: env(safe-area-inset-right, 0px); --safe-b: env(safe-area-inset-bottom, 0px); --safe-l: env(safe-area-inset-left, 0px);
+}
+body { font-family: 'Nunito', system-ui, sans-serif; }
+.fr { font-family: 'Fredoka', 'Nunito', sans-serif; }
+button { font-family: 'Fredoka', 'Nunito', sans-serif; }
+.hidden { display: none !important; }
+svg.ic { width: 1em; height: 1em; vertical-align: -0.14em; fill: currentColor; }
+
+/* ------------------------------------------------------------ loading */
+/* Polish (P6): the loading screen's whole style is inline in index.html (it must not wait for this file); it copies #title's layout */
+
+/* ------------------------------------------------------------ title */
+#title { position: fixed; inset: 0; z-index: 35; background: #6fa7d6 50% 5% / cover no-repeat; display: none; }   /* Fixes-2: crop from the bottom (a wide phone cut Gus's head off the top) */
+#title.on { display: flex; flex-direction: column; align-items: flex-start; gap: clamp(12px, 4vh, 40px); padding: calc(6vh + var(--safe-t)) 0 0 calc(5vw + var(--safe-l)); box-sizing: border-box; }   /* logo then menu, in flow: they never overlap at any size */
+#title::after { content: ''; position: absolute; inset: 0; background: linear-gradient(100deg, rgba(25, 30, 45, 0.42) 0%, rgba(25, 30, 45, 0.12) 38%, rgba(0, 0, 0, 0) 60%); pointer-events: none; }
+#title .logo { position: relative; z-index: 1; color: #fff8ea; margin: 0; line-height: 0.92; font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: clamp(34px, min(8.2vw, 14vh), 104px); letter-spacing: 0.5px; text-shadow: 0 4px 0 #b85e25, 0 7px 0 rgba(70, 35, 10, 0.5), 0 14px 30px rgba(0, 0, 0, 0.35); }
+#title .logo small { display: block; max-width: 44vw; font-size: 0.32em; letter-spacing: 1.5px; margin-top: 0.55em; color: #ffe9c4; text-shadow: 0 2px 0 rgba(70, 35, 10, 0.55); font-weight: 600; }
+#title .menu { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 10px; min-width: 250px; }
+#title .press { position: absolute; z-index: 1; left: 50%; bottom: calc(6vh + var(--safe-b)); transform: translateX(-50%); color: #fff; font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 22px; text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6); animation: pulse 1.6s ease-in-out infinite; white-space: nowrap; }
+#title .gallery { position: absolute; z-index: 1; left: calc(14px + var(--safe-l, 0px)); bottom: calc(10px + var(--safe-b)); color: rgba(255, 255, 255, 0.85); font-size: 13px; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6); text-decoration: none; }
+#title .credit a, #title .gallery { pointer-events: auto; }
+#title a.ext { color: rgba(255, 255, 255, 0.9); }
+#title a.ext:hover { text-decoration: underline; }
+@media (max-height: 500px) { #title .gallery, #title .credit { font-size: 11px; } }
+#title .credit { position: absolute; z-index: 1; right: calc(14px + var(--safe-r)); bottom: calc(10px + var(--safe-b)); color: rgba(255, 255, 255, 0.85); font-size: 13px; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6); }
+@keyframes pulse { 50% { opacity: 0.55; } }
+
+/* ------------------------------------------------------------ buttons and menus */
+.btn { font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 19px; line-height: 1.2; padding: 11px 26px; border: 0; border-radius: 14px; background: var(--paper); color: var(--ink); cursor: pointer; box-shadow: 0 3px 0 rgba(70, 45, 20, 0.35), 0 6px 14px rgba(0, 0, 0, 0.18); text-align: left; display: flex; align-items: center; gap: 10px; outline: none; transition: transform 0.08s; }
+.btn.primary { background: var(--orange); color: #fff; }
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(1px); }
+.btn[disabled], .btn.dis { opacity: 0.5; cursor: default; }
+.btn.small { font-size: 15px; padding: 7px 14px; border-radius: 10px; }
+.focus-ring:focus, .btn:focus, .focusable:focus { outline: 4px solid var(--gold); outline-offset: 3px; }
+/* polish (P4): one "selected" button at a time. The orange default (Resume, Continue, the open crew) gives up its fill
+   while focus is on a sibling, keeping only an orange edge, so the gold focus ring is the one selection on screen. */
+:has(> .btn:focus) > .btn.primary:not(:focus) { background: var(--paper); color: var(--ink); box-shadow: inset 5px 0 0 var(--orange), 0 3px 0 rgba(70, 45, 20, 0.35), 0 6px 14px rgba(0, 0, 0, 0.18); }
+.btn .ic { width: 1.15em; height: 1.15em; flex: none; }
+.btn .right { margin-left: auto; opacity: 0.75; font-size: 0.85em; }
+
+.overlay { position: fixed; inset: 0; z-index: 36; display: none; place-items: center; background: rgba(20, 24, 34, 0.5); }   /* above the title (35): Settings and Credits open over it */
+.overlay.on { display: grid; }
+.card { background: var(--cream); border-radius: 20px; padding: 22px 28px 18px; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35); color: var(--ink); max-width: min(92vw, 720px); max-height: calc(100vh - 40px); overflow: auto; }
+.card h2 { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 28px; margin: 0 0 12px; text-wrap: balance; }
+.card h3 { font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 19px; margin: 14px 0 6px; }
+.card p { margin: 6px 0; text-wrap: pretty; }
+.card .list { display: flex; flex-direction: column; gap: 8px; min-width: 280px; }
+.card .row { display: flex; gap: 10px; flex-wrap: wrap; }
+.card .reason { color: #8a3a1a; font-weight: 700; }
+.card .muted { color: #6a6058; font-size: 14px; }
+.hints { display: flex; gap: 16px; justify-content: flex-end; margin-top: 14px; font-size: 14px; color: #5a5048; flex-wrap: wrap; }
+.hints span { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+
+/* key caps and pad glyphs */
+.key { display: inline-flex; align-items: center; justify-content: center; min-width: 1.6em; height: 1.6em; padding: 0 0.4em; border-radius: 0.35em; background: #fffdf8; color: #2a2a2a; border: 1px solid rgba(0, 0, 0, 0.25); border-bottom-width: 3px; font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 0.85em; line-height: 1; box-sizing: border-box; }
+.pad { display: inline-block; width: 1.6em; height: 1.6em; vertical-align: middle; }
+.padtxt { display: inline-flex; align-items: center; justify-content: center; width: 1.6em; height: 1.6em; border-radius: 50%; color: #fff; font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 0.85em; }
+.padpill { display: inline-flex; align-items: center; justify-content: center; height: 1.5em; padding: 0 0.45em; border-radius: 0.5em; background: #333; color: #fff; font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 0.8em; }
+
+/* settings */
+.set { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 10px 18px; min-width: min(480px, 84vw); }
+.set label { font-weight: 700; }
+.slider { display: flex; align-items: center; gap: 10px; }
+.slider .track { width: 180px; height: 10px; border-radius: 6px; background: rgba(0, 0, 0, 0.15); position: relative; }
+.slider .fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 6px; background: var(--orange); }
+.slider .val { width: 42px; text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
+.choice { display: flex; gap: 6px; flex-wrap: wrap; }
+.choice .btn.on { background: var(--orange); color: #fff; }
+
+/* ------------------------------------------------------------ HUD */
+#hud { position: fixed; inset: 0; pointer-events: none; z-index: 10; color: var(--hud-ink); font-family: 'Fredoka', sans-serif; display: none; }
+#hud.on { display: block; }
+#hud .tl { position: absolute; left: calc(14px + var(--safe-l)); top: calc(12px + var(--safe-t)); display: grid; grid-template-columns: auto auto; gap: 4px 10px; align-items: center; }
+#hud .portrait { position: relative; width: 70px; height: 70px; grid-row: span 2; pointer-events: auto; cursor: pointer; }
+#hud .portrait img { position: absolute; left: 7px; top: 7px; width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 2px solid #fffaf0; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35); background: #d8cfc0; }
+#hud .portrait svg { position: absolute; inset: 0; width: 70px; height: 70px; }
+#hud .portrait .trk { fill: none; stroke: rgba(30, 30, 40, 0.35); stroke-width: 5; }
+#hud .portrait .stam { fill: none; stroke: #f4f1ea; stroke-width: 5; stroke-linecap: round; transition: stroke 0.2s; }
+#hud .portrait.low .stam { stroke: #e8682a; }
+#hud .portrait.boost .stam { stroke: var(--gold); }
+#hud .portrait .rkey { position: absolute; right: -4px; bottom: -2px; font-size: 13px; }
+#hud .feathers { display: flex; gap: 2px; }
+#hud .feathers svg { width: 24px; height: 24px; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5)); }
+#hud .feathers .off { opacity: 0.25; }
+#hud .carry { display: flex; align-items: center; gap: 8px; height: 40px; }
+#hud .slot { position: relative; width: 40px; height: 40px; border-radius: 12px; background: var(--hud-bg); display: grid; place-items: center; }
+#hud .slot svg.ring { position: absolute; inset: -3px; width: 46px; height: 46px; transform: rotate(-90deg); }
+#hud .slot svg.ring circle { fill: none; stroke-width: 3.5; }
+#hud .slot .ic { width: 26px; height: 26px; }
+#hud .slot { transition: opacity 0.2s; }
+#hud .slot.empty { opacity: 0; }   /* polish (P19): no empty ring when Gus carries nothing (its space stays, so nothing below jumps) */
+#hud .carry .lbl { font-size: 14px; font-weight: 600; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6); white-space: nowrap; }
+#hud .goal { grid-column: 1 / -1; max-width: min(380px, 42vw); margin-top: 6px; padding: 8px 28px 8px 12px; border-radius: 12px; background: var(--hud-bg); font-family: 'Nunito', sans-serif; font-size: 14px; line-height: 1.3; pointer-events: auto; position: relative; }
+#hud .goal b { font-family: 'Fredoka', sans-serif; font-weight: 600; display: block; font-size: 15px; text-wrap: balance; }   /* playtest: 'grate.' alone on a phone */
+#hud .goal .obst { opacity: 0.85; }
+#hud .goal .x { position: absolute; right: 4px; top: 2px; background: none; border: 0; color: #fff; opacity: 0.7; font-size: 16px; cursor: pointer; padding: 2px 6px; pointer-events: auto; }
+#hud .goal.off { display: none; }
+#hud .tr { position: absolute; right: calc(12px + var(--safe-r)); top: calc(10px + var(--safe-t)); display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+#hud .btns { display: flex; gap: 6px; pointer-events: auto; }
+#hud .hb { width: 44px; height: 44px; border-radius: 12px; border: 0; background: var(--hud-bg); color: #fff; display: grid; place-items: center; cursor: pointer; }
+#hud .hb .ic { width: 24px; height: 24px; }
+#hud .stats { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; max-width: 60vw; }
+#hud .chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 12px; background: var(--hud-bg); font-weight: 600; font-size: 16px; white-space: nowrap; }
+#hud .chip .ic { width: 18px; height: 18px; }
+#hud .chip.flash { animation: flash 0.5s ease-out 3; }
+#hud .chip.pop { animation: pop 0.35s ease-out; }
+@keyframes flash { 50% { background: rgba(196, 73, 45, 0.85); } }
+@keyframes pop { 40% { transform: scale(1.18); } }
+#hud .meters { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+/* playtest: the right-hand chips wrap before they reach the goal card on the left (it was overlapped below ~1150 px) */
+#hud .meters, #hud .stats { max-width: calc(100vw - min(380px, 42vw) - 48px - var(--safe-l, 0px) - var(--safe-r, 0px)); }
+#hud .chip.phase .ic { width: 22px; height: 22px; }
+#compass { position: absolute; left: 50%; top: calc(10px + var(--safe-t)); transform: translateX(-50%); width: min(460px, 38vw); height: 34px; border-radius: 17px; background: var(--hud-bg); overflow: hidden; }
+#compass .tick { position: absolute; top: 4px; transform: translateX(-50%); font-size: 13px; font-weight: 700; opacity: 0.85; }
+#compass .tick.minor { top: 8px; width: 2px; height: 8px; background: rgba(255, 255, 255, 0.5); }
+#compass .mk { position: absolute; top: 15px; transform: translateX(-50%); width: 18px; height: 18px; display: grid; place-items: center; }
+#compass .mk svg { width: 18px; height: 18px; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.6)); }
+#compass .mk .d { position: absolute; top: -12px; font-size: 10px; white-space: nowrap; opacity: 0.9; }
+#compass .mid { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: var(--gold); opacity: 0.8; }
+/* playtest: toasts sat at 54 px, under the right-hand chip rows (crumbs, flock, meters), which covered them; now below them */
+#toasts { position: absolute; z-index: 2; left: 50%; top: calc(172px + var(--safe-t)); transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.toast { padding: 7px 16px; border-radius: 18px; background: rgba(38, 32, 28, 0.72); color: #fff7e8; font-weight: 600; font-size: 16px; letter-spacing: 0.3px; white-space: nowrap; animation: tin 0.3s ease-out; }
+.toast.stamp { background: var(--orange); font-size: 18px; transform: rotate(-2deg); animation-name: tinStamp; }
+@keyframes tinStamp { from { opacity: 0; transform: translateY(-8px) rotate(-2deg); } }
+.toast.bad { background: rgba(140, 40, 30, 0.85); }
+@keyframes tin { from { opacity: 0; transform: translateY(-8px); } }
+#prompt { position: absolute; transform: translate(-50%, 0); padding: 6px 12px; border-radius: 14px; background: rgba(30, 26, 22, 0.66); color: #fff; font-weight: 600; font-size: 16px; white-space: nowrap; display: none; align-items: center; gap: 8px; }
+#prompt.on { display: inline-flex; }
+#tutor { position: absolute; transform: translate(-50%, -100%); padding: 10px 16px; border-radius: 16px; background: var(--paper); color: var(--ink); font-weight: 700; font-size: 20px; white-space: nowrap; display: none; align-items: center; gap: 10px; box-shadow: var(--shadow); }
+#tutor.on { display: inline-flex; animation: bob 1.4s ease-in-out infinite; }
+#tutor::after { content: ''; position: absolute; left: 50%; bottom: -9px; margin-left: -9px; border: 9px solid transparent; border-bottom: 0; border-top-color: var(--paper); }
+@keyframes bob { 50% { margin-top: -5px; } }
+#bubbles { position: fixed; inset: 0; pointer-events: none; z-index: 9; }
+.bubble { position: absolute; transform: translate(-50%, -100%); padding: 6px 12px; border-radius: 14px; background: #fffdf6; color: var(--ink); font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 15px; white-space: nowrap; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25); }
+.bubble::after { content: ''; position: absolute; left: 50%; bottom: -7px; margin-left: -7px; border: 7px solid transparent; border-bottom: 0; border-top-color: #fffdf6; }
+.bubble.thought { border-radius: 20px; font-style: italic; }
+.bubble.thought::after { width: 10px; height: 10px; border: 0; border-radius: 50%; background: #fffdf6; bottom: -14px; margin-left: -5px; }
+.bubble.clue { font-size: 22px; padding: 2px 12px; font-family: 'Fredoka', sans-serif; }
+.bubble.far { opacity: 0.8; font-size: 13px; }
+#hud .speed { position: absolute; right: calc(16px + var(--safe-r)); bottom: calc(16px + var(--safe-b)); }
+
+/* ------------------------------------------------------------ dialogue */
+#dialogue { position: fixed; left: 50%; bottom: calc(18px + var(--safe-b)); transform: translateX(-50%); width: min(820px, 94vw); z-index: 25; display: none; pointer-events: auto; cursor: pointer; }
+/* playtest: the shared 'tin' keyframes replaced this box's translateX(-50%), so each line slid in from the right half and jumped back */
+#dialogue.on { display: block; animation: din 0.25s ease-out; }
+@keyframes din { from { opacity: 0; transform: translate(-50%, 8px); } }
+#dialogue .panel { display: grid; grid-template-columns: 116px 1fr; gap: 16px; padding: 14px 18px 14px 14px; border-radius: 20px; background: var(--paper); color: var(--ink); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35); min-height: 122px; }
+#dialogue .frame { width: 116px; height: 128px; background: #fff; padding: 6px 6px 18px; box-sizing: border-box; border-radius: 4px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25); transform: rotate(-2.5deg); }
+#dialogue .panel.noportrait { grid-template-columns: 1fr; padding-left: 26px; }
+#dialogue .panel.noportrait .frame { display: none; }
+#dialogue .frame img { width: 104px; height: 104px; object-fit: cover; display: block; background: #d8cfc0; }
+#dialogue .name { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 20px; color: var(--orange-d); margin: 2px 0 4px; }
+#dialogue .text { font-size: 19px; line-height: 1.38; min-height: 3.2em; text-wrap: pretty; }
+#dialogue .next { position: absolute; right: 18px; bottom: 12px; font-size: 14px; color: #6a6058; display: flex; gap: 6px; align-items: center; }
+
+/* ------------------------------------------------------------ the Scheme Board */
+#board .card { width: min(1180px, 96vw); max-width: none; height: min(720px, 94vh); background: #b88a5a radial-gradient(rgba(0, 0, 0, 0.06) 1px, transparent 1.5px) 0 0 / 7px 7px; display: flex; flex-direction: column; padding: 16px 18px 12px; }
+#board .head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; color: #fff8ea; }
+#board .head h2 { color: #fff8ea; margin: 0; text-shadow: 0 2px 0 rgba(60, 30, 10, 0.45); }
+#board .gate { padding: 5px 12px; border-radius: 10px; background: rgba(40, 24, 10, 0.5); font-family: 'Fredoka', sans-serif; font-weight: 600; }
+#board .head .sp { flex: 1; }
+#board .lanes { flex: 1; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(190px, 1fr); gap: 12px; margin-top: 12px; overflow-x: auto; overflow-y: hidden; position: relative; }
+#board .lane { background: rgba(255, 248, 234, 0.16); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; min-height: 0; }
+#board .lane .lh { background: var(--paper); border-radius: 10px; padding: 8px 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); }
+#board .lane .lh .t { display: flex; align-items: center; gap: 8px; font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 17px; text-wrap: balance; }
+/* Polish-1: no lone last words in any Board title, card text or detail heading */
+#board h2, #board h3, #board .ti, #board .gl, #board .g, #board .st { text-wrap: balance; }
+#board .lane .lh .t .ic { width: 26px; height: 26px; flex: none; }
+#board .lane .lh .g { font-size: 13px; margin: 3px 0 5px; text-wrap: pretty; }
+#board .lane .lh .m { font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+#board .lane .lh .bar { flex: 1; height: 8px; border-radius: 4px; background: rgba(0, 0, 0, 0.14); overflow: hidden; }
+#board .lane .lh .bar i { display: block; height: 100%; background: var(--orange); }
+#board .pc { position: relative; background: #fff; padding: 9px 10px 10px; border-radius: 3px; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.28); transform: rotate(var(--r, -1deg)); color: var(--ink); cursor: pointer; }
+#board .pc::before { content: ''; position: absolute; left: 50%; top: -6px; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: var(--red); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4); }
+#board .pc.done { background: #f4f0e6; opacity: 0.92; }
+#board .pc.done::after { content: 'DONE'; position: absolute; right: 7px; top: 7px; font-family: 'Fredoka', sans-serif; font-weight: 700; color: var(--green); border: 2px solid var(--green); border-radius: 6px; padding: 0 4px; font-size: 11px; line-height: 15px; transform: rotate(8deg); background: rgba(244, 240, 230, 0.9); }
+/* polish (P10): a done card's title keeps clear of the stamp (it ran under it); postcards have no stamp, so their titles
+   use the card's whole width (they wrapped at ~100 px) */
+#board .pc.done .ti { margin-right: 52px; }
+#board .pc.pcard .ti { margin-right: 0; }
+#board .pc.tracked { outline: 3px solid var(--orange); }
+#board .pc:focus { outline: 4px solid var(--gold); outline-offset: 2px; }
+#board .pc .ti { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 16px; margin-right: 0; text-wrap: balance;   /* polish (P10): room for the stamp only on done cards */ }
+#board .pc .st { font-size: 12px; color: #7a6a5a; }
+#board .pc .gl { font-size: 14px; margin-top: 4px; font-weight: 700; }
+#board .pc .ob { font-size: 13px; color: #5a4a3a; margin-top: 2px; text-wrap: balance; }   /* playtest: "roost." sat alone on its line */
+#board .pc .nd { font-size: 13px; margin-top: 6px; padding: 5px 7px; border-radius: 6px; background: #fff3d6; }
+#board .pc .an { font-size: 13px; margin-top: 6px; padding: 5px 7px; border-radius: 6px; background: #e6f0dc; }
+#board .pc .tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
+#board .pc .tag { font-size: 11px; font-weight: 700; padding: 1px 6px; border-radius: 6px; background: #efe7d8; }
+#board .pc .tag.phase { background: #e3d9f2; }
+#board .pc .tag.cost { background: #f6e1cf; }
+#board .pc .tag.friend { background: #f2dede; display: inline-flex; align-items: center; gap: 3px; }   /* fun pass (P1): "a friend from the Slice Run" */
+#board .pc .tag.friend .ic { width: 12px; height: 12px; }
+#board .pc .acts { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+#board .foot { display: flex; gap: 10px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
+#board .foot .hints { margin: 0 0 0 auto; color: #fff3df; }
+#board .intro { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(40, 22, 10, 0.55); z-index: 3; }
+#board .intro .box { background: var(--paper); border-radius: 16px; padding: 16px 20px; display: flex; gap: 14px; align-items: center; max-width: 520px; box-shadow: var(--shadow); }
+#board .intro img { width: 96px; height: 96px; border-radius: 10px; object-fit: cover; }
+#board svg.strings { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+
+/* ------------------------------------------------------------ map */
+#map .card { width: min(1100px, 96vw); max-width: none; height: min(720px, 94vh); display: flex; flex-direction: column; padding: 14px 16px 12px; }
+#map .wrap { flex: 1; position: relative; overflow: hidden; border-radius: 12px; background: #2a3a2a; min-height: 0; cursor: crosshair; }
+#map canvas { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); image-rendering: auto; }
+#map .legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 13px; margin-top: 8px; align-items: center; }
+#map .legend span { display: inline-flex; align-items: center; gap: 4px; }
+#map .legend i { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+
+/* ------------------------------------------------------------ roster */
+#roster .card { width: min(1100px, 96vw); max-width: none; height: min(720px, 94vh); display: flex; flex-direction: column; }
+#roster .body { flex: 1; display: grid; grid-template-columns: 230px 1fr; gap: 14px; min-height: 0; }
+#roster .crews { overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding: 4px; }
+#roster .crews .btn { font-size: 15px; padding: 7px 10px; }
+#roster .crews .btn.joined { background: #e3efd6; }
+/* polish (P1): the open crew is orange with white text even when joined (it was white on the joined pale green) */
+#roster .crews .btn.joined.primary { background: var(--orange); color: #fff; }
+#roster .crews:has(> .btn:focus) > .btn.joined.primary:not(:focus) { background: #e3efd6; color: var(--ink); }
+#roster .page { overflow-y: auto; padding: 4px; }
+#roster .chars { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin-top: 8px; }
+#roster .ch { background: #fff; padding: 7px 7px 10px; border-radius: 4px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); }
+#roster .ch img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; background: #d8cfc0; }
+#roster .ch.locked img { filter: grayscale(1) brightness(0.7); }
+#roster .ch .n { font-family: 'Fredoka', sans-serif; font-weight: 700; margin-top: 5px; }
+#roster .ch .b { font-size: 12px; color: #5a4a3a; }
+#roster .mecha { display: grid; grid-template-columns: 220px 1fr; gap: 12px; align-items: center; }
+#roster .mecha > svg, #roster .mecha > img { width: 220px; height: 220px; }
+#roster .mecha > img { border-radius: 14px; background: radial-gradient(circle at 50% 42%, #fff6e4, #e4d6bf 70%); }
+/* playtest: the rule above also blew the parts list's little part icons up to 220 px (grey hexagons over the list) */
+#roster .mecha p { margin: 4px 0; }
+#roster .mecha p .ic { width: 18px; height: 18px; vertical-align: -3px; margin-right: 4px; }
+
+/* ------------------------------------------------------------ ally wheel */
+#wheel { position: fixed; inset: 0; z-index: 20; display: none; place-items: center; pointer-events: none; background: radial-gradient(rgba(20, 20, 30, 0.45), rgba(20, 20, 30, 0.2)); }
+#wheel.on { display: grid; }
+/* Fixes-1: while the wheel is up, the chips, meters, goal card and compass fade back, so the ring never sits on top of
+   readable text (phone landscape: the top ally covered the meters row). The portrait and feathers stay. */
+#hud .stats, #hud .meters, #hud .goal, #compass { transition: opacity 0.15s; }
+body.wheel-open #hud .stats, body.wheel-open #hud .meters, body.wheel-open #hud .goal, body.wheel-open #compass { opacity: 0.08; }
+/* Fixes-2 (P8): during cutscenes and showpieces (body.cine, set in main.js frameUi) the portrait, chips, meters, goal card
+   and compass step out of the picture; the pause/map/board buttons stay */
+#hud .tl { transition: opacity 0.3s; }
+body.cine #hud .tl, body.cine #hud .stats, body.cine #hud .meters, body.cine #hud .goal, body.cine #compass, body.cine #drivehud, body.cine #prompt { opacity: 0; transition: opacity 0.3s; }   /* Fixes-3 (R8): the drive dial and its prompt too */
+/* polish (P2): the ring's size, radius and portrait size come from ui/wheel.js layout() (fits the screen with the
+   names at full size; no transform scaling, which took the phone's names down to 7 px) */
+#wheel .ring { position: relative; width: 460px; height: 460px; pointer-events: auto; --p: 72px; }
+#wheel .al { position: absolute; width: calc(var(--p) + 30px); margin: calc(var(--p) / -2 - 3px) 0 0 calc(var(--p) / -2 - 15px); text-align: center; color: #fff; font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 13px; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
+#wheel .al img { width: var(--p); height: var(--p); box-sizing: border-box; border-radius: 50%; border: 3px solid #fffaf0; object-fit: cover; background: #d8cfc0; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4); }
+#wheel .al .nmx { position: relative; z-index: 1; margin-top: -7px; padding: 1px 7px; border-radius: 9px; background: rgba(28, 24, 22, 0.82); line-height: 16px; white-space: nowrap; }
+#wheel .al.sel .nmx { background: var(--gold); color: var(--ink); }
+#wheel .al.sel img { border-color: var(--gold); transform: scale(1.14); box-shadow: 0 0 0 4px var(--gold); }
+#wheel .al.off img { filter: grayscale(1) brightness(0.65); }
+/* the 1–9, 0 keys: a small badge on the portrait's rim (keyboard only; wheel.js sets .keys) */
+#wheel .al .k { display: none; position: absolute; left: 10px; top: -2px; z-index: 2; width: 19px; height: 19px; border-radius: 50%; background: #2b2622; color: #fffaf0; font-size: 12px; line-height: 19px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5); }
+#wheel.keys .al .k:not(:empty) { display: block; }
+#wheel .center { position: absolute; left: 50%; top: 50%; width: 210px; transform: translate(-50%, -50%); text-align: center; background: var(--paper); color: var(--ink); border-radius: 18px; padding: 12px; box-shadow: var(--shadow); }
+#wheel .center .nm { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 18px; }
+#wheel .center .why { color: #8a3a1a; font-weight: 700; font-size: 14px; }
+#wheel .center .act { font-size: 14px; margin-top: 4px; }
+
+/* ------------------------------------------------------------ fades */
+#fade { position: fixed; inset: 0; z-index: 28; background: #141a2a; opacity: 0; pointer-events: none; transition: opacity 0.4s; display: grid; place-items: center; }
+#fade.on { opacity: 1; }
+#fade .msg { color: #fff6e6; font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 28px; text-align: center; text-wrap: balance; max-width: 80vw; }
+/* polish (P18): the nap: a dusk-to-night sky and Gus asleep on his lamppost (assets/ui/nap-gus.jpg), breathing slowly */
+#fade.nap { background: radial-gradient(ellipse at 50% 38%, #3b3768 0%, #232647 45%, #141a2a 100%); }
+#fade .napimg { display: block; width: min(240px, 42vh); height: min(240px, 42vh); margin: 0 auto 22px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 4px rgba(255, 246, 230, 0.85), 0 12px 40px rgba(0, 0, 0, 0.45); animation: napBreathe 2.6s ease-in-out infinite; }
+@keyframes napBreathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.025); } }
+#nap .ic.tod [fill="#f3ecc8"] { fill: #6d5fa8; }   /* polish (P18): the moon was cream on the cream button */
+#nap .card > p.muted, #nap p.muted { margin-bottom: 14px; }
+#fade .msg small { display: block; font-size: 18px; opacity: 0.85; margin-top: 8px; font-family: 'Nunito', sans-serif; }
+#fade.feathers { background: radial-gradient(#f6efe2, #d8c8a8); }
+#fade.feathers .msg { color: var(--ink); }
+
+/* turn your phone */
+#turn { position: fixed; inset: 0; z-index: 60; display: none; place-items: center; background: #26351f; color: #fff8ea; text-align: center; font-family: 'Fredoka', sans-serif; font-size: 22px; }
+@media (orientation: portrait) and (pointer: coarse) { #turn { display: grid; } }
+#turn img { width: 120px; height: 120px; border-radius: 50%; animation: tilt 2s ease-in-out infinite; display: block; margin: 0 auto 14px; }
+@keyframes tilt { 50% { transform: rotate(-90deg); } }
+
+/* touch HUD tweaks */
+body.touch #hud .portrait .rkey, body.touch .hints, body.touch #map .legend span.hints { display: none; }
+/* polish (P8): a phone (no hover, coarse pointer) never shows keyboard hints, even after a stray key event; a controller does */
+@media (hover: none) and (pointer: coarse) { body:not(.pad) .hints, body:not(.pad) #map .legend span.hints, body:not(.pad) #hud .portrait .rkey { display: none; } }
+@media (max-height: 460px) {
+  #hud .goal { max-width: 34vw; font-size: 12px; }
+  #hud .meters, #hud .stats { max-width: calc(66vw - 48px - var(--safe-l, 0px) - var(--safe-r, 0px)); }
+  #compass { width: 30vw; }
+  .card { padding: 14px 16px; }
+  .card h2 { font-size: 22px; }
+  #dialogue .panel { grid-template-columns: 80px 1fr; min-height: 90px; }
+  #dialogue .panel.noportrait { grid-template-columns: 1fr; }
+  #dialogue .frame { width: 80px; height: 90px; } #dialogue .frame img { width: 68px; height: 68px; }
+  #dialogue .text { font-size: 15px; }
+}
+#controls .card { width: min(92vw, 780px); max-width: none; }
+/* polish (P19): one width for the small list menus (Pause was 336 px, Nap stretched to 776 px by its paragraph) */
+#pause .card, #nest .card, #nap .card, #confirm .card, #grates .card { width: min(460px, 92vw); box-sizing: border-box; }
+#pause .card .list, #nest .card .list, #nap .card .list, #grates .card .list { min-width: 0; }
+#controls .cards { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+@media (max-width: 700px) { #controls .cards { grid-template-columns: 1fr !important; } }
+#roster .body { grid-template-columns: 270px 1fr; }
+#roster .crews .btn span { white-space: normal; text-align: left; }
+#roster .ch .b, #roster .ch .n { text-wrap: balance; }
+#title .logo small { text-wrap: balance; }
+@media (max-height: 460px) {
+  #pause .list { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  #pause .btn { font-size: 15px; padding: 7px 12px; }
+  #pause h2 { margin-bottom: 6px; }
+}
+
+/* ------------------------------------------------------------ milestone 3a: encounter panel, driving HUD, clue icons */
+#panel { position: absolute; left: 50%; top: calc(150px + var(--safe-t)); transform: translateX(-50%); display: none; flex-direction: column; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 16px; background: var(--hud-bg); color: #fff; font-weight: 700; font-size: 16px; min-width: 220px; }
+#panel.on { display: flex; }
+#hud.panelon #toasts { top: calc(232px + var(--safe-t)); }
+#panel .row { display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+#panel .meter { width: 220px; height: 14px; border-radius: 7px; background: rgba(255, 255, 255, 0.18); overflow: hidden; }
+#panel .meter i { display: block; height: 100%; background: linear-gradient(90deg, #8fd36a, #f2c230 60%, #e8462f); transition: width 0.1s; }
+#panel .meter.calm i { background: #8fd36a; }
+#panel .pips { display: flex; gap: 6px; }
+#panel .pips i { width: 14px; height: 14px; border-radius: 50%; background: rgba(255, 255, 255, 0.25); border: 2px solid rgba(255, 255, 255, 0.6); }
+#panel .pips i.on { background: var(--gold); border-color: #fff; }
+#panel .big { font-family: 'Fredoka', sans-serif; font-size: 26px; letter-spacing: 0.5px; }
+#panel .sub { font-size: 13px; font-weight: 600; opacity: 0.85; }
+#panel .warn { color: #ffb38a; }
+#panel .arrow { font-size: 28px; color: var(--gold); line-height: 1; }
+#drivehud { position: absolute; left: 50%; bottom: calc(18px + var(--safe-b)); transform: translateX(-50%); display: none; align-items: flex-end; gap: 14px; }
+#drivehud.on { display: flex; }
+#drivehud .dial { position: relative; width: 130px; height: 84px; border-radius: 16px; background: var(--hud-bg); display: grid; place-items: center; }
+#drivehud .dial svg { position: absolute; left: 5px; top: 6px; width: 120px; height: 70px; }
+#drivehud .dial .trk { fill: none; stroke: rgba(255, 255, 255, 0.2); stroke-width: 8; stroke-linecap: round; }
+#drivehud .dial .val { fill: none; stroke: var(--gold); stroke-width: 8; stroke-linecap: round; }
+#drivehud .dial b { position: absolute; top: 32px; font: 700 26px 'Fredoka', sans-serif; color: #fff; }
+#drivehud .dial .unit { position: absolute; top: 60px; font-size: 11px; font-weight: 700; color: #fff; opacity: 0.8; }
+#drivehud .dial .vn { position: absolute; top: -20px; font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7); }
+#drivehud .hopper { display: flex; flex-direction: column; gap: 4px; padding: 8px 12px; border-radius: 14px; background: var(--hud-bg); color: #fff; font-weight: 700; font-size: 13px; }
+#drivehud .hopper .bar { width: 120px; height: 14px; border-radius: 7px; background: rgba(255, 255, 255, 0.2); overflow: hidden; }
+#drivehud .hopper .bar i { display: block; height: 100%; background: #dff3ff; }
+#drivehud .hopper.full .bar i { background: var(--gold); }
+#drivehud .dp { display: flex; flex-direction: column; gap: 4px; }
+#drivehud .dp .k { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 14px; background: rgba(30, 26, 22, 0.66); color: #fff; font-weight: 600; font-size: 15px; white-space: nowrap; }
+.bubble.icon { padding: 3px; border-radius: 50%; }
+.bubble.icon img { width: 40px; height: 40px; border-radius: 50%; display: block; }
+#board .pc.pcard .ti { text-wrap: balance; }
+#board .pc.todo { opacity: 0.62; background: #f3ece0; }
+
+/* ------------------------------------------------------------ M4: credits, the bug report form */
+#credits .card { width: min(680px, 92vw); text-align: center; }
+#credits .credits-body { max-height: min(58vh, 560px); overflow: auto; padding: 0 8px; outline: none; }
+#credits .credits-body h2 { font-family: 'Fredoka', sans-serif; font-size: 17px; letter-spacing: 1px; text-transform: uppercase; color: var(--orange-d); margin: 18px 0 4px; }
+#credits .credits-body p { margin: 3px 0; text-wrap: balance; }
+#credits .credits-body .big { font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 22px; }
+#credits .credits-body .small { font-size: 13px; color: #5a5048; }
+/* polish (P19): section breaks, the crews as one flowing list, a fade at the cut edges and a "Scroll for more" cue */
+#credits .credits-wrap { position: relative; }
+#credits .credits-wrap::before, #credits .credits-wrap::after { content: ''; position: absolute; left: 0; right: 12px; height: 34px; pointer-events: none; transition: opacity 0.2s; z-index: 1; }
+#credits .credits-wrap::before { top: 0; background: linear-gradient(var(--cream), rgba(246, 239, 226, 0)); }
+#credits .credits-wrap::after { bottom: 0; background: linear-gradient(rgba(246, 239, 226, 0), var(--cream)); }
+#credits .credits-wrap.top::before, #credits .credits-wrap.end::after { opacity: 0; }
+#credits .credits-wrap .more { position: absolute; left: 50%; bottom: 4px; transform: translateX(-50%); z-index: 2; font: 600 13px 'Fredoka', sans-serif; color: var(--orange-d); background: var(--paper); padding: 2px 12px; border-radius: 10px; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15); pointer-events: none; transition: opacity 0.2s; }
+#credits .credits-wrap.end .more { opacity: 0; }
+#credits .credits-body h2 ~ h2 { border-top: 2px dashed #e0cfb4; padding-top: 14px; margin-top: 20px; }
+#credits .credits-body .crewlist { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px 0; max-width: 540px; margin: 0 auto; }
+#credits .credits-body .crewlist p.crew { margin: 2px 0; }
+#credits .credits-body .crewlist p.crew:not(:last-child)::after { content: '·'; margin: 0 8px; color: #b9a283; }
+#credits .row, #settings .row.more { justify-content: center; }
+gh-feedback { -webkit-user-select: text; user-select: text; touch-action: auto; }
+/* the form in the game's own look: its fonts and the cream card (vendored copy stays unchanged) */
+gh-feedback { --gh-feedback-bg: var(--cream); --gh-feedback-text: var(--ink); --gh-feedback-input-bg: var(--paper); --gh-feedback-border: #d9cbb2; }
+gh-feedback::part(popup) { font-family: 'Nunito', system-ui, sans-serif; font-size: 15px; border-radius: 18px; }
+
+/* M4: short landscape screens (phones held sideways): compact title menu, settings in two columns, a smaller report form */
+@media (max-height: 500px) {
+  /* polish (P8, scarf Back): the Board's header fits one row; the scarf list is compact so Back shows without scrolling */
+  #board .head { gap: 8px; }
+  #board .head h2 { font-size: 22px; }
+  #board .head .btn.small { padding: 5px 10px; font-size: 14px; }
+  #scarf .card > p.muted { margin: 0 0 6px; }
+  #scarf .list .btn.small { padding: 3px 10px; }
+  #scarf .list .btn.small img { width: 26px !important; height: 26px !important; }
+  #scarf .row { margin-top: 6px !important; }
+  #scarf .row .btn { padding: 6px 18px; font-size: 16px; }
+  #title .menu { gap: 7px; min-width: 220px; }
+  #title .menu .btn { font-size: 17px; padding: 8px 22px; }
+  #title .logo small { max-width: 60vw; }
+  .card { padding: 12px 18px 10px; max-height: calc(100vh - 16px); }
+  .card h2 { font-size: 22px; margin-bottom: 6px; }
+  #settings .card { max-width: 96vw; }
+  #settings .set { grid-template-columns: auto minmax(150px, 1fr) auto minmax(150px, 1fr); gap: 6px 14px; }
+  #settings .set .slider .track { width: 110px; }
+  #settings .set .btn.small { padding: 5px 12px; }
+  #settings .set > label:last-of-type { grid-column: 1; }
+  #settings .set .choice { grid-column: span 3; flex-wrap: nowrap; }   /* Graphics: its own row, buttons in one line */
+  #settings .card > .muted { margin: 6px 0 0; font-size: 13px; }
+  #settings .row.more { margin-top: 6px !important; }
+  #settings .row.more .btn { padding: 7px 18px; font-size: 16px; }
+  gh-feedback::part(popup) { width: min(560px, 92vw); padding: 12px 18px; max-height: calc(100vh - 12px); max-height: calc(100dvh - 12px); }
+}

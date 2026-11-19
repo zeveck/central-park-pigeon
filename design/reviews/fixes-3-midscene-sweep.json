@@ -1,0 +1,6698 @@
+{
+ "rows": {
+  "prologue.s1": {
+   "key": "prologue.s1",
+   "scripts": "prologue.feeders",
+   "b": {
+    "quitIn": "prologue-crumbs @0.5s",
+    "save": {
+     "t": 0.5,
+     "steps": {},
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {
+     "cutscene": "prologue-intro",
+     "bodyClass": [
+      "cine"
+     ]
+    },
+    "trigger": "flip: nothing spent",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "prologue-crumbs @1.22s",
+    "save": {
+     "t": 0.5,
+     "steps": {},
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 0.5,
+     "steps": {},
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {
+     "cutscene": "prologue-intro",
+     "cameraLocked": true,
+     "bodyClass": [
+      "cine"
+     ]
+    },
+    "trigger": "flip: nothing spent",
+    "completed": "yes"
+   },
+   "fixture": "prologue",
+   "via": "goals",
+   "secs": 183,
+   "consoleErrors": [],
+   "at": "2026-11-19T04:16:16.299Z"
+  },
+  "prologue.s2": {
+   "key": "prologue.s2",
+   "scripts": "prologue.frenzy",
+   "b": {
+    "quitIn": "prologue-frenzy @0.52s",
+    "save": {
+     "t": 31.2,
+     "steps": {
+      "prologue": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "signsLive: nothing spent",
+    "retrigger": "scene run again (replay from the fixture)",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "prologue-frenzy @1.22s",
+    "save": {
+     "t": 31.2,
+     "steps": {
+      "prologue": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 31.2,
+     "steps": {
+      "prologue": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "signsLive: nothing spent",
+    "completed": "trigger available: signsLive: nothing spent"
+   },
+   "fixture": "prologue.s2",
+   "goalsFailed": "goal script could not pick up here (an earlier pass)",
+   "via": "replay",
+   "secs": 197,
+   "consoleErrors": [],
+   "at": "2026-11-19T04:19:33.487Z"
+  },
+  "prologue.s3": {
+   "key": "prologue.s3",
+   "scripts": "prologue.end",
+   "b": {
+    "quitIn": "prologue-end @0.52s",
+    "save": {
+     "t": 69.8,
+     "steps": {
+      "prologue": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "auto: nothing spent",
+    "retrigger": "scene run again (replay from the fixture)",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "prologue-end @1.22s",
+    "save": {
+     "t": 69.8,
+     "steps": {
+      "prologue": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 69.8,
+     "steps": {
+      "prologue": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {
+     "cutscene": "prologue-end",
+     "busy": [
+      "prologue"
+     ],
+     "bodyClass": [
+      "cine"
+     ]
+    },
+    "trigger": "auto: nothing spent",
+    "completed": "trigger available: auto: nothing spent"
+   },
+   "fixture": "prologue.s3",
+   "goalsFailed": "goal script could not pick up here (an earlier pass)",
+   "via": "replay",
+   "secs": 327,
+   "consoleErrors": [],
+   "at": "2026-11-19T04:25:00.668Z"
+  },
+  "den-ducks.s1": {
+   "key": "den-ducks.s1",
+   "scripts": "ducks.meet",
+   "b": {
+    "quitIn": "(script) @0.52s",
+    "save": {
+     "t": 95.3,
+     "steps": {
+      "prologue": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "talk: nothing spent",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "(script) @1.22s",
+    "save": {
+     "t": 95.3,
+     "steps": {
+      "prologue": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 95.3,
+     "steps": {
+      "prologue": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "talk: nothing spent",
+    "completed": "yes"
+   },
+   "fixture": "den-ducks",
+   "via": "goals",
+   "secs": 217,
+   "consoleErrors": [],
+   "at": "2026-11-19T04:28:37.602Z"
+  },
+  "den-ducks.s3": {
+   "key": "den-ducks.s3",
+   "scripts": "ducks.join",
+   "b": {
+    "quitIn": "ducks-join @0.5s",
+    "save": {
+     "t": 164.9,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 2
+     },
+     "carried": "peas",
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": "peas",
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "peas at hand",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "ducks-join @1.2s",
+    "save": {
+     "t": 164.9,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 2
+     },
+     "carried": "peas",
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 164.9,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 2
+     },
+     "carried": "peas",
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": "peas",
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "peas at hand",
+    "completed": "yes"
+   },
+   "fixture": "den-ducks.s3",
+   "via": "goals",
+   "secs": 180,
+   "consoleErrors": [],
+   "at": "2026-11-19T04:31:37.785Z"
+  },
+  "den-raccoons.s1": {
+   "key": "den-raccoons.s1",
+   "scripts": "raccoons.meet",
+   "b": {
+    "quitIn": "(script) @0.52s",
+    "save": {
+     "t": 1501.3,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "talk: nothing spent",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "(script) @1.22s",
+    "save": {
+     "t": 1501.3,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 1501.3,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "talk: nothing spent",
+    "completed": "yes"
+   },
+   "fixture": "den-raccoons",
+   "via": "goals",
+   "secs": 206,
+   "consoleErrors": [],
+   "at": "2026-11-19T04:35:03.959Z"
+  },
+  "den-raccoons.s2": {
+   "key": "den-raccoons.s2",
+   "scripts": "raccoons.wrench",
+   "b": {
+    "quitIn": "(script) @0.52s",
+    "save": {
+     "t": 1623,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "trade wrench open / pickup: nothing spent",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "(script) @1.22s",
+    "save": {
+     "t": 1679.8,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 1679.8,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "trade wrench open / pickup: nothing spent",
+    "completed": "yes"
+   },
+   "fixture": "den-raccoons.s2",
+   "via": "goals",
+   "secs": 375,
+   "consoleErrors": [],
+   "at": "2026-11-19T04:41:19.146Z"
+  },
+  "den-raccoons.s3": {
+   "key": "den-raccoons.s3",
+   "scripts": "raccoons.join",
+   "b": {
+    "quitIn": "raccoons-join @0.52s",
+    "save": {
+     "t": 1626.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 2
+     },
+     "carried": "wrench",
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": "wrench",
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "wrench at hand",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "raccoons-join @1.22s",
+    "save": {
+     "t": 1626.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 2
+     },
+     "carried": "wrench",
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 1626.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 2
+     },
+     "carried": "wrench",
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": "wrench",
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "wrench at hand",
+    "completed": "yes"
+   },
+   "fixture": "den-raccoons.s3",
+   "via": "goals",
+   "secs": 215,
+   "consoleErrors": [],
+   "at": "2026-11-19T04:44:54.653Z"
+  },
+  "sab-middle.s1": {
+   "key": "sab-middle.s1",
+   "scripts": "sab.middle.gate",
+   "b": {
+    "quitIn": "(script) @0.52s",
+    "save": {
+     "t": 1764.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "boathouse.gateOpen not yet (redo the action)",
+    "retrigger": "scene run again (replay from the fixture)",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "(script) @1.22s",
+    "save": {
+     "t": 1764.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 1764.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "boathouse.gateOpen not yet (redo the action)",
+    "completed": "trigger available: boathouse.gateOpen not yet (redo the action)"
+   },
+   "fixture": "sab-middle",
+   "goalsFailed": "goal script could not pick up here (an earlier pass)",
+   "via": "replay",
+   "secs": 354,
+   "consoleErrors": [],
+   "at": "2026-11-19T04:50:49.199Z"
+  },
+  "sab-middle.s2": {
+   "key": "sab-middle.s2",
+   "scripts": "sab.middle.done",
+   "b": {
+    "quitIn": "(script) @0.52s",
+    "save": {
+     "t": 1769.4,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "clue cart-middle unspent",
+    "retrigger": "scene run again (replay from the fixture)",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "(script) @1.22s",
+    "save": {
+     "t": 1769.4,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 1769.4,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "clue cart-middle unspent",
+    "completed": "trigger available: clue cart-middle unspent"
+   },
+   "fixture": "sab-middle.s2",
+   "goalsFailed": "goal script could not pick up here (an earlier pass)",
+   "via": "replay",
+   "secs": 200,
+   "consoleErrors": [],
+   "at": "2026-11-19T04:54:09.929Z"
+  },
+  "sab-north.s2": {
+   "key": "sab-north.s2",
+   "scripts": "sab.north.done",
+   "b": {
+    "quitIn": "(script) @0.52s",
+    "save": {
+     "t": 1715.7,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "clue cart-north unspent",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "(script) @1.22s",
+    "save": {
+     "t": 1715.7,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 1715.7,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "clue cart-north unspent",
+    "completed": "yes"
+   },
+   "fixture": "sab-north.s2",
+   "via": "goals",
+   "secs": 215,
+   "consoleErrors": [],
+   "at": "2026-11-19T04:57:44.490Z"
+  },
+  "part-eyes.s1": {
+   "key": "part-eyes.s1",
+   "error": "Error: page.evaluate: Error: no fixture part-eyes\n    at Object.goToScheme (http://127.0.0.1:8261/src/debug.js:178:24)\n    at async <anonymous>:381:23",
+   "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 404 (File not found)"
+   ],
+   "at": "2026-11-19T04:57:44.584Z"
+  },
+  "den-choir.s1": {
+   "key": "den-choir.s1",
+   "scripts": "choir.meet",
+   "b": {
+    "quitIn": "(script) @0.52s",
+    "save": {
+     "t": 1991.1,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 2,
+      "part-eyes": 1,
+      "part-body": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "talk: nothing spent",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "(script) @1.22s",
+    "save": {
+     "t": 1991.1,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 2,
+      "part-eyes": 1,
+      "part-body": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 1991.1,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 2,
+      "part-eyes": 1,
+      "part-body": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "talk: nothing spent",
+    "completed": "yes"
+   },
+   "fixture": "den-choir",
+   "via": "goals",
+   "secs": 197,
+   "consoleErrors": [],
+   "at": "2026-11-19T05:03:23.657Z"
+  },
+  "den-choir.s2": {
+   "key": "den-choir.s2",
+   "scripts": "choir.signs",
+   "b": {
+    "quitIn": "(script) @0.5s",
+    "save": {
+     "t": 2018.8,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 2,
+      "part-eyes": 1,
+      "part-body": 3,
+      "den-choir": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "signsLive: nothing spent",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "(script) @1.2s",
+    "save": {
+     "t": 2018.8,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 2,
+      "part-eyes": 1,
+      "part-body": 3,
+      "den-choir": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 2018.8,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 2,
+      "part-eyes": 1,
+      "part-body": 3,
+      "den-choir": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "signsLive: nothing spent",
+    "completed": "yes"
+   },
+   "fixture": "den-choir.s2",
+   "via": "goals",
+   "secs": 198,
+   "consoleErrors": [],
+   "at": "2026-11-19T05:06:41.198Z"
+  },
+  "den-choir.s3": {
+   "key": "den-choir.s3",
+   "scripts": "choir.join",
+   "b": {
+    "quitIn": "choir-join @0.5s",
+    "save": {
+     "t": 2155.8,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 2,
+      "part-eyes": 1,
+      "part-body": 3,
+      "den-choir": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "coo: nothing spent",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "choir-join @1.2s",
+    "save": {
+     "t": 2155.8,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 2,
+      "part-eyes": 1,
+      "part-body": 3,
+      "den-choir": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 2155.8,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 2,
+      "part-eyes": 1,
+      "part-body": 3,
+      "den-choir": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "coo: nothing spent",
+    "completed": "yes"
+   },
+   "fixture": "den-choir.s3",
+   "via": "goals",
+   "secs": 180,
+   "consoleErrors": [],
+   "at": "2026-11-19T05:09:40.804Z"
+  },
+  "den-rats.s1": {
+   "key": "den-rats.s1",
+   "scripts": "rats.meet",
+   "b": {
+    "quitIn": "(script) @0.52s",
+    "save": {
+     "t": 367.8,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "talk: nothing spent",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "(script) @1.22s",
+    "save": {
+     "t": 367.8,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 367.8,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "talk: nothing spent",
+    "completed": "yes"
+   },
+   "fixture": "den-rats",
+   "via": "goals",
+   "secs": 186,
+   "consoleErrors": [],
+   "at": "2026-11-19T05:12:46.598Z"
+  },
+  "den-rats.s3": {
+   "key": "den-rats.s3",
+   "scripts": "rats.join",
+   "b": {
+    "quitIn": "rats-relay @0.52s",
+    "save": {
+     "t": 406.9,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 2
+     },
+     "carried": "slice",
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": "slice",
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "slice at hand",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "rats-relay @1.22s",
+    "save": {
+     "t": 406.9,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 2
+     },
+     "carried": "slice",
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 406.9,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 2
+     },
+     "carried": "slice",
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": "slice",
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "slice at hand",
+    "completed": "yes"
+   },
+   "fixture": "den-rats.s3",
+   "via": "goals",
+   "secs": 187,
+   "consoleErrors": [],
+   "at": "2026-11-19T05:15:53.843Z"
+  },
+  "den-cats.s1": {
+   "key": "den-cats.s1",
+   "scripts": "cats.meet",
+   "b": {
+    "quitIn": "(script) @0.52s",
+    "save": {
+     "t": 427.8,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "talk: nothing spent",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "(script) @1.22s",
+    "save": {
+     "t": 427.8,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 427.8,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "talk: nothing spent",
+    "completed": "yes"
+   },
+   "fixture": "den-cats",
+   "via": "goals",
+   "secs": 186,
+   "consoleErrors": [],
+   "at": "2026-11-19T05:18:59.555Z"
+  },
+  "den-cats.s3": {
+   "key": "den-cats.s3",
+   "scripts": "cats.join",
+   "b": {
+    "quitIn": "cats-join @0.52s",
+    "save": {
+     "t": 548.2,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 2
+     },
+     "carried": "slice-anchovy",
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": "slice-anchovy",
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "slice-anchovy at hand / slice-anchovy at hand",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "cats-join @1.22s",
+    "save": {
+     "t": 548.2,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 2
+     },
+     "carried": "slice-anchovy",
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 548.2,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 2
+     },
+     "carried": "slice-anchovy",
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": "slice-anchovy",
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "slice-anchovy at hand / slice-anchovy at hand",
+    "completed": "yes"
+   },
+   "fixture": "den-cats.s3",
+   "via": "goals",
+   "secs": 187,
+   "consoleErrors": [],
+   "at": "2026-11-19T05:22:06.130Z"
+  },
+  "part-body.s1": {
+   "key": "part-body.s1",
+   "scripts": "body.fedup",
+   "b": {
+    "quitIn": "(script) @0.52s",
+    "save": {
+     "t": 1797.9,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 2,
+      "part-eyes": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "signsLive: nothing spent / slice NOT at hand",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "(script) @1.22s",
+    "save": {
+     "t": 1797.9,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 2,
+      "part-eyes": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 1797.9,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 2,
+      "part-eyes": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "signsLive: nothing spent / slice NOT at hand",
+    "completed": "yes"
+   },
+   "fixture": "part-body",
+   "via": "goals",
+   "secs": 218,
+   "consoleErrors": [],
+   "at": "2026-11-19T05:25:44.182Z"
+  },
+  "part-body.s2": {
+   "key": "part-body.s2",
+   "scripts": "fight.vinnie",
+   "b": {
+    "quitIn": "(script) @0.52s",
+    "save": {
+     "t": 1839.2,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 2,
+      "part-eyes": 1,
+      "part-body": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "ask: nothing spent",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "(script) @1.22s",
+    "save": {
+     "t": 1839.2,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 2,
+      "part-eyes": 1,
+      "part-body": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 1839.2,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 2,
+      "part-eyes": 1,
+      "part-body": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "ask: nothing spent",
+    "completed": "yes"
+   },
+   "fixture": "part-body.s2",
+   "via": "goals",
+   "secs": 205,
+   "consoleErrors": [],
+   "at": "2026-11-19T05:29:09.210Z"
+  },
+  "part-body.s3": {
+   "key": "part-body.s3",
+   "scripts": "body.home",
+   "b": {
+    "quitIn": "(script) @0.52s",
+    "save": {
+     "t": 1877.2,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 2,
+      "part-eyes": 1,
+      "part-body": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "reach: nothing spent",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "(script) @1.22s",
+    "save": {
+     "t": 1877.2,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 2,
+      "part-eyes": 1,
+      "part-body": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 1877.2,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 2,
+      "part-eyes": 1,
+      "part-body": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "reach: nothing spent",
+    "completed": "yes"
+   },
+   "fixture": "part-body.s3",
+   "via": "goals",
+   "secs": 295,
+   "consoleErrors": [],
+   "at": "2026-11-19T05:34:03.919Z"
+  },
+  "truce-cats-rats.s1": {
+   "key": "truce-cats-rats.s1",
+   "scripts": "catsrats.bins",
+   "b": {
+    "quitIn": "(script) @0.5s",
+    "save": {
+     "t": 2516.8,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 2,
+      "part-eyes": 1,
+      "part-body": 3,
+      "den-choir": 3,
+      "part-beak": 4,
+      "den-turtles": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "reach: nothing spent",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "(script) @1.2s",
+    "save": {
+     "t": 2516.8,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 2,
+      "part-eyes": 1,
+      "part-body": 3,
+      "den-choir": 3,
+      "part-beak": 4,
+      "den-turtles": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 2516.8,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 2,
+      "part-eyes": 1,
+      "part-body": 3,
+      "den-choir": 3,
+      "part-beak": 4,
+      "den-turtles": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "reach: nothing spent",
+    "completed": "yes"
+   },
+   "fixture": "truce-cats-rats",
+   "via": "goals",
+   "secs": 259,
+   "consoleErrors": [],
+   "at": "2026-11-19T05:38:23.123Z"
+  },
+  "truce-cats-rats.s3": {
+   "key": "truce-cats-rats.s3",
+   "scripts": "catsrats.truce",
+   "b": {
+    "quitIn": "catsrats-truce @0.5s",
+    "save": {
+     "t": 2650.2,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 2,
+      "part-eyes": 1,
+      "part-body": 3,
+      "den-choir": 3,
+      "part-beak": 4,
+      "den-turtles": 3,
+      "truce-cats-rats": 2
+     },
+     "carried": "box",
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": "box",
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "boxOpened: nothing spent",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "catsrats-truce @1.2s",
+    "save": {
+     "t": 2650.2,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 2,
+      "part-eyes": 1,
+      "part-body": 3,
+      "den-choir": 3,
+      "part-beak": 4,
+      "den-turtles": 3,
+      "truce-cats-rats": 2
+     },
+     "carried": "box",
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 2650.2,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 2,
+      "part-eyes": 1,
+      "part-body": 3,
+      "den-choir": 3,
+      "part-beak": 4,
+      "den-turtles": 3,
+      "truce-cats-rats": 2
+     },
+     "carried": "box",
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": "box",
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "boxOpened: nothing spent",
+    "completed": "yes"
+   },
+   "fixture": "truce-cats-rats.s3",
+   "via": "goals",
+   "secs": 272,
+   "consoleErrors": [],
+   "at": "2026-11-19T05:42:55.684Z"
+  },
+  "den-songbirds.s1": {
+   "key": "den-songbirds.s1",
+   "scripts": "songbirds.roost",
+   "b": {
+    "quitIn": "songbirds-roost @0.5s",
+    "save": {
+     "t": 2220.5,
+     "steps": {
+      "prologue": 3,
+      "den-cats": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "reach: nothing spent",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "songbirds-roost @1.2s",
+    "save": {
+     "t": 2220.5,
+     "steps": {
+      "prologue": 3,
+      "den-cats": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 2220.5,
+     "steps": {
+      "prologue": 3,
+      "den-cats": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "reach: nothing spent",
+    "completed": "yes"
+   },
+   "fixture": "den-songbirds",
+   "via": "goals",
+   "secs": 275,
+   "consoleErrors": [],
+   "at": "2026-11-19T05:51:05.062Z"
+  },
+  "den-songbirds.s2": {
+   "key": "den-songbirds.s2",
+   "scripts": "songbirds.cornice",
+   "b": {
+    "quitIn": "(script) @0.5s",
+    "save": {
+     "t": 2248.6,
+     "steps": {
+      "prologue": 3,
+      "den-cats": 3,
+      "den-songbirds": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "spike.P3.cleared not yet (redo the action)",
+    "retrigger": "scene run again (replay from the fixture)",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "(script) @1.2s",
+    "save": {
+     "t": 2248.6,
+     "steps": {
+      "prologue": 3,
+      "den-cats": 3,
+      "den-songbirds": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 2248.6,
+     "steps": {
+      "prologue": 3,
+      "den-cats": 3,
+      "den-songbirds": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "spike.P3.cleared not yet (redo the action)",
+    "completed": "trigger available: spike.P3.cleared not yet (redo the action)"
+   },
+   "fixture": "den-songbirds.s2",
+   "goalsFailed": "goal script could not pick up here (an earlier pass)",
+   "via": "replay",
+   "secs": 420,
+   "consoleErrors": [],
+   "at": "2026-11-19T05:58:05.105Z"
+  },
+  "den-songbirds.s3": {
+   "key": "den-songbirds.s3",
+   "scripts": "songbirds.jingle",
+   "b": {
+    "quitIn": "songbirds-jingle @0.5s",
+    "save": {
+     "t": 2300.2,
+     "steps": {
+      "prologue": 3,
+      "den-cats": 3,
+      "den-songbirds": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "peck: nothing spent",
+    "retrigger": "scene run again (replay from the fixture)",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "songbirds-jingle @1.2s",
+    "save": {
+     "t": 2300.2,
+     "steps": {
+      "prologue": 3,
+      "den-cats": 3,
+      "den-songbirds": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 2300.2,
+     "steps": {
+      "prologue": 3,
+      "den-cats": 3,
+      "den-songbirds": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "peck: nothing spent",
+    "completed": "trigger available: peck: nothing spent"
+   },
+   "fixture": "den-songbirds.s3",
+   "goalsFailed": "goal script could not pick up here (an earlier pass)",
+   "via": "replay",
+   "secs": 386,
+   "consoleErrors": [],
+   "at": "2026-11-19T06:04:31.441Z"
+  },
+  "den-racers.s1": {
+   "key": "den-racers.s1",
+   "scripts": "racers.coach",
+   "b": {
+    "quitIn": "racers-coach @0.5s",
+    "save": {
+     "t": 2220.5,
+     "steps": {
+      "prologue": 3,
+      "den-cats": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "talk: nothing spent",
+    "retrigger": "scene run again (replay from the fixture)",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "racers-coach @1.2s",
+    "save": {
+     "t": 2220.5,
+     "steps": {
+      "prologue": 3,
+      "den-cats": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 2220.5,
+     "steps": {
+      "prologue": 3,
+      "den-cats": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "talk: nothing spent",
+    "completed": "trigger available: talk: nothing spent"
+   },
+   "fixture": "den-racers",
+   "goalsFailed": "goal script could not pick up here (an earlier pass)",
+   "via": "replay",
+   "secs": 201,
+   "consoleErrors": [],
+   "at": "2026-11-19T06:07:53.353Z"
+  },
+  "den-racers.s2": {
+   "key": "den-racers.s2",
+   "scripts": "racers.roost",
+   "b": {
+    "quitIn": "(script) @0.5s",
+    "save": {
+     "t": 2249.2,
+     "steps": {
+      "prologue": 3,
+      "den-cats": 3,
+      "den-racers": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "spike.P2.cleared not yet (redo the action)",
+    "retrigger": "scene run again (replay from the fixture)",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "(script) @1.2s",
+    "save": {
+     "t": 2249.2,
+     "steps": {
+      "prologue": 3,
+      "den-cats": 3,
+      "den-racers": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 2249.2,
+     "steps": {
+      "prologue": 3,
+      "den-cats": 3,
+      "den-racers": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "spike.P2.cleared not yet (redo the action)",
+    "completed": "trigger available: spike.P2.cleared not yet (redo the action)"
+   },
+   "fixture": "den-racers.s2",
+   "goalsFailed": "goal script could not pick up here (an earlier pass)",
+   "via": "replay",
+   "secs": 256,
+   "consoleErrors": [],
+   "at": "2026-11-19T06:12:09.875Z"
+  },
+  "den-racers.s3": {
+   "key": "den-racers.s3",
+   "scripts": "racers.won",
+   "b": {
+    "quitIn": "(script) @0.5s",
+    "save": {
+     "t": 2289.6,
+     "steps": {
+      "prologue": 3,
+      "den-cats": 3,
+      "den-racers": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "race.won not yet (redo the action) / race.won not yet (redo the action)",
+    "retrigger": "scene run again (replay from the fixture)",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "(script) @1.2s",
+    "save": {
+     "t": 2289.6,
+     "steps": {
+      "prologue": 3,
+      "den-cats": 3,
+      "den-racers": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 2289.6,
+     "steps": {
+      "prologue": 3,
+      "den-cats": 3,
+      "den-racers": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "race.won not yet (redo the action) / race.won not yet (redo the action)",
+    "completed": "trigger available: race.won not yet (redo the action) / race.won not yet (redo the action)"
+   },
+   "fixture": "den-racers.s3",
+   "goalsFailed": "goal script could not pick up here (an earlier pass)",
+   "via": "replay",
+   "secs": 265,
+   "consoleErrors": [],
+   "at": "2026-11-19T06:16:34.749Z"
+  },
+  "den-racers.s4": {
+   "key": "den-racers.s4",
+   "scripts": "racers.feast",
+   "b": {
+    "quitIn": "racers-feast @0.5s",
+    "save": {
+     "t": 2358.6,
+     "steps": {
+      "prologue": 3,
+      "den-cats": 3,
+      "den-racers": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 3,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "coo: nothing spent",
+    "retrigger": "scene run again (replay from the fixture)",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "racers-feast @1.2s",
+    "save": {
+     "t": 2358.6,
+     "steps": {
+      "prologue": 3,
+      "den-cats": 3,
+      "den-racers": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 2358.6,
+     "steps": {
+      "prologue": 3,
+      "den-cats": 3,
+      "den-racers": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 3,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "coo: nothing spent",
+    "completed": "trigger available: coo: nothing spent"
+   },
+   "fixture": "den-racers.s4",
+   "goalsFailed": "goal script could not pick up here (an earlier pass)",
+   "via": "replay",
+   "secs": 261,
+   "consoleErrors": [],
+   "at": "2026-11-19T06:20:55.515Z"
+  },
+  "den-horses.s1": {
+   "key": "den-horses.s1",
+   "scripts": "horses.trough",
+   "b": {
+    "quitIn": "horses-trough @0.52s",
+    "save": {
+     "t": 4740.5,
+     "steps": {
+      "prologue": 3,
+      "den-cats": 3,
+      "den-songbirds": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "talk: nothing spent",
+    "retrigger": "scene run again (replay from the fixture)",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "horses-trough @1.22s",
+    "save": {
+     "t": 4740.5,
+     "steps": {
+      "prologue": 3,
+      "den-cats": 3,
+      "den-songbirds": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 4740.5,
+     "steps": {
+      "prologue": 3,
+      "den-cats": 3,
+      "den-songbirds": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "talk: nothing spent",
+    "completed": "trigger available: talk: nothing spent"
+   },
+   "fixture": "den-horses",
+   "goalsFailed": "goal script could not pick up here (an earlier pass)",
+   "via": "replay",
+   "secs": 137,
+   "consoleErrors": [],
+   "at": "2026-11-19T06:23:13.112Z"
+  },
+  "den-horses.s2": {
+   "key": "den-horses.s2",
+   "scripts": "horses.vanOff",
+   "b": {
+    "quitIn": "horses-vanoff @0.52s",
+    "save": {
+     "t": 4786.7,
+     "steps": {
+      "prologue": 3,
+      "den-cats": 3,
+      "den-songbirds": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-horses": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "prickett.moved set (re-fires) / prickett.moved set (re-fires)",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "horses-vanoff @1.22s",
+    "save": {
+     "t": 4786.7,
+     "steps": {
+      "prologue": 3,
+      "den-cats": 3,
+      "den-songbirds": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-horses": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 4786.7,
+     "steps": {
+      "prologue": 3,
+      "den-cats": 3,
+      "den-songbirds": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-horses": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "prickett.moved set (re-fires) / prickett.moved set (re-fires)",
+    "completed": "yes"
+   },
+   "fixture": "den-horses.s2",
+   "via": "goals",
+   "secs": 191,
+   "consoleErrors": [],
+   "at": "2026-11-19T10:13:46.698Z"
+  },
+  "den-horses.s3": {
+   "key": "den-horses.s3",
+   "scripts": "horses.drink",
+   "b": {
+    "quitIn": "horses-drink @0.52s",
+    "save": {
+     "t": 4821.4,
+     "steps": {
+      "prologue": 3,
+      "den-cats": 3,
+      "den-songbirds": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-horses": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "auto: nothing spent",
+    "retrigger": "scene run again (replay from the fixture)",
+    "worldDiff": [
+     "char:clementine: [-12,-6.5] vs fresh [73.5,-7]",
+     "char:dapple: [-24,-6.5] vs fresh [74.5,-7]",
+     "char:bigben: [0,-6.5] vs fresh [75,-7]",
+     "prickett: [1,86.5,-10,0] vs fresh [1,86.5,-10,1]"
+    ]
+   },
+   "a": {
+    "quitIn": "horses-drink @1.22s",
+    "save": {
+     "t": 4821.4,
+     "steps": {
+      "prologue": 3,
+      "den-cats": 3,
+      "den-songbirds": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-horses": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 4821.4,
+     "steps": {
+      "prologue": 3,
+      "den-cats": 3,
+      "den-songbirds": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-horses": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {
+     "scriptedChars": [
+      "clementine",
+      "dapple",
+      "bigben"
+     ],
+     "cutscene": "horses-drink",
+     "busy": [
+      "den-horses"
+     ],
+     "cameraLocked": true,
+     "bodyClass": [
+      "cine"
+     ]
+    },
+    "trigger": "auto: nothing spent",
+    "completed": "trigger available: auto: nothing spent"
+   },
+   "fixture": "den-horses.s3",
+   "goalsFailed": "goal script could not pick up here (an earlier pass)",
+   "via": "replay",
+   "secs": 248,
+   "consoleErrors": [],
+   "at": "2026-11-19T06:31:36.296Z"
+  },
+  "part-talons.s1": {
+   "key": "part-talons.s1",
+   "scripts": "rink.stock",
+   "b": {
+    "quitIn": "rink-stock @0.52s",
+    "save": {
+     "t": 5160.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-cats": 3,
+      "den-raccoons": 3,
+      "sab-middle": 2,
+      "den-songbirds": 3,
+      "den-horses": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "reach: nothing spent",
+    "retrigger": "scene run again (replay from the fixture)",
+    "worldDiff": [
+     "prickett: [0,86.5,-10,0] vs fresh [0,86.5,-10,1]"
+    ]
+   },
+   "a": {
+    "quitIn": "rink-stock @1.22s",
+    "save": {
+     "t": 5160.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-cats": 3,
+      "den-raccoons": 3,
+      "sab-middle": 2,
+      "den-songbirds": 3,
+      "den-horses": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 5160.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-cats": 3,
+      "den-raccoons": 3,
+      "sab-middle": 2,
+      "den-songbirds": 3,
+      "den-horses": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "reach: nothing spent",
+    "completed": "trigger available: reach: nothing spent"
+   },
+   "fixture": "part-talons",
+   "goalsFailed": "goal script could not pick up here (an earlier pass)",
+   "via": "replay",
+   "secs": 138,
+   "consoleErrors": [],
+   "at": "2026-11-19T06:33:53.940Z"
+  },
+  "part-talons.s3@0.5": {
+   "key": "part-talons.s3@0.5",
+   "scripts": "setpiece.rinkjob",
+   "b": {
+    "quitIn": "rinkjob @0.52s",
+    "save": {
+     "t": 5322.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-cats": 3,
+      "den-raccoons": 3,
+      "sab-middle": 2,
+      "den-songbirds": 3,
+      "den-horses": 3,
+      "part-talons": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "rink.launched not yet (redo the action)",
+    "goalsAgainFailed": "goal script stuck 3 times: timeout on goal 0 {\"sfIdle\":true,\"frames\":20,\"timeout\":60} {\"busy\":[],\"cut\":null,\"beat\":5,\"dlg\":null,\"menu\":\"nap\",\"t\":5322.9}",
+    "retrigger": "scene run again (replay from the fixture)",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "rinkjob @6.02s",
+    "save": {
+     "t": 5330,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-cats": 3,
+      "den-raccoons": 3,
+      "sab-middle": 2,
+      "den-songbirds": 3,
+      "den-horses": 3,
+      "part-talons": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 5330,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-cats": 3,
+      "den-raccoons": 3,
+      "sab-middle": 2,
+      "den-songbirds": 3,
+      "den-horses": 3,
+      "part-talons": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "rink.launched not yet (redo the action)",
+    "completed": "trigger available: rink.launched not yet (redo the action)"
+   },
+   "fixture": "part-talons.s3",
+   "via": "goals",
+   "secs": 579,
+   "consoleErrors": [],
+   "at": "2026-11-19T10:23:25.488Z"
+  },
+  "part-talons.s3@14": {
+   "key": "part-talons.s3@14",
+   "scripts": "setpiece.rinkjob",
+   "b": {
+    "quitIn": "rinkjob @14.02s",
+    "save": {
+     "t": 5330,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-cats": 3,
+      "den-raccoons": 3,
+      "sab-middle": 2,
+      "den-songbirds": 3,
+      "den-horses": 3,
+      "part-talons": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "rink.launched not yet (redo the action)",
+    "retrigger": "scene run again (replay from the fixture)",
+    "worldDiff": [
+     "mod:clues/Group10/Mesh3: 0 vs fresh 1"
+    ]
+   },
+   "a": {
+    "quitIn": "rinkjob @26.02s",
+    "save": {
+     "t": 5330,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-cats": 3,
+      "den-raccoons": 3,
+      "sab-middle": 2,
+      "den-songbirds": 3,
+      "den-horses": 3,
+      "part-talons": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 5330,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-cats": 3,
+      "den-raccoons": 3,
+      "sab-middle": 2,
+      "den-songbirds": 3,
+      "den-horses": 3,
+      "part-talons": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "rink.launched not yet (redo the action)",
+    "completed": "trigger available: rink.launched not yet (redo the action)"
+   },
+   "fixture": "part-talons.s3",
+   "goalsFailed": "goal script could not pick up here (an earlier pass)",
+   "via": "replay",
+   "secs": 656,
+   "consoleErrors": [],
+   "at": "2026-11-19T10:34:21.849Z"
+  },
+  "den-turtles.s1": {
+   "key": "den-turtles.s1",
+   "scripts": "turtles.rock",
+   "b": {
+    "quitIn": "turtles-rock @0.5s",
+    "save": {
+     "t": 3060.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "talk: nothing spent",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "turtles-rock @1.2s",
+    "save": {
+     "t": 3060.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 3060.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "talk: nothing spent",
+    "completed": "yes"
+   },
+   "fixture": "den-turtles",
+   "via": "goals",
+   "secs": 131,
+   "consoleErrors": [],
+   "at": "2026-11-19T06:58:33.774Z"
+  },
+  "den-turtles.s2": {
+   "key": "den-turtles.s2",
+   "scripts": "turtles.surfaced",
+   "b": {
+    "quitIn": "(script) @0.5s",
+    "save": {
+     "t": 3080.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3,
+      "den-turtles": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "clue turtle-cart unspent",
+    "retrigger": "scene started again",
+    "worldDiff": [
+     "mod:clues/Group7/Mesh3: 0 vs fresh 1"
+    ]
+   },
+   "a": {
+    "quitIn": "(script) @1.2s",
+    "save": {
+     "t": 3080.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3,
+      "den-turtles": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 3080.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3,
+      "den-turtles": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "clue turtle-cart unspent",
+    "completed": "yes"
+   },
+   "fixture": "den-turtles.s2",
+   "via": "goals",
+   "secs": 139,
+   "consoleErrors": [],
+   "at": "2026-11-19T07:00:52.701Z"
+  },
+  "den-turtles.s3": {
+   "key": "den-turtles.s3",
+   "scripts": "turtles.join",
+   "b": {
+    "quitIn": "turtles-join @0.5s",
+    "save": {
+     "t": 3097.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3,
+      "den-turtles": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "cart haulable",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "turtles-join @1.2s",
+    "save": {
+     "t": 3097.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3,
+      "den-turtles": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 3097.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3,
+      "den-turtles": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "cart haulable",
+    "completed": "yes"
+   },
+   "fixture": "den-turtles.s3",
+   "via": "goals",
+   "secs": 136,
+   "consoleErrors": [],
+   "at": "2026-11-19T07:03:09.035Z"
+  },
+  "den-geese.s1": {
+   "key": "den-geese.s1",
+   "scripts": "geese.arm",
+   "b": {
+    "quitIn": "geese-arm @0.5s",
+    "save": {
+     "t": 3480.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "talk: nothing spent",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "geese-arm @1.2s",
+    "save": {
+     "t": 3480.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 3480.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "talk: nothing spent",
+    "completed": "yes"
+   },
+   "fixture": "den-geese",
+   "via": "goals",
+   "secs": 139,
+   "consoleErrors": [],
+   "at": "2026-11-19T07:05:28.118Z"
+  },
+  "den-geese.s2": {
+   "key": "den-geese.s2",
+   "scripts": "geese.lawn",
+   "b": {
+    "quitIn": "geese-lawn @0.5s",
+    "save": {
+     "t": 3566.3,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "signsLive: nothing spent",
+    "retrigger": "scene run again (replay from the fixture)",
+    "worldDiff": [
+     "mod:spikes-feuds/Mesh4: 1 vs fresh 0"
+    ]
+   },
+   "a": {
+    "quitIn": "geese-lawn @1.2s",
+    "save": {
+     "t": 3566.3,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 3566.3,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "signsLive: nothing spent",
+    "completed": "trigger available: signsLive: nothing spent"
+   },
+   "fixture": "den-geese.s2",
+   "goalsFailed": "goal script could not pick up here (an earlier pass)",
+   "via": "replay",
+   "secs": 482,
+   "consoleErrors": [],
+   "at": "2026-11-19T07:13:30.180Z"
+  },
+  "den-geese.s3": {
+   "key": "den-geese.s3",
+   "scripts": "geese.truce",
+   "b": {
+    "quitIn": "geese-truce @0.5s",
+    "save": {
+     "t": 3681.7,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "auto: nothing spent",
+    "retrigger": "scene run again (replay from the fixture)",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "geese-truce @1.2s",
+    "save": {
+     "t": 3681.7,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 3681.7,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "auto: nothing spent",
+    "completed": "trigger available: auto: nothing spent"
+   },
+   "fixture": "den-geese.s3",
+   "goalsFailed": "goal script ended, condition not met",
+   "via": "replay",
+   "secs": 495,
+   "consoleErrors": [],
+   "at": "2026-11-19T07:21:45.227Z"
+  },
+  "truce-dogs-squirrels.s1": {
+   "key": "truce-dogs-squirrels.s1",
+   "scripts": "dogs.chase",
+   "b": {
+    "quitIn": "dogs-chase @0.5s",
+    "save": {
+     "t": 3480.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "reach: nothing spent",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "dogs-chase @1.2s",
+    "save": {
+     "t": 3480.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 3480.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "reach: nothing spent",
+    "completed": "yes"
+   },
+   "fixture": "truce-dogs-squirrels",
+   "via": "goals",
+   "secs": 131,
+   "consoleErrors": [],
+   "at": "2026-11-19T07:23:56.082Z"
+  },
+  "truce-dogs-squirrels.s2": {
+   "key": "truce-dogs-squirrels.s2",
+   "scripts": "dogs.cache",
+   "b": {
+    "quitIn": "(script) @0.5s",
+    "save": {
+     "t": 3497.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "truce-dogs-squirrels": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "clue pecan-cache unspent",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "(script) @1.2s",
+    "save": {
+     "t": 3497.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "truce-dogs-squirrels": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 3497.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "truce-dogs-squirrels": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "clue pecan-cache unspent",
+    "completed": "yes"
+   },
+   "fixture": "truce-dogs-squirrels.s2",
+   "via": "goals",
+   "secs": 155,
+   "consoleErrors": [],
+   "at": "2026-11-19T07:26:31.332Z"
+  },
+  "truce-dogs-squirrels.s3": {
+   "key": "truce-dogs-squirrels.s3",
+   "scripts": "dogs.balls",
+   "b": {
+    "quitIn": "dogs-balls @0.5s",
+    "save": {
+     "t": 3549.6,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "truce-dogs-squirrels": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "drop: nothing spent",
+    "retrigger": "scene run again (replay from the fixture)",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "dogs-balls @1.2s",
+    "save": {
+     "t": 3549.6,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "truce-dogs-squirrels": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 3549.6,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "truce-dogs-squirrels": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "drop: nothing spent",
+    "completed": "trigger available: drop: nothing spent"
+   },
+   "fixture": "truce-dogs-squirrels.s3",
+   "goalsFailed": "goal script stuck 3 times: timeout on goal 4 {\"waitFor\":\"truce-dogs-squirrels\",\"timeout\":120} {\"busy\":[],\"cut\":null,\"beat\":0,\"dlg\":null,\"menu\":null,\"t\":4237.5}",
+   "via": "replay",
+   "secs": 429,
+   "consoleErrors": [],
+   "at": "2026-11-19T07:33:40.287Z"
+  },
+  "part-legs.s1": {
+   "key": "part-legs.s1",
+   "scripts": "legs.marked",
+   "b": {
+    "quitIn": "(script) @0.52s",
+    "save": {
+     "t": 6420.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-cats": 3,
+      "den-biscuit": 3,
+      "gear-headlamp": 2,
+      "den-strix": 2,
+      "den-turtles": 3,
+      "truce-dogs-squirrels": 3,
+      "den-songbirds": 3,
+      "den-horses": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "clue pipe-marks unspent",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "(script) @1.22s",
+    "save": {
+     "t": 6420.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-cats": 3,
+      "den-biscuit": 3,
+      "gear-headlamp": 2,
+      "den-strix": 2,
+      "den-turtles": 3,
+      "truce-dogs-squirrels": 3,
+      "den-songbirds": 3,
+      "den-horses": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 6420.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-cats": 3,
+      "den-biscuit": 3,
+      "gear-headlamp": 2,
+      "den-strix": 2,
+      "den-turtles": 3,
+      "truce-dogs-squirrels": 3,
+      "den-songbirds": 3,
+      "den-horses": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "clue pipe-marks unspent",
+    "completed": "yes"
+   },
+   "fixture": "part-legs",
+   "via": "goals",
+   "secs": 134,
+   "consoleErrors": [],
+   "at": "2026-11-19T07:35:53.925Z"
+  },
+  "part-legs.s2": {
+   "key": "part-legs.s2",
+   "scripts": "legs.dug",
+   "b": {
+    "quitIn": "(script) @0.52s",
+    "save": {
+     "t": 6593.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-cats": 3,
+      "den-biscuit": 3,
+      "gear-headlamp": 2,
+      "den-strix": 2,
+      "den-turtles": 3,
+      "truce-dogs-squirrels": 3,
+      "den-songbirds": 3,
+      "den-horses": 3,
+      "part-legs": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "legs.dug not yet (redo the action)",
+    "goalsAgainFailed": "goal script stuck 3 times: timeout on goal 0 {\"sfIdle\":true,\"frames\":20,\"timeout\":60} {\"busy\":[],\"cut\":null,\"beat\":0,\"dlg\":null,\"menu\":\"nap\",\"t\":6602.3}",
+    "retrigger": "scene run again (replay from the fixture)",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "(script) @1.22s",
+    "save": {
+     "t": 6609.8,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-cats": 3,
+      "den-biscuit": 3,
+      "gear-headlamp": 2,
+      "den-strix": 2,
+      "den-turtles": 3,
+      "truce-dogs-squirrels": 3,
+      "den-songbirds": 3,
+      "den-horses": 3,
+      "part-legs": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 6609.8,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-cats": 3,
+      "den-biscuit": 3,
+      "gear-headlamp": 2,
+      "den-strix": 2,
+      "den-turtles": 3,
+      "truce-dogs-squirrels": 3,
+      "den-songbirds": 3,
+      "den-horses": 3,
+      "part-legs": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "legs.dug not yet (redo the action)",
+    "completed": "trigger available: legs.dug not yet (redo the action)"
+   },
+   "fixture": "part-legs.s2",
+   "via": "goals",
+   "secs": 384,
+   "consoleErrors": [],
+   "at": "2026-11-19T07:42:18.105Z"
+  },
+  "part-power.s1@0.5": {
+   "key": "part-power.s1@0.5",
+   "scripts": "wedding.intro",
+   "b": {
+    "quitIn": "wedding-intro @0.52s",
+    "save": {
+     "t": 5160.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "reach: nothing spent",
+    "retrigger": "scene started again",
+    "worldDiff": [
+     "mod:clues/Group8/Mesh3: 0 vs fresh 1"
+    ]
+   },
+   "a": {
+    "quitIn": "wedding-intro @5.02s",
+    "save": {
+     "t": 5160.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 5160.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "reach: nothing spent",
+    "completed": "yes"
+   },
+   "fixture": "part-power",
+   "via": "goals",
+   "secs": 147,
+   "consoleErrors": [],
+   "at": "2026-11-19T07:44:45.510Z"
+  },
+  "part-power.s2@0.5": {
+   "key": "part-power.s2@0.5",
+   "scripts": "wedding.release",
+   "b": {
+    "quitIn": "wedding-release @0.52s",
+    "save": {
+     "t": 5185.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 3,
+      "part-power": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "peck: nothing spent",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "wedding-release @4.02s",
+    "save": {
+     "t": 5185.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 3,
+      "part-power": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 5185.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 3,
+      "part-power": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "peck: nothing spent",
+    "completed": "yes (1 retry)"
+   },
+   "fixture": "part-power.s2",
+   "via": "goals",
+   "secs": 244,
+   "consoleErrors": [],
+   "at": "2026-11-19T07:50:47.485Z"
+  },
+  "part-power.s3@0.5": {
+   "key": "part-power.s3@0.5",
+   "scripts": "setpiece.wedding",
+   "b": {
+    "quitIn": "wedding @0.52s",
+    "save": {
+     "t": 5236.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 3,
+      "part-power": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "ask: nothing spent",
+    "retrigger": "scene started again",
+    "worldDiff": [
+     "mod:clues/Group10/Mesh3: 1 vs fresh 0"
+    ]
+   },
+   "a": {
+    "quitIn": "wedding @8.02s",
+    "save": {
+     "t": 5236.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 3,
+      "part-power": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 5236.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 3,
+      "part-power": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "ask: nothing spent",
+    "completed": "yes"
+   },
+   "fixture": "part-power.s3",
+   "via": "goals",
+   "secs": 150,
+   "consoleErrors": [],
+   "at": "2026-11-19T07:53:17.138Z"
+  },
+  "part-power.s3@16": {
+   "key": "part-power.s3@16",
+   "scripts": "setpiece.wedding",
+   "b": {
+    "quitIn": "wedding @16.02s",
+    "save": {
+     "t": 5236.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 3,
+      "part-power": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "ask: nothing spent",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "wedding @24.02s",
+    "save": {
+     "t": 5236.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 3,
+      "part-power": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 5236.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 3,
+      "part-power": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "ask: nothing spent",
+    "completed": "yes"
+   },
+   "fixture": "part-power.s3",
+   "via": "goals",
+   "secs": 155,
+   "consoleErrors": [],
+   "at": "2026-11-19T07:55:52.000Z"
+  },
+  "den-rhoda.s1": {
+   "key": "den-rhoda.s1",
+   "scripts": "rhoda.sal",
+   "b": {
+    "quitIn": "rhoda-sal @0.5s",
+    "save": {
+     "t": 3480.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-raccoons": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "talk: nothing spent",
+    "retrigger": "scene started again",
+    "worldDiff": [
+     "mod:clues/Group8/Mesh3: 0 vs fresh 1"
+    ]
+   },
+   "a": {
+    "quitIn": "rhoda-sal @1.2s",
+    "save": {
+     "t": 3480.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-raccoons": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 3480.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-raccoons": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "talk: nothing spent",
+    "completed": "yes"
+   },
+   "fixture": "den-rhoda",
+   "via": "goals",
+   "secs": 145,
+   "consoleErrors": [],
+   "at": "2026-11-19T07:58:17.002Z"
+  },
+  "den-rhoda.s2": {
+   "key": "den-rhoda.s2",
+   "scripts": "fight.rhoda",
+   "b": {
+    "quitIn": "(script) @0.5s",
+    "save": {
+     "t": 3520.8,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "reach: nothing spent",
+    "goalsAgainFailed": "goal script stuck 3 times: timeout on goal 0 {\"sfIdle\":true,\"frames\":20,\"timeout\":60} {\"busy\":[],\"cut\":null,\"beat\":7,\"dlg\":null,\"menu\":\"nap\",\"t\":3521.2}",
+    "retrigger": "scene run again (replay from the fixture)",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "(script) @1.2s",
+    "save": {
+     "t": 3517.9,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 3517.9,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "reach: nothing spent",
+    "completed": "trigger available: reach: nothing spent"
+   },
+   "fixture": "den-rhoda.s2",
+   "via": "goals",
+   "secs": 287,
+   "consoleErrors": [],
+   "at": "2026-11-19T08:03:04.357Z"
+  },
+  "den-rhoda.s3": {
+   "key": "den-rhoda.s3",
+   "scripts": "rhoda.home",
+   "b": {
+    "quitIn": "rhoda-home @0.5s",
+    "save": {
+     "t": 3691.7,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "clue walter-stairs unspent",
+    "goalsAgainFailed": "goal script stuck 3 times: timeout on goal 0 {\"sfIdle\":true,\"frames\":20,\"timeout\":60} {\"busy\":[],\"cut\":null,\"beat\":2,\"dlg\":null,\"menu\":\"nap\",\"t\":3763.5}",
+    "retrigger": "scene run again (replay from the fixture)",
+    "worldDiff": [
+     "mod:clues/Group10/Mesh3: 0 vs fresh 1"
+    ]
+   },
+   "a": {
+    "quitIn": "rhoda-home @1.2s",
+    "save": {
+     "t": 3700.6,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 3700.6,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "clue walter-stairs unspent",
+    "completed": "trigger available: clue walter-stairs unspent"
+   },
+   "fixture": "den-rhoda.s3",
+   "via": "goals",
+   "secs": 401,
+   "consoleErrors": [],
+   "at": "2026-11-19T08:09:45.482Z"
+  },
+  "den-meermob.s1": {
+   "key": "den-meermob.s1",
+   "scripts": "meer.flypast",
+   "b": {
+    "quitIn": "(script) @0.52s",
+    "save": {
+     "t": 6000.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-cats": 3,
+      "den-racers": 4,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "meer.flypast not yet (redo the action)",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "(script) @1.22s",
+    "save": {
+     "t": 6000.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-cats": 3,
+      "den-racers": 4,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 6000.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-cats": 3,
+      "den-racers": 4,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "meer.flypast not yet (redo the action)",
+    "completed": "yes"
+   },
+   "fixture": "den-meermob",
+   "via": "goals",
+   "secs": 141,
+   "consoleErrors": [],
+   "at": "2026-11-19T08:12:06.284Z"
+  },
+  "den-meermob.s2": {
+   "key": "den-meermob.s2",
+   "scripts": "meer.join",
+   "b": {
+    "quitIn": "meer-join @0.52s",
+    "save": {
+     "t": 6061.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-cats": 3,
+      "den-racers": 4,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 3,
+      "den-meermob": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "coo: nothing spent / slice NOT at hand",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "meer-join @1.22s",
+    "save": {
+     "t": 6061.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-cats": 3,
+      "den-racers": 4,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 3,
+      "den-meermob": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 6061.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-cats": 3,
+      "den-racers": 4,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 3,
+      "den-meermob": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "coo: nothing spent / slice NOT at hand",
+    "completed": "yes"
+   },
+   "fixture": "den-meermob.s2",
+   "via": "goals",
+   "secs": 143,
+   "consoleErrors": [],
+   "at": "2026-11-19T08:14:28.949Z"
+  },
+  "den-squirrels.s1": {
+   "key": "den-squirrels.s1",
+   "scripts": "squirrels.meet",
+   "b": {
+    "quitIn": "(script) @0.52s",
+    "save": {
+     "t": 259.8,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "talk: nothing spent",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "(script) @1.22s",
+    "save": {
+     "t": 259.8,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 259.8,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "talk: nothing spent",
+    "completed": "yes"
+   },
+   "fixture": "den-squirrels",
+   "via": "goals",
+   "secs": 145,
+   "consoleErrors": [],
+   "at": "2026-11-19T08:16:53.483Z"
+  },
+  "den-squirrels.s3": {
+   "key": "den-squirrels.s3",
+   "scripts": "squirrels.join",
+   "b": {
+    "quitIn": "squirrels-join @0.52s",
+    "save": {
+     "t": 340.3,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "talk: nothing spent",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "squirrels-join @1.22s",
+    "save": {
+     "t": 340.3,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 340.3,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "talk: nothing spent",
+    "completed": "yes"
+   },
+   "fixture": "den-squirrels.s3",
+   "via": "goals",
+   "secs": 159,
+   "consoleErrors": [],
+   "at": "2026-11-19T08:19:32.071Z"
+  },
+  "den-crows.s1": {
+   "key": "den-crows.s1",
+   "scripts": "crows.meet",
+   "b": {
+    "quitIn": "(script) @0.52s",
+    "save": {
+     "t": 611.4,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "talk: nothing spent",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "(script) @1.22s",
+    "save": {
+     "t": 611.4,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 611.4,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "talk: nothing spent",
+    "completed": "yes"
+   },
+   "fixture": "den-crows",
+   "via": "goals",
+   "secs": 196,
+   "consoleErrors": [],
+   "at": "2026-11-19T08:22:48.133Z"
+  },
+  "den-crows.s3": {
+   "key": "den-crows.s3",
+   "scripts": "crows.join",
+   "b": {
+    "quitIn": "crows-join @0.52s",
+    "save": {
+     "t": 732.9,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 2
+     },
+     "carried": "shiny",
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": "shiny",
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "auto: nothing spent",
+    "retrigger": "scene started again",
+    "worldDiff": [
+     "char:ledger: [-7,363] vs fresh [-7,363.5]",
+     "char:glint: [-14,368] vs fresh [-13.5,368]"
+    ]
+   },
+   "a": {
+    "quitIn": "crows-join @1.22s",
+    "save": {
+     "t": 732.9,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 2
+     },
+     "carried": "shiny",
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 732.9,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 2
+     },
+     "carried": "shiny",
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": "shiny",
+     "repaired": null
+    },
+    "leftovers": {
+     "scriptedChars": [
+      "vesper",
+      "ledger",
+      "glint",
+      "cawdry"
+     ],
+     "cutscene": "crows-join",
+     "busy": [
+      "den-crows"
+     ],
+     "cameraLocked": true,
+     "bodyClass": [
+      "cine"
+     ]
+    },
+    "trigger": "auto: nothing spent",
+    "completed": "yes"
+   },
+   "fixture": "den-crows.s3",
+   "via": "goals",
+   "secs": 176,
+   "consoleErrors": [],
+   "at": "2026-11-19T08:25:43.870Z"
+  },
+  "den-biscuit.s3": {
+   "key": "den-biscuit.s3",
+   "scripts": "fight.biscuit",
+   "b": {
+    "quitIn": "(script) @0.52s",
+    "save": {
+     "t": 1333.3,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "reach: nothing spent",
+    "retrigger": "scene run again (replay from the fixture)",
+    "worldDiff": [
+     "mod:clues/Group6/Mesh3: 0 vs fresh 1"
+    ]
+   },
+   "a": {
+    "quitIn": "(script) @1.22s",
+    "save": {
+     "t": 1333.3,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 1333.3,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "reach: nothing spent",
+    "completed": "trigger available: reach: nothing spent"
+   },
+   "fixture": "den-biscuit.s3",
+   "goalsFailed": "goal script stuck 3 times: timeout on goal 6 {\"waitEvent\":\"talent\",\"match\":{\"clue\":\"ball-lake\"}} {\"busy\":[],\"cut\":null,\"beat\":0,\"dlg\":null,\"menu\":null,\"t\":2194.3}",
+   "via": "replay",
+   "secs": 404,
+   "consoleErrors": [],
+   "at": "2026-11-19T08:34:57.621Z"
+  },
+  "den-strix.s2": {
+   "key": "den-strix.s2",
+   "scripts": "stealth.strix",
+   "b": {
+    "quitIn": "(script) @0.52s",
+    "save": {
+     "t": 1401.2,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 1
+     },
+     "carried": "spectacles",
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": "spectacles",
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "reach: nothing spent",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "(script) @1.22s",
+    "save": {
+     "t": 1401.2,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 1
+     },
+     "carried": "spectacles",
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 1401.2,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 1
+     },
+     "carried": "spectacles",
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": "spectacles",
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "reach: nothing spent",
+    "completed": "yes"
+   },
+   "fixture": "den-strix.s2",
+   "via": "goals",
+   "secs": 243,
+   "consoleErrors": [],
+   "at": "2026-11-19T08:39:01.238Z"
+  },
+  "gear-pen.s1": {
+   "key": "gear-pen.s1",
+   "scripts": "pen.cufflink",
+   "b": {
+    "quitIn": "(script) @0.52s",
+    "save": {
+     "t": 891,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "pickup: nothing spent / pickup: nothing spent",
+    "goalsAgainFailed": "goal script stuck 3 times: timeout on goal 5 {\"timeout\":10} {\"busy\":[],\"cut\":null,\"beat\":0,\"dlg\":null,\"menu\":null,\"t\":927}",
+    "retrigger": "scene run again (replay from the fixture)",
+    "worldDiff": [
+     "mod:clues/Group10/Mesh3: 0 vs fresh 1"
+    ]
+   },
+   "a": {
+    "quitIn": "(script) @1.22s",
+    "save": {
+     "t": 890.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 890.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "pickup: nothing spent / pickup: nothing spent",
+    "completed": "trigger available: pickup: nothing spent / pickup: nothing spent"
+   },
+   "fixture": "gear-pen",
+   "via": "goals",
+   "secs": 674,
+   "consoleErrors": [],
+   "at": "2026-11-19T08:50:15.271Z"
+  },
+  "gear-pen.s2": {
+   "key": "gear-pen.s2",
+   "scripts": "pen.portrait",
+   "b": {
+    "quitIn": "(script) @0.52s",
+    "save": {
+     "t": 897,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 1
+     },
+     "carried": "cufflink",
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": "cufflink",
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "trade pen open",
+    "retrigger": "scene started again",
+    "worldDiff": [
+     "mod:clues/Group10/Mesh3: 0 vs fresh 1"
+    ]
+   },
+   "a": {
+    "quitIn": "(script) @1.22s",
+    "save": {
+     "t": 897,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 1
+     },
+     "carried": "cufflink",
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 897,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 1
+     },
+     "carried": "cufflink",
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": "cufflink",
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "trade pen open",
+    "completed": "yes"
+   },
+   "fixture": "gear-pen.s2",
+   "via": "goals",
+   "secs": 251,
+   "consoleErrors": [],
+   "at": "2026-11-19T08:54:26.581Z"
+  },
+  "gear-headlamp.s1": {
+   "key": "gear-headlamp.s1",
+   "scripts": "headlamp.key",
+   "b": {
+    "quitIn": "(script) @0.52s",
+    "save": {
+     "t": 927.4,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "clue turtle-key unspent",
+    "retrigger": "scene started again",
+    "worldDiff": [
+     "mod:clues/Group8/Mesh3: 0 vs fresh 1",
+     "mod:clues/Group10/Mesh3: 0 vs fresh 1"
+    ]
+   },
+   "a": {
+    "quitIn": "(script) @1.22s",
+    "save": {
+     "t": 927.4,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 927.4,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "clue turtle-key unspent",
+    "completed": "yes"
+   },
+   "fixture": "gear-headlamp",
+   "via": "goals",
+   "secs": 248,
+   "consoleErrors": [],
+   "at": "2026-11-19T08:58:34.163Z"
+  },
+  "gear-headlamp.s2": {
+   "key": "gear-headlamp.s2",
+   "scripts": "headlamp.trade",
+   "b": {
+    "quitIn": "(script) @0.52s",
+    "save": {
+     "t": 1012,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 1
+     },
+     "carried": "key",
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": "key",
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "trade headlamp open / trade headlamp open",
+    "retrigger": "scene run again (replay from the fixture)",
+    "worldDiff": [
+     "mod:clues/Group8/Mesh3: 0 vs fresh 1"
+    ]
+   },
+   "a": {
+    "quitIn": "(script) @1.22s",
+    "save": {
+     "t": 1012,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 1
+     },
+     "carried": "key",
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 1012,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 1
+     },
+     "carried": "key",
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": "key",
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "trade headlamp open / trade headlamp open",
+    "completed": "trigger available: trade headlamp open / trade headlamp open"
+   },
+   "fixture": "gear-headlamp.s2",
+   "goalsFailed": "goal script stuck 3 times: timeout on goal 6 {\"waitEvent\":\"talent\",\"match\":{\"clue\":\"turtle-key\"}} {\"busy\":[],\"cut\":null,\"beat\":0,\"dlg\":null,\"menu\":null,\"t\":1492.2}",
+   "via": "replay",
+   "secs": 490,
+   "consoleErrors": [],
+   "at": "2026-11-19T09:06:44.687Z"
+  },
+  "part-wings.s1": {
+   "key": "part-wings.s1",
+   "scripts": "wings.sail1",
+   "b": {
+    "quitIn": "(script) @0.52s",
+    "save": {
+     "t": 1091.4,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "reach: nothing spent",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "(script) @1.22s",
+    "save": {
+     "t": 1726.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2
+     },
+     "carried": "sail",
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 1726.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2
+     },
+     "carried": "sail",
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": "sail",
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "reach: nothing spent",
+    "completed": "yes"
+   },
+   "fixture": "part-wings",
+   "via": "goals",
+   "secs": 534,
+   "consoleErrors": [],
+   "at": "2026-11-19T09:15:38.858Z"
+  },
+  "part-wings.s2": {
+   "key": "part-wings.s2",
+   "scripts": "wings.remote",
+   "b": {
+    "quitIn": "(script) @0.52s",
+    "save": {
+     "t": 1211,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 1
+     },
+     "carried": "shiny",
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": "shiny",
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "trade remote open / pickup: nothing spent",
+    "goalsAgainFailed": "goal script stuck 3 times: timeout on goal 10 {\"peck\":\"sign:M7\",\"timeout\":20} {\"busy\":[],\"cut\":null,\"beat\":0,\"dlg\":null,\"menu\":null,\"t\":1350.5}",
+    "retrigger": "scene run again (replay from the fixture)",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "(script) @1.22s",
+    "save": {
+     "t": 1211.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 1
+     },
+     "carried": "shiny",
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 1211.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 1
+     },
+     "carried": "shiny",
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": "shiny",
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "trade remote open / pickup: nothing spent",
+    "completed": "trigger available: trade remote open / pickup: nothing spent"
+   },
+   "fixture": "part-wings.s2",
+   "via": "goals",
+   "secs": 573,
+   "consoleErrors": [],
+   "at": "2026-11-19T09:25:11.974Z"
+  },
+  "part-wings.s3": {
+   "key": "part-wings.s3",
+   "scripts": "wings.sail2",
+   "b": {
+    "quitIn": "(script) @0.52s",
+    "save": {
+     "t": 1235.7,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "reach: nothing spent",
+    "retrigger": "scene started again",
+    "worldDiff": [
+     "mod:clues/Group11/Mesh3: 1 vs fresh 0"
+    ]
+   },
+   "a": {
+    "quitIn": "(script) @1.22s",
+    "save": {
+     "t": 1235.7,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 1235.7,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "reach: nothing spent",
+    "completed": "yes"
+   },
+   "fixture": "part-wings.s3",
+   "via": "goals",
+   "secs": 282,
+   "consoleErrors": [],
+   "at": "2026-11-19T09:29:53.788Z"
+  },
+  "part-beak.s1": {
+   "key": "part-beak.s1",
+   "scripts": "beak.sticker",
+   "b": {
+    "quitIn": "(script) @0.5s",
+    "save": {
+     "t": 2237.4,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 2,
+      "part-eyes": 1,
+      "part-body": 3,
+      "den-choir": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "clue sticker-grate unspent",
+    "retrigger": "scene started again",
+    "worldDiff": [
+     "mod:clues/Group11/Mesh3: 0 vs fresh 1"
+    ]
+   },
+   "a": {
+    "quitIn": "(script) @1.2s",
+    "save": {
+     "t": 2237.4,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 2,
+      "part-eyes": 1,
+      "part-body": 3,
+      "den-choir": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 2237.4,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 2,
+      "part-eyes": 1,
+      "part-body": 3,
+      "den-choir": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "clue sticker-grate unspent",
+    "completed": "yes"
+   },
+   "fixture": "part-beak",
+   "via": "goals",
+   "secs": 233,
+   "consoleErrors": [],
+   "at": "2026-11-19T09:33:47.258Z"
+  },
+  "part-beak.s2": {
+   "key": "part-beak.s2",
+   "scripts": "beak.deal",
+   "b": {
+    "quitIn": "(script) @0.5s",
+    "save": {
+     "t": 2289,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 2,
+      "part-eyes": 1,
+      "part-body": 3,
+      "den-choir": 3,
+      "part-beak": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "trade cone open",
+    "retrigger": "scene run again (replay from the fixture)",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "(script) @1.2s",
+    "save": {
+     "t": 2289,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 2,
+      "part-eyes": 1,
+      "part-body": 3,
+      "den-choir": 3,
+      "part-beak": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 2289,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 2,
+      "part-eyes": 1,
+      "part-body": 3,
+      "den-choir": 3,
+      "part-beak": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 1,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "trade cone open",
+    "completed": "trigger available: trade cone open"
+   },
+   "fixture": "part-beak.s2",
+   "goalsFailed": "goal script stuck 3 times: timeout on goal 6 {\"waitEvent\":\"talent\",\"match\":{\"clue\":\"sticker-grate\"}} {\"busy\":[],\"cut\":null,\"beat\":0,\"dlg\":null,\"menu\":null,\"t\":2953}",
+   "via": "replay",
+   "secs": 433,
+   "consoleErrors": [],
+   "at": "2026-11-19T09:41:00.699Z"
+  },
+  "part-beak.s3": {
+   "key": "part-beak.s3",
+   "scripts": "beak.gate",
+   "b": {
+    "quitIn": "(script) @0.5s",
+    "save": {
+     "t": 2354.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 2,
+      "part-eyes": 1,
+      "part-body": 3,
+      "den-choir": 3,
+      "part-beak": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "clue shed-gate unspent / clue shed-gate unspent",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "(script) @1.2s",
+    "save": {
+     "t": 2354.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 2,
+      "part-eyes": 1,
+      "part-body": 3,
+      "den-choir": 3,
+      "part-beak": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 2354.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 2,
+      "part-eyes": 1,
+      "part-body": 3,
+      "den-choir": 3,
+      "part-beak": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 2,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "clue shed-gate unspent / clue shed-gate unspent",
+    "completed": "yes"
+   },
+   "fixture": "part-beak.s3",
+   "via": "goals",
+   "secs": 216,
+   "consoleErrors": [],
+   "at": "2026-11-19T09:44:36.525Z"
+  },
+  "finale@doors": {
+   "key": "finale@doors",
+   "scripts": "finale",
+   "b": {
+    "quitIn": "finale @0.52s",
+    "save": {
+     "t": 5264.4,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 3,
+      "part-power": 4,
+      "sab-middle": 2,
+      "sab-north": 2,
+      "part-eyes": 1,
+      "den-choir": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "part-body": 3,
+      "truce-cats-rats": 3,
+      "den-songbirds": 3,
+      "den-racers": 4,
+      "den-horses": 3,
+      "part-talons": 3,
+      "truce-dogs-squirrels": 3,
+      "part-legs": 3,
+      "den-meermob": 2,
+      "den-strix": 2,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "part-beak": 4
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "reach: nothing spent",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "finale @0.52s",
+    "save": {
+     "t": 5264.4,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 3,
+      "part-power": 4,
+      "sab-middle": 2,
+      "sab-north": 2,
+      "part-eyes": 1,
+      "den-choir": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "part-body": 3,
+      "truce-cats-rats": 3,
+      "den-songbirds": 3,
+      "den-racers": 4,
+      "den-horses": 3,
+      "part-talons": 3,
+      "truce-dogs-squirrels": 3,
+      "part-legs": 3,
+      "den-meermob": 2,
+      "den-strix": 2,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "part-beak": 4
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 5264.4,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 3,
+      "part-power": 4,
+      "sab-middle": 2,
+      "sab-north": 2,
+      "part-eyes": 1,
+      "den-choir": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "part-body": 3,
+      "truce-cats-rats": 3,
+      "den-songbirds": 3,
+      "den-racers": 4,
+      "den-horses": 3,
+      "part-talons": 3,
+      "truce-dogs-squirrels": 3,
+      "part-legs": 3,
+      "den-meermob": 2,
+      "den-strix": 2,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "part-beak": 4
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "reach: nothing spent",
+    "completed": "yes"
+   },
+   "fixture": "finale",
+   "via": "goals",
+   "secs": 216,
+   "consoleErrors": [],
+   "at": "2026-11-19T09:50:49.461Z"
+  },
+  "finale@biggify": {
+   "key": "finale@biggify",
+   "scripts": "finale",
+   "b": {
+    "quitIn": "finale @0.52s",
+    "save": {
+     "t": 5264.4,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 3,
+      "part-power": 4,
+      "sab-middle": 2,
+      "sab-north": 2,
+      "part-eyes": 1,
+      "den-choir": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "part-body": 3,
+      "truce-cats-rats": 3,
+      "den-songbirds": 3,
+      "den-racers": 4,
+      "den-horses": 3,
+      "part-talons": 3,
+      "truce-dogs-squirrels": 3,
+      "part-legs": 3,
+      "den-meermob": 2,
+      "den-strix": 2,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "part-beak": 4
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "reach: nothing spent",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "finale @0.52s",
+    "save": {
+     "t": 5264.4,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 3,
+      "part-power": 4,
+      "sab-middle": 2,
+      "sab-north": 2,
+      "part-eyes": 1,
+      "den-choir": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "part-body": 3,
+      "truce-cats-rats": 3,
+      "den-songbirds": 3,
+      "den-racers": 4,
+      "den-horses": 3,
+      "part-talons": 3,
+      "truce-dogs-squirrels": 3,
+      "part-legs": 3,
+      "den-meermob": 2,
+      "den-strix": 2,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "part-beak": 4
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 5264.4,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 3,
+      "part-power": 4,
+      "sab-middle": 2,
+      "sab-north": 2,
+      "part-eyes": 1,
+      "den-choir": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "part-body": 3,
+      "truce-cats-rats": 3,
+      "den-songbirds": 3,
+      "den-racers": 4,
+      "den-horses": 3,
+      "part-talons": 3,
+      "truce-dogs-squirrels": 3,
+      "part-legs": 3,
+      "den-meermob": 2,
+      "den-strix": 2,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "part-beak": 4
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "reach: nothing spent",
+    "completed": "yes"
+   },
+   "fixture": "finale",
+   "via": "goals",
+   "secs": 192,
+   "consoleErrors": [],
+   "at": "2026-11-19T09:54:01.108Z"
+  },
+  "finale@stomp": {
+   "key": "finale@stomp",
+   "scripts": "finale",
+   "b": {
+    "quitIn": "finale @0.52s",
+    "save": {
+     "t": 5264.4,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 3,
+      "part-power": 4,
+      "sab-middle": 2,
+      "sab-north": 2,
+      "part-eyes": 1,
+      "den-choir": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "part-body": 3,
+      "truce-cats-rats": 3,
+      "den-songbirds": 3,
+      "den-racers": 4,
+      "den-horses": 3,
+      "part-talons": 3,
+      "truce-dogs-squirrels": 3,
+      "part-legs": 3,
+      "den-meermob": 2,
+      "den-strix": 2,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "part-beak": 4
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "reach: nothing spent",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "finale @0.52s",
+    "save": {
+     "t": 5264.4,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 3,
+      "part-power": 4,
+      "sab-middle": 2,
+      "sab-north": 2,
+      "part-eyes": 1,
+      "den-choir": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "part-body": 3,
+      "truce-cats-rats": 3,
+      "den-songbirds": 3,
+      "den-racers": 4,
+      "den-horses": 3,
+      "part-talons": 3,
+      "truce-dogs-squirrels": 3,
+      "part-legs": 3,
+      "den-meermob": 2,
+      "den-strix": 2,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "part-beak": 4
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 5264.4,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 3,
+      "part-power": 4,
+      "sab-middle": 2,
+      "sab-north": 2,
+      "part-eyes": 1,
+      "den-choir": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "part-body": 3,
+      "truce-cats-rats": 3,
+      "den-songbirds": 3,
+      "den-racers": 4,
+      "den-horses": 3,
+      "part-talons": 3,
+      "truce-dogs-squirrels": 3,
+      "part-legs": 3,
+      "den-meermob": 2,
+      "den-strix": 2,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "part-beak": 4
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "reach: nothing spent",
+    "completed": "yes"
+   },
+   "fixture": "finale",
+   "via": "goals",
+   "secs": 201,
+   "consoleErrors": [],
+   "at": "2026-11-19T09:57:22.272Z"
+  },
+  "finale@climb": {
+   "key": "finale@climb",
+   "scripts": "finale",
+   "b": {
+    "quitIn": "finale @0.52s",
+    "save": {
+     "t": 5264.4,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 3,
+      "part-power": 4,
+      "sab-middle": 2,
+      "sab-north": 2,
+      "part-eyes": 1,
+      "den-choir": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "part-body": 3,
+      "truce-cats-rats": 3,
+      "den-songbirds": 3,
+      "den-racers": 4,
+      "den-horses": 3,
+      "part-talons": 3,
+      "truce-dogs-squirrels": 3,
+      "part-legs": 3,
+      "den-meermob": 2,
+      "den-strix": 2,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "part-beak": 4
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "reach: nothing spent",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "finale @0.52s",
+    "save": {
+     "t": 5264.4,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 3,
+      "part-power": 4,
+      "sab-middle": 2,
+      "sab-north": 2,
+      "part-eyes": 1,
+      "den-choir": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "part-body": 3,
+      "truce-cats-rats": 3,
+      "den-songbirds": 3,
+      "den-racers": 4,
+      "den-horses": 3,
+      "part-talons": 3,
+      "truce-dogs-squirrels": 3,
+      "part-legs": 3,
+      "den-meermob": 2,
+      "den-strix": 2,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "part-beak": 4
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 5264.4,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 3,
+      "part-power": 4,
+      "sab-middle": 2,
+      "sab-north": 2,
+      "part-eyes": 1,
+      "den-choir": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "part-body": 3,
+      "truce-cats-rats": 3,
+      "den-songbirds": 3,
+      "den-racers": 4,
+      "den-horses": 3,
+      "part-talons": 3,
+      "truce-dogs-squirrels": 3,
+      "part-legs": 3,
+      "den-meermob": 2,
+      "den-strix": 2,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "part-beak": 4
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "reach: nothing spent",
+    "completed": "yes"
+   },
+   "fixture": "finale",
+   "via": "goals",
+   "secs": 195,
+   "consoleErrors": [],
+   "at": "2026-11-19T10:00:37.110Z"
+  },
+  "finale@shout": {
+   "key": "finale@shout",
+   "scripts": "finale",
+   "b": {
+    "quitIn": "finale @0.52s",
+    "save": {
+     "t": 5264.4,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 3,
+      "part-power": 4,
+      "sab-middle": 2,
+      "sab-north": 2,
+      "part-eyes": 1,
+      "den-choir": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "part-body": 3,
+      "truce-cats-rats": 3,
+      "den-songbirds": 3,
+      "den-racers": 4,
+      "den-horses": 3,
+      "part-talons": 3,
+      "truce-dogs-squirrels": 3,
+      "part-legs": 3,
+      "den-meermob": 2,
+      "den-strix": 2,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "part-beak": 4
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "reach: nothing spent",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "finale @0.52s",
+    "save": {
+     "t": 5264.4,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 3,
+      "part-power": 4,
+      "sab-middle": 2,
+      "sab-north": 2,
+      "part-eyes": 1,
+      "den-choir": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "part-body": 3,
+      "truce-cats-rats": 3,
+      "den-songbirds": 3,
+      "den-racers": 4,
+      "den-horses": 3,
+      "part-talons": 3,
+      "truce-dogs-squirrels": 3,
+      "part-legs": 3,
+      "den-meermob": 2,
+      "den-strix": 2,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "part-beak": 4
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 5264.4,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 3,
+      "part-power": 4,
+      "sab-middle": 2,
+      "sab-north": 2,
+      "part-eyes": 1,
+      "den-choir": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "part-body": 3,
+      "truce-cats-rats": 3,
+      "den-songbirds": 3,
+      "den-racers": 4,
+      "den-horses": 3,
+      "part-talons": 3,
+      "truce-dogs-squirrels": 3,
+      "part-legs": 3,
+      "den-meermob": 2,
+      "den-strix": 2,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "part-beak": 4
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "reach: nothing spent",
+    "completed": "yes"
+   },
+   "fixture": "finale",
+   "via": "goals",
+   "secs": 189,
+   "consoleErrors": [],
+   "at": "2026-11-19T10:03:46.447Z"
+  },
+  "finale@credits": {
+   "key": "finale@credits",
+   "scripts": "finale",
+   "b": {
+    "quitIn": "finale @0.52s",
+    "save": {
+     "t": 5264.4,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 3,
+      "part-power": 4,
+      "sab-middle": 2,
+      "sab-north": 2,
+      "part-eyes": 1,
+      "den-choir": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "part-body": 3,
+      "truce-cats-rats": 3,
+      "den-songbirds": 3,
+      "den-racers": 4,
+      "den-horses": 3,
+      "part-talons": 3,
+      "truce-dogs-squirrels": 3,
+      "part-legs": 3,
+      "den-meermob": 2,
+      "den-strix": 2,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "part-beak": 4
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "reach: nothing spent",
+    "retrigger": "scene started again",
+    "worldDiff": []
+   },
+   "a": {
+    "quitIn": "finale @0.52s",
+    "save": {
+     "t": 5264.4,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 3,
+      "part-power": 4,
+      "sab-middle": 2,
+      "sab-north": 2,
+      "part-eyes": 1,
+      "den-choir": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "part-body": 3,
+      "truce-cats-rats": 3,
+      "den-songbirds": 3,
+      "den-racers": 4,
+      "den-horses": 3,
+      "part-talons": 3,
+      "truce-dogs-squirrels": 3,
+      "part-legs": 3,
+      "den-meermob": 2,
+      "den-strix": 2,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "part-beak": 4
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "saveAfterClose": {
+     "t": 5264.4,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 3,
+      "part-power": 4,
+      "sab-middle": 2,
+      "sab-north": 2,
+      "part-eyes": 1,
+      "den-choir": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "part-body": 3,
+      "truce-cats-rats": 3,
+      "den-songbirds": 3,
+      "den-racers": 4,
+      "den-horses": 3,
+      "part-talons": 3,
+      "truce-dogs-squirrels": 3,
+      "part-legs": 3,
+      "den-meermob": 2,
+      "den-strix": 2,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "part-beak": 4
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "after": {
+     "step": 0,
+     "carried": null,
+     "repaired": null
+    },
+    "leftovers": {},
+    "trigger": "reach: nothing spent",
+    "completed": "yes"
+   },
+   "fixture": "finale",
+   "via": "goals",
+   "secs": 247,
+   "consoleErrors": [],
+   "at": "2026-11-19T10:07:53.817Z"
+  }
+ }
+}

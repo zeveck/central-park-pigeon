@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Central Park Pigeon: Gus test scene</title>
+  <style>
+    html, body { margin: 0; height: 100%; overflow: hidden; background: #9fd0f0; touch-action: none; user-select: none; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+    #hud { position: fixed; left: 8px; bottom: 8px; font: 12px/1.4 system-ui, sans-serif; color: #1d2a1b;
+           background: rgba(255,255,255,0.6); padding: 4px 8px; border-radius: 6px; pointer-events: none; }
+    #loading { position: fixed; inset: 0; display: grid; place-items: center; font: 600 18px system-ui, sans-serif; color: #26351f; }
+  </style>
+  <script type="importmap">
+  { "imports": { "three": "../vendor/three.module.js", "three/addons/": "../vendor/addons/" } }
+  </script>
+</head>
+<body>
+  <div id="loading">Loading Gus…</div>
+  <div id="hud">WASD move · Space take off / flap · C dive · E peck</div>
+  <script type="module" src="./gus-test.js"></script>
+</body>
+</html>
