@@ -1,0 +1,45 @@
+# Land/perf: full replay of every recorded solution (after the last flight change: gus.js tap-to-land with LAND.calm)
+# 2026-11-20 container clock; game/tools/sf-run.mjs serve/replay (HTTP cache off), one headless browser on port 8321, preset low, 960x540.
+# 'base' = the end game time in polish-replays.txt / boot-fix (prologue 103.4 since boot-fix). den-meermob.alt failed on the first pass (the first tap rule latched a trim right after Flap at frame 3757); it passed after LAND.calm (the page reloaded with that rule before every job from den-turtles on).
+
+prologue.json completed=yes consoleErrorLines=0 end "t":103.4 base "t":98.4
+den-ducks.json completed=yes consoleErrorLines=0 end "t":196.38 base "t":196.38
+finale.json completed=yes consoleErrorLines=0 end "t":5446.9 base "t":5446.9
+den-choir.json completed=yes consoleErrorLines=0 end "t":2086.68 base "t":2086.68
+den-geese.json completed=yes consoleErrorLines=0 end "t":3731.52 base "t":3731.52
+den-meermob.alt (first pass).json completed=NO consoleErrorLines=0 end "t":6195 base "t":6187.97
+den-meermob.json completed=yes consoleErrorLines=0 end "t":6074 base "t":6074
+den-racers.alt.json completed=yes consoleErrorLines=0 end "t":4147.45 base "t":4147.45
+den-racers.json completed=yes consoleErrorLines=0 end "t":2322 base "t":2322
+den-songbirds.json completed=yes consoleErrorLines=0 end "t":2401.52 base "t":2401.52
+den-turtles.json completed=yes consoleErrorLines=0 end "t":3129 base "t":3129
+part-beak.alt.json completed=yes consoleErrorLines=0 end "t":2337.23 base "t":2337.23
+part-legs.json completed=yes consoleErrorLines=0 end "t":6739.52 base "t":6739.52
+den-biscuit.json completed=yes consoleErrorLines=0 end "t":1393.98 base "t":1393.98
+den-cats.alt.json completed=yes consoleErrorLines=0 end "t":689.78 base "t":689.78
+den-cats.json completed=yes consoleErrorLines=0 end "t":622.88 base "t":622.88
+den-crows.json completed=yes consoleErrorLines=0 end "t":755.88 base "t":755.88
+den-horses.alt.json completed=yes consoleErrorLines=0 end "t":4839 base "t":4839
+den-horses.json completed=yes consoleErrorLines=0 end "t":4839 base "t":4839
+den-raccoons.alt.json completed=yes consoleErrorLines=0 end "t":1698.65 base "t":1698.65
+den-raccoons.json completed=yes consoleErrorLines=0 end "t":1693.82 base "t":1693.82
+den-rats.json completed=yes consoleErrorLines=0 end "t":429.3 base "t":429.3
+den-rhoda.json completed=yes consoleErrorLines=0 end "t":3726.97 base "t":3726.97
+den-squirrels.json completed=yes consoleErrorLines=0 end "t":368.3 base "t":368.3
+den-strix.json completed=yes consoleErrorLines=0 end "t":1504.4 base "t":1504.4
+gear-headlamp.json completed=yes consoleErrorLines=0 end "t":1055.43 base "t":1055.43
+gear-pen.alt.json completed=yes consoleErrorLines=0 end "t":936.88 base "t":936.88
+gear-pen.json completed=yes consoleErrorLines=0 end "t":955.88 base "t":955.88
+gear-sunglasses.json completed=yes consoleErrorLines=0 end "t":874.88 base "t":874.88
+part-beak.json completed=yes consoleErrorLines=0 end "t":2517.27 base "t":2517.27
+part-body.json completed=yes consoleErrorLines=0 end "t":1991.2 base "t":1991.2
+part-power.json completed=yes consoleErrorLines=0 end "t":5274.9 base "t":5274.9
+part-talons.json completed=yes consoleErrorLines=0 end "t":5466.73 base "t":5466.73
+part-wings.alt.json completed=yes consoleErrorLines=0 end "t":1270.98 base "t":1270.98
+part-wings.json completed=yes consoleErrorLines=0 end "t":1292.98 base "t":1292.98
+sab-middle.json completed=yes consoleErrorLines=0 end "t":1791.23 base "t":1791.23
+sab-north.json completed=yes consoleErrorLines=0 end "t":1734.23 base "t":1734.23
+truce-cats-rats.alt.json completed=yes consoleErrorLines=0 end "t":2696.82 base "t":2696.82
+truce-cats-rats.json completed=yes consoleErrorLines=0 end "t":2735.85 base "t":2735.85
+truce-dogs-squirrels.json completed=yes consoleErrorLines=0 end "t":3637 base "t":3637
+den-meermob.alt (retry).json completed=yes consoleErrorLines=0 end "t":6187.97 base "t":6187.97

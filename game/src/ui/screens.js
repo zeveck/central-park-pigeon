@@ -124,7 +124,7 @@ export function settingsScreen(G) {
   const el = overlay('settings', `
     <h2>Settings</h2>
     <div class="set"></div>
-    <p class="muted">Changing the graphics reloads the park (your progress is saved first).</p>
+    <p class="muted gfxnow"></p>
     <p class="muted offline hidden"></p>
     <div class="row more" style="margin-top:10px"></div>
     ${hints([['uiLeft', '−'], ['uiRight', '+'], ['uiOk', 'Select'], ['uiBack', 'Back']])}`);
@@ -136,12 +136,14 @@ export function settingsScreen(G) {
     ['sfx', 'Effects volume', 0, 1, 0.1, (v) => `${Math.round(v * 100)}%`],
     ['sensitivity', 'Camera sensitivity', 0.3, 2.5, 0.1, (v) => `${v.toFixed(1)}×`],
   ];
-  const toggles = [['muted', 'Mute'], ['invertY', 'Invert camera Y'], ['autoFollow', 'Flight camera auto-follow'], ['vibration', 'Vibration']];
+  const toggles = [['muted', 'Mute'], ['invertY', 'Invert camera Y'], ['autoFollow', 'Flight camera auto-follow'], ['vibration', 'Vibration'], ['showFps', 'Show FPS']];   // Land/perf: the frame-rate readout
   const render = () => {
     const S = G.settings;
     box.innerHTML = sliders.map(([k, label, lo, hi, , fmt]) => `<label>${label}</label><div class="slider"><div class="track focusable" tabindex="0" data-slider="${k}"><div class="fill" style="width:${((S[k] - lo) / (hi - lo)) * 100}%"></div></div><span class="val">${fmt(S[k])}</span></div>`).join('')
       + toggles.map(([k, label]) => `<label>${label}</label><button type="button" class="btn small" data-toggle="${k}">${S[k] ? 'On' : 'Off'}</button>`).join('')
       + `<label>Graphics</label><div class="choice">${['auto', 'low', 'medium', 'high'].map((g) => `<button type="button" class="btn small ${S.graphics === g ? 'on' : ''}" data-gfx="${g}">${g[0].toUpperCase() + g.slice(1)}</button>`).join('')}</div>`;
+    // Land/perf: say what is running (Auto may have stepped down)
+    el.querySelector('.gfxnow').textContent = `Running: ${G.preset?.label || ''}${G.presetAuto ? ' (Auto)' : ''}. Changing the graphics reloads the park (your progress is saved first).`;
     more.innerHTML = btn('back', 'Back', 'back', 'primary') + btn('credits', 'Credits', 'postcard') + (G.reportAvailable?.() ? btn('report', 'Report a bug', 'bug') : '');
     s.refreshOffline();
   };
@@ -200,17 +202,17 @@ export function settingsScreen(G) {
 
 // ------------------------------------------------------------------ controls cards
 const CARDS = [
-  { title: 'Move and fly', rows: [['move', 'Waddle / steer'], ['look', 'Camera'], ['flap', 'Hop, take off; hold to climb'], ['dive', 'Dive, land'], ['sprint', 'Waddle-sprint; boost in the air']] },
+  { title: 'Move and fly', rows: [['move', 'Waddle / steer'], ['look', 'Camera'], ['flap', 'Hop, take off; hold to climb'], ['dive', 'Land / Dive: tap when low to land, hold to dive'], ['sprint', 'Waddle-sprint; boost in the air']] },
   { title: 'Peck and coo', rows: [['peck', 'Peck: talk, pick up, give, flip a sign'], ['coo', 'Coo: tap to gather the flock, hold to swarm'], ['drop', 'Drop what you carry'], ['nap', 'Nap (on a perch, when it shows)']] },
   { title: 'Calling allies', rows: [['wheel', 'Hold the Ally wheel, pick, release'], ['peck', 'Peck an ally who is here: Ask'], ['board', 'Scheme Board'], ['map', 'Map']] },
   { title: 'Driving', rows: [['move', 'Steer'], ['flap', 'Gas'], ['dive', 'Brake, reverse'], ['coo', 'Horn (Dump / Spray on the Zamboni)'], ['peck', 'Get out']] },
 ];
 // Fixes-1: on touch the cards name the on-screen controls (the key list made no sense on a phone)
 const TOUCH_CARDS = [
-  { title: 'Move and fly', rows: [['Stick', 'Waddle / steer; push to the edge to sprint'], ['Drag', 'Camera: drag on the right half'], ['Flap', 'Hop, take off; hold to climb'], ['Dive', 'Dive, land'], ['Double-tap Flap', 'Boost in the air']] },
+  { title: 'Move and fly', rows: [['Stick', 'Waddle / steer; push to the edge to sprint'], ['Drag', 'Camera: drag on the right half'], ['Flap', 'Hop, take off; hold to climb'], ['Land', 'Land / Dive: tap when low to land, hold to dive'], ['Double-tap Flap', 'Boost in the air']] },
   { title: 'Peck and coo', rows: [['Peck', 'Talk, pick up, give, flip a sign'], ['Coo', 'Tap to gather the flock, hold to swarm'], ['Hold Peck', 'Drop what you carry'], ['Peck', 'Nap (on a perch, when it shows)']] },
   { title: 'Calling allies', rows: [['Gus', 'Tap his picture (top left): the Ally wheel'], ['Tap', 'Tap an ally on the wheel: Call or Ask'], ['Peck', 'Peck an ally who is here: Ask'], ['Board', 'Board and Map: the top-right buttons']] },
-  { title: 'Driving', rows: [['Stick', 'Steer'], ['Gas', 'Gas (the Flap button)'], ['Brake', 'Brake, reverse (Dive)'], ['Horn', 'Horn; Dump / Spray on the Zamboni (Coo)'], ['Out', 'Get out (Peck)']] },
+  { title: 'Driving', rows: [['Stick', 'Steer'], ['Gas', 'Gas (the Flap button)'], ['Brake', 'Brake, reverse (the Land button)'], ['Horn', 'Horn; Dump / Spray on the Zamboni (Coo)'], ['Out', 'Get out (Peck)']] },
 ];
 export function controlsScreen(G) {
   const el = overlay('controls', `<h2>Controls</h2><div class="cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px"></div><p class="muted pad-note hidden">Controllers work best in Chrome or Edge.</p><p class="muted report-note hidden">Ctrl+Shift+L: report a bug</p>${hints([['uiBack', 'Back']])}<div class="row" style="margin-top:8px">${btn('back', 'Back', 'back')}</div>`);

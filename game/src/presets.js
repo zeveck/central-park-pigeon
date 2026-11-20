@@ -2,14 +2,18 @@
 // desktop targets; Low is for phones and weak laptops. Auto picks Low on touch
 // devices, Medium on integrated GPUs, otherwise High, then probes the first
 // 3 s (below 40 fps → Low) and steps down one level if play stays below
-// 50 fps for 5 s. A forced preset (?preset=low|medium|high) turns Auto off,
+// 50 fps for 5 s. Land/perf: both are judged on whole windows (the 3 s after a
+// 2 s warm-up; then 1 s windows), not frame by frame: at 45 fps on a 60 Hz
+// screen every other frame is a fast one, which used to reset the 5 s count,
+// so the step-down never happened in play. A forced preset (?preset=low|medium|high) turns Auto off,
 // so headless replays never change what they draw.
 
 export const PRESETS = {
   high: {
     id: 'high', label: 'High', caps: { triangles: 1_200_000, calls: 300 }, far: 400, fog: [260, 2300],
     trees: { full: 36, mid: 84, lod: 320 }, crowd: { full: 90, lod: 250, songbirds: 80, horses: 10, range: 120 },
-    shadowMap: 2048, shadowBox: 60, pixelRatio: 2, textureScale: 1, facadeMax: 2048, humans: 16, blobDetail: 1,
+    shadowMap: 2048, shadowBox: 60, pixelRatio: 1.5,   // Land/perf: was 2 (a high-DPI monitor drew 4x the pixels)
+    textureScale: 1, facadeMax: 2048, humans: 16, blobDetail: 1,
     casters: { trees: 40, static: true }, propPool: { lamppost: 24, bench: 16 }, farDetail: 'full', fullTreeModel: 'full',
   },
   medium: {
@@ -62,19 +66,31 @@ export class AutoProbe {
     this.preset = preset;
     this.onDrop = onDrop;
     this.t = 0; this.frames = 0; this.slowFor = 0; this.done = false;
+    this.winT = 0; this.winN = 0;
   }
+  /** dt: one rendered frame's real duration (s), only while playing (not paused, not mid-scene). */
   frame(dt) {
     if (this.done || dt <= 0 || dt > 0.5) return;
-    this.t += dt; this.frames++;
     const next = this.preset.id === 'high' ? 'medium' : this.preset.id === 'medium' ? 'low' : null;
     if (!next) { this.done = true; return; }
-    if (this.t >= 3 && this.t - dt < 3) {
-      const fps = this.frames / this.t;
-      if (fps < 40) { this.done = true; this.onDrop('low'); return; }
+    this.t += dt;
+    if (this.t <= 2) return;   // warm-up: the first frames of play stream models and upload textures
+    this.frames++;
+    if (this.t >= 5 && this.t - dt < 5) {
+      const fps = this.frames / (this.t - 2);
+      if (fps < 40) { this.done = true; this.onDrop(fps < 25 ? 'low' : next, fps); return; }
     }
-    if (this.t > 3) {
-      this.slowFor = 1 / dt < 50 ? this.slowFor + dt : 0;
-      if (this.slowFor > 5) { this.done = true; this.onDrop(next); }
+    if (this.t > 5) {
+      this.winT += dt; this.winN++;
+      if (this.winT >= 1) {
+        const fps = this.winN / this.winT;
+        this.slowFor = fps < 50 ? this.slowFor + this.winT : 0;
+        this.lastFps = fps;
+        this.winT = 0; this.winN = 0;
+        if (this.slowFor >= 5) { this.done = true; this.onDrop(next, fps); }
+      }
     }
   }
+  /** A pause, a menu or a scene breaks the run: the slow count starts again (the warm-up doesn't). */
+  interrupt() { this.winT = 0; this.winN = 0; this.slowFor = 0; }
 }

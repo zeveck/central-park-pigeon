@@ -1,0 +1,1546 @@
+{
+ "preset": "high",
+ "spots": {
+  "bethesda": {
+   "sim": {
+    "msPerUpdate": 3.206,
+    "per": {
+     "systems": 0.044,
+     "humans": 1.486,
+     "crowds": 1.062,
+     "rest": 0.52
+    }
+   },
+   "withRenderMs": {
+    "ms": 15.454,
+    "calls": 233,
+    "tris": 1110700,
+    "far": 20,
+    "shadowCalls": 233
+   },
+   "profMsPerFrame": 21.341,
+   "topSelf": [
+    [
+     "(program) :0",
+     3.052,
+     14.3
+    ],
+    [
+     "updateMatrixWorld orig/vendor/three.core.js:12",
+     2.395,
+     11.2
+    ],
+    [
+     "(anon) orig/vendor/three.module.js:12",
+     1.094,
+     5.1
+    ],
+    [
+     "Ve orig/vendor/three.module.js:12",
+     0.896,
+     4.2
+    ],
+    [
+     "E orig/vendor/three.module.js:12",
+     0.83,
+     3.9
+    ],
+    [
+     "multiplyMatrices orig/vendor/three.core.js:12",
+     0.732,
+     3.4
+    ],
+    [
+     "bindVertexArray :0",
+     0.698,
+     3.3
+    ],
+    [
+     "update orig/vendor/three.module.js:12",
+     0.571,
+     2.7
+    ],
+    [
+     "WebGLRenderer.renderBufferDirect orig/vendor/three.module.js:12",
+     0.519,
+     2.4
+    ],
+    [
+     "uniformMatrix4fv :0",
+     0.465,
+     2.2
+    ],
+    [
+     "#move orig/src/entities/crowds.js:329",
+     0.308,
+     1.4
+    ],
+    [
+     "setValue orig/vendor/three.module.js:12",
+     0.291,
+     1.4
+    ],
+    [
+     "Xe orig/vendor/three.module.js:12",
+     0.289,
+     1.4
+    ],
+    [
+     "bufferSubData :0",
+     0.28,
+     1.3
+    ],
+    [
+     "getParameters orig/vendor/three.module.js:12",
+     0.264,
+     1.2
+    ],
+    [
+     "evaluate orig/vendor/three.core.js:12",
+     0.262,
+     1.2
+    ],
+    [
+     "#draw orig/src/entities/crowds.js:375",
+     0.259,
+     1.2
+    ],
+    [
+     "bindTexture :0",
+     0.252,
+     1.2
+    ],
+    [
+     "texSubImage2D :0",
+     0.245,
+     1.1
+    ],
+    [
+     "apply orig/vendor/three.core.js:12",
+     0.223,
+     1
+    ],
+    [
+     "update orig/src/entities/crowds.js:274",
+     0.211,
+     1
+    ],
+    [
+     "#downmix orig/src/audio.js:298",
+     0.208,
+     1
+    ],
+    [
+     "useProgram :0",
+     0.207,
+     1
+    ],
+    [
+     "r orig/vendor/three.module.js:12",
+     0.205,
+     1
+    ],
+    [
+     "setup orig/vendor/three.module.js:12",
+     0.203,
+     1
+    ]
+   ],
+   "topIncl": [
+    [
+     "(anon) :1",
+     17.738
+    ],
+    [
+     "evaluate :364",
+     17.736
+    ],
+    [
+     "step http://127.0.0.1:8321/orig/src/debug.js:153",
+     17.727
+    ],
+    [
+     "render http://127.0.0.1:8321/orig/src/main.js:1436",
+     13.696
+    ],
+    [
+     "WebGLRenderer.render http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     13.61
+    ],
+    [
+     "WebGLRenderer.renderBufferDirect http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     6.92
+    ],
+    [
+     "He http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     5.677
+    ],
+    [
+     "ke http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     5.665
+    ],
+    [
+     "ze http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     5.531
+    ],
+    [
+     "(anon) http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     5.518
+    ],
+    [
+     "update http://127.0.0.1:8321/orig/src/main.js:757",
+     3.808
+    ],
+    [
+     "gameplay http://127.0.0.1:8321/orig/src/main.js:785",
+     3.643
+    ],
+    [
+     "updateMatrixWorld http://127.0.0.1:8321/orig/vendor/three.core.js:12",
+     2.854
+    ],
+    [
+     "sm.render http://127.0.0.1:8321/orig/src/gfx/shadow-only.js:26",
+     2.771
+    ],
+    [
+     "WebGLShadowMap.render http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     2.756
+    ],
+    [
+     "E http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     2.611
+    ],
+    [
+     "Ve http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     2.157
+    ],
+    [
+     "setValue http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     1.617
+    ],
+    [
+     "upload http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     1.475
+    ],
+    [
+     "update http://127.0.0.1:8321/orig/src/entities/humans.js:445",
+     1.383
+    ],
+    [
+     "setup http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     1.378
+    ],
+    [
+     "update http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     1.14
+    ],
+    [
+     "update http://127.0.0.1:8321/orig/src/entities/crowds.js:274",
+     1.051
+    ],
+    [
+     "setValueT1 http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     1.044
+    ],
+    [
+     "b http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     1.029
+    ],
+    [
+     "update http://127.0.0.1:8321/orig/vendor/three.core.js:12",
+     0.907
+    ],
+    [
+     "multiplyMatrices http://127.0.0.1:8321/orig/vendor/three.core.js:12",
+     0.732
+    ],
+    [
+     "s http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.718
+    ],
+    [
+     "bindVertexArray :0",
+     0.698
+    ],
+    [
+     "N http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.649
+    ],
+    [
+     "Xe http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.602
+    ],
+    [
+     "uniformMatrix4fv :0",
+     0.465
+    ],
+    [
+     "evaluate http://127.0.0.1:8321/orig/vendor/three.core.js:12",
+     0.437
+    ],
+    [
+     "#draw http://127.0.0.1:8321/orig/src/entities/crowds.js:375",
+     0.394
+    ],
+    [
+     "bindTexture http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.387
+    ],
+    [
+     "#move http://127.0.0.1:8321/orig/src/entities/crowds.js:329",
+     0.371
+    ],
+    [
+     "setValueM4Array http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.37
+    ],
+    [
+     "setValueM4 http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.365
+    ],
+    [
+     "apply http://127.0.0.1:8321/orig/vendor/three.core.js:12",
+     0.315
+    ],
+    [
+     "setMaterial http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.31
+    ]
+   ]
+  },
+  "mall": {
+   "sim": {
+    "msPerUpdate": 2.866,
+    "per": {
+     "systems": 0.064,
+     "humans": 1.203,
+     "crowds": 0.93,
+     "rest": 0.396
+    }
+   },
+   "withRenderMs": {
+    "ms": 15.022,
+    "calls": 217,
+    "tris": 1067589,
+    "far": 20,
+    "shadowCalls": 217
+   },
+   "profMsPerFrame": 18.307,
+   "topSelf": [
+    [
+     "updateMatrixWorld orig/vendor/three.core.js:12",
+     2.617,
+     14.3
+    ],
+    [
+     "Ve orig/vendor/three.module.js:12",
+     0.998,
+     5.5
+    ],
+    [
+     "E orig/vendor/three.module.js:12",
+     0.825,
+     4.5
+    ],
+    [
+     "bindVertexArray :0",
+     0.803,
+     4.4
+    ],
+    [
+     "(anon) orig/vendor/three.module.js:12",
+     0.757,
+     4.1
+    ],
+    [
+     "(program) :0",
+     0.746,
+     4.1
+    ],
+    [
+     "multiplyMatrices orig/vendor/three.core.js:12",
+     0.619,
+     3.4
+    ],
+    [
+     "update orig/vendor/three.module.js:12",
+     0.547,
+     3
+    ],
+    [
+     "WebGLRenderer.renderBufferDirect orig/vendor/three.module.js:12",
+     0.484,
+     2.6
+    ],
+    [
+     "uniformMatrix4fv :0",
+     0.43,
+     2.4
+    ],
+    [
+     "#move orig/src/entities/crowds.js:329",
+     0.409,
+     2.2
+    ],
+    [
+     "bufferSubData :0",
+     0.32,
+     1.8
+    ],
+    [
+     "setValue orig/vendor/three.module.js:12",
+     0.313,
+     1.7
+    ],
+    [
+     "evaluate orig/vendor/three.core.js:12",
+     0.284,
+     1.6
+    ],
+    [
+     "texParameteri :0",
+     0.254,
+     1.4
+    ],
+    [
+     "bindTexture :0",
+     0.24,
+     1.3
+    ],
+    [
+     "activeTexture :0",
+     0.234,
+     1.3
+    ],
+    [
+     "useProgram :0",
+     0.229,
+     1.3
+    ],
+    [
+     "r orig/vendor/three.module.js:12",
+     0.221,
+     1.2
+    ],
+    [
+     "refreshMaterialUniforms orig/vendor/three.module.js:12",
+     0.217,
+     1.2
+    ],
+    [
+     "texSubImage2D :0",
+     0.217,
+     1.2
+    ],
+    [
+     "upload orig/vendor/three.module.js:12",
+     0.211,
+     1.2
+    ],
+    [
+     "Xe orig/vendor/three.module.js:12",
+     0.205,
+     1.1
+    ],
+    [
+     "#draw orig/src/entities/crowds.js:375",
+     0.179,
+     1
+    ],
+    [
+     "apply orig/vendor/three.core.js:12",
+     0.168,
+     0.9
+    ]
+   ],
+   "topIncl": [
+    [
+     "(anon) :1",
+     17.477
+    ],
+    [
+     "evaluate :364",
+     17.477
+    ],
+    [
+     "step http://127.0.0.1:8321/orig/src/debug.js:153",
+     17.474
+    ],
+    [
+     "render http://127.0.0.1:8321/orig/src/main.js:1436",
+     14.032
+    ],
+    [
+     "WebGLRenderer.render http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     13.854
+    ],
+    [
+     "WebGLRenderer.renderBufferDirect http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     6.939
+    ],
+    [
+     "He http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     5.867
+    ],
+    [
+     "ke http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     5.851
+    ],
+    [
+     "ze http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     5.688
+    ],
+    [
+     "(anon) http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     5.608
+    ],
+    [
+     "update http://127.0.0.1:8321/orig/src/main.js:757",
+     3.241
+    ],
+    [
+     "gameplay http://127.0.0.1:8321/orig/src/main.js:785",
+     3.139
+    ],
+    [
+     "updateMatrixWorld http://127.0.0.1:8321/orig/vendor/three.core.js:12",
+     3.018
+    ],
+    [
+     "sm.render http://127.0.0.1:8321/orig/src/gfx/shadow-only.js:26",
+     2.622
+    ],
+    [
+     "WebGLShadowMap.render http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     2.61
+    ],
+    [
+     "E http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     2.491
+    ],
+    [
+     "Ve http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     2.181
+    ],
+    [
+     "setValue http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     1.811
+    ],
+    [
+     "upload http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     1.608
+    ],
+    [
+     "setup http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     1.332
+    ],
+    [
+     "b http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     1.218
+    ],
+    [
+     "setValueT1 http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     1.213
+    ],
+    [
+     "update http://127.0.0.1:8321/orig/src/entities/humans.js:445",
+     1.191
+    ],
+    [
+     "update http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     1.118
+    ],
+    [
+     "update http://127.0.0.1:8321/orig/src/entities/crowds.js:274",
+     0.88
+    ],
+    [
+     "update http://127.0.0.1:8321/orig/vendor/three.core.js:12",
+     0.83
+    ],
+    [
+     "s http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.806
+    ],
+    [
+     "bindVertexArray :0",
+     0.803
+    ],
+    [
+     "N http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.651
+    ],
+    [
+     "multiplyMatrices http://127.0.0.1:8321/orig/vendor/three.core.js:12",
+     0.619
+    ],
+    [
+     "bindTexture http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.573
+    ],
+    [
+     "#move http://127.0.0.1:8321/orig/src/entities/crowds.js:329",
+     0.479
+    ],
+    [
+     "setValueM4 http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.444
+    ],
+    [
+     "refreshMaterialUniforms http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.441
+    ],
+    [
+     "uniformMatrix4fv :0",
+     0.43
+    ],
+    [
+     "Xe http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.403
+    ],
+    [
+     "evaluate http://127.0.0.1:8321/orig/vendor/three.core.js:12",
+     0.387
+    ],
+    [
+     "apply http://127.0.0.1:8321/orig/vendor/three.core.js:12",
+     0.321
+    ],
+    [
+     "bufferSubData :0",
+     0.32
+    ],
+    [
+     "setMaterial http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.304
+    ]
+   ]
+  },
+  "columbus": {
+   "sim": {
+    "msPerUpdate": 1.972,
+    "per": {
+     "systems": 0.043,
+     "humans": 0.414,
+     "crowds": 0.648,
+     "rest": 0.395
+    }
+   },
+   "withRenderMs": {
+    "ms": 11.549,
+    "calls": 100,
+    "tris": 324896,
+    "far": 11,
+    "shadowCalls": 100
+   },
+   "profMsPerFrame": 13.323,
+   "topSelf": [
+    [
+     "updateMatrixWorld orig/vendor/three.core.js:12",
+     2.726,
+     20.5
+    ],
+    [
+     "(program) :0",
+     1.434,
+     10.8
+    ],
+    [
+     "(anon) orig/vendor/three.module.js:12",
+     0.596,
+     4.5
+    ],
+    [
+     "multiplyMatrices orig/vendor/three.core.js:12",
+     0.561,
+     4.2
+    ],
+    [
+     "bindVertexArray :0",
+     0.402,
+     3
+    ],
+    [
+     "Ve orig/vendor/three.module.js:12",
+     0.392,
+     2.9
+    ],
+    [
+     "E orig/vendor/three.module.js:12",
+     0.371,
+     2.8
+    ],
+    [
+     "WebGLRenderer.renderBufferDirect orig/vendor/three.module.js:12",
+     0.359,
+     2.7
+    ],
+    [
+     "uniformMatrix4fv :0",
+     0.35,
+     2.6
+    ],
+    [
+     "update orig/vendor/three.module.js:12",
+     0.244,
+     1.8
+    ],
+    [
+     "bindTexture :0",
+     0.216,
+     1.6
+    ],
+    [
+     "setValue orig/vendor/three.module.js:12",
+     0.211,
+     1.6
+    ],
+    [
+     "Xe orig/vendor/three.module.js:12",
+     0.202,
+     1.5
+    ],
+    [
+     "#move orig/src/entities/crowds.js:329",
+     0.196,
+     1.5
+    ],
+    [
+     "#downmix orig/src/audio.js:298",
+     0.194,
+     1.5
+    ],
+    [
+     "getParameters orig/vendor/three.module.js:12",
+     0.164,
+     1.2
+    ],
+    [
+     "r orig/vendor/three.module.js:12",
+     0.163,
+     1.2
+    ],
+    [
+     "bufferSubData :0",
+     0.153,
+     1.2
+    ],
+    [
+     "useProgram :0",
+     0.147,
+     1.1
+    ],
+    [
+     "intersectsObject orig/vendor/three.core.js:12",
+     0.14,
+     1
+    ],
+    [
+     "#draw orig/src/entities/crowds.js:375",
+     0.114,
+     0.9
+    ],
+    [
+     "upload orig/vendor/three.module.js:12",
+     0.113,
+     0.8
+    ],
+    [
+     "refreshFogUniforms orig/vendor/three.module.js:12",
+     0.105,
+     0.8
+    ],
+    [
+     "update orig/src/entities/humans.js:445",
+     0.102,
+     0.8
+    ],
+    [
+     "pick orig/src/systems/interact.js:24",
+     0.098,
+     0.7
+    ]
+   ],
+   "topIncl": [
+    [
+     "step http://127.0.0.1:8321/orig/src/debug.js:153",
+     11.647
+    ],
+    [
+     "(anon) :1",
+     11.647
+    ],
+    [
+     "evaluate :364",
+     11.647
+    ],
+    [
+     "render http://127.0.0.1:8321/orig/src/main.js:1436",
+     9.535
+    ],
+    [
+     "WebGLRenderer.render http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     9.336
+    ],
+    [
+     "WebGLRenderer.renderBufferDirect http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     4.088
+    ],
+    [
+     "(anon) http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     3.377
+    ],
+    [
+     "updateMatrixWorld http://127.0.0.1:8321/orig/vendor/three.core.js:12",
+     3.226
+    ],
+    [
+     "He http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     3.089
+    ],
+    [
+     "ke http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     3.071
+    ],
+    [
+     "ze http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     3.028
+    ],
+    [
+     "update http://127.0.0.1:8321/orig/src/main.js:757",
+     1.927
+    ],
+    [
+     "sm.render http://127.0.0.1:8321/orig/src/gfx/shadow-only.js:26",
+     1.856
+    ],
+    [
+     "WebGLShadowMap.render http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     1.852
+    ],
+    [
+     "gameplay http://127.0.0.1:8321/orig/src/main.js:785",
+     1.787
+    ],
+    [
+     "E http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     1.734
+    ],
+    [
+     "Ve http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     1.059
+    ],
+    [
+     "upload http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     1.011
+    ],
+    [
+     "setValue http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.852
+    ],
+    [
+     "setup http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.807
+    ],
+    [
+     "multiplyMatrices http://127.0.0.1:8321/orig/vendor/three.core.js:12",
+     0.561
+    ],
+    [
+     "update http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.526
+    ],
+    [
+     "update http://127.0.0.1:8321/orig/src/entities/crowds.js:274",
+     0.506
+    ],
+    [
+     "b http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.479
+    ],
+    [
+     "setValueT1 http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.478
+    ],
+    [
+     "s http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.408
+    ],
+    [
+     "update http://127.0.0.1:8321/orig/src/entities/humans.js:445",
+     0.402
+    ],
+    [
+     "bindVertexArray :0",
+     0.402
+    ],
+    [
+     "Xe http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.388
+    ],
+    [
+     "uniformMatrix4fv :0",
+     0.35
+    ],
+    [
+     "bindTexture http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.334
+    ],
+    [
+     "setValueM4 http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.27
+    ],
+    [
+     "#move http://127.0.0.1:8321/orig/src/entities/crowds.js:329",
+     0.237
+    ],
+    [
+     "bindTexture :0",
+     0.216
+    ],
+    [
+     "refreshMaterialUniforms http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.214
+    ],
+    [
+     "#ambBuffer http://127.0.0.1:8321/orig/src/audio.js:284",
+     0.204
+    ],
+    [
+     "#downmix http://127.0.0.1:8321/orig/src/audio.js:298",
+     0.194
+    ],
+    [
+     "setValueM4Array http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.189
+    ],
+    [
+     "getParameters http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.174
+    ],
+    [
+     "frameUi http://127.0.0.1:8321/orig/src/main.js:1465",
+     0.172
+    ]
+   ]
+  },
+  "wollman": {
+   "sim": {
+    "msPerUpdate": 2.746,
+    "per": {
+     "systems": 0.044,
+     "humans": 1.156,
+     "crowds": 0.804,
+     "rest": 0.403
+    }
+   },
+   "withRenderMs": {
+    "ms": 13.102,
+    "calls": 201,
+    "tris": 855348,
+    "far": 20,
+    "shadowCalls": 201
+   },
+   "profMsPerFrame": 17.021,
+   "topSelf": [
+    [
+     "updateMatrixWorld orig/vendor/three.core.js:12",
+     2.757,
+     16.2
+    ],
+    [
+     "(program) :0",
+     0.958,
+     5.6
+    ],
+    [
+     "(anon) orig/vendor/three.module.js:12",
+     0.874,
+     5.1
+    ],
+    [
+     "multiplyMatrices orig/vendor/three.core.js:12",
+     0.796,
+     4.7
+    ],
+    [
+     "bindVertexArray :0",
+     0.649,
+     3.8
+    ],
+    [
+     "Ve orig/vendor/three.module.js:12",
+     0.571,
+     3.4
+    ],
+    [
+     "E orig/vendor/three.module.js:12",
+     0.496,
+     2.9
+    ],
+    [
+     "uniformMatrix4fv :0",
+     0.463,
+     2.7
+    ],
+    [
+     "#move orig/src/entities/crowds.js:329",
+     0.458,
+     2.7
+    ],
+    [
+     "WebGLRenderer.renderBufferDirect orig/vendor/three.module.js:12",
+     0.452,
+     2.7
+    ],
+    [
+     "update orig/vendor/three.module.js:12",
+     0.382,
+     2.2
+    ],
+    [
+     "setValue orig/vendor/three.module.js:12",
+     0.32,
+     1.9
+    ],
+    [
+     "intersectsObject orig/vendor/three.core.js:12",
+     0.288,
+     1.7
+    ],
+    [
+     "bindTexture :0",
+     0.274,
+     1.6
+    ],
+    [
+     "upload orig/vendor/three.module.js:12",
+     0.252,
+     1.5
+    ],
+    [
+     "apply orig/vendor/three.core.js:12",
+     0.239,
+     1.4
+    ],
+    [
+     "useProgram :0",
+     0.236,
+     1.4
+    ],
+    [
+     "evaluate orig/vendor/three.core.js:12",
+     0.233,
+     1.4
+    ],
+    [
+     "r orig/vendor/three.module.js:12",
+     0.219,
+     1.3
+    ],
+    [
+     "bufferSubData :0",
+     0.198,
+     1.2
+    ],
+    [
+     "texSubImage2D :0",
+     0.175,
+     1
+    ],
+    [
+     "#draw orig/src/entities/crowds.js:375",
+     0.162,
+     1
+    ],
+    [
+     "Xe orig/vendor/three.module.js:12",
+     0.151,
+     0.9
+    ],
+    [
+     "push orig/vendor/three.module.js:12",
+     0.137,
+     0.8
+    ],
+    [
+     "refreshFogUniforms orig/vendor/three.module.js:12",
+     0.136,
+     0.8
+    ]
+   ],
+   "topIncl": [
+    [
+     "(anon) :1",
+     15.93
+    ],
+    [
+     "evaluate :364",
+     15.93
+    ],
+    [
+     "step http://127.0.0.1:8321/orig/src/debug.js:153",
+     15.928
+    ],
+    [
+     "render http://127.0.0.1:8321/orig/src/main.js:1436",
+     12.62
+    ],
+    [
+     "WebGLRenderer.render http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     12.492
+    ],
+    [
+     "WebGLRenderer.renderBufferDirect http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     6.055
+    ],
+    [
+     "He http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     5.154
+    ],
+    [
+     "ke http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     5.129
+    ],
+    [
+     "ze http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     5
+    ],
+    [
+     "(anon) http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     4.831
+    ],
+    [
+     "updateMatrixWorld http://127.0.0.1:8321/orig/vendor/three.core.js:12",
+     3.371
+    ],
+    [
+     "update http://127.0.0.1:8321/orig/src/main.js:757",
+     3.101
+    ],
+    [
+     "gameplay http://127.0.0.1:8321/orig/src/main.js:785",
+     2.997
+    ],
+    [
+     "sm.render http://127.0.0.1:8321/orig/src/gfx/shadow-only.js:26",
+     2.095
+    ],
+    [
+     "WebGLShadowMap.render http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     2.087
+    ],
+    [
+     "E http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     1.934
+    ],
+    [
+     "Ve http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     1.791
+    ],
+    [
+     "upload http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     1.512
+    ],
+    [
+     "setValue http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     1.385
+    ],
+    [
+     "setup http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     1.249
+    ],
+    [
+     "update http://127.0.0.1:8321/orig/src/entities/humans.js:445",
+     1.075
+    ],
+    [
+     "update http://127.0.0.1:8321/orig/src/entities/crowds.js:274",
+     0.929
+    ],
+    [
+     "update http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.813
+    ],
+    [
+     "setValueT1 http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.805
+    ],
+    [
+     "multiplyMatrices http://127.0.0.1:8321/orig/vendor/three.core.js:12",
+     0.796
+    ],
+    [
+     "b http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.791
+    ],
+    [
+     "update http://127.0.0.1:8321/orig/vendor/three.core.js:12",
+     0.779
+    ],
+    [
+     "s http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.658
+    ],
+    [
+     "bindVertexArray :0",
+     0.649
+    ],
+    [
+     "#move http://127.0.0.1:8321/orig/src/entities/crowds.js:329",
+     0.567
+    ],
+    [
+     "uniformMatrix4fv :0",
+     0.463
+    ],
+    [
+     "N http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.434
+    ],
+    [
+     "bindTexture http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.411
+    ],
+    [
+     "intersectsFrustum http://127.0.0.1:8321/orig/vendor/three.core.js:12",
+     0.356
+    ],
+    [
+     "setValueM4 http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.346
+    ],
+    [
+     "apply http://127.0.0.1:8321/orig/vendor/three.core.js:12",
+     0.344
+    ],
+    [
+     "evaluate http://127.0.0.1:8321/orig/vendor/three.core.js:12",
+     0.331
+    ],
+    [
+     "refreshMaterialUniforms http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.322
+    ],
+    [
+     "intersectsObject http://127.0.0.1:8321/orig/vendor/three.core.js:12",
+     0.315
+    ],
+    [
+     "setValueM4Array http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.299
+    ]
+   ]
+  },
+  "high-midpark": {
+   "sim": {
+    "msPerUpdate": 1.015,
+    "per": {
+     "systems": 0.03,
+     "humans": 0.149,
+     "crowds": 0.397,
+     "rest": 0.257
+    }
+   },
+   "withRenderMs": {
+    "ms": 9.556,
+    "calls": 148,
+    "tris": 752352,
+    "far": 17,
+    "shadowCalls": 148
+   },
+   "profMsPerFrame": 10.473,
+   "topSelf": [
+    [
+     "updateMatrixWorld orig/vendor/three.core.js:12",
+     2.311,
+     22.1
+    ],
+    [
+     "(program) :0",
+     0.635,
+     6.1
+    ],
+    [
+     "(anon) orig/vendor/three.module.js:12",
+     0.477,
+     4.6
+    ],
+    [
+     "multiplyMatrices orig/vendor/three.core.js:12",
+     0.475,
+     4.5
+    ],
+    [
+     "bindVertexArray :0",
+     0.389,
+     3.7
+    ],
+    [
+     "WebGLRenderer.renderBufferDirect orig/vendor/three.module.js:12",
+     0.325,
+     3.1
+    ],
+    [
+     "Ve orig/vendor/three.module.js:12",
+     0.313,
+     3
+    ],
+    [
+     "update orig/vendor/three.module.js:12",
+     0.259,
+     2.5
+    ],
+    [
+     "uniformMatrix4fv :0",
+     0.229,
+     2.2
+    ],
+    [
+     "setValue orig/vendor/three.module.js:12",
+     0.219,
+     2.1
+    ],
+    [
+     "E orig/vendor/three.module.js:12",
+     0.193,
+     1.8
+    ],
+    [
+     "#move orig/src/entities/crowds.js:329",
+     0.182,
+     1.7
+    ],
+    [
+     "uniform3f :0",
+     0.178,
+     1.7
+    ],
+    [
+     "bufferSubData :0",
+     0.162,
+     1.5
+    ],
+    [
+     "intersectsObject orig/vendor/three.core.js:12",
+     0.152,
+     1.4
+    ],
+    [
+     "#draw orig/src/entities/crowds.js:375",
+     0.144,
+     1.4
+    ],
+    [
+     "upload orig/vendor/three.module.js:12",
+     0.134,
+     1.3
+    ],
+    [
+     "r orig/vendor/three.module.js:12",
+     0.122,
+     1.2
+    ],
+    [
+     "#sim orig/src/entities/humans.js:516",
+     0.116,
+     1.1
+    ],
+    [
+     "bindTexture :0",
+     0.115,
+     1.1
+    ],
+    [
+     "Xe orig/vendor/three.module.js:12",
+     0.106,
+     1
+    ],
+    [
+     "setup orig/vendor/three.module.js:12",
+     0.105,
+     1
+    ],
+    [
+     "useProgram :0",
+     0.102,
+     1
+    ],
+    [
+     "getParameters orig/vendor/three.module.js:12",
+     0.097,
+     0.9
+    ],
+    [
+     "#compass orig/src/ui/hud.js:198",
+     0.097,
+     0.9
+    ]
+   ],
+   "topIncl": [
+    [
+     "step http://127.0.0.1:8321/orig/src/debug.js:153",
+     9.779
+    ],
+    [
+     "(anon) :1",
+     9.779
+    ],
+    [
+     "evaluate :364",
+     9.779
+    ],
+    [
+     "render http://127.0.0.1:8321/orig/src/main.js:1436",
+     7.951
+    ],
+    [
+     "WebGLRenderer.render http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     7.855
+    ],
+    [
+     "WebGLRenderer.renderBufferDirect http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     3.407
+    ],
+    [
+     "He http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     2.973
+    ],
+    [
+     "ke http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     2.938
+    ],
+    [
+     "ze http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     2.869
+    ],
+    [
+     "updateMatrixWorld http://127.0.0.1:8321/orig/vendor/three.core.js:12",
+     2.765
+    ],
+    [
+     "(anon) http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     2.656
+    ],
+    [
+     "update http://127.0.0.1:8321/orig/src/main.js:757",
+     1.575
+    ],
+    [
+     "gameplay http://127.0.0.1:8321/orig/src/main.js:785",
+     1.499
+    ],
+    [
+     "sm.render http://127.0.0.1:8321/orig/src/gfx/shadow-only.js:26",
+     1.07
+    ],
+    [
+     "WebGLShadowMap.render http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     1.058
+    ],
+    [
+     "Ve http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.967
+    ],
+    [
+     "E http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.953
+    ],
+    [
+     "upload http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.903
+    ],
+    [
+     "setup http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.781
+    ],
+    [
+     "setValue http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.777
+    ],
+    [
+     "update http://127.0.0.1:8321/orig/src/entities/crowds.js:274",
+     0.508
+    ],
+    [
+     "update http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.483
+    ],
+    [
+     "multiplyMatrices http://127.0.0.1:8321/orig/vendor/three.core.js:12",
+     0.475
+    ],
+    [
+     "s http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.39
+    ],
+    [
+     "bindVertexArray :0",
+     0.389
+    ],
+    [
+     "setValueM4 http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.266
+    ],
+    [
+     "setValueV3f http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.265
+    ],
+    [
+     "frameUi http://127.0.0.1:8321/orig/src/main.js:1465",
+     0.249
+    ],
+    [
+     "#move http://127.0.0.1:8321/orig/src/entities/crowds.js:329",
+     0.233
+    ],
+    [
+     "uniformMatrix4fv :0",
+     0.229
+    ],
+    [
+     "Xe http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.222
+    ],
+    [
+     "setValueT1 http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.21
+    ],
+    [
+     "update http://127.0.0.1:8321/orig/src/entities/humans.js:445",
+     0.202
+    ],
+    [
+     "intersectsFrustum http://127.0.0.1:8321/orig/vendor/three.core.js:12",
+     0.192
+    ],
+    [
+     "b http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.183
+    ],
+    [
+     "uniform3f :0",
+     0.178
+    ],
+    [
+     "refreshMaterialUniforms http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.175
+    ],
+    [
+     "bindTexture http://127.0.0.1:8321/orig/vendor/three.module.js:12",
+     0.171
+    ],
+    [
+     "bufferSubData :0",
+     0.162
+    ],
+    [
+     "intersectsObject http://127.0.0.1:8321/orig/vendor/three.core.js:12",
+     0.162
+    ]
+   ]
+  }
+ },
+ "errors": []
+}

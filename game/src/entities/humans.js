@@ -468,14 +468,32 @@ export class Humans {
       if (far !== c.far) { c.far = far; for (const [o, lm] of c.lods) { o.visible = !far; lm.visible = far; } }
       const bare = dc > this.lodDist * 2;   // and no accessories past twice that (each is a draw call)
       if (bare !== c.bare) { c.bare = bare; for (const h of Object.values(c.hold)) h.visible = !bare; }
-      if (c.animated) {
-        this.#clipFor(a, c, dt);
-        c.mixer.update(dt);
-        anim++;
-      } else frozen++;
-      if (a.dogs) this.#walkDogs(a, c, dt);
+      // Land/perf: the clip choice, the mixer and the dogs are visual only: they run once per DRAWN frame (pose(), from
+      // main.js render()), with the game time since, and less often for people far from the camera
+      c.dc = dc;
+      if (c.animated) { c.animDt = (c.animDt || 0) + dt; anim++; } else frozen++;
+      if (a.dogs) c.dogDt = (c.dogDt || 0) + dt;
     }
     this.drawn = { animated: anim, frozen };
+  }
+
+  /** Land/perf: pose and animate the drawn people (visual only; nothing in the sim reads a clip, a bone or a dog). Mixers
+   *  run every drawn frame within 14 m of the camera, every 2nd frame to 30 m, every 3rd beyond (with the time since). */
+  pose() {
+    this.poseN = (this.poseN || 0) + 1;
+    for (const list of [this.agents, this.extras]) for (const a of list) {
+      const c = a.clone;
+      if (!c) continue;
+      if (c.animated && c.animDt > 0) {
+        const every = c.dc < 14 ? 1 : c.dc < 30 ? 2 : 3;
+        if (c.current == null || (this.poseN + (a.k | 0)) % every === 0 || c.animDt > 0.25) {
+          this.#clipFor(a, c, c.animDt);
+          c.mixer.update(c.animDt);
+          c.animDt = 0;
+        }
+      }
+      if (a.dogs && c.dogDt > 0) { this.#walkDogs(a, c, c.dogDt); c.dogDt = 0; }
+    }
   }
 
   /** Where a seated agent's model is drawn (visual only: the agent's own x/z stay where the sim has them). */
@@ -706,6 +724,7 @@ export class Humans {
         const t = a.tint;
         for (const m of c.mats) t ? m.color.setRGB(t[0], t[1], t[2]) : m.color.setRGB(1, 1, 1);
         c.flav = null; c.flavT = 2 + (a.k % 5);
+        c.animDt = 0; c.dogDt = 0;   // Land/perf (pose())
         this.#dress(c, a);
       }
       a.clone.animated = a.wantAnim;

@@ -1,6 +1,6 @@
 // Touch controls (best-effort): a virtual stick (bottom-left, 140 px zone),
 // Flap (96 px, bottom-right; hold to climb, slide off it to turn the camera
-// with the same thumb, double-tap to boost), Dive (72 px), Peck (80 px) and
+// with the same thumb, double-tap to boost), Land (72 px; Land / Dive: tap when low to land, hold to dive), Peck (80 px) and
 // Coo (72 px; long-press Peck drops). Pause, map and board are HUD buttons. A drag on the right half that isn't a
 // button turns the camera. Shown only on touch devices, 55% opaque, inside the
 // safe areas; the bottom-centre 40% stays clear so they never cover Gus.
@@ -23,7 +23,7 @@ export class TouchControls {
     this.el.innerHTML = `
       <div class="stick"><div class="knob"></div></div>
       <button type="button" class="tb flap" data-a="flap" aria-label="Flap">Flap</button>
-      <button type="button" class="tb dive" data-a="dive" aria-label="Dive">Dive</button>
+      <button type="button" class="tb dive" data-a="dive" aria-label="Land">Land</button>
       <button type="button" class="tb peck" data-a="peck" aria-label="Peck">Peck</button>
       <button type="button" class="tb coo" data-a="coo" aria-label="Coo">Coo</button>`;
     root.appendChild(this.el);

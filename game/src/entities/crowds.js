@@ -287,7 +287,16 @@ export class Crowds {
     // ambient barks and sounds
     this.barkT -= dt;
     if (this.barkT <= 0) { this.barkT = 5 + ((G.state.time * 7) % 5); this.#bark(g); }
-    this.#draw(camera);
+    // Land/perf: drawing (nearest-N, instance matrices) is visual only: once per drawn frame (draw(), from main.js
+    // render()), not once per update (two or three updates a frame when the frame rate drops)
+    this.drawCam = camera; this.drawDirty = true;
+  }
+
+  /** Land/perf: refill the instanced meshes if anything moved since the last drawn frame. */
+  draw() {
+    if (!this.drawDirty || !this.drawCam) return;
+    this.drawDirty = false;
+    this.#draw(this.drawCam);
   }
 
   #decide(a, dt, g, gusLow) {

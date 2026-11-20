@@ -38,6 +38,12 @@ const TAKEOFF_SQUASH = 0.14;    // s
 const FLY = { cruise: 11, glide: 7.5, boost: 17, boostTime: 2, dive: 20, turn: 1.9, climb: 3.2, glideSink: 0.8, diveSink: 9, ceiling: 190 };
 const STAMINA = { climbDrain: 0.11, boostCost: 0.25, perchFill: 0.6, glideFill: 0.07 };
 const BODY_R = { ground: 0.12, air: 0.18 };
+// Land/perf: Land / Dive (C, ○/B, L2, the touch Land button). Held, it is the old dive (unchanged: recorded solutions
+// press it on exact frames). New: a short TAP (≤ `tap` s, and not right after climbing: no Flap in the `calm` s before it)
+// while low (within `alt` m of what's below, not over water) lands too: the
+// descent carries on after the key is up (gentler, slower forward speed) until he lands, and a perch within `perchR`
+// catches him. Flap, boost, a splash, a cutscene (locked input) or `max` seconds cancel it.
+const LAND = { tap: 0.3, calm: 0.25, alt: 10, max: 4, speed: 5, sink: 6.5, perchR: 1.0 };
 
 const ease = (t) => 1 - Math.pow(1 - t, 3);
 const approach = (v, target, rate, dt) => v + (target - v) * Math.min(1, rate * dt);
@@ -104,6 +110,11 @@ export class Gus {
     this.twirlT = 0;                // the wardrobe twirl (s left)
     this.staminaBonus = 0;          // golden pretzels: each one trims the climb drain a little
     this.slideV = 0; this.slideDist = 0;   // belly-sliding on the ice
+    this.diveHeldT = 0;             // Land/perf: how long Land / Dive has been held (for the tap-to-land)
+    this.landLatch = 0;             // Land/perf: > 0 while a tapped Land is carrying him down (s left)
+    this.glideT = 0;                // Land/perf: seconds flying without Flap or Land (the HUD's Land prompt reads it)
+    this.sinceFlap = 0;             // Land/perf: seconds since Flap was last held in the air (a tap right after a climb is a trim, not a landing)
+    this.lowAlt = Infinity;         // Land/perf: height over what's below him while flying (HUD only)
     this.useModel('stand');
   }
 
@@ -136,6 +147,7 @@ export class Gus {
     this.stepPhase = 0;
     this.inCanopy = false;
     this.events = [];
+    this.diveHeldT = 0; this.landLatch = 0; this.glideT = 0; this.lowAlt = Infinity; this.sinceFlap = 0;
     this.speed = speed ?? (mode === 'fly' ? FLY.cruise : 0);
     this.velocity.set(Math.sin(yaw), 0, Math.cos(yaw)).multiplyScalar(this.speed);
     this.useModel(mode === 'fly' ? 'fly' : 'stand');
@@ -253,6 +265,7 @@ export class Gus {
     this.speed = speed;
     this.perch = null;
     this.boostT = 0;
+    this.diveHeldT = 0; this.landLatch = 0; this.glideT = 0; this.sinceFlap = 0;
     this.useModel('fly');
   }
 
@@ -261,9 +274,26 @@ export class Gus {
     const inp = this.input;
     const mv = inp.move ? inp.move() : { x: inp.axis('left', 'right'), y: inp.axis('back', 'forward') };
     const amount = Math.min(1, Math.hypot(mv.x, mv.y));
-    const diving = inp.held('dive');
+    const diveIn = inp.held('dive');
     const canClimb = this.stamina > 0.001;
     const flapping = inp.held('flap') && canClimb;
+    // Land/perf: a short tap of Land while low lands too (see LAND). Holding it is the dive exactly as before.
+    this.sinceFlap = inp.held('flap') ? 0 : this.sinceFlap + dt;
+    if (diveIn) this.diveHeldT += dt;
+    else {
+      if (this.diveHeldT > 0 && this.diveHeldT <= LAND.tap + 1e-6 && this.sinceFlap - this.diveHeldT >= LAND.calm - 1e-6 && !inp.locked) {
+        const pp = this.root.position, below = this.#surface(pp.x, pp.z, pp.y + 0.05);
+        if (below.kind !== 'water' && pp.y - below.y <= LAND.alt) this.landLatch = LAND.max;
+      }
+      this.diveHeldT = 0;
+    }
+    if (this.landLatch > 0) {
+      this.landLatch -= dt;
+      if (inp.locked || inp.held('flap') || inp.pressed('sprint') || inp.pressed('boost') || this.boostT > 0) this.landLatch = 0;
+    }
+    const landing = this.landLatch > 0 && !diveIn;
+    const diving = diveIn || landing;
+    this.glideT = flapping || diving ? 0 : this.glideT + dt;
     // boost: Shift (or L3) pressed in the air, or a double-tapped Flap on touch
     if ((inp.pressed('sprint') || inp.pressed('boost')) && this.boostT <= 0 && this.stamina >= STAMINA.boostCost * 0.5) {
       this.boostT = FLY.boostTime * (this.boostMul || 1);   // Draft: the Racers double it
@@ -284,10 +314,10 @@ export class Gus {
 
     const lim = this.carryLimits;
     if (lim) this.boostT = 0;   // a heavy item: low and slow
-    let targetSpeed = this.boostT > 0 ? FLY.boost : diving ? FLY.dive : amount > 0.1 ? FLY.cruise : FLY.glide;
+    let targetSpeed = this.boostT > 0 ? FLY.boost : landing ? LAND.speed : diving ? FLY.dive : amount > 0.1 ? FLY.cruise : FLY.glide;
     if (lim) targetSpeed = Math.min(targetSpeed, lim.maxSpeed);
-    this.speed = approach(this.speed, targetSpeed, this.boostT > 0 ? 4 : diving ? 1.8 : 1.6, dt);
-    const targetVy = diving ? -FLY.diveSink : flapping ? FLY.climb : -FLY.glideSink;
+    this.speed = approach(this.speed, targetSpeed, this.boostT > 0 ? 4 : landing ? 2.5 : diving ? 1.8 : 1.6, dt);
+    const targetVy = landing ? -LAND.sink : diving ? -FLY.diveSink : flapping ? FLY.climb : -FLY.glideSink;
     this.vy = approach(this.vy, targetVy, flapping ? 3 : diving ? 2.2 : 1.5, dt);
     if (inp.pressed('flap') && canClimb) this.vy += 1.2;
 
@@ -336,21 +366,24 @@ export class Gus {
     if (p.y < surf.y && surf.kind !== 'water' && this.vy > -0.5) {
       p.y = surf.y;
     }
+    this.lowAlt = p.y - surf.y;   // Land/perf: for the HUD's Land prompt (read only)
 
     this.bank = approach(this.bank, THREE.MathUtils.clamp(yawRate * 0.42, -0.85, 0.85), 4, dt);
     // wings: fast hard beats when climbing, slower beats in a glide, tucked in a dive
     const a = this.flyAnim;
     const takeoffBoost = Math.max(0, 1 - this.modeT / 0.6);
     const beating = flapping || takeoffBoost > 0 || this.boostT > 0;
-    a.freq = approach(a.freq, diving ? 1.5 : beating ? 7.5 : amount > 0.1 ? 4.6 : 3.4, 6, dt);
-    a.amp = approach(a.amp, diving ? 0.12 : beating ? 0.95 : amount > 0.1 ? 0.72 : 0.45, 5, dt);
-    a.offset = approach(a.offset, diving ? 0.35 : -0.5, 5, dt);
+    // Land/perf: the last couple of metres of a landing, wings spread and back-beating (a flare; looks only)
+    const flare = diving && this.lowAlt < 2.2 && surf.kind !== 'water';
+    a.freq = approach(a.freq, flare ? 6.5 : diving ? 1.5 : beating ? 7.5 : amount > 0.1 ? 4.6 : 3.4, 6, dt);
+    a.amp = approach(a.amp, flare ? 0.85 : diving ? 0.12 : beating ? 0.95 : amount > 0.1 ? 0.72 : 0.45, flare ? 12 : 5, dt);
+    a.offset = approach(a.offset, flare ? -0.2 : diving ? 0.35 : -0.5, flare ? 12 : 5, dt);
     this.wings.advance(dt, a.freq);
     this.wings.setStroke(a.amp, a.offset);
 
     // perch or land
     if (this.vy <= 0.2 && this.modeT > 0.3) {
-      const perch = this.#nearestPerch(0.6, 0.15, 0.6);
+      const perch = this.#nearestPerch(landing ? LAND.perchR : 0.6, 0.15, 0.6);   // Land/perf: a tapped Land catches a perch a little wider
       if (perch) {
         p.set(perch.x, perch.y, perch.z);
         if (perch.yaw != null) this.yaw = perch.yaw;
@@ -365,6 +398,7 @@ export class Gus {
           p.y = ground.y + 0.02;
           this.vy = 3.2;
           this.speed = Math.max(this.speed * 0.6, 4);
+          this.landLatch = 0;   // Land/perf: water is no landing
           this.#splash();
           return;
         }
@@ -393,6 +427,7 @@ export class Gus {
     this.modeT = 0;
     this.perch = perch ? { ...perch, r: perch.perch?.r ?? 0.15, edge: perch.perch?.t === 'edge', id: perch.perch?.id, kind: perch.perch?.kind } : null;
     this.boostT = 0;
+    this.landLatch = 0; this.diveHeldT = 0;
     this.events.push({ type: mode === 'perch' ? 'perch' : 'land', x: this.root.position.x, y: this.root.position.y, z: this.root.position.z });
     this.vy = 0;
     this.speed = 0;

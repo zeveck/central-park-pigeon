@@ -12,7 +12,7 @@ export const SETTINGS_KEY = 'cpp-settings-v1';
 
 export const DEFAULT_SETTINGS = {
   music: 0.7, sfx: 0.85, muted: false,
-  sensitivity: 1, invertY: false, autoFollow: true, vibration: true, graphics: 'auto',
+  sensitivity: 1, invertY: false, autoFollow: true, vibration: true, graphics: 'auto', showFps: false,   // Land/perf: showFps
 };
 
 export function loadSettings() {

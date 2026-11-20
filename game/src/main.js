@@ -331,6 +331,24 @@
 //   - ui/map.js renderMapImage is async: keeps the scene's fog pushed out of reach (fog = null had compiled a second
 //     variant of every program), compileAsync for the rest, readRenderTargetPixelsAsync (PBO) instead of readPixels.
 //   - stage() waits a frame before changing the label too, so work a stage defers to the next paint shows under its own label.
+//
+// Land/perf notes (the user: "Is there a trick to landing?" and "slow even on my desktop"; design/reviews/land-perf-progress.md;
+// shots design/screenshots/land-perf/). Shared-file edits:
+//   - entities/gus.js: Land / Dive. Holding it is the old dive, unchanged. New: a short TAP (≤ 0.3 s, not within 0.25 s of
+//     holding Flap: that's a trim, and den-meermob.alt's recorded trims latched) while within 10 m of what's below (not water) lands too (gus.landLatch: a gentler descent, 5 m/s forward, 6.5 m/s down, a 1 m perch catch);
+//     Flap, boost, a splash, locked input (LOCKED_INPUT.locked, here) or 4 s cancel it. A wing flare in the last 2 m (looks
+//     only). gus.glideT / gus.lowAlt are read by the HUD only.
+//   - Here: hudView() shows "<Land key> Land" (landPromptWanted: flying and low, a perch below, within 30 m of a target or
+//     waypoint, or 3 s gliding; not over water, not in scenes, wheel, encounters/races (panel), or under another prompt or a
+//     tutor). glyphs.js / touch.js / screens.js: the action is "Land" on touch and "Land / Dive" in Controls.
+//   - Perf, render only (the sim is untouched; same seeds, same results): humans.js pose() and crowds.js draw() do the clip
+//     choice, mixers, dogs and the instance refill once per DRAWN frame (render() calls them), mixers at 1/2 or 1/3 rate past
+//     14 / 30 m; while render() runs, hidden subtrees skip updateMatrixWorld (the Object3D patch at the top); a frame with no
+//     update since the last isn't redrawn (120/144 Hz screens); hud.js / bubbles.js write the DOM only when a value changes
+//     (the compass strip reuses its spans). presets.js: High pixelRatio 1.5 (was 2); AutoProbe judged on whole windows
+//     (it reset on any single fast frame, so it never stepped down in play) and a toast before and after the reload.
+//   - FPS readout: Settings "Show FPS" (settings.showFps) or ?fps=1 → #fpsbox: drawn fps, frame ms (worst), CPU per update
+//     and per drawn frame, preset and pixel ratio.
 import * as THREE from 'three';
 import { choosePreset, PRESETS, AutoProbe, savePreset } from './presets.js';
 import { Progress, TextureStore } from './gfx/textures.js';
@@ -419,9 +437,19 @@ import { installReport } from './ui/report.js';
 import { installOffline } from './ui/offline.js';
 
 const DT = 1 / 60;
+// Land/perf: while the renderer walks the scene for a frame, a hidden subtree (pooled people and their 50-bone skeletons,
+// the Workshop, parked clue props, …) skips its matrix update: it isn't drawn, and it is brought up to date the frame it
+// shows again (updateMatrix() flags it, and a skipped node is flagged too). Outside render() nothing changes, so
+// getWorldPosition() and the sim see exactly what they saw before. Render only.
+let skipHiddenMatrices = false;
+const _umw = THREE.Object3D.prototype.updateMatrixWorld;
+THREE.Object3D.prototype.updateMatrixWorld = function (force) {
+  if (skipHiddenMatrices && this.visible === false) { this.matrixWorldNeedsUpdate = true; return; }
+  return _umw.call(this, force);
+};
 const MIRROR = new THREE.Matrix4().makeScale(-1, 1, 1);
 const NAP_SECS = 3;
-const LOCKED_INPUT = { held: () => false, pressed: () => false, axis: () => 0, move: () => ({ x: 0, y: 0, edge: false }) };
+const LOCKED_INPUT = { locked: true, held: () => false, pressed: () => false, axis: () => 0, move: () => ({ x: 0, y: 0, edge: false }) };
 
 const G = {
   DT, ready: false, frozen: false, paused: false, simTime: 0, updates: 0, fps: 60, lastStats: { triangles: 0, calls: 0 }, lastFarStats: null,
@@ -482,7 +510,7 @@ async function boot() {
   // Fixes-1 (bughunter #1): a phone turned while loading kept the canvas at its old size, because the listener
   // came at the end of boot. Listen from here on; the cameras and particles join in once they exist (resizeHook).
   let resizeHook = null;
-  const onResize = () => { renderer.setSize(innerWidth, innerHeight); resizeHook?.(); };
+  const onResize = () => { renderer.setSize(innerWidth, innerHeight); resizeHook?.(); G.needRender = true; };
   addEventListener('resize', onResize);
   addEventListener('orientationchange', onResize);
 
@@ -1153,6 +1181,7 @@ async function boot() {
     input.setSensitivity(s.sensitivity);
     input.setInvertY(s.invertY);
     rig.autoFollow = s.autoFollow;
+    G.showFps?.();   // Land/perf
     saveSettings(s);
   };
   G.toggleMute = () => { audio.toggleMute(); saveSettings(G.settings); G.menus.top?.reopen?.(); };
@@ -1418,6 +1447,11 @@ async function boot() {
     const feet = project(gus.position.x, gus.position.y - 0.02, gus.position.z);   // Fixes-1: the prompt goes below these
     const tu = G.tutorState;
     const dev = input.device, fam = input.gamepad.family;
+    let prompt = G.cutscene.locked || G.dialogue.open ? '' : (G.vehicles.driving ? G.vehicles.prompt : G.interact.prompt);
+    const panel = G.mods.map((m) => m.panel?.()).filter(Boolean).join('');
+    // Fixes-2: no second "□ the sign" bubble while the context prompt already says "□ Peck the sign"
+    const tutor = tu && !G.dialogue.open && !G.wheel.open && !(tu.action === 'peck' && G.interact.prompt && !G.cutscene.locked) ? `${glyph(tu.action, dev, fam)}<span>${tu.text}</span>` : '';
+    if (!prompt && !tutor && !panel && landPromptWanted(marks)) prompt = dev === 'touch' ? `<span>Tap</span>${glyph('dive', dev, fam)}<span>to land</span>` : `${glyph('dive', dev, fam)}<span>Land</span>`;   // Land/perf (touch: the button is named Land)
     return {
       stamina: gus.stamina, boosting: gus.boostT > 0, portrait: G.gusPortrait(),   // polish: the HUD circle is always Gus (it previewed the wheel's selected ally, which read as the player changing; the wheel itself shows the pick)
       device: dev, family: fam, feathers: st.feathers,
@@ -1425,12 +1459,25 @@ async function boot() {
       goal: G.schemes.goal(), crumbs: st.crumbs, flock: d.flock, crews: d.crews, parts: d.parts,
       phase: st.phase, phaseLabel: PHASE_LABEL[st.phase], meters: metersFor(st, d), muted: G.settings.muted,
       compass: marks, camYaw, gusScreen: sp.visible ? sp : null, gusFeetY: feet.visible ? feet.y : null,
-      prompt: G.cutscene.locked || G.dialogue.open ? '' : (G.vehicles.driving ? G.vehicles.prompt : G.interact.prompt),
-      panel: G.mods.map((m) => m.panel?.()).filter(Boolean).join(''),
-      drive: G.vehicles.hud(),
-      // Fixes-2: no second "□ the sign" bubble while the context prompt already says "□ Peck the sign"
-      tutor: tu && !G.dialogue.open && !G.wheel.open && !(tu.action === 'peck' && G.interact.prompt && !G.cutscene.locked) ? `${glyph(tu.action, dev, fam)}<span>${tu.text}</span>` : '',
+      prompt, panel, drive: G.vehicles.hud(), tutor,
     };
+  }
+  /** Land/perf: the in-flight "C Land" prompt (render/UI only; reads Gus, never changes him). Shown while flying when he
+   *  is low (within ~10 m of the ground or of a perch below), near the goal or a compass target, or has been gliding a
+   *  few seconds; not over water, not while Land is already held or carrying him down, not in scenes or with the wheel. */
+  let landShownT = -1, landPerchT = 0, landPerch = false;
+  function landPromptWanted(marks) {
+    if (gus.mode !== 'fly' || G.vehicles.driving || G.cutscene.locked || G.dialogue.open || G.wheel.open || G.altView) { landShownT = -1; return false; }
+    if (gus.landLatch > 0 || input.held('dive')) return false;
+    const p = gus.position;
+    if ((landPerchT -= 1) <= 0) { landPerchT = 8; landPerch = !!collision.nearestPerch(p, 4, 0.2, 10); }   // every 8th frame
+    const overWater = !!collision.waterAt(p.x, p.z) && gus.lowAlt < 30;
+    const near = marks.some((m) => (m.icon === 'target' || m.icon === 'waypoint') && m.dist != null && m.dist <= 30);
+    const want = !overWater && (gus.lowAlt <= 10 || landPerch || near || gus.glideT >= 3);
+    if (want) { if (landShownT < 0) landShownT = G.simTime; return true; }
+    if (landShownT >= 0 && G.simTime - landShownT < 0.6) return true;   // no flicker at the edges
+    landShownT = -1;
+    return false;
   }
 
   function render() {
@@ -1446,11 +1493,15 @@ async function boot() {
       G.lastStats = { triangles: renderer.info.render.triangles, calls: renderer.info.render.calls };
       return G.lastStats;
     }
-    renderer.render(far.scene, farCam);
-    G.lastFarStats = { triangles: renderer.info.render.triangles, calls: renderer.info.render.calls };
-    renderer.clearDepth();
-    G.detailCull.update(renderCam);   // perf pass
-    renderer.render(scene, renderCam);
+    G.humans.pose(); G.crowds.draw();   // Land/perf: their visual-only work, once per drawn frame
+    skipHiddenMatrices = true;
+    try {
+      renderer.render(far.scene, farCam);
+      G.lastFarStats = { triangles: renderer.info.render.triangles, calls: renderer.info.render.calls };
+      renderer.clearDepth();
+      G.detailCull.update(renderCam);   // perf pass
+      renderer.render(scene, renderCam);
+    } finally { skipHiddenMatrices = false; }
     G.lastStats = { triangles: renderer.info.render.triangles, calls: renderer.info.render.calls };
     // keep the preset's triangle cap: the crowds, people and named characters give way first
     const cap = preset.caps.triangles, t = G.lastStats.triangles;   // (info isn't reset between the passes: this counts both)
@@ -1540,11 +1591,31 @@ async function boot() {
   G.ready = true;
   if (resume && hasSave()) G.continueGame();
 
-  if (auto) G.autoProbe = new AutoProbe(preset, (next) => { G.setGraphics(next, { auto: true }); });   // Fixes-3 (B4)
+  // Land/perf: Auto's step-down tells the player (a toast now, and another after the reload)
+  if (auto) G.autoProbe = new AutoProbe(preset, (next, fps) => {   // Fixes-3 (B4)
+    const label = PRESETS[next]?.label || next;
+    console.info(`Auto graphics: ${Math.round(fps || 0)} fps on ${preset.label}, stepping down to ${label}`);
+    G.toast(`Running slowly: graphics to ${label}…`);
+    try { sessionStorage.setItem('cpp-autodrop', label); } catch { /* */ }
+    G.setGraphics(next, { auto: true });
+  });
+  try {
+    const dropped = sessionStorage.getItem('cpp-autodrop');
+    if (dropped) { sessionStorage.removeItem('cpp-autodrop'); G.later(1.5, () => G.toast(`Graphics set to ${dropped} to keep things smooth (Settings to change).`, { seconds: 5 })); }
+  } catch { /* */ }
   G.setPreset = (id) => G.setGraphics(id);
 
+  // Land/perf: the FPS / frame-time readout (Settings "Show FPS", or ?fps=1): frames per second, average and worst frame
+  // time, and the CPU time of the updates and the render (the GPU's share is the rest of the frame). Updated twice a second.
+  const fpsEl = document.createElement('div');
+  fpsEl.id = 'fpsbox';
+  document.body.appendChild(fpsEl);
+  const fpsForced = new URLSearchParams(location.search).get('fps') === '1';
+  const fpsStat = { n: 0, t: 0, worst: 0, upd: 0, rnd: 0, updN: 0 };
+  G.showFps = () => { const on = fpsForced || !!G.settings.showFps; fpsEl.classList.toggle('on', on); return on; };
+  G.showFps();
   let last = performance.now(), acc = 0, fpsT = 0, fpsN = 0;
-  G.resetClock = () => { last = performance.now(); acc = 0; };
+  G.resetClock = () => { last = performance.now(); acc = 0; G.autoProbe?.interrupt(); };
   function frame(now) {
     requestAnimationFrame(frame);
     const elapsed = Math.min(0.25, (now - last) / 1000);
@@ -1552,14 +1623,32 @@ async function boot() {
     fpsT += elapsed; fpsN++;
     if (fpsT > 1) { G.fps = fpsN / fpsT; fpsT = 0; fpsN = 0; }
     if (!G.frozen && !G.paused && G.screen === 'play' && !G.midScene()) G.autoProbe?.frame(elapsed);   // Fixes-1 (#3): not during the opening scene
+    else G.autoProbe?.interrupt();   // Land/perf: a pause or a scene breaks the slow run
+    const t0 = performance.now();
+    let n = 0;
     if (!G.frozen) {
       acc += elapsed;
-      let n = 0;
       while (acc >= DT && n < 8) { update(DT); acc -= DT; n++; }
       if (n === 8) acc = 0;
     }
+    const t1 = performance.now();
     frameUi(elapsed);
-    if (!G.frozen && G.screen === 'play') render();
+    // Land/perf: a frame with no update since the last one would draw the very same picture (everything moves on the
+    // fixed clock), so on a 120/144 Hz screen it isn't drawn again: the canvas keeps showing the last frame. A resize
+    // (or G.needRender) draws regardless.
+    const drew = !G.frozen && G.screen === 'play' && (n > 0 || G.needRender);
+    if (drew) { G.needRender = false; render(); }
+    if (fpsEl.classList.contains('on')) {
+      // fps = frames actually drawn per second; ms = average time between them (and the worst); cpu = this page's own
+      // JavaScript per update and per drawn frame (UI + render calls). A frame much longer than the cpu numbers is GPU-bound.
+      const S = fpsStat;
+      S.t += elapsed; S.upd += t1 - t0; S.updN += n;
+      if (drew) { S.n++; S.rnd += performance.now() - t1; const gap = S.lastDraw ? now - S.lastDraw : 0; S.worst = Math.max(S.worst, gap); S.lastDraw = now; }
+      if (S.t >= 0.5 && S.n) {
+        fpsEl.textContent = `${Math.round(S.n / S.t)} fps · ${(1000 * S.t / S.n).toFixed(1)} ms (worst ${S.worst.toFixed(0)}) · cpu: update ${(S.upd / Math.max(1, S.updN)).toFixed(1)} ms ×${(S.updN / S.n).toFixed(1)}, draw ${(S.rnd / S.n).toFixed(1)} ms · ${preset.label}${auto ? ' (Auto)' : ''} ×${renderer.getPixelRatio().toFixed(2)}`;
+        S.n = 0; S.t = 0; S.worst = 0; S.upd = 0; S.updN = 0; S.rnd = 0;
+      } else if (S.t >= 0.5 && !S.n) { fpsEl.textContent = `${Math.round(G.fps)} fps (${G.screen !== 'play' ? 'menu' : 'not drawing'}) · ${preset.label}${auto ? ' (Auto)' : ''} ×${renderer.getPixelRatio().toFixed(2)}`; S.t = 0; S.upd = 0; S.updN = 0; }
+    }
   }
   requestAnimationFrame(frame);
 

@@ -107,9 +107,13 @@ export class Hud {
       L.carry = ckey;
     }
     const heat = c && c.heat != null ? c.heat : null;
-    $.cool.style.display = heat == null ? 'none' : '';
-    if (heat != null) $.cool.style.strokeDashoffset = (125.7 * (1 - heat)).toFixed(1);
-    if (heat != null) $.carryLbl.textContent = (ITEM_DEFS[c.id]?.name || 'Slice') + (heat > 0 ? ' · hot' : ' · cold');
+    // Land/perf: written only when they change
+    const hk = heat == null ? 'none' : (125.7 * (1 - heat)).toFixed(1);
+    if (L.heat !== hk) {
+      L.heat = hk;
+      $.cool.style.display = heat == null ? 'none' : '';
+      if (heat != null) { $.cool.style.strokeDashoffset = hk; $.carryLbl.textContent = (ITEM_DEFS[c.id]?.name || 'Slice') + (heat > 0 ? ' · hot' : ' · cold'); }
+    }
     // current goal
     const g = v.goal;
     const gk = g ? g.key : '';
@@ -155,14 +159,18 @@ export class Hud {
     const sp = v.gusScreen;
     if (v.prompt && sp) {
       if (L.prompt !== v.prompt) { $.prompt.innerHTML = v.prompt; L.prompt = v.prompt; }
-      $.prompt.style.left = `${sp.x}px`; $.prompt.style.top = `${Math.max(sp.y + 34, (v.gusFeetY ?? 0) + 10)}px`;   // Fixes-1: below his feet when the camera is close
-      $.prompt.classList.add('on');
-    } else $.prompt.classList.remove('on');
+      const pl = `${Math.round(sp.x)}px`, pt = `${Math.round(Math.max(sp.y + 34, (v.gusFeetY ?? 0) + 10))}px`;   // Fixes-1: below his feet when the camera is close
+      if (L.pl !== pl) { $.prompt.style.left = pl; L.pl = pl; }   // Land/perf: style writes only when it moved a pixel
+      if (L.pt !== pt) { $.prompt.style.top = pt; L.pt = pt; }
+      if (!L.promptOn) { $.prompt.classList.add('on'); L.promptOn = true; }
+    } else if (L.promptOn !== false) { $.prompt.classList.remove('on'); L.promptOn = false; }
     if (v.tutor && sp) {
       if (L.tutor !== v.tutor) { $.tutor.innerHTML = v.tutor; L.tutor = v.tutor; }
-      $.tutor.style.left = `${sp.x}px`; $.tutor.style.top = `${sp.y - 56}px`;
-      $.tutor.classList.add('on');
-    } else $.tutor.classList.remove('on');
+      const tl = `${Math.round(sp.x)}px`, tt = `${Math.round(sp.y - 56)}px`;
+      if (L.tl !== tl) { $.tutor.style.left = tl; L.tl = tl; }
+      if (L.tt !== tt) { $.tutor.style.top = tt; L.tt = tt; }
+      if (!L.tutorOn) { $.tutor.classList.add('on'); L.tutorOn = true; }
+    } else if (L.tutorOn !== false) { $.tutor.classList.remove('on'); L.tutorOn = false; }
   }
 
   /** Toasts age on the game clock (each fixed update), so stepped runs see what a player sees. */
@@ -203,12 +211,12 @@ export class Hud {
     const letters = [];   // playtest: where the cardinal letters sit (%), so distance labels never print over them
     for (const [l, a] of card) {
       const rel = wrap(a - camYaw);
-      if (Math.abs(rel) < span) { const x = 50 + (rel / span) * 50; letters.push(x); html.push(`<span class="tick" style="left:${x.toFixed(1)}%">${l}</span>`); }
+      if (Math.abs(rel) < span) { const x = 50 + (rel / span) * 50; letters.push(x); html.push(['tick', x.toFixed(1), '', l]); }
     }
     for (let k = 0; k < 8; k++) {
       const a = Math.PI / 4 + k * Math.PI / 2 / 2;
       const rel = wrap(a - camYaw);
-      if (k % 2 === 0 && Math.abs(rel) < span) html.push(`<span class="tick minor" style="left:${(50 + (rel / span) * 50).toFixed(1)}%"></span>`);
+      if (k % 2 === 0 && Math.abs(rel) < span) html.push(['tick minor', (50 + (rel / span) * 50).toFixed(1), '', '']);
     }
     // playtest: one distance label per stretch of the strip (the nearest mark's), none over a cardinal letter
     const labelled = [];
@@ -227,10 +235,20 @@ export class Hud {
       let rel = wrap(m.bearing - camYaw);
       const edge = Math.abs(rel) > span * 0.96;
       if (edge) rel = Math.sign(rel) * span * 0.96;
-      html.push(`<span class="mk" style="left:${(50 + (rel / span) * 50).toFixed(1)}%;opacity:${edge ? 0.55 : 1}">${icon(m.icon)}${showDist.has(i) ? `<span class="d">${m.dist} m</span>` : ''}</span>`);
+      html.push(['mk', (50 + (rel / span) * 50).toFixed(1), edge ? '0.55' : '', `${icon(m.icon)}${showDist.has(i) ? `<span class="d">${m.dist} m</span>` : ''}`]);
     });
-    const s = html.join('');
-    if (s !== this.last.compass) { box.innerHTML = s; this.last.compass = s; }
+    // Land/perf: the strip's spans are kept and only what changed is written (it was a full innerHTML rewrite on every
+    // frame the camera turned: new nodes, style and layout each frame)
+    const kids = box.children;
+    while (kids.length < html.length) box.appendChild(document.createElement('span'));
+    while (kids.length > html.length) box.lastChild.remove();
+    for (let i = 0; i < html.length; i++) {
+      const [cls, left, op, inner] = html[i], el = kids[i], c = el._c || (el._c = {});
+      if (c.cls !== cls) { el.className = cls; c.cls = cls; }
+      if (c.left !== left) { el.style.left = left + '%'; c.left = left; }
+      if (c.op !== op) { el.style.opacity = op; c.op = op; }
+      if (c.inner !== inner) { el.innerHTML = inner; c.inner = inner; }
+    }
   }
 
   toast(text, { kind = '', seconds = 2.6, now = false } = {}) {

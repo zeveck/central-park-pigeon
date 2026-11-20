@@ -1,0 +1,29 @@
+# Land/perf progress
+
+- 09:27 Started. Read main.js builder notes. Next: read gus.js, presets.js, hud.js, input/glyphs/touch.
+- 09:41 Baseline measured (scratchpad perf-before.json: Bethesda 10.2 ms/update sim, 21.8 ms with render JS). Done: tap-to-land latch (gus.js), Land prompt (main.js hudView), renames, High pixelRatio 1.5, AutoProbe windows + toast, FPS readout (Settings + ?fps=1), humans pose()/crowds draw() deferred to render, hidden-subtree matrix skip, no redraw on update-less frames. Doing: HUD compass DOM reuse, then re-measure.
+- 09:52 Re-measuring before/after side by side (orig copy served from scratchpad www/orig vs game; machine load avg ~9-10 so numbers noisy). First stable pass: Bethesda sim 2.50 -> 0.87 ms/update, update+render JS 12.9 -> 10.5 ms. check-schemes passes. Next: screenshots, then replays (risky tap ones first, then all 40).
+- 10:11 Screenshots done (design/screenshots/land-perf/). Tap test: 0.1 s tap at 7 m lands in 1.25 s; no tap still flying after 6.7 s; tap at 24 m doesn't latch. Started 40 replays (sf-run serve, port 8321; tap-risk solutions first).
+- 10:12 Replays booting/running (sf-run serve). AutoProbe simulated: jittery 36 fps → steps down at 5 s; 40 fps alternating → 10 s; steady 60 → never; old probe never stepped down on alternating frames.
+- 10:19 Replays: prologue completed (t=103.4, same as the boot-fix baseline). Running den-ducks, finale, then the tap-risk ones.
+- 10:25 Replays 3/3 so far: prologue t=103.4, den-ducks t=196.38, finale completed (all = the boot-fix baselines). Running the tap-risk ones.
+- 10:31 Replays: 4 passed (prologue, den-ducks, finale, den-choir), den-geese running.
+- 10:35 Replays: 5 pass, 1 FAIL: den-meermob.alt (it has short dive taps with nothing after: the new tap-to-land latched). Probing which tap (queued eval job); will narrow the tap rule, then re-run the tap-risk set.
+- 10:43 Replays: den-meermob (main) passed; probe of the alt queued after den-racers.alt.
+- 10:50 Probe: meermob.alt latched at frame 3757 (a 4-frame dive trim right after holding Flap, 2.4 m up). Rule narrowed: no tap-to-land within 0.25 s after Flap (gus.js LAND.calm). Reload + alt retry queued; racers.alt, racers passed.
+- 10:56 Replays: 8 passed so far (all end times equal the polish/boot-fix baselines); songbirds running, then reload + meermob.alt retry.
+- 11:05 Replays: 9 passed (songbirds t=2401.52 = baseline). Page reloaded with the narrowed rule; den-meermob.alt retry running.
+- 11:05 den-meermob.alt retry PASSED (t=6187.97 = polish baseline). Tap test with the new rule: taps of 0.1–0.2 s at 7 m land in ~1.2 s; a tap right after Flap doesn't latch. Continuing the other 30 replays.
+- 11:14 Replays: 12 passed (+ the alt retry), part-legs running.
+- 11:18 Replays: 14 passed (part-legs, den-biscuit ok); den-cats.alt running.
+- 11:27 Replays: 15 passed; den-cats running.
+- 11:31 Replays: 19 passed; den-raccoons.alt running.
+- 11:40 Replays: 20+ passed; raccoons running.
+- 11:48 Replays: 22 passed; den-rhoda running.
+- 11:54 Replays: 25 passed; gear-headlamp running.
+- 12:00 Replays: 29 passed; part-beak running.
+- 12:05 Replays: 31 passed; part-power running (then talons, wings x2, sab x2, truces x3).
+- 12:14 Replays: 32 passed; part-talons running.
+- 12:20 Replays: 34 passed; part-wings running (6 to go).
+- 12:26 Replays: 37 passed; the truces running (3 to go).
+- 12:37 DONE. 40/40 replays complete (den-meermob.alt after the LAND.calm fix); every end time equals its baseline (design/reviews/land-perf-replays.txt). check-schemes passes. Perf JSON: design/reviews/land-perf-before.json / -after.json. Browser and my server (8321) closed; :8000 untouched.

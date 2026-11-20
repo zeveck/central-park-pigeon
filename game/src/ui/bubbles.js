@@ -40,15 +40,18 @@ export class Bubbles {
 
   /** project(x, y, z) → { x, y, dist, visible } in CSS pixels. */
   render(project) {
+    // Land/perf: style writes only when a value changed (bubbles are positioned every drawn frame)
     for (const b of this.list.values()) {
       const p = typeof b.at === 'function' ? b.at() : b.at;
-      if (!p) { b.el.style.display = 'none'; continue; }
-      const s = project(p.x, p.y, p.z);
-      if (!s.visible || s.dist > b.range) { b.el.style.display = 'none'; continue; }
-      b.el.style.display = '';
-      b.el.style.left = `${s.x.toFixed(1)}px`;
-      b.el.style.top = `${s.y.toFixed(1)}px`;
-      b.el.classList.toggle('far', s.dist > b.range * 0.6);
+      const s = p ? project(p.x, p.y, p.z) : null;
+      const show = !!s && s.visible && s.dist <= b.range;
+      const c = b._c || (b._c = {});
+      if (c.show !== show) { b.el.style.display = show ? '' : 'none'; c.show = show; }
+      if (!show) continue;
+      const x = `${s.x.toFixed(0)}px`, y = `${s.y.toFixed(0)}px`, far = s.dist > b.range * 0.6;
+      if (c.x !== x) { b.el.style.left = x; c.x = x; }
+      if (c.y !== y) { b.el.style.top = y; c.y = y; }
+      if (c.far !== far) { b.el.classList.toggle('far', far); c.far = far; }
     }
   }
 }

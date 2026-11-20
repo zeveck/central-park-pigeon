@@ -8,7 +8,7 @@ const KEYS = {
   mute: 'M', pause: 'Esc', uiOk: 'Enter', uiBack: 'Esc', move: 'WASD', look: 'Mouse', nap: 'E',
   uiLeft: '←', uiRight: '→', uiUp: '↑', uiDown: '↓',   // polish (P19): arrow key caps
 };
-const TOUCH = { uiLeft: 'Tap', uiRight: 'Tap', flap: 'Flap', dive: 'Dive', peck: 'Peck', coo: 'Coo', drop: 'Hold Peck', sprint: 'Stick edge', boost: 'Double-tap Flap', wheel: 'Portrait', map: 'Map', board: 'Board', pause: 'Pause', uiOk: 'Tap', uiBack: 'Back', move: 'Stick', look: 'Drag', nap: 'Peck' };
+const TOUCH = { uiLeft: 'Tap', uiRight: 'Tap', flap: 'Flap', dive: 'Land', peck: 'Peck', coo: 'Coo', drop: 'Hold Peck', sprint: 'Stick edge', boost: 'Double-tap Flap', wheel: 'Portrait', map: 'Map', board: 'Board', pause: 'Pause', uiOk: 'Tap', uiBack: 'Back', move: 'Stick', look: 'Drag', nap: 'Peck' };
 // position: bottom right left top (standard mapping 0 1 2 3)
 const PAD_POS = { flap: 'bottom', uiOk: 'bottom', dive: 'right', uiBack: 'right', peck: 'left', nap: 'left', coo: 'top' };
 const PAD_OTHER = {
