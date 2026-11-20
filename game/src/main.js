@@ -445,8 +445,12 @@ function makeBus() {
 const loadingEl = document.getElementById('loading');
 const barEl = document.getElementById('loading-bar');
 const labelEl = document.getElementById('loading-label');
+let loadingShown = 0;
 const setLoading = (f, label) => {
-  if (barEl) barEl.style.width = (Math.max(0.03, Math.min(1, f)) * 100).toFixed(1) + '%';   // polish: a plain bar (index.html)
+  // Never move backwards: downloads that finish during the build stages (and the texture-upload sub-progress)
+  // report their own, lower fractions, which used to make the bar jump back and forth.
+  loadingShown = Math.max(loadingShown, Math.max(0.03, Math.min(1, f)));
+  if (barEl) barEl.style.width = (loadingShown * 100).toFixed(1) + '%';   // polish: a plain bar (index.html)
   if (labelEl && label) labelEl.textContent = label;
 };
 const nextFrame = () => new Promise((r) => requestAnimationFrame(() => setTimeout(r, 0)));
