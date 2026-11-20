@@ -10,7 +10,7 @@ export function installDenCrows(G) {
   E.registerScript('crows.meet', (ctx, done) => G.say([
     L('vesper', 'The Exchange doesn\'t talk to walk-ins, kid. But you\'ve got friends. I hear things.'),
     L('vesper', 'Entry fee\'s three shinies. One\'s on a ledge on Central Park West. One\'s under a dust plume by the Ramble. One\'s under the Lake.'),
-    L('cawdry', 'Plume at two o\'clock. Bubbles at the Lake, nine o\'clock. Ledge, way west. You\'re welcome.'),
+    L('cawdry', 'Plume just east of this oak. Bubbles out on the Lake. Ledge on CPW by 72nd. Go on.'),
     L('ledger', 'I\'ll open a page for you. "Gus. Pigeon. Owes three shinies." Don\'t make me cross it out.'),
   ], done));
   // each shiny handed over: a line from Vesper (the taker's line), and Ledger keeps count

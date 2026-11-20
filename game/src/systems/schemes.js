@@ -406,13 +406,14 @@ export class SchemeEngine {
     if (!step || this.busy.has(id)) return out;
     const tg = step.target || {};
     const signs = tg.signs || (tg.sign ? [tg.sign] : []);
-    for (const sid of signs) if (!this.G.signs.live(sid)) { const s = SIGNS.find((q) => q.id === sid); out.push({ x: s.x, z: s.z, icon: 'target', label: s.name }); }
+    // guidance: y (where the world marker sits, ui/guide.js) and sign (its id) ride along; the compass reads x, z only
+    for (const sid of signs) if (!this.G.signs.live(sid)) { const s = SIGNS.find((q) => q.id === sid), b = this.G.signs.byId?.[sid]; out.push({ x: s.x, z: s.z, y: (b?.y ?? 0) + 1.9, sign: sid, icon: 'target', label: s.name }); }
     // fun pass (first-15 check): a talk or give step with no target of its own points at whoever it's for (the compass
     // showed only the place, and vanished on arrival: "Meet Subway Sue" left a new player circling Columbus Circle)
-    if (tg.at) out.push({ x: tg.at.x, z: tg.at.z, icon: 'target', label: tg.at.label });   // fun pass: a spot (the tourist's bench, the picnic)
+    if (tg.at) out.push({ x: tg.at.x, z: tg.at.z, y: this.G.terrain.heightAt(tg.at.x, tg.at.z) + 2.5, icon: 'target', label: tg.at.label });   // fun pass: a spot (the tourist's bench, the picnic)
     const who = tg.who || [step.on, ...(step.alts || []).map((a) => a.on)].map((o) => (o?.type === 'talk' ? o.who : o?.type === 'give' ? o.to : null)).find((w) => w && CHARACTERS[w]);
-    if (who) { const c = this.G.chars?.find(who); if (c) out.push({ x: c.x, z: c.z, icon: 'target', label: CHARACTERS[who].name }); }
-    if (!out.length && step.needs?.place && !this.atPlace(step.needs.place)) { const p = PLACES[step.needs.place]; out.push({ x: p.x, z: p.z, icon: 'target', label: p.name }); }
+    if (who) { const c = this.G.chars?.find(who); if (c) out.push({ x: c.x, z: c.z, y: (c.y ?? this.G.terrain.heightAt(c.x, c.z)) + 1.1, icon: 'target', label: CHARACTERS[who].name }); }
+    if (!out.length && step.needs?.place && !this.atPlace(step.needs.place)) { const p = PLACES[step.needs.place]; out.push({ x: p.x, z: p.z, y: this.G.terrain.heightAt(p.x, p.z) + 3, icon: 'target', label: p.name }); }
     return out;
   }
 

@@ -13,6 +13,27 @@ export const GUS_STAND = {
     neckZ: [-0.04, 0.02],                // the tail feather (z < -0.1) never moves
     headY: [0.212, 0.24],
   },
+  // Gus rig: the procedural skeleton (anim/skin-rig.js, entities/gus-skin.js). Pivots measured from the
+  // GLB's vertex slices and its pink leg texels (legs y 0.02-0.045, columns ~0.012 m round; toes y < 0.02).
+  skin: {
+    body: [0, 0.06, 0.03],                 // pivot low, near the feet: the waddle roll and the peck lean
+    neck: [0, 0.17, 0.07],
+    head: [0, 0.232, 0.1],                 // base of the skull
+    tail: [0, 0.1, -0.085],
+    legs: [                                // [0] is the x < 0 side, [1] x > 0 (the model's left/right as modelled)
+      { hip: [-0.046, 0.1, 0.034], ankle: [-0.046, 0.014, 0.034] },
+      { hip: [0.0495, 0.1, 0.021], ankle: [0.0495, 0.014, 0.021] },
+    ],
+    legCol: [0.02, 0.034],                 // leg column radius: full weight inside, none outside
+    legTop: [0.04, 0.062],                 // leg weight fades out up into the belly feathers
+    toesY: [0.024, 0.034],                 // below this every vertex on that side is foot
+    footY: [0.008, 0.02],                  // toe (foot bone) weight below this, blending into the shank
+    neckY: [0.16, 0.21],
+    neckZ: [-0.04, 0.02],                  // the back and tail (z < -0.04) stay on the body
+    headY: [0.203, 0.228],
+    tailZ: [-0.095, -0.13],              // the tail and the wing tips over it
+    tailY: [0.05, 0.08],
+  },
   scarf: {
     neck: { x: 0, y: 0.204, z: 0.101 },  // the neck is 0.10 deep (z 0.05-0.15) and 0.095 wide here
     radius: [0.052, 0.054],
@@ -31,6 +52,16 @@ export const GUS_FLY = {
   scale: 1.15,
   bodyCenter: { x: 0, y: 0.16, z: 0 },
   flightPitch: 0.7,                      // the model is upright (as its picture); lean it forward to fly
+  // Gus rig: leg bones only (the wings stay on anim/wingbeat.js). Feet are the pink clumps under the belly.
+  skin: {
+    legs: [
+      { hip: [-0.026, 0.078, -0.016], foot: [-0.026, 0.046, -0.02] },
+      { hip: [0.034, 0.078, -0.012], foot: [0.034, 0.046, -0.01] },
+    ],
+    box: [0.022, 0.036],                   // |x - hip.x| full weight inside, none outside
+    top: [0.062, 0.078],                   // leg weight fades out up into the belly
+    tailZ: [-0.075, -0.06],                // the tail tips (z < -0.07) are never leg
+  },
   wings: {
     shoulder: { x: 0.062, y: 0.175, z: -0.01 },
     rootX: [0.058, 0.1],

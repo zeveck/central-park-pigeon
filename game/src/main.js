@@ -349,6 +349,42 @@
 //     (it reset on any single fast frame, so it never stepped down in play) and a toast before and after the reload.
 //   - FPS readout: Settings "Show FPS" (settings.showFps) or ?fps=1 → #fpsbox: drawn fps, frame ms (worst), CPU per update
 //     and per drawn frame, preset and pixel ratio.
+//
+// Guidance notes (the user: "'Land by the sign' is way too vague. We need something better guiding you to an available next
+// thing to do without being too pushy."; design/reviews/guidance-progress.md; shots design/screenshots/guidance/). UI only:
+// no rule, timer or random stream changed, and nothing reads the new input in a replay. Shared-file edits:
+//   - Here: G.guide = new Guide(G) (ui/guide.js) after the wheel; update() turns a 'where' press into G.guide.request() (free
+//     play only, like Map/Board); gameplay() calls G.guide.tick(dt) after the schemes (reads only: the idle clock);
+//     frameUi() calls G.guide.render(project) (the marker, the "Where to?" line, the "Something to do" card); applyState()
+//     resets it.
+//   - data/schemes.js: every goal names a visible thing and where it is; every step has `where` (a location, never the method;
+//     ui/guide.js reads it); a few nudge/obstacle "where" phrases. tools/check-schemes.mjs checks `where` and goal length.
+//   - systems/schemes.js targets(): each target also carries y (where the marker sits) and sign (its id); the compass still
+//     reads x, z only. input.js: action 'where' (KeyG, pad button 11 = R3/RS); glyphs.js: its key/pad/touch names.
+//   - ui/screens.js: Settings "Guidance: Subtle / Normal / Off" (settings.guidance, save.js default 'subtle'); Controls rows.
+//     ui/board.js: the foot's "Something to do" line with "Track it". ui/touch.js: a tap on the compass or the card is not a
+//     camera drag. ui.css: #guidemarks, #whereto (heads the toast column), #hud .suggest, #board .foot .todo.
+//   - Text whose length could move a replay: three dialogue lines changed (den-rats Sue's meet line, den-crows Cawdry's line,
+//     Bella's TALK line), each no longer than before, so every recorded "next" press still lands on a finished line.
+//     prologue.js: the "find the sign" toast names the sign and comes after 8 s (was 12; a toast only).
+//   - debug only: human-check.js presses "Where to?" on each new card and logs the marker, the line and how each card went.
+// Gus rig notes (the user: "the head bob animation could be better and the feet should move"; design/reviews/gus-rig-progress.md;
+// shots design/screenshots/gus-rig/). Visual only: no position, collision, timing or input change.
+//   - anim/skin-rig.js (new): SkinRig turns a baked static geometry into a SkinnedMesh on a procedural skeleton (bones kept
+//     out of the scene, DetachedBindMode + identity bind, so bone matrixWorld = model space); weights from a function of
+//     the rest position; makeMesh() for attachments, deformPoint() = CPU skinning of one point.
+//   - entities/gus-skin.js (new): GusSkin. gus-stand: root, body, neck, head, tail, leg0/foot0, leg1/foot1 (data in
+//     gus-rig.js GUS_STAND.skin, measured from the vertex slices and the pink leg texels). gus-fly: root + two legs
+//     (GUS_FLY.skin; its wings stay on Wingbeat). Walk: feet swing on the step cycle and are pinned in world space while
+//     planted (no sliding); the head is posed in model space (held still, then thrust; never bobs); body roll/bob; idle
+//     look/tilt/weight shift and shuffle steps; the head leads the peck. Flight: legs tuck after take-off, reach down in
+//     the flare / any low descent; the flare also pitches the fly model up a touch.
+//   - entities/gus.js: NeckBend replaced by GusSkin (gus.neck is now the stand SkinRig; gus.skin the animator);
+//     STEP_LEN 0.2 → 0.12 (stepPhase is visual only: the feet's reach sets it); #pose hands the ground pose to the
+//     skeleton (standPose keeps only the take-off/landing squash); gus.flare / gus.flareK are looks-only fields.
+//   - entities/scarf.js: on a wearer whose rig has makeMesh(), the wrap and knot are SkinnedMeshes on the same bones.
+//   - The finale's Gus on the Mecha (finale.js gusMesh) still uses the shared static stand geometry, unchanged.
+//   - test/gus-test.js: debug.cam() / debug.weights() for the rig shots; state() reports the feet.
 import * as THREE from 'three';
 import { choosePreset, PRESETS, AutoProbe, savePreset } from './presets.js';
 import { Progress, TextureStore } from './gfx/textures.js';
@@ -394,6 +430,7 @@ import { boardScreen } from './ui/board.js';
 import { mapScreen, renderMapImage, FogOfWar } from './ui/map.js';
 import { rosterScreen } from './ui/roster.js';
 import { Wheel } from './ui/wheel.js';
+import { Guide } from './ui/guide.js';   // guidance: the soft marker, "Where to?", "Something to do"
 import { glyph } from './ui/glyphs.js';
 import { Interact } from './systems/interact.js';
 import { Items, grateBlockedReason } from './systems/items.js';
@@ -745,6 +782,7 @@ async function boot() {
   G.dialogue = new Dialogue(G);
   G.bubbles = new Bubbles();
   G.wheel = new Wheel(G);
+  G.guide = new Guide(G);   // guidance (UI only)
   G.menus = new Menus(G);
   for (const f of [titleScreen, pauseScreen, settingsScreen, controlsScreen, creditsScreen, confirmScreen, napScreen, nestScreen, scarfScreen, grateScreen, boardScreen, mapScreen, rosterScreen]) G.menus.add(f(G));
   installReport(G);
@@ -796,6 +834,7 @@ async function boot() {
     if (free && !G.wheel.open) {
       if (input.pressed('map')) { input.endUpdate(); G.openMenu('map'); return; }
       if (input.pressed('board')) { input.endUpdate(); G.openMenu('board'); return; }
+      if (input.pressed('where')) G.guide.request();   // guidance: "Where to?" (G / R3 / a tap on the compass)
     }
     if (G.hitStop > 0) { G.hitStop--; input.endUpdate(); return; }   // 3b juice: a hit pause holds the whole park for a few updates
     if (G.shakeT > 0) G.shakeT -= dt;
@@ -864,6 +903,7 @@ async function boot() {
     G.street.update(dt);
     for (const m of G.mods) m.update?.(dt);
     G.schemes.update(dt);
+    G.guide.tick(dt);   // guidance: reads only (the idle clock for "Something to do")
     if (P) { const t4 = performance.now(); P.systems = (P.systems || 0) + (t1 - t0); P.humans = (P.humans || 0) + (t2 - t1); P.crowds = (P.crowds || 0) + (t3 - t2); P.rest = (P.rest || 0) + (t4 - t3); P.n = (P.n || 0) + 1; }
     U.uTime.value += dt;
     skyUniforms.uTime.value = U.uTime.value;
@@ -1254,6 +1294,7 @@ async function boot() {
     // onDone would complete a step in the new game), a grate trip, a nap or a Ruffled fade, the autosave throttle.
     // Fixes-3: all of that (and the rest of a scene's leftovers) is G.abandonScene().
     G.abandonScene();
+    G.guide?.reset();   // guidance
     lastSave = -9;
     G.state = st;
     // runtime leftovers that would make a fixture or a replay start differently
@@ -1521,6 +1562,7 @@ async function boot() {
       G.hud.update(dt, hudView());
       G.bubbles.render(project);
     }
+    G.guide.render(project);   // guidance: the world marker, the "Where to?" line, the "Something to do" card
     audio.setListener(dataCam.position.x, dataCam.position.y, dataCam.position.z, Math.atan2(gus.position.x - dataCam.position.x, gus.position.z - dataCam.position.z));
     audio.update(dt);
     if ((musicT -= dt) <= 0) {

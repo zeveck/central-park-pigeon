@@ -20,7 +20,7 @@
 //          onLeafBurst(pos), onSplash(pos) (optional effects hooks) }
 
 import * as THREE from 'three';
-import { NeckBend } from '../anim/neck-bend.js';
+import { GusSkin } from './gus-skin.js';   // Gus rig
 import { Wingbeat } from '../anim/wingbeat.js';
 import { Scarf } from './scarf.js';
 import { GUS_STAND, GUS_FLY } from './gus-rig.js';
@@ -28,12 +28,8 @@ import { GUS_STAND, GUS_FLY } from './gus-rig.js';
 const WALK_SPEED = 1.2;         // m/s (design)
 const SPRINT_SPEED = 2.5;       // m/s waddle-sprint
 const TURN_RATE = 9;            // rad/s on the ground
-const STEP_LEN = 0.2;           // m per step at walking speed (6 steps/s); longer when sprinting
-const HEAD_SHIFT = 0.024;       // m the head travels relative to the body each step
-const HOLD = 0.68;              // fraction of a step the head is locked in place
+const STEP_LEN = 0.12;          // m per step at walking speed (10 steps/s); longer when sprinting (Gus rig: the feet's reach sets it; visual only)
 const PECK_TIME = 0.25;         // s, design: dips 40° and back in 0.25 s
-const PECK_ANGLE = THREE.MathUtils.degToRad(40);
-const PECK_LEAN = THREE.MathUtils.degToRad(16);   // body lean from the feet during a peck
 const TAKEOFF_SQUASH = 0.14;    // s
 const FLY = { cruise: 11, glide: 7.5, boost: 17, boostTime: 2, dive: 20, turn: 1.9, climb: 3.2, glideSink: 0.8, diveSink: 9, ceiling: 190 };
 const STAMINA = { climbDrain: 0.11, boostCost: 0.25, perchFill: 0.6, glideFill: 0.07 };
@@ -56,21 +52,21 @@ export class Gus {
     this.root = new THREE.Group();
     this.root.name = 'gus';
 
-    // Ground model: root → standPose (squash/bob/waddle) → standMesh (model space)
-    this.neck = new NeckBend(GUS_STAND.neck);
-    const standMat = stand.makeMaterial();
-    this.neck.patch(standMat);
-    this.standMesh = new THREE.Mesh(stand.geometry, standMat);
+    // Gus rig: both models are SkinnedMeshes on procedural skeletons (entities/gus-skin.js); the pose is visual only.
+    // Ground model: root → standPose (take-off/landing squash) → standMesh (model space; body, neck, head, tail, legs, feet bones)
+    this.wings = new Wingbeat(GUS_FLY.wings);
+    const flyMat = fly.makeMaterial();
+    this.wings.patch(flyMat);
+    this.skin = new GusSkin(stand, stand.makeMaterial(), fly, flyMat);
+    this.neck = this.skin.stand;    // the scarf follows the neck and head bones through it (deformPoint / makeMesh)
+    this.standMesh = this.skin.standMesh;
     this.standMesh.name = 'gus-stand';
     this.standPose = new THREE.Group();
     this.standPose.add(this.standMesh);
     this.root.add(this.standPose);
 
     // Flight model: root → flyPose (at the body centre: pitch, bank, stretch) → flyMesh (offset so its body centre is the pivot)
-    this.wings = new Wingbeat(GUS_FLY.wings);
-    const flyMat = fly.makeMaterial();
-    this.wings.patch(flyMat);
-    this.flyMesh = new THREE.Mesh(fly.geometry, flyMat);
+    this.flyMesh = this.skin.flyMesh;
     this.flyMesh.name = 'gus-fly';
     const c = GUS_FLY.bodyCenter;
     this.flyMesh.position.set(-c.x, -c.y, -c.z);
@@ -151,6 +147,7 @@ export class Gus {
     this.speed = speed ?? (mode === 'fly' ? FLY.cruise : 0);
     this.velocity.set(Math.sin(yaw), 0, Math.cos(yaw)).multiplyScalar(this.speed);
     this.useModel(mode === 'fly' ? 'fly' : 'stand');
+    this.skin.replant = true; this.skin.legExt = mode === 'fly' ? 0 : 1;   // Gus rig: feet back under him
     this.#pose(0);
     this.root.updateMatrixWorld(true);
     this.scarf.reset();
@@ -244,13 +241,10 @@ export class Gus {
   stand() { this.mode = 'walk'; this.modeT = 0; this.driveCam = null; this.speed = 0; }
   twirl() { this.twirlT = 0.8; }
 
-  /** Head offset (m, + forward of rest) for the current step phase: locked, then a snap forward. */
+  /** Head offset (m, + forward of rest) of the walk's head thrust: held still in space, then a snap forward (Gus rig). */
   headShift() {
     if (this.mode !== 'walk' && this.mode !== 'perch') return 0;
-    const amp = HEAD_SHIFT * Math.min(1, this.speed / (WALK_SPEED * 0.6));
-    const u = this.stepPhase % 1;
-    if (u < HOLD) return amp * (1 - (2 * u) / HOLD);               // body walks under a still head
-    return amp * (-1 + 2 * ease((u - HOLD) / (1 - HOLD)));         // head snaps forward
+    return this.skin.headShift;
   }
 
   // ---------------------------------------------------------------- take-off
@@ -375,6 +369,7 @@ export class Gus {
     const beating = flapping || takeoffBoost > 0 || this.boostT > 0;
     // Land/perf: the last couple of metres of a landing, wings spread and back-beating (a flare; looks only)
     const flare = diving && this.lowAlt < 2.2 && surf.kind !== 'water';
+    this.flare = flare;   // Gus rig: the legs reach down for the landing (looks only)
     a.freq = approach(a.freq, flare ? 6.5 : diving ? 1.5 : beating ? 7.5 : amount > 0.1 ? 4.6 : 3.4, 6, dt);
     a.amp = approach(a.amp, flare ? 0.85 : diving ? 0.12 : beating ? 0.95 : amount > 0.1 ? 0.72 : 0.45, flare ? 12 : 5, dt);
     a.offset = approach(a.offset, flare ? -0.2 : diving ? 0.35 : -0.5, flare ? 12 : 5, dt);
@@ -433,6 +428,7 @@ export class Gus {
     this.speed = 0;
     this.stepPhase = Math.ceil(this.stepPhase);
     this.landSquash = 1;
+    this.skin.replant = true;   // Gus rig: he lands with both feet on their rest spots
     this.useModel('stand');
   }
 
@@ -494,34 +490,31 @@ export class Gus {
     this.root.rotation.set(0, this.yaw + spin, 0);
     if (this.mode === 'fly') {
       const climb = THREE.MathUtils.clamp(this.vy * 0.07, -0.35, 0.3);
-      this.pitch = approach(this.pitch, GUS_FLY.flightPitch - climb, 6, dt);
+      // Gus rig: in the landing flare he pitches up a little and reaches down with his feet (looks only)
+      this.flareK = approach(this.flareK || 0, this.flare ? 1 : 0, 8, dt);
+      this.pitch = approach(this.pitch, GUS_FLY.flightPitch - climb - this.flareK * 0.45, 6, dt);
       this.flyPose.rotation.set(this.pitch, 0, this.bank, 'YXZ');
       const stretch = Math.max(0, 1 - this.modeT / 0.25) * 0.15;
       this.flyPose.scale.set(1 - stretch * 0.4, 1 + stretch, 1 - stretch * 0.4);
+      this.skin.poseFly({ dt, modeT: this.modeT, flare: this.flare, lowAlt: this.lowAlt, vy: this.vy });
       return;
     }
-    // ground poses
+    this.flare = false; this.flareK = 0;
+    // ground poses: the take-off / landing squash stays on standPose; everything else is the skeleton (Gus rig)
     let sq = 0;
     if (this.mode === 'takeoff') sq = Math.sin(Math.min(1, this.modeT / TAKEOFF_SQUASH) * Math.PI * 0.5) * 0.24;
     if (this.landSquash > 0) {
       sq = Math.max(sq, Math.sin(this.landSquash * Math.PI) * 0.18);
       this.landSquash = Math.max(0, this.landSquash - dt / 0.18);
     }
-    const walk = Math.min(1, this.speed / WALK_SPEED);
-    const s = this.stepPhase;
-    const bob = Math.abs(Math.sin(Math.PI * s)) * 0.007 * walk;
-    const waddle = Math.sin(Math.PI * s) * 0.07 * walk;
-    // a peck tips the head the full 40 deg and leans the body forward from the feet
-    const peck = this.peckT >= 0 ? Math.sin(Math.PI * Math.min(1, this.peckT / PECK_TIME)) : 0;
-    this.standPose.position.y = bob;
-    this.standPose.rotation.set(peck * PECK_LEAN, 0, waddle);
+    this.standPose.position.y = 0;
+    this.standPose.rotation.set(0, 0, 0);
     this.standPose.scale.set(1 + sq * 0.45, 1 - sq, 1 + sq * 0.45);
-
-    if (this.peckT >= 0) {
-      this.neck.setPose(PECK_ANGLE * peck, 0);
-    } else {
-      this.neck.setPose(this.neck.bendForHeadShift(this.headShift()), 1);
-    }
+    const stepLen = STEP_LEN * (1 + 0.5 * Math.max(0, (this.speed - WALK_SPEED) / (SPRINT_SPEED - WALK_SPEED)));
+    this.skin.poseGround({
+      dt, root: this.root, speed: this.mode === 'drive' ? 0 : this.speed, walkSpeed: WALK_SPEED, stepPhase: this.stepPhase, stepLen,
+      peck: this.peckT >= 0 ? Math.min(1, this.peckT / PECK_TIME) : -1, spin: this.twirlT > 0, ride: this.mode === 'drive',
+    });
   }
 }
 

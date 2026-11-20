@@ -31,6 +31,7 @@ const DEFAULT_BINDINGS = {
   wheel: ['KeyR'],
   map: ['Tab'],
   board: ['KeyJ'],
+  where: ['KeyG'],   // guidance: "Where to?"
   mute: ['KeyM'],
   pause: ['Escape', 'KeyP'],
   debugPhase: ['KeyT'],
@@ -47,7 +48,7 @@ const DEFAULT_BINDINGS = {
 // standard-mapping button → actions (each pad button does one thing in play; menus read the ui* twins)
 const PAD_BUTTONS = {
   0: ['flap', 'uiOk'], 1: ['dive', 'uiBack'], 2: ['peck'], 3: ['coo'], 4: ['drop'], 5: ['wheel'],
-  8: ['map'], 9: ['pause'], 10: ['sprint'], 12: ['board', 'uiUp'], 13: ['map', 'uiDown'], 14: ['uiLeft'], 15: ['uiRight'],
+  8: ['map'], 9: ['pause'], 10: ['sprint'], 11: ['where'], 12: ['board', 'uiUp'], 13: ['map', 'uiDown'], 14: ['uiLeft'], 15: ['uiRight'],
 };
 const DEAD = 0.25;
 const UI_DIRS = ['uiUp', 'uiDown', 'uiLeft', 'uiRight'];

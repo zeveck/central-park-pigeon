@@ -130,6 +130,19 @@ const DARK_WOODS = new Set(['ramble', 'north-woods', 'shakespeare-garden', 'exch
 const PATIO = new Set(['tavern']);
 const penSign = (id) => SIGNS.find((s) => s.id === id)?.flip === 'pen';
 
+// ---------------------------------------------------------------- guidance: every step says where (ui/guide.js reads it)
+{
+  const bad = [];
+  for (const s of SCHEMES) s.steps.forEach((st, i) => {
+    const w = st.where;
+    if (!w || typeof w !== 'string') bad.push(`${s.id} step ${i + 1}: no where`);
+    else if (w.length > 120) bad.push(`${s.id} step ${i + 1}: where is ${w.length} chars (keep it under 120)`);
+    else if (/\.$/.test(w)) bad.push(`${s.id} step ${i + 1}: where ends in a full stop (the guide adds its own)`);
+    if (st.goal && st.goal.length > 90) bad.push(`${s.id} step ${i + 1}: goal is ${st.goal.length} chars (keep the card short)`);
+  });
+  if (bad.length) for (const b of bad) fail(b); else pass('every step has a short `where` (guidance) and a short goal');
+}
+
 // ---------------------------------------------------------------- 3. per-step rules
 let stepCount = 0;
 for (const s of SCHEMES) {

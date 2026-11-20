@@ -120,6 +120,9 @@ export function pauseScreen(G) {
 }
 
 // ------------------------------------------------------------------ settings
+// guidance (ui/guide.js): Subtle shows the marker near the target or on "Where to?" and suggests something to do after a
+// long idle; Normal always marks the target and suggests sooner; Off leaves only the goal card
+const GUIDANCE = [['subtle', 'Subtle'], ['normal', 'Normal'], ['off', 'Off']];
 export function settingsScreen(G) {
   const el = overlay('settings', `
     <h2>Settings</h2>
@@ -141,6 +144,7 @@ export function settingsScreen(G) {
     const S = G.settings;
     box.innerHTML = sliders.map(([k, label, lo, hi, , fmt]) => `<label>${label}</label><div class="slider"><div class="track focusable" tabindex="0" data-slider="${k}"><div class="fill" style="width:${((S[k] - lo) / (hi - lo)) * 100}%"></div></div><span class="val">${fmt(S[k])}</span></div>`).join('')
       + toggles.map(([k, label]) => `<label>${label}</label><button type="button" class="btn small" data-toggle="${k}">${S[k] ? 'On' : 'Off'}</button>`).join('')
+      + `<label>Guidance</label><div class="choice">${GUIDANCE.map(([g, l]) => `<button type="button" class="btn small ${(S.guidance || 'subtle') === g ? 'on' : ''}" data-guide="${g}">${l}</button>`).join('')}</div>`
       + `<label>Graphics</label><div class="choice">${['auto', 'low', 'medium', 'high'].map((g) => `<button type="button" class="btn small ${S.graphics === g ? 'on' : ''}" data-gfx="${g}">${g[0].toUpperCase() + g.slice(1)}</button>`).join('')}</div>`;
     // Land/perf: say what is running (Auto may have stepped down)
     el.querySelector('.gfxnow').textContent = `Running: ${G.preset?.label || ''}${G.presetAuto ? ' (Auto)' : ''}. Changing the graphics reloads the park (your progress is saved first).`;
@@ -170,9 +174,14 @@ export function settingsScreen(G) {
   };
   wire(el, { back: () => G.menus.pop(), credits: () => G.menus.push('credits'), report: () => G.openReport() });
   el.addEventListener('click', (e) => {
-    const t = e.target.closest('[data-toggle], [data-gfx], [data-slider]');
+    const t = e.target.closest('[data-toggle], [data-gfx], [data-slider], [data-guide]');
     if (!t) return;
-    if (t.dataset.toggle) {
+    if (t.dataset.guide) {   // guidance: Subtle / Normal / Off (saved with the other settings)
+      G.settings.guidance = t.dataset.guide;
+      G.applySettings();
+      render();
+      box.querySelector(`[data-guide="${t.dataset.guide}"]`).focus();
+    } else if (t.dataset.toggle) {
       const k = t.dataset.toggle;
       G.settings[k] = !G.settings[k];
       G.applySettings();
@@ -204,14 +213,14 @@ export function settingsScreen(G) {
 const CARDS = [
   { title: 'Move and fly', rows: [['move', 'Waddle / steer'], ['look', 'Camera'], ['flap', 'Hop, take off; hold to climb'], ['dive', 'Land / Dive: tap when low to land, hold to dive'], ['sprint', 'Waddle-sprint; boost in the air']] },
   { title: 'Peck and coo', rows: [['peck', 'Peck: talk, pick up, give, flip a sign'], ['coo', 'Coo: tap to gather the flock, hold to swarm'], ['drop', 'Drop what you carry'], ['nap', 'Nap (on a perch, when it shows)']] },
-  { title: 'Calling allies', rows: [['wheel', 'Hold the Ally wheel, pick, release'], ['peck', 'Peck an ally who is here: Ask'], ['board', 'Scheme Board'], ['map', 'Map']] },
+  { title: 'Calling allies', rows: [['wheel', 'Hold the Ally wheel, pick, release'], ['peck', 'Peck an ally who is here: Ask'], ['board', 'Scheme Board'], ['map', 'Map'], ['where', 'Where to? Shows where your goal is']] },
   { title: 'Driving', rows: [['move', 'Steer'], ['flap', 'Gas'], ['dive', 'Brake, reverse'], ['coo', 'Horn (Dump / Spray on the Zamboni)'], ['peck', 'Get out']] },
 ];
 // Fixes-1: on touch the cards name the on-screen controls (the key list made no sense on a phone)
 const TOUCH_CARDS = [
   { title: 'Move and fly', rows: [['Stick', 'Waddle / steer; push to the edge to sprint'], ['Drag', 'Camera: drag on the right half'], ['Flap', 'Hop, take off; hold to climb'], ['Land', 'Land / Dive: tap when low to land, hold to dive'], ['Double-tap Flap', 'Boost in the air']] },
   { title: 'Peck and coo', rows: [['Peck', 'Talk, pick up, give, flip a sign'], ['Coo', 'Tap to gather the flock, hold to swarm'], ['Hold Peck', 'Drop what you carry'], ['Peck', 'Nap (on a perch, when it shows)']] },
-  { title: 'Calling allies', rows: [['Gus', 'Tap his picture (top left): the Ally wheel'], ['Tap', 'Tap an ally on the wheel: Call or Ask'], ['Peck', 'Peck an ally who is here: Ask'], ['Board', 'Board and Map: the top-right buttons']] },
+  { title: 'Calling allies', rows: [['Gus', 'Tap his picture (top left): the Ally wheel'], ['Tap', 'Tap an ally on the wheel: Call or Ask'], ['Peck', 'Peck an ally who is here: Ask'], ['Board', 'Board and Map: the top-right buttons'], ['Compass', 'Tap the compass: where to next']] },
   { title: 'Driving', rows: [['Stick', 'Steer'], ['Gas', 'Gas (the Flap button)'], ['Brake', 'Brake, reverse (the Land button)'], ['Horn', 'Horn; Dump / Spray on the Zamboni (Coo)'], ['Out', 'Get out (Peck)']] },
 ];
 export function controlsScreen(G) {

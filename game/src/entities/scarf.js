@@ -5,7 +5,8 @@
 //
 // Everything lives in the wearer's model space (a child of the model):
 // - the wrap and knot use the wearer's NeckBend shader patch (if any), so they
-//   bend with the neck;
+//   bend with the neck; on a skinned wearer (Gus rig: entities/gus-skin.js) the
+//   rig's makeMesh() skins them to the same bones and deformPoint() is CPU skinning;
 // - the tails are verlet chains simulated in the wearer's own frame, pinned to
 //   the knot (moved through NeckBend.deformPoint). Gravity, the wearer's
 //   acceleration and the relative wind are turned into that frame each update.
@@ -160,7 +161,8 @@ export class Scarf {
     this.wrap = new THREE.Group();
     this.wrap.name = 'scarf-wrap';
     for (const g of [wrapGeo, knotGeo]) {
-      const m = new THREE.Mesh(g, mat);
+      // Gus rig: on a skinned wearer the wrap and knot are skinned to the same neck/head bones (makeMesh)
+      const m = neckBend?.makeMesh ? neckBend.makeMesh(g, mat) : new THREE.Mesh(g, mat);
       m.castShadow = true;
       this.wrap.add(m);
     }

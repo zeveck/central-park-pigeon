@@ -52,7 +52,7 @@ export const TALK = {
   crumbsy: [['The crust is the best part. Everybody knows that. Nobody believes me.'], ['Tourists on the joint\'s bench drop EVERYTHING when a flock comes at them.'], ['Vinnie HATES pizza. Hot pizza on his counter, with people watching? He\'d blow a gasket.']],
   rex: [['Did you see that dive? Rhoda didn\'t. Tell her.']],
   pip: [['I\'m learning to dive. I\'m not scared. I\'m a little scared.']],
-  bella: [['Coo-OOO-ooo! That was a high C, pigeon.'], ['An audience that STAYS, darling. Is that so much to ask?'], ['Eight signs, darling! The enamel ones want the pen, and the terrace one wants sunglasses.']],
+  bella: [['Coo-OOO-ooo! That was a high C, pigeon.'], ['An audience that STAYS, darling. Is that so much to ask?'], ['Four signs, darling! The Mall\'s two ends, the terrace and Cherry Hill. Feed them all.']],
   lou: [['*low coo*'], ['*lower coo*'], ['*the lowest coo in New York, approvingly*']],
   encore: [['One more! ONE MORE!'], ['That sax man plays ONE riff. One! And they all leave us for it!'], ['Afternoon! Forty crumbs! A Coo on the terrace! And then ONE MORE!']],
   sprint: [['Fastest bird in the park. Ask anyone. Ask ME.']],

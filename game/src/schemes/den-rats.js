@@ -6,7 +6,7 @@ export function installDenRats(G) {
   const E = G.schemes;
   E.registerScript('rats.meet', (ctx, done) => G.say([
     L('sue', 'Subway Sue. I run the grates. Seven of \'em, and every train under this park.'),
-    L('sue', 'You want a ticket? Bring me a whole slice. HOT. Down the stairs. None of that bin stuff.'),
+    L('sue', 'Want a ticket? A whole slice from that $1 SLICE joint over there. HOT. Down the stairs.'),
     L('crumbsy', 'And the crust. Don\'t forget the crust. The crust is the best part.'),
   ], done));
   G.bus.on('pickup', (t, e) => {

@@ -4,17 +4,17 @@
 // or the on-screen button's name on touch.
 
 const KEYS = {
-  flap: 'Space', dive: 'C', peck: 'E', coo: 'F', drop: 'Q', sprint: 'Shift', boost: 'Shift', wheel: 'R', map: 'Tab', board: 'J',
+  flap: 'Space', dive: 'C', peck: 'E', coo: 'F', drop: 'Q', sprint: 'Shift', boost: 'Shift', wheel: 'R', map: 'Tab', board: 'J', where: 'G',
   mute: 'M', pause: 'Esc', uiOk: 'Enter', uiBack: 'Esc', move: 'WASD', look: 'Mouse', nap: 'E',
   uiLeft: '←', uiRight: '→', uiUp: '↑', uiDown: '↓',   // polish (P19): arrow key caps
 };
-const TOUCH = { uiLeft: 'Tap', uiRight: 'Tap', flap: 'Flap', dive: 'Land', peck: 'Peck', coo: 'Coo', drop: 'Hold Peck', sprint: 'Stick edge', boost: 'Double-tap Flap', wheel: 'Portrait', map: 'Map', board: 'Board', pause: 'Pause', uiOk: 'Tap', uiBack: 'Back', move: 'Stick', look: 'Drag', nap: 'Peck' };
+const TOUCH = { uiLeft: 'Tap', uiRight: 'Tap', flap: 'Flap', dive: 'Land', peck: 'Peck', coo: 'Coo', drop: 'Hold Peck', sprint: 'Stick edge', boost: 'Double-tap Flap', wheel: 'Portrait', map: 'Map', board: 'Board', where: 'Compass', pause: 'Pause', uiOk: 'Tap', uiBack: 'Back', move: 'Stick', look: 'Drag', nap: 'Peck' };
 // position: bottom right left top (standard mapping 0 1 2 3)
 const PAD_POS = { flap: 'bottom', uiOk: 'bottom', dive: 'right', uiBack: 'right', peck: 'left', nap: 'left', coo: 'top' };
 const PAD_OTHER = {
-  playstation: { uiLeft: 'D-pad left', uiRight: 'D-pad right', drop: 'L1', wheel: 'R1', sprint: 'L3', boost: 'L3', map: 'Create', board: 'D-pad up', pause: 'Options', move: 'L stick', look: 'R stick' },
-  xbox: { uiLeft: 'D-pad left', uiRight: 'D-pad right', drop: 'LB', wheel: 'RB', sprint: 'LS', boost: 'LS', map: 'View', board: 'D-pad up', pause: 'Menu', move: 'L stick', look: 'R stick' },
-  nintendo: { uiLeft: 'D-pad left', uiRight: 'D-pad right', drop: 'L', wheel: 'R', sprint: 'LS', boost: 'LS', map: '−', board: 'D-pad up', pause: '+', move: 'L stick', look: 'R stick' },
+  playstation: { uiLeft: 'D-pad left', uiRight: 'D-pad right', drop: 'L1', wheel: 'R1', sprint: 'L3', boost: 'L3', map: 'Create', board: 'D-pad up', where: 'R3', pause: 'Options', move: 'L stick', look: 'R stick' },
+  xbox: { uiLeft: 'D-pad left', uiRight: 'D-pad right', drop: 'LB', wheel: 'RB', sprint: 'LS', boost: 'LS', map: 'View', board: 'D-pad up', where: 'RS', pause: 'Menu', move: 'L stick', look: 'R stick' },
+  nintendo: { uiLeft: 'D-pad left', uiRight: 'D-pad right', drop: 'L', wheel: 'R', sprint: 'LS', boost: 'LS', map: '−', board: 'D-pad up', where: 'RS', pause: '+', move: 'L stick', look: 'R stick' },
 };
 const LETTERS = {
   xbox: { bottom: ['A', '#3c9a3c'], right: ['B', '#c8352e'], left: ['X', '#2f6fc0'], top: ['Y', '#d8a91f'] },

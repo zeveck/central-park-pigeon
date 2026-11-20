@@ -86,7 +86,7 @@ export class TouchControls {
     // camera drag on the right half (anywhere that isn't a button)
     let drag = null;
     window.addEventListener('pointerdown', (e) => {
-      if (e.pointerType !== 'touch' || e.target.closest('#touch .tb, #touch .stick, #pause, gh-feedback')) return;
+      if (e.pointerType !== 'touch' || e.target.closest('#touch .tb, #touch .stick, #pause, gh-feedback, #compass, #hud .suggest')) return;
       if (e.clientX < innerWidth / 2) return;
       if (blocked()) return;   // Fixes-1 (#8): a swipe on the Board, Map or Settings scrolls them, it doesn't turn the camera
       drag = { id: e.pointerId, x: e.clientX, y: e.clientY };

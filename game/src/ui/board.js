@@ -28,10 +28,16 @@ export function boardScreen(G) {
       <button type="button" class="btn small" data-act="collection">${icon('postcard')}<span>Collection</span></button>
       <button type="button" class="btn small" data-act="close">${icon('close')}<span>Close</span></button></div>
     <div class="lanes"></div>
-    <div class="foot"><span class="elders-out" style="color:#fff8ea;font-weight:700;max-width:60%"></span><div class="hints" data-auto='[["uiOk","Track / select"],["uiBack","Close"]]'></div></div>`);
+    <div class="foot"><span class="todo"></span><span class="elders-out" style="color:#fff8ea;font-weight:700;max-width:60%"></span><div class="hints" data-auto='[["uiOk","Track / select"],["uiBack","Close"]]'></div></div>`);
   const lanes = el.querySelector('.lanes');
   const gate = el.querySelector('.gate');
   const eldersOut = el.querySelector('.elders-out');
+  const todo = el.querySelector('.todo');
+  // guidance (ui/guide.js): the nearest thing to do now (or the nap that opens one), on request, so no cooldown
+  const todoLine = () => {
+    const p = !showCollection && G.guide?.boardLine();
+    todo.innerHTML = p ? `<span><b>Something to do:</b> ${esc(p.text)}</span>${p.id && p.id !== G.state.tracked && G.schemes.isOpen(p.id) ? `<button type="button" class="btn small" data-act="track" data-id="${p.id}">Track it</button>` : ''}` : '';
+  };
   let introT = 0;
 
   const card = (id, done) => {
@@ -82,6 +88,7 @@ export function boardScreen(G) {
 
   const render = () => {
     const st = G.state, d = derived(st);
+    todoLine();
     if (showCollection) { gate.textContent = `Crews ${d.crews}/${CREW_COUNT} · Parts ${d.parts}/8`; lanes.innerHTML = collection(); eldersOut.textContent = ''; G.menus.refreshHints(); return; }
     gate.textContent = `Crews ${d.crews}/${CREW_COUNT} · Parts ${d.parts}/8`;
     const open = G.schemes.openList(), done = G.schemes.doneList();
@@ -166,7 +173,7 @@ export function boardScreen(G) {
         const ans = G.schemes.eldersAnswer();
         if (ans.locked) eldersOut.textContent = ans.text;
         else { G.ui.eldersFor = G.state.tracked; render(); G.audio.play('turtle-grumble', { ui: true }); }
-      } else if (a === 'track') { G.state.tracked = b.dataset.id; render(); el.querySelector(`[data-card="${b.dataset.id}"]`)?.focus(); }
+      } else if (a === 'track') { G.state.tracked = b.dataset.id; render(); el.querySelector(`[data-card="${b.dataset.id}"]`)?.focus(); G.guide?.dismiss(); }
       else if (a === 'napto' && !b.classList.contains('dis')) { G.closeMenus(); G.nap(b.dataset.phase); }
       return;
     }

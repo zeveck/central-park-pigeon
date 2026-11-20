@@ -1,0 +1,10 @@
+# Guidance pass: replays (game/tools/sf-run.mjs replay, HTTP cache off, one headless browser on 8341, preset low), 2026-11-20 13:43
+# end game time 't' matches the land-perf baseline for every one (dialogue edits are no longer than the lines they replace)
+prologue.json completed=yes consoleErrors=0 "t": 103.4 
+den-ducks.json completed=yes consoleErrors=0 "t": 196.38 
+den-cats.json completed=yes consoleErrors=0 "t": 622.88 
+den-cats.alt.json completed=yes consoleErrors=0 "t": 689.78 
+den-rats.json completed=yes consoleErrors=0 "t": 429.3 
+den-crows.json completed=yes consoleErrors=0 "t": 755.88 
+finale.json completed=yes consoleErrors=0 "t": 5446.9 
+REPLAYSDONE

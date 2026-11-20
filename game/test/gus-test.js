@@ -136,6 +136,7 @@ const input = createInput(window);
 const rig = new CameraRig(camera);
 let gus, flock;
 let simTime = 0;
+let fixedCam = null;   // Gus rig: a camera held relative to Gus (screenshots)
 
 async function boot() {
   const [stand, fly, knit] = await Promise.all([
@@ -176,7 +177,7 @@ function update(dt) {
   simTime += dt;
   gus.update(dt, rig.yaw);
   if (flock.mesh.visible) flock.update(dt, leader(), camera.position);
-  rig.update(dt, gus);
+  if (fixedCam) fixedCam(); else rig.update(dt, gus);
   // keep the shadow box around Gus
   sun.target.position.copy(gus.position);
   sun.position.copy(gus.position).add(_sunOffset);
@@ -238,7 +239,7 @@ window.__game = {
       yaw: round(gus.yaw),
       speed: round(gus.speed),
       headShift: round(gus.headShift()),
-      neckBend: round(gus.neck.uniforms.uNeckBend.value),
+      feet: gus.skin.feet.map((f) => ({ x: round(f.wx), z: round(f.wz), up: round(f.local.y), swing: f.swinging })),   // Gus rig
       wingPhase: round(gus.wings.uniforms.uWingPhase.value % 1),
       onScreen: screenSize(),
       viewport: { w: innerWidth, h: innerHeight },
@@ -263,6 +264,33 @@ window.__game = {
     render: () => render(),
     place: (opts) => { gus.place(opts); rig.yaw = gus.yaw; flock.place(leader()); rig.update(DT, gus, { snap: true }); render(); return window.__game.state(); },
     view: (v) => { rig.setView(v); rig.update(0, gus); render(); return window.__game.state(); },
+    /** Gus rig: hold the camera at an offset from Gus (in his yaw frame: x right, z forward) looking at a point on him; null = rig. */
+    cam(off, look = { x: 0, y: 0.15, z: 0 }, fov = 40, follow = true) {
+      if (!off) { fixedCam = null; return; }
+      const base = gus.position.clone();
+      fixedCam = () => {
+        const p = follow ? gus.position : base, c = Math.cos(gus.yaw0 ?? 0), sn = Math.sin(gus.yaw0 ?? 0);
+        const tx = (v) => new THREE.Vector3(p.x + v.x * c + v.z * sn, p.y + v.y, p.z - v.x * sn + v.z * c);
+        camera.position.copy(tx(off)); camera.lookAt(tx(look)); camera.fov = fov; camera.updateProjectionMatrix();
+      };
+      gus.yaw0 = gus.yaw;
+      fixedCam(); render();
+    },
+    /** Gus rig: colour the skinned models by their strongest bone (weights check). */
+    weights(on = true) {
+      for (const mesh of [gus.standMesh, gus.flyMesh]) {
+        const g = mesh.geometry;
+        if (on) {
+          const pal = [[0.6, 0.6, 0.6], [0.2, 0.5, 1], [1, 0.8, 0.1], [1, 0.2, 0.2], [0.6, 0.2, 0.9], [0.1, 0.9, 0.3], [0, 0.5, 0.2], [0.1, 0.9, 0.9], [0, 0.4, 0.5]];
+          const si = g.attributes.skinIndex, sw = g.attributes.skinWeight, col = new Float32Array(si.count * 3);
+          for (let i = 0; i < si.count; i++) for (let k = 0; k < 4; k++) { const c = pal[si.getComponent(i, k)] || [1, 1, 1], w = sw.getComponent(i, k); col[i * 3] += c[0] * w; col[i * 3 + 1] += c[1] * w; col[i * 3 + 2] += c[2] * w; }
+          g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+          mesh.userData.mat ??= mesh.material;
+          mesh.material = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.9 });
+        } else if (mesh.userData.mat) mesh.material = mesh.userData.mat;
+      }
+      render();
+    },
     flock: (on) => { flock.mesh.visible = !!on; if (on) flock.place(leader()); render(); },
     /** Side-by-side match check: both models at rest, hidden Gus, camera at a given yaw/distance. */
     compare(on = true, { yaw = 0, dist = 1.4, height = 0.25 } = {}) {

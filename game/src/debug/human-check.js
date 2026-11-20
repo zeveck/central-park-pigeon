@@ -34,6 +34,10 @@ export class HumanCheck {
       target: tg ? { x: tg.x, z: tg.z, label: tg.label } : null,
       prompt: G.interact.label || null, dialogue: G.dialogue.open ? (G.dialogue.line?.text || '') : null,
       tutor: G.tutorState?.text ? `${G.tutorState.action}: ${G.tutorState.text}` : null,
+      // guidance: what the soft marker and the "Where to?" line show (a player sees these)
+      markers: [...document.querySelectorAll('#guidemarks .gmark')].filter((m) => m.style.display !== 'none').length,
+      where: document.querySelector('#whereto.on')?.textContent || null,
+      suggest: document.querySelector('#hud .suggest:not(.off) .tx')?.textContent || null,
       menu: G.menus.open ? G.menus.top?.id || 'menu' : null, cine: !!G.cutscene.locked, cutscene: G.cutscene.running ? G.cutscene.name : null,
       carried: G.state.carried?.id || null, phase: G.state.phase,
       near: G.items.world.filter((w) => Math.hypot(w.x - G.gus.position.x, w.z - G.gus.position.z) < 15).map((w) => `${w.id}@${Math.hypot(w.x - G.gus.position.x, w.z - G.gus.position.z).toFixed(1)}m,y${(w.y - G.gus.position.y).toFixed(1)}`).join(' '),
@@ -73,7 +77,17 @@ export class HumanCheck {
     const G = this.G, out = { held: new Set(), stick: { x: 0, y: 0 } }, sc = this.screen(), s = this.s;
     s.t = (s.t || 0) + dt;
     // the goal card changed: a fresh plan
-    if (sc.key !== this.goalKey) { this.goalKey = sc.key; this.mode = 'follow'; this.s = { t: 0 }; if (sc.goal) this.note(`goal card: "${sc.goal}" / "${sc.obstacle}" → compass: ${sc.target ? sc.target.label : 'none'}`); }
+    if (sc.key !== this.goalKey) {
+      // guidance: how the last card went (found and done without the nudge?)
+      if (this.goalKey && this.cardT != null) this.note(`card done in ${(G.state.time - this.cardT).toFixed(0)} s; nudge shown first: ${this.cardNudge ? 'yes' : 'no'}; marker first seen ${this.markerAt != null ? `${this.markerAt.toFixed(0)} s in, ${this.markerD} m from the target` : 'never'}`);
+      this.goalKey = sc.key; this.mode = 'follow'; this.s = { t: 0, askWhere: sc.goal ? 30 : 0 }; this.cardT = G.state.time; this.cardNudge = false; this.markerAt = null;
+      if (sc.goal) this.note(`goal card: "${sc.goal}" / "${sc.obstacle}" → compass: ${sc.target ? sc.target.label : 'none'}`);
+    }
+    if (G.state.tracked && G.schemes.nudgeShown(G.state.tracked)) this.cardNudge = true;
+    if (sc.markers && this.markerAt == null && sc.target) { this.markerAt = G.state.time - this.cardT; this.markerD = Math.round(Math.hypot(sc.target.x - G.gus.position.x, sc.target.z - G.gus.position.z)); }
+    // guidance: a new card, half a second to read it, then "Where to?" (G), like a player asking where that is
+    if (s.askWhere > 0 && --s.askWhere === 0 && !sc.dialogue && !sc.menu && !G.cutscene.locked) { out.held.add('where'); G.input.setAuto(out); s.whereAsked = true; return out; }
+    if (sc.where && sc.where !== this.lastWhere) { this.lastWhere = sc.where; this.note(`"Where to?" says: ${sc.where}`); }
     // reading: dialogue lines (a second or so each once typed out), the Board (a look, then close it)
     if (sc.dialogue != null) {
       if (!this.seen.has(sc.dialogue)) { this.seen.add(sc.dialogue); this.note(`reads: ${G.dialogue.line?.who || ''}: ${sc.dialogue}`); s.readT = 0; }
@@ -139,7 +153,7 @@ export class HumanCheck {
       return false;
     }
     // the peas: try the obvious (peck the tub, swarm them), wait for the nudge, then do what it says
-    if (/picnickers' peas/i.test(g)) {
+    if (/tub of peas|picnickers' peas/i.test(g)) {   // (guidance: the card names the tub now)
       const tub = this.nearItem('peas', 30);
       const t = sc.target, p = G.gus.position;
       if (!s.stage) s.stage = 'go';

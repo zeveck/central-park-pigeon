@@ -13,6 +13,9 @@
 import { PROLOGUE } from '../world/layout.js';
 import { PROLOGUE_LINES } from '../data/dialogue.js';
 
+// guidance (the user: "'Land by the sign' is way too vague"): the sign by its look and where it stands (east of the lamppost)
+const FIND_SIGN = 'Fly east to the sign with the red DON\'T strip, by the Pond\'s east path.';
+
 export function installPrologue(G) {
   const E = G.schemes;
   const S1 = () => G.signs.byId.S1;
@@ -75,7 +78,7 @@ export function installPrologue(G) {
     G.intro.stage = 'find'; G.intro.findT = 0;
     const s = S1();
     G.bubbles.add('!', { id: 'S1-clue', kind: 'clue', at: { x: s.x, y: s.y + 1.25, z: s.z }, ttl: 0, range: 120 });
-    G.toast('Land by the sign on the east path.');
+    G.toast(FIND_SIGN, { seconds: 5 });   // guidance: names what to look for, and where
   };
 
   /** Fixes-3 (R1): where Gus reads S1 from: 1 m in front of its face, on dry ground (else a little to one side). */
@@ -115,7 +118,7 @@ export function installPrologue(G) {
           { follow: true },
           { do: () => { G.tutor('peck', 'the sign'); I.stage = 'peck'; } },
         ]);
-      } else if (I.findT > 12 && !I.hinted) { I.hinted = true; G.toast('Land by the sign on the east path.'); }
+      } else if (I.findT > 8 && !I.hinted) { I.hinted = true; G.toast(FIND_SIGN, { seconds: 5 }); }
     }
     if (I.stage === 'peck' && G.signs.live('S1')) { G.tutor(null); I.stage = 'crumbs'; }
   };
