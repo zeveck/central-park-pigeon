@@ -32,7 +32,7 @@ export function titleScreen(G) {
     <h1 class="logo">Central Park<br>Pigeon<small>ONE PIGEON. SEVENTEEN CREWS. ONE VERY LARGE ROBOT.</small></h1>
     <div class="menu"></div>
     <div class="press"></div>
-    <div class="credit">A game by Rich Conlan · <a class="ext" href="https://github.com/zeveck/central-park-pigeon" target="_blank" rel="noopener" title="Central Park Pigeon on GitHub: how it was made">GitHub</a></div>
+    <div class="credit"><a class="ext" href="https://github.com/zeveck/central-park-pigeon" target="_blank" rel="noopener" title="Central Park Pigeon on GitHub: how it was made">GitHub</a></div>
     <a class="gallery ext" href="https://synapticnoise.com/" target="_blank" rel="noopener" title="More games at synapticnoise.com">synapticnoise.com</a>`;
   // Publish: the outbound links open in a new tab and never start the game or move menu focus.
   for (const a of el.querySelectorAll('a.ext')) for (const t of ['pointerdown', 'mousedown', 'touchstart', 'click', 'keydown']) a.addEventListener(t, (e) => e.stopPropagation());
