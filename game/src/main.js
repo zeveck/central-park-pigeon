@@ -385,6 +385,20 @@
 //   - entities/scarf.js: on a wearer whose rig has makeMesh(), the wrap and knot are SkinnedMeshes on the same bones.
 //   - The finale's Gus on the Mecha (finale.js gusMesh) still uses the shared static stand geometry, unchanged.
 //   - test/gus-test.js: debug.cam() / debug.weights() for the rig shots; state() reports the feet.
+// Polish-2 notes (scarf tails, the guide pin, the "Something to do" card; design/reviews/polish2-progress.md; shots
+// design/screenshots/gus-rig/scarf-clip-{before,after}-*.png and design/screenshots/polish2/). Visual/UI only: no rule,
+// timer, random stream or input changed (prologue and den-ducks replay to the same end times). Shared-file edits:
+//   - entities/scarf.js: cfg.hull, a "radial hull" built once from the wearer's rest geometry (farthest vertex per
+//     direction bin from a centre, inside a box that leaves out the head, legs and tail feather); tail points inside it
+//     are pushed out radially (+ margin), riding the hull's bone (the body: roll, bob, peck lean). cfg.swing: a cone
+//     round each tail's rest direction (which also follows the body). hull.face: ribbons lie flat on the body.
+//     Without cfg.hull the old body sphere is used.
+//   - entities/gus-rig.js: GUS_STAND.scarf.hull / swing 0.6, GUS_FLY.scarf.hull (body only; the wings are on the shader).
+//   - ui/guide.js: the pin moves up (clear 8 px gap) when it would touch the context prompt (#prompt, e.g. "C Land");
+//     the prompt never moves. pick() returns { id, title, text }; the text no longer starts with "<Title>: ", the card
+//     shows the title as a small muted .sch label over the line, and the nap/crumbs lines say "this one" instead.
+//     The card keeps the line's last two words together (span.nw, nowrap): no orphans at 960/1280/1366/1920 wide or on a phone.
+//   - ui/board.js: the foot's "Something to do" shows the title as a muted <small class="sch">. ui.css: .sch styles.
 import * as THREE from 'three';
 import { choosePreset, PRESETS, AutoProbe, savePreset } from './presets.js';
 import { Progress, TextureStore } from './gfx/textures.js';

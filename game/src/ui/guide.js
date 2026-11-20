@@ -29,6 +29,7 @@ const MODES = {
 };
 const REVEAL = 6, WHERE_SECS = 6, SUGGEST_SECS = 16;
 const ARRIVE = 3, FADE_FROM = 6.5;
+const PIN_UP = 35, PIN_DOWN = 4, GAP = 8;   // Polish-2: the pin's extent over its point (ui.css: bottom 4px, 26px tall, a 5px bob); the clear gap to the prompt
 const WORKING = 30;   // within this of the tracked step's target, Gus is on it (the idle clock waits for the nudge)   // the marker is gone within ARRIVE m and fades in from FADE_FROM m
 const ORDER = ['morning', 'afternoon', 'dusk', 'night'];
 const DIRS = ['north', 'north-east', 'east', 'south-east', 'south', 'south-west', 'west', 'north-west'];
@@ -39,7 +40,7 @@ export class Guide {
   constructor(G) {
     this.G = G;
     this.revealT = 0; this.whereT = 0; this.idleT = 0; this.lastSuggest = -1e9;
-    this.sugg = null;      // { id, text, t } the "Something to do" card on screen
+    this.sugg = null;      // { id, title, text, t } the "Something to do" card on screen
     this.marks = [];
     // world markers (over the canvas, under the HUD, like the bubbles)
     const box = this.box = document.createElement('div');
@@ -53,7 +54,7 @@ export class Guide {
     hud.querySelector('#toasts').prepend(this.line);   // at the head of the toast column (below the right-hand chip rows)
     this.card = document.createElement('div');
     this.card.className = 'suggest off';
-    this.card.innerHTML = `<button type="button" class="x" aria-label="Dismiss">${icon('close')}</button><i>Something to do</i><span class="tx"></span><span class="hk"></span>`;
+    this.card.innerHTML = `<button type="button" class="x" aria-label="Dismiss">${icon('close')}</button><i>Something to do</i><span class="sch"></span><span class="tx"></span><span class="hk"></span>`;
     hud.querySelector('.tl').appendChild(this.card);
     this.card.querySelector('.x').addEventListener('click', (e) => { e.stopPropagation(); this.dismiss(); });
     this.card.addEventListener('click', () => this.request());
@@ -185,7 +186,9 @@ export class Guide {
     return pl ? PLACES[pl] : null;
   }
 
-  /** The suggestion: { id, text } for the nearest open step that can be done now, else a nap, else crumbs. */
+  /** The suggestion: { id, title, text } for the nearest open step that can be done now, else a nap, else crumbs.
+   *  Polish-2: the line no longer starts with the scheme's title ("Hazel Forgot: Hazel scurries about…"); the card and
+   *  the Board show `title` as a small label of its own. */
   pick() {
     const G = this.G, E = G.schemes, st = G.state, g = G.gus.position;
     const now = [], nap = [], broke = [];
@@ -208,17 +211,17 @@ export class Guide {
       const b = now[0], ph = b.step.needs?.phase || b.step.alts?.[0]?.needs?.phase;
       const limited = ph && phaseList(ph).length <= 2;
       const far = b.pos && b.d >= 12 ? ` (${this.distText(b.pos)})` : '';
-      return { id: b.id, text: `${title(b.id)}: ${where(b.step)}${far}.${limited ? ` ${PHASE_LABEL[st.phase]} is the time for it.` : ''}` };
+      return { id: b.id, title: title(b.id), text: `${where(b.step)}${far}.${limited ? ` ${PHASE_LABEL[st.phase]} is the time for it.` : ''}` };
     }
     nap.sort((a, b) => a.score - b.score);
     if (nap.length) {
       const b = nap[0];
-      return { id: b.id, text: `Nothing more to do this ${PHASE_LABEL[st.phase]}. Nap at a Nest until ${PHASE_LABEL[b.r.nap]}: ${title(b.id)} is waiting.` };
+      return { id: b.id, title: title(b.id), text: `Nothing more to do this ${PHASE_LABEL[st.phase]}. Nap at a Nest until ${PHASE_LABEL[b.r.nap]}, and this one can go on.` };
     }
     broke.sort((a, b) => a.score - b.score);
     if (broke.length) {
       const b = broke[0];
-      return { id: b.id, text: `${title(b.id)} needs ${b.r.crumbs} crumbs (you have ${st.crumbs}). Every sign you flip to FEED brings feeders.` };
+      return { id: b.id, title: title(b.id), text: `This one needs ${b.r.crumbs} crumbs (you have ${st.crumbs}). Every sign you flip to FEED brings feeders.` };
     }
     return null;
   }
@@ -248,6 +251,17 @@ export class Guide {
         if (want.length >= 4) break;
       }
     }
+    // Polish-2: never on the context prompt ("C Land" under Gus): a pin that would touch it (with a clear GAP) goes up
+    // above it. The prompt has just been placed this frame (hud.update runs first); it never moves for the pin.
+    const pr = want.length && G.hud.$?.prompt;
+    if (pr && pr.classList.contains('on')) {
+      const r = pr.getBoundingClientRect();
+      if (r.width > 0) for (const w of want) {
+        const half = w.label ? 24 : 10;                          // the pin, or its "240 m" label
+        const top = w.y - PIN_UP - (w.label ? 17 : 0), bottom = w.y - PIN_DOWN;
+        if (w.x + half + GAP > r.left && w.x - half - GAP < r.right && top - GAP < r.bottom && bottom + GAP > r.top) w.y = r.top - GAP + PIN_DOWN;
+      }
+    }
     while (this.marks.length < want.length) {
       const el = document.createElement('div');
       el.className = 'gmark';
@@ -272,7 +286,10 @@ export class Guide {
     const sg = this.sugg && free ? this.sugg.text : '';
     const dev = G.input.device + G.input.gamepad.family;
     if (L.sugg !== sg || L.dev !== dev) {
-      this.card.querySelector('.tx').textContent = sg;
+      this.card.querySelector('.sch').textContent = sg ? this.sugg.title || '' : '';
+      // Polish-2: the last two words never part (no lone "north-west)." on a line of its own; text-wrap: pretty alone let it)
+      const cut = sg.lastIndexOf(' ', sg.lastIndexOf(' ') - 1);
+      this.card.querySelector('.tx').innerHTML = cut > 0 ? `${esc(sg.slice(0, cut + 1))}<span class="nw">${esc(sg.slice(cut + 1))}</span>` : esc(sg);
       this.card.querySelector('.hk').innerHTML = sg ? `${glyph('where', G.input.device, G.input.gamepad.family)}<span>Show me</span>` : '';
       this.card.classList.toggle('off', !sg);
       L.sugg = sg; L.dev = dev;

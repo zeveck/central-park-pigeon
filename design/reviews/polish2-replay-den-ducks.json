@@ -1,0 +1,37 @@
+{
+ "replayed": true,
+ "completed": true,
+ "until": "den-ducks",
+ "end": {
+  "t": 196.38,
+  "crumbs": 23,
+  "flock": 6,
+  "x": -21.81,
+  "z": 298.15,
+  "crews": [
+   "swells",
+   "ducks"
+  ],
+  "parts": []
+ },
+ "recordedEnd": {
+  "t": 192.38,
+  "phase": "afternoon",
+  "crumbs": 23,
+  "flock": 6,
+  "x": -21.81,
+  "z": 298.15,
+  "crews": [
+   "swells",
+   "ducks"
+  ],
+  "parts": [],
+  "open": [
+   "den-rats",
+   "den-cats",
+   "den-squirrels",
+   "den-biscuit"
+  ],
+  "flags": 13
+ }
+}

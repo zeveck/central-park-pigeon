@@ -1,0 +1,14 @@
+# Polish-2 progress
+- 18:10 started: reading notes, scarf.js, guide.js, gus-test.js
+- 18:16 before sheets taken (scarf-clip-before-*). Clipping is clear from behind and the sides: the old single body sphere (r 0.088) is well inside the folded wings (body half-width up to 0.10). Fitting an ellipsoid to the stand mesh next.
+- 18:23 scarf: radial hull collider (built from the stand/fly geometry, rides the body bone) + a swing cone (0.75 rad) + ribbons face along the body surface. Full after-set capture running.
+- 18:27 after-set reviewed: no clipping; tightening the swing cone (0.75 -> 0.6) so sprint tails hug the back; flight ribbons back to facing his right. Re-capturing.
+- 18:30 scarf after-set final (swing 0.6): no clipping in walk/sprint/idle/peck/flight. Now: pin vs Land prompt (guide.js), 'Something to do' label + line, then the title shot and replays.
+- 18:35 check-schemes passes (32 schemes, 86 steps). Builder notes added (Polish-2 notes in main.js). Pin before/after capture running.
+- 18:42 pin before/after capture still running (before shot confirms the pin touching 'C Land'). Next: card scan, title shot, replays.
+- 18:53 pin before: overlaps (gap -1 px, pin-before.png). After-run retrying (screenshot timed out under load).
+- 19:09 pin fixed: 0 overlaps in 6 approaches (closest gap 8 px); same-frame before/after shots. Running the card text scan.
+- 19:11 scan found 45 orphans (a lone 'north-west).' on the last line); the card now keeps the last two words together. Re-scanning.
+- 19:14 scan: 297 lines x 5 viewports, 0 orphans/clipped; board and card shots reviewed. Next: title shot, then replays.
+- 19:15 title.jpg retaken (1280x720, q85 4:2:0, same tables as before; synapticnoise.com lower-left, GitHub lower-right). Replays running.
+- 19:22 replays (cache off, port 8351): prologue end 103.4, den-ducks end 196.38 (match; positions identical to recordings). check-schemes passes. Server 8351 stopped, no browsers left. Done.

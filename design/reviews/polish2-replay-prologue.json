@@ -1,0 +1,35 @@
+{
+ "replayed": true,
+ "completed": true,
+ "until": "prologue",
+ "end": {
+  "t": 103.4,
+  "crumbs": 23,
+  "flock": 6,
+  "x": 50.3,
+  "z": 5.71,
+  "crews": [
+   "swells"
+  ],
+  "parts": []
+ },
+ "recordedEnd": {
+  "t": 99.4,
+  "phase": "morning",
+  "crumbs": 23,
+  "flock": 6,
+  "x": 50.3,
+  "z": 5.71,
+  "crews": [
+   "swells"
+  ],
+  "parts": [],
+  "open": [
+   "den-ducks",
+   "den-rats",
+   "den-cats",
+   "den-squirrels"
+  ],
+  "flags": 9
+ }
+}

@@ -42,6 +42,10 @@ export const GUS_STAND = {
     knot: { x: 0.014, y: 0.198, z: 0.046 },
     tails: [{ x: -0.25, y: -1, z: -0.7 }, { x: 0.3, y: -1, z: -0.6 }],
     body: { x: 0, y: 0.09, z: 0.03, r: 0.088 },
+    // Polish-2: the tails stay outside this (scarf.js buildHull): the body and folded wings below the wrap, the legs and
+    // the tail feather left out; it rides the body bone. The old sphere above sat ~1 cm inside the folded wings.
+    hull: { c: [0, 0.11, 0], x: 0.13, y: [0.05, 0.178], z: [-0.135, 0.15], margin: 0.005, bone: 'body', face: true },
+    swing: 0.6,                          // Polish-2: radians either way of its rest direction (they had swung round his chest)
   },
 };
 
@@ -76,5 +80,6 @@ export const GUS_FLY = {
     knot: { x: 0.012, y: 0.186, z: -0.008 },
     tails: [{ x: -0.35, y: -1, z: -0.5 }, { x: 0.35, y: -1, z: -0.45 }], // down his back: ~25 deg below level in flight
     body: { x: 0, y: 0.13, z: 0.03, r: 0.07 },
+    hull: { c: [0, 0.11, -0.02], x: 0.06, y: [0.03, 0.17], z: [-0.12, 0.08], margin: 0.005 },   // Polish-2: the body, not the wings
   },
 };

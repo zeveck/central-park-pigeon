@@ -36,7 +36,7 @@ export function boardScreen(G) {
   // guidance (ui/guide.js): the nearest thing to do now (or the nap that opens one), on request, so no cooldown
   const todoLine = () => {
     const p = !showCollection && G.guide?.boardLine();
-    todo.innerHTML = p ? `<span><b>Something to do:</b> ${esc(p.text)}</span>${p.id && p.id !== G.state.tracked && G.schemes.isOpen(p.id) ? `<button type="button" class="btn small" data-act="track" data-id="${p.id}">Track it</button>` : ''}` : '';
+    todo.innerHTML = p ? `<span><b>Something to do:</b>${p.title ? ` <small class="sch">${esc(p.title)}</small>` : ''} ${esc(p.text)}</span>${p.id && p.id !== G.state.tracked && G.schemes.isOpen(p.id) ? `<button type="button" class="btn small" data-act="track" data-id="${p.id}">Track it</button>` : ''}` : '';
   };
   let introT = 0;
 

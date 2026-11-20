@@ -12,6 +12,10 @@
 //   acceleration and the relative wind are turned into that frame each update.
 //   Simulating in world space instead is fragile: in flight the knot moves
 //   five segment lengths per update.
+// - Polish-2: the tails stay outside the body and the folded wings. cfg.hull builds a "radial hull" from the wearer's
+//   own rest geometry (the vertices in a box round the body, binned by direction from a centre: the farthest one per
+//   bin), and every tail point inside it is pushed out along its direction to the surface plus a margin. On a skinned
+//   wearer the hull rides the named bone (the body: its roll, bob and peck lean). Without a hull, the old body sphere.
 //
 // Usage:
 //   const scarf = new Scarf({ texture: knitTile });   // scarf-slice-orange.jpg (makeKnitTexture() as a fallback)
@@ -72,6 +76,61 @@ const _bodyC = new THREE.Vector3();
 const _rest = new THREE.Vector3();
 const _side = new THREE.Vector3();
 const X = new THREE.Vector3(1, 0, 0);
+const _w = new THREE.Vector3();
+const _prevSide = new THREE.Vector3();
+const _hm = new THREE.Matrix4();
+const _hmi = new THREE.Matrix4();
+const HULL_AZ = 32, HULL_EL = 16;   // direction bins: azimuth round +y, elevation
+const hulls = new WeakMap();          // geometry → { key, R } (built once per model and config)
+
+/**
+ * The radial hull of a geometry's rest positions: the farthest vertex from `c` in each direction bin, among the vertices
+ * inside the box h.x (|x| max), h.y [lo, hi], h.z [lo, hi]. Empty bins borrow their neighbours' largest (one ring).
+ */
+function buildHull(geometry, h) {
+  const key = JSON.stringify(h);
+  const got = hulls.get(geometry);
+  if (got && got.key === key) return got;
+  const pos = geometry.attributes.position;
+  const R = new Float32Array(HULL_AZ * HULL_EL);
+  const [cx, cy, cz] = h.c;
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i);
+    if (Math.abs(x) > h.x || y < h.y[0] || y > h.y[1] || z < h.z[0] || z > h.z[1]) continue;
+    const dx = x - cx, dy = y - cy, dz = z - cz, r = Math.hypot(dx, dy, dz);
+    if (r < 1e-6) continue;
+    const b = hullBin(dx, dy, dz, r);
+    if (r > R[b]) R[b] = r;
+  }
+  const F = R.slice();
+  for (let e = 0; e < HULL_EL; e++) for (let a = 0; a < HULL_AZ; a++) {
+    if (R[e * HULL_AZ + a] > 0) continue;
+    let m = 0;
+    for (let de = -1; de <= 1; de++) for (let da = -1; da <= 1; da++) {
+      const ee = e + de; if (ee < 0 || ee >= HULL_EL) continue;
+      m = Math.max(m, R[ee * HULL_AZ + ((a + da + HULL_AZ) % HULL_AZ)]);
+    }
+    F[e * HULL_AZ + a] = m;
+  }
+  const out = { key, R: F, c: new THREE.Vector3(cx, cy, cz), margin: h.margin ?? 0.004, bone: h.bone || null, face: !!h.face };
+  hulls.set(geometry, out);
+  return out;
+}
+function hullBin(dx, dy, dz, r) {
+  const az = Math.floor(((Math.atan2(dx, dz) / (2 * Math.PI)) + 1) * HULL_AZ) % HULL_AZ;
+  const el = Math.min(HULL_EL - 1, Math.floor((Math.asin(Math.max(-1, Math.min(1, dy / r))) / Math.PI + 0.5) * HULL_EL));
+  return el * HULL_AZ + az;
+}
+/** The hull's radius in a direction: bilinear between the four nearest bin centres (smooth, so a tail slides). */
+function hullRadius(R, dx, dy, dz, r) {
+  const fa = ((Math.atan2(dx, dz) / (2 * Math.PI)) + 1) * HULL_AZ - 0.5;
+  const fe = (Math.asin(Math.max(-1, Math.min(1, dy / r))) / Math.PI + 0.5) * HULL_EL - 0.5;
+  const a0 = Math.floor(fa), e0 = Math.floor(fe), ta = fa - a0, te = fe - e0;
+  const A0 = ((a0 % HULL_AZ) + HULL_AZ) % HULL_AZ, A1 = (A0 + 1) % HULL_AZ;
+  const E0 = Math.max(0, Math.min(HULL_EL - 1, e0)), E1 = Math.max(0, Math.min(HULL_EL - 1, e0 + 1));
+  const r00 = R[E0 * HULL_AZ + A0], r01 = R[E0 * HULL_AZ + A1], r10 = R[E1 * HULL_AZ + A0], r11 = R[E1 * HULL_AZ + A1];
+  return (r00 * (1 - ta) + r01 * ta) * (1 - te) + (r10 * (1 - ta) + r11 * ta) * te;
+}
 
 export class Scarf {
   /**
@@ -133,7 +192,10 @@ export class Scarf {
   /**
    * Put the scarf on a model. `cfg` (model space): neck {x,y,z}, radius [rx, rz],
    * tube, tilt (radians, front dips), knot {x,y,z}, tails [{x,y,z},{x,y,z}] (rest
-   * direction of each tail), body {x,y,z,r} (sphere the tails must stay out of).
+   * direction of each tail), body {x,y,z,r} (sphere the tails must stay out of, when there's no hull),
+   * hull { c: [x,y,z], x: max |x|, y: [lo,hi], z: [lo,hi], margin, bone, face } (Polish-2: the radial hull, see buildHull;
+   * face: the ribbons lie flat on it rather than across the wearer's right),
+   * swing (Polish-2, radians): how far a tail may swing from its rest direction (0: free).
    */
   attach(model, cfg, neckBend = null) {
     // carry the tails' current shape across a model swap (world → new model space)
@@ -171,6 +233,8 @@ export class Scarf {
     this.anchorLocal[0].set(cfg.knot.x - cfg.tube * 0.8, cfg.knot.y, cfg.knot.z);
     this.anchorLocal[1].set(cfg.knot.x + cfg.tube * 0.8, cfg.knot.y, cfg.knot.z);
     cfg.tails.forEach((d, i) => this.restDir[i].set(d.x, d.y, d.z).normalize());
+    this.hull = cfg.hull && model.geometry ? buildHull(model.geometry, cfg.hull) : null;
+    this.hullC = this.hull ? this.hull.c.clone() : null;   // the hull's centre as posed (for the ribbon's facing)
     if (carried) this.#tailsFromWorld(carried);
     else this.reset();
   }
@@ -254,13 +318,16 @@ export class Scarf {
     const flutterAmp = Math.min(1, speed / 3);
     const body = this.cfg.body;
     _bodyC.set(body.x, body.y, body.z);
+    this.#hullPose();
     const segLen = this.segLen;
     const damp = 0.92;
     const dt2 = dt * dt;
 
+    const swing = this.cfg.swing || 0, cosSw = Math.cos(swing), sinSw = Math.sin(swing);
     this.strands.forEach((s, k) => {
       const anchor = this.#anchor(k, _a);
       const rest = _rest.copy(this.restDir[k]);
+      if (this.hullPosed) rest.transformDirection(_hm);   // the rest direction leans and rolls with the body
       const flutter = Math.sin(this.time * (9 + speed * 2.2) + s.phase) * flutterAmp;
       const side = k ? 1 : -1;
       for (let i = 1; i < s.p.length; i++) {
@@ -286,30 +353,85 @@ export class Scarf {
           const corr = (d - segLen) / d;
           if (i === 1) p.addScaledVector(_v, -corr);
           else { p.addScaledVector(_v, -corr * 0.5); a.addScaledVector(_v, corr * 0.5); }
-          _v.subVectors(p, _bodyC);
-          const bd = _v.length();
-          if (bd < body.r) p.addScaledVector(_v, (body.r - bd) / (bd || 1));
+          if (swing) this.#cone(p, anchor, rest, cosSw, sinSw);
+          if (this.hull) this.#collide(p);
+          else {
+            _v.subVectors(p, _bodyC);
+            const bd = _v.length();
+            if (bd < body.r) p.addScaledVector(_v, (body.r - bd) / (bd || 1));
+          }
         }
         s.p[0].copy(anchor);
       }
       // knit doesn't stretch: a last follow-the-leader pass makes every segment exactly segLen
+      // (Polish-2: each point pushed out of the hull again as it goes, so the last word is "outside")
       for (let i = 1; i < s.p.length; i++) {
         _v.subVectors(s.p[i], s.p[i - 1]);
         const d = _v.length();
         if (d > 1e-6) s.p[i].copy(s.p[i - 1]).addScaledVector(_v, segLen / d);
+        if (swing) this.#cone(s.p[i], anchor, rest, cosSw, sinSw);
+        if (this.hull) this.#collide(s.p[i]);
       }
       this.#writeRibbon(s);
     });
   }
 
+  /** Polish-2: the hull's pose this update (its bone's skinning matrix, or none). */
+  #hullPose() {
+    const h = this.hull, rig = this.neckBend;
+    this.hullPosed = false;
+    if (!h || !h.bone || !rig?.bones?.[h.bone] || !rig.skeleton) return;
+    const i = rig.index[h.bone];
+    _hm.multiplyMatrices(rig.bones[h.bone].matrixWorld, rig.skeleton.boneInverses[i]);
+    _hmi.copy(_hm).invert();
+    this.hullPosed = true;
+    this.hullC.copy(h.c).applyMatrix4(_hm);
+  }
+
+  /** Polish-2: keep a tail point within `swing` of its rest direction, seen from the knot (cfg.swing; same distance). */
+  #cone(p, anchor, rest, cosSw, sinSw) {
+    _w.subVectors(p, anchor);
+    const d = _w.length();
+    if (d < 1e-6) return;
+    const along = _w.dot(rest);
+    if (along >= d * cosSw) return;
+    _w.addScaledVector(rest, -along);          // the part across the rest direction
+    const across = _w.length();
+    if (across < 1e-6) _w.set(rest.y, -rest.x, 0).normalize(); else _w.divideScalar(across);
+    p.copy(anchor).addScaledVector(rest, d * cosSw).addScaledVector(_w, d * sinSw);
+  }
+
+  /** Polish-2: push a model-space point out of the radial hull (to its surface plus the margin, along its direction). */
+  #collide(p) {
+    const h = this.hull;
+    if (this.hullPosed) p.applyMatrix4(_hmi);
+    const dx = p.x - h.c.x, dy = p.y - h.c.y, dz = p.z - h.c.z, r = Math.hypot(dx, dy, dz);
+    if (r > 1e-6) {
+      const R = hullRadius(h.R, dx, dy, dz, r) + h.margin;
+      if (r < R && R > h.margin) p.set(h.c.x + (dx * R) / r, h.c.y + (dy * R) / r, h.c.z + (dz * R) / r);
+    }
+    if (this.hullPosed) p.applyMatrix4(_hm);
+  }
+
   #writeRibbon(s) {
     const pos = s.mesh.geometry.attributes.position;
     const n = s.p.length;
-    // ribbon width across the wearer's right (keeps the tail flat, like knit)
+    // ribbon width across the wearer's right (keeps the tail flat, like knit); Polish-2: with a hull, across the body's
+    // surface instead (lying flat on the wings and back, not edge-on to them), kept from flipping along the strand
+    const hc = this.hull?.face ? this.hullC : null;
     for (let i = 0; i < n; i++) {
       const a = s.p[Math.max(0, i - 1)], c = s.p[Math.min(n - 1, i + 1)];
       _v.subVectors(c, a).normalize();
-      _side.copy(X).addScaledVector(_v, -X.dot(_v)).normalize();
+      if (hc) {
+        _w.subVectors(s.p[i], hc);
+        _side.crossVectors(_v, _w);
+        const l = _side.length();
+        if (l > 1e-6 * _w.length()) {
+          _side.divideScalar(l);
+          if (i ? _side.dot(_prevSide) < 0 : _side.x < 0) _side.negate();
+        } else _side.copy(X).addScaledVector(_v, -X.dot(_v)).normalize();
+        _prevSide.copy(_side);
+      } else _side.copy(X).addScaledVector(_v, -X.dot(_v)).normalize();
       const w = this.tailWidth * (i === n - 1 ? 0.8 : 1) * 0.5;
       const p = s.p[i];
       pos.setXYZ(i * 2, p.x - _side.x * w, p.y - _side.y * w, p.z - _side.z * w);
