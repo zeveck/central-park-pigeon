@@ -318,6 +318,19 @@
 //   - Data: crew names "Strix's Parliament", "Rhoda's Family"; Nests "Pond Nest" etc.; postcards title case; the finale
 //     fixture now holds the three earned scarves (the engine grants them; the fixture had missed them).
 //   - hudView().portrait is always Gus (it showed the wheel's selected ally in the HUD circle, which read as a new player).
+//
+// Boot fix notes (loading froze under "Planting the trees", Chrome "Page Unresponsive"; design/reviews/boot-fix-progress.md):
+//   - Cause: world/terrain.js finish() painted leaf litter as one blur(3px)-filtered arc per tree (~2500) on the 800×2504
+//     CPU mask canvas. Each filtered draw is its own blurred layer, all rasterised in CanvasRenderingContext2D::FinalizeFrame
+//     at the next paint: 68 s on the main thread (Chrome trace), shown under the stale label. Now: discs unblurred on a scratch
+//     canvas, blurred once onto mask B (mask B max diff 8/255; mask A, the heights and the trees are bit-identical).
+//     paintMasks()/buildTerrain() are async and yield between shape groups (same draws, same masks).
+//   - Warm-up (gfx/warm.js): compileQuiet (compileAsync where KHR_parallel_shader_compile exists, else compile()); gpuIdle (a
+//     fence polled from timers); primePrograms (uniforms fetched while the GPU is idle); uploadTextures (batched initTexture);
+//     then render() and gpuIdle again. No task waits on the GPU.
+//   - ui/map.js renderMapImage is async: keeps the scene's fog pushed out of reach (fog = null had compiled a second
+//     variant of every program), compileAsync for the rest, readRenderTargetPixelsAsync (PBO) instead of readPixels.
+//   - stage() waits a frame before changing the label too, so work a stage defers to the next paint shows under its own label.
 import * as THREE from 'three';
 import { choosePreset, PRESETS, AutoProbe, savePreset } from './presets.js';
 import { Progress, TextureStore } from './gfx/textures.js';
@@ -327,6 +340,7 @@ import { Batcher } from './gfx/batch.js';
 import { installShadowOnly } from './gfx/shadow-only.js';   // perf pass
 import { DetailCull } from './gfx/detail-cull.js';         // perf pass
 import { simplifiedGeometry, simplifierReady } from './gfx/simplify.js';   // perf pass
+import { gpuIdle, primePrograms, sceneTextures, uploadTextures, compileQuiet } from './gfx/warm.js';   // boot fix
 import { Collision } from './systems/collision.js';
 import { TimeOfDay, PHASES, PHASE_ORDER } from './systems/timeofday.js';
 import { buildTerrain } from './world/terrain.js';
@@ -496,9 +510,11 @@ async function boot() {
   G.store = store;
 
   // ---------------------------------------------------------------- world
-  const stage = async (label, f) => { setLoading(0.6 + f * 0.4, label); await nextFrame(); };
+  // Boot fix: a frame BEFORE the new label too. Work a stage defers to the next frame (a 2D canvas is rasterised when the
+  // page paints, textures upload at a render) then lands under that stage's own label, never under the next one.
+  const stage = async (label, f) => { await nextFrame(); setLoading(0.6 + f * 0.4, label); await nextFrame(); };
   await stage('Laying out the park', 0);
-  const terrain = buildTerrain({ textures });
+  const terrain = await buildTerrain({ textures });   // boot fix: async (world/terrain.js paintMasks yields)
   const collision = new Collision({ heightAt: terrain.heightAt });
   for (const wb of terrain.shapes.water) collision.addWater({ outline: wb.poly, level: wb.level, id: wb.id, name: wb.name });
   G.terrain = terrain; G.collision = collision;
@@ -1487,9 +1503,17 @@ async function boot() {
   for (const m of G.mods) m.group?.traverse((o) => { if (!o.visible) { o.visible = true; warm.push(o); } });
   syncCameras();
   terrain.updateLod(dataCam.position);
-  renderer.compile(far.scene, farCam);
-  renderer.compile(scene, renderCam);
+  // Boot fix: compileAsync (KHR_parallel_shader_compile) instead of compile(), and every GPU step waited for with a fence
+  // (gfx/warm.js) instead of a synchronous query. compile() + the first render waited on each program and then on the
+  // GPU's pipeline builds inside one task (12 s in software GL; Windows/ANGLE HLSL compiles can take far longer).
+  await compileQuiet(renderer, far.scene, farCam);
+  await compileQuiet(renderer, scene, renderCam);
+  await gpuIdle(renderer);   // compile() also drew the shadow maps
+  primePrograms(renderer);
+  const warmTex = sceneTextures(far.scene, scene);
+  await uploadTextures(renderer, warmTex, { onProgress: (f) => setLoading(0.6 + (0.8 + f * 0.06) * 0.4, null) });
   render();
+  await gpuIdle(renderer);   // the first draws build the GPU pipelines: wait here, not in the next stage's first query
   for (const m of Object.values(G.crowds.meshes)) { m.full.count = 0; m.full.visible = false; }
   for (const h of Object.values(G.crowds.hats || {})) { h.count = 0; h.visible = false; }
   for (const pool of Object.values(G.humans.pools)) for (const c of pool) c.holder.visible = !!c.agent;
@@ -1497,7 +1521,7 @@ async function boot() {
   G.food.mesh.count = 0;
   for (const o of warm) o.visible = false;
   await stage('Drawing the map', 0.92);
-  G.mapImage = renderMapImage(G);
+  G.mapImage = await renderMapImage(G);   // Boot fix: async (no synchronous shader links or readPixels; ui/map.js)
   await streamer.ready();
   setLoading(1, 'Ready');
 

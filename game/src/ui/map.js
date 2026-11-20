@@ -11,6 +11,7 @@ import { WORLD, NESTS, GRATES, SIGNS, SPIKE_SITES, SLICE, RANGER_CARTS, PLACES, 
 import { CREWS, CHARACTERS, FEUDS } from '../data/crews.js';
 import { overlay } from './menu.js';
 import { icon } from './icons.js';
+import { gpuIdle, primePrograms, compileQuiet } from '../gfx/warm.js';   // boot fix
 
 const CELL = 10;
 const NX = Math.ceil((WORLD.xMax - WORLD.xMin) / CELL), NZ = Math.ceil((WORLD.zMax - WORLD.zMin) / CELL);
@@ -41,8 +42,12 @@ export class FogOfWar {
   fraction() { let n = 0; for (let j = 0; j < NZ; j++) for (let i = 0; i < NX; i++) n += this.seen(i, j); return n / (NX * NZ); }
 }
 
-/** Render the world from straight above into a canvas (once, at load). */
-export function renderMapImage(G, { w = 384, h = 1200 } = {}) {
+/** Render the world from straight above into a canvas (once, at load).
+ * Boot fix: async. The scene keeps its fog (pushed out of reach) so the map pass reuses the programs the warm-up compiled
+ * (fog = null was a second variant of every program: ~8 s of synchronous shader links in software GL, far more on
+ * Windows/ANGLE), any program still missing is compiled with compileAsync, and the pixels come back through a PBO
+ * (readRenderTargetPixelsAsync) instead of a readPixels that waits for the GPU to finish the whole frame. */
+export async function renderMapImage(G, { w = 384, h = 1200 } = {}) {
   const r = G.renderer;
   const W = WORLD.xMax - WORLD.xMin, H = WORLD.zMax - WORLD.zMin;
   const cam = new THREE.OrthographicCamera(-W / 2, W / 2, H / 2, -H / 2, 1, 600);
@@ -54,21 +59,36 @@ export function renderMapImage(G, { w = 384, h = 1200 } = {}) {
   const rt = new THREE.WebGLRenderTarget(w, h, { samples: 0 });
   rt.texture.colorSpace = THREE.SRGBColorSpace;
   const scene = G.scene;
-  const fog = scene.fog; scene.fog = null;
+  const fog = scene.fog, fogNear = fog?.near, fogFar = fog?.far;
   const hide = [G.gus.root, G.flock.mesh, G.particles.points, G.humans?.group, G.crowds?.group, G.chars?.group].filter(Boolean);
   const vis = hide.map((o) => o.visible);
-  hide.forEach((o) => { o.visible = false; });
-  G.terrain.updateLod(new THREE.Vector3(0, 0, -5000));
+  const setUp = () => {
+    if (fog) { fog.near = 1e7; fog.far = 1e7 + 1; }   // no fog on the map, same shader programs
+    hide.forEach((o) => { o.visible = false; });
+    G.terrain.updateLod(new THREE.Vector3(0, 0, -5000));
+  };
+  const restore = () => {
+    if (fog) { fog.near = fogNear; fog.far = fogFar; }
+    hide.forEach((o, i) => { o.visible = vis[i]; });
+  };
+  setUp();
+  r.setRenderTarget(rt);
+  await compileQuiet(r, scene, cam);   // whatever the warm-up missed (compileAsync where the browser has it)
+  r.setRenderTarget(null);
+  await gpuIdle(r);
+  primePrograms(r);
+  setUp();
   r.setRenderTarget(rt);
   r.setClearColor(0x2a3a2a, 1);
   r.clear();
   r.render(scene, cam);
   const px = new Uint8Array(w * h * 4);
-  r.readRenderTargetPixels(rt, 0, 0, w, h, px);
+  const read = r.readRenderTargetPixelsAsync(rt, 0, 0, w, h, px);   // issues the read now, resolves when the GPU is done
   r.setRenderTarget(null);
   r.setClearColor(0x000000, 0);
-  scene.fog = fog;
-  hide.forEach((o, i) => { o.visible = vis[i]; });
+  restore();
+  await read;
+  await gpuIdle(r);
   rt.dispose();
   const c = document.createElement('canvas');
   c.width = w; c.height = h;

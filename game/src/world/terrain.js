@@ -4,7 +4,7 @@
 // blends: grass, leaf litter, shore mud, bridle dirt, gravel paths, asphalt,
 // hex pavers and, on steep slopes, schist.
 //
-//   const terrain = buildTerrain({ textures });   // CPU data + masks
+//   const terrain = await buildTerrain({ textures });   // CPU data + masks
 //   terrain.heightAt(x, z)                         // matches the rendered triangles exactly
 //   scene.add(terrain.mesh)                        // chunked (128 m), frustum-culled
 
@@ -73,26 +73,36 @@ function fillRect(g, x0, z0, x1, z1, color, blur = 0.6) {
   g.fillRect(x0, z0, x1 - x0, z1 - z0);
 }
 
-function paintMasks(S) {
+// Boot fix: async, with a pause between groups of shapes. Every blurred draw is a filtered layer that Skia rasterises
+// at the next flush; flushing (a 1 px read) and yielding between groups splits ~3 s of main-thread raster (software
+// Chromium) into short tasks. The draws and their order are unchanged, so the masks are identical.
+const rasterNow = async (...gs) => { for (const g of gs) g.getImageData(0, 0, 1, 1); await new Promise((r) => setTimeout(r, 0)); };
+
+async function paintMasks(S) {
   const m = makeMaskCanvases();
   const A = m.A.g, B = m.B.g;
   // A: r = gravel path, g = hex pavers, b = asphalt.  B: r = leaf litter, g = shore mud, b = bridle dirt.
   for (const w of S.woods) { B.globalAlpha = 0.55 * w.density; fillPoly(B, w.poly, CH.r, 6); }
   B.globalAlpha = 1;
+  await rasterNow(B);
   for (const wb of S.water) {
     if (wb.stone) continue;
     strokeLine(B, wb.poly, wb.stream ? 2.4 : 3.2, CH.g, true, 2.5);
   }
+  await rasterNow(B);
   for (const p of S.paths) {
     const kind = p.kind || 'path';
     if (kind === 'bridle') strokeLine(B, p.line, p.width, CH.b, p.closed, 1.2);
     else strokeLine(A, p.line, p.width, kind === 'pavers' ? CH.g : CH.r, p.closed, 1.0);
   }
+  await rasterNow(A, B);
   for (const pl of S.plazas) {
     const kind = pl.kind || 'pavers';
     fillPoly(A, pl.poly, kind === 'path' || kind === 'garden' ? CH.r : kind === 'asphalt' ? CH.b : CH.g, 1.0);
   }
+  await rasterNow(A);
   for (const d of S.drives) strokeLine(A, d.line, d.width, CH.b, false, 0.8);
+  await rasterNow(A);
   // transverse road beds
   for (const t of TRANSVERSES) fillRect(A, PARK.xMin - 1, t.z - 4.2, PARK.xMax + 1, t.z + 4.2, CH.b, 0.8);
   // the city ring: avenues and side streets are asphalt (sidewalks are raised slabs built by city.js)
@@ -124,6 +134,7 @@ function paintMasks(S) {
     if (g.side === 'east') fillRect(A, PARK.xMax - 4, g.z - g.w / 2, PARK.xMax + 1, g.z + g.w / 2, CH.g);
   }
   A.filter = B.filter = 'none';
+  await rasterNow(A, B);
   return m;
 }
 
@@ -380,10 +391,10 @@ export function createTerrainMaterial(tex, maskTexA, maskTexB) {
 }
 
 // ------------------------------------------------------------------ build
-export function buildTerrain({ textures, onStage = () => {} }) {
+export async function buildTerrain({ textures, onStage = () => {} }) {   // boot fix: async (paintMasks yields)
   const S = shapes();
   onStage('Painting paths');
-  const masks = paintMasks(S);
+  const masks = await paintMasks(S);
   onStage('Raising hills');
   const { h, woodsId, waterId } = computeHeights(S, masks);
 
@@ -425,11 +436,28 @@ export function buildTerrain({ textures, onStage = () => {} }) {
 
   /** Called once trees are placed: leaf litter under every canopy, then upload the masks. */
   terrain.finish = (trees = []) => {
+    // Boot fix: this used to fill one arc per tree with B.filter = 'blur(3px)'. A filtered draw is a blurred layer of its
+    // own, thousands of them on a CPU canvas, all rasterised at the next frame: a 68 s main-thread freeze in headless
+    // Chromium ("Page Unresponsive" on desktops). Blur is linear, so: every disc unblurred on a scratch canvas (two passes
+    // at half strength so overlaps don't clamp), then that canvas blurred once onto B ('lighter' adds it, as before).
+    // Render only (nothing reads mask B but the terrain shader).
     const B = masks.B.g;
+    const scratch = document.createElement('canvas');
+    scratch.width = masks.w; scratch.height = masks.h;
+    const S2 = scratch.getContext('2d', { willReadFrequently: true });
+    S2.globalCompositeOperation = 'lighter';
+    S2.setTransform(B.getTransform());
+    S2.fillStyle = 'rgba(255,0,0,0.14)';
+    for (const t of trees) { S2.beginPath(); S2.arc(t.x, t.z, t.crown * 1.1, 0, Math.PI * 2); S2.fill(); }
+    B.save();
+    B.setTransform(1, 0, 0, 1, 0, 0);
     B.filter = 'blur(3px)';
-    B.fillStyle = 'rgba(255,0,0,0.28)';
-    for (const t of trees) { B.beginPath(); B.arc(t.x, t.z, t.crown * 1.1, 0, Math.PI * 2); B.fill(); }
+    B.drawImage(scratch, 0, 0);
+    B.drawImage(scratch, 0, 0);
+    B.restore();
     B.filter = 'none';
+    B.getImageData(0, 0, 1, 1);   // rasterise now, inside the trees stage (not at the next frame, under the next label)
+    scratch.width = scratch.height = 0;
     const texA = new THREE.CanvasTexture(masks.A.c), texB = new THREE.CanvasTexture(masks.B.c);
     for (const t of [texA, texB]) {
       t.flipY = false;
