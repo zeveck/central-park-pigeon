@@ -139,6 +139,13 @@ svg.ic { width: 1em; height: 1em; vertical-align: -0.14em; fill: currentColor; }
 #prompt.on { display: inline-flex; }
 #tutor { position: absolute; transform: translate(-50%, -100%); padding: 10px 16px; border-radius: 16px; background: var(--paper); color: var(--ink); font-weight: 700; font-size: 20px; white-space: nowrap; display: none; align-items: center; gap: 10px; box-shadow: var(--shadow); }
 #tutor.on { display: inline-flex; animation: bob 1.4s ease-in-out infinite; }
+/* Flight hint / scarf: the flight control hints, fixed at the bottom centre (no world anchor, no bob); fades in and out */
+#flighthints { position: absolute; left: 50%; bottom: calc(22px + var(--safe-b)); transform: translateX(-50%); display: flex; gap: 10px; opacity: 0; visibility: hidden; transition: opacity 0.6s ease, visibility 0s linear 0.6s; }
+#flighthints.on { opacity: 1; visibility: visible; transition: opacity 0.6s ease 0.15s, visibility 0s; }
+#flighthints > span { display: inline-flex; align-items: center; gap: 7px; padding: 5px 12px 5px 6px; border-radius: 14px; background: rgba(30, 26, 22, 0.58); color: #fff; font-weight: 600; font-size: 15px; white-space: nowrap; }
+#flighthints > span.t { padding-left: 12px; }
+#flighthints .key, #flighthints .padpill { font-size: 13px; }
+body.cine #flighthints { opacity: 0; }
 #tutor::after { content: ''; position: absolute; left: 50%; bottom: -9px; margin-left: -9px; border: 9px solid transparent; border-bottom: 0; border-top-color: var(--paper); }
 @keyframes bob { 50% { margin-top: -5px; } }
 #bubbles { position: fixed; inset: 0; pointer-events: none; z-index: 9; }

@@ -24,10 +24,11 @@ import * as THREE from 'three';
 import { SkinRig, smoothstep } from '../anim/skin-rig.js';
 import { GUS_STAND, GUS_FLY } from './gus-rig.js';
 
-const REACH = 0.055;         // m: a planted foot travels ±REACH (local z) under the hip during stance
+const REACH = 0.075;         // m: a planted foot travels ±REACH (local z) under the hip during stance (Flight hint / scarf: 0.055 → 0.075 for the longer, slower step)
+const DRAG = 0.132;          // m: a planted foot dragged this far from its rest spot re-plants (Flight hint / scarf: was REACH * 2.4; kept when REACH grew)
 const LIFT = 0.028;          // m: foot lift at mid-swing (walk)
 const TOE = 0.062;           // m: ankle to the front toe tips
-const HEAD_RANGE = 0.03;     // m: the head's forward/back travel relative to the body (each way)
+const HEAD_RANGE = 0.04;     // m: the head's forward/back travel relative to the body (each way; Flight hint / scarf: 0.03 → 0.04, a longer hold)
 const PECK_ANGLE = THREE.MathUtils.degToRad(40);
 const PECK_LEAN = THREE.MathUtils.degToRad(16);
 
@@ -146,6 +147,7 @@ export class GusSkin {
   // ------------------------------------------------------------ helpers
   #toWorld(f, root) {
     const yaw = root.rotation.y, sx = root.scale.x, c = Math.cos(yaw), s = Math.sin(yaw);
+    f.wyaw = yaw; f.yawOff = 0;   // Flight hint / scarf: a planted foot keeps its heading too (its toes don't swivel as he turns)
     const lx = f.local.x * sx, lz = f.local.z;
     f.wx = root.position.x + lx * c + lz * s;
     f.wz = root.position.z - lx * s + lz * c;
@@ -194,7 +196,7 @@ export class GusSkin {
     this.prevS = s;
 
     // -------- feet
-    const D = THREE.MathUtils.clamp(REACH / sl, 0.3, 0.72);   // stance share of a stride
+    const D = THREE.MathUtils.clamp(REACH / sl, 0.15, 0.72);   // stance share of a stride (Flight hint / scarf: min 0.3 → 0.15, so a long step never drags a planted foot past its reach)
     const sw = 2 * (1 - D);                                       // swing length, in steps
     const ahead = REACH * Math.min(1, o.speed / (0.5 * o.walkSpeed));
     let idleSwing = false;
@@ -221,6 +223,7 @@ export class GusSkin {
     for (const f of this.feet) {
       if (f.swinging) {
         const e = smooth(Math.min(1, f.u));
+        f.yawOff = (f.yawOff0 || 0) * (1 - e);   // the heading comes back round in the air
         f.local.x = lerp(f.from.x, f.to.x, e);
         f.local.z = lerp(f.from.z, f.to.z, e);
         const lift = (stepping ? LIFT * (0.55 + 0.45 * walkK) : LIFT * 0.6) * Math.sin(Math.PI * Math.min(1, f.u));
@@ -231,8 +234,9 @@ export class GusSkin {
         this.#toLocal(f, root, f.local);
         f.local.y = 0;
         f.curl = 0;
+        f.yawOff = Math.atan2(Math.sin(f.wyaw - root.rotation.y), Math.cos(f.wyaw - root.rotation.y));
         // dragged too far (a hard turn, a shove): a quick re-plant
-        if (Math.hypot(f.local.x - f.neutral.x, f.local.z - f.neutral.z) > REACH * 2.4) { f.local.copy(f.neutral); this.#toWorld(f, root); }
+        if (Math.hypot(f.local.x - f.neutral.x, f.local.z - f.neutral.z) > DRAG || Math.abs(f.yawOff) > 0.9) { f.local.copy(f.neutral); this.#toWorld(f, root); }
       }
     }
     // standing: shuffle a foot that isn't on its rest spot (after stopping or turning on the spot)
@@ -292,6 +296,7 @@ export class GusSkin {
   }
 
   #beginSwing(f, root, kk) {
+    f.yawOff0 = f.yawOff || 0;
     f.swinging = true;
     f.k = kk;
     f.u = 0;
@@ -317,7 +322,7 @@ export class GusSkin {
     leg.position.copy(tgt).sub(rel);          // root is identity: the leg's local position is its model-space pivot
     // the foot stays level on the ground, toes curl down in the swing
     _q.copy(leg.quaternion).invert();
-    foot.quaternion.setFromEuler(_e.set(f.curl, 0, 0, 'XYZ')).premultiply(_q);
+    foot.quaternion.setFromEuler(_e.set(f.curl, f.yawOff || 0, 0, 'YXZ')).premultiply(_q);
   }
 
   #idle(dt, o, stepping) {

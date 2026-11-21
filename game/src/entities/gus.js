@@ -28,7 +28,11 @@ import { GUS_STAND, GUS_FLY } from './gus-rig.js';
 const WALK_SPEED = 1.2;         // m/s (design)
 const SPRINT_SPEED = 2.5;       // m/s waddle-sprint
 const TURN_RATE = 9;            // rad/s on the ground
-const STEP_LEN = 0.12;          // m per step at walking speed (10 steps/s); longer when sprinting (Gus rig: the feet's reach sets it; visual only)
+const STEP_LEN = 0.32;          // m per step at walking speed (3.75 steps and head thrusts a second; 5.2 at a sprint, 0.48 m). Visual only.
+                                // Flight hint / scarf: was 0.12 (10/s and 14/s, far faster than a pigeon's 3-5 bobs a second)
+// Flight hint / scarf: the visual step: STEP_LEN at a walk, half as long again at a sprint, and shorter when shuffling
+// slowly (so a slow turn still steps instead of dragging a planted foot round). Visual only.
+const stepLength = (speed) => STEP_LEN * Math.min(1, Math.max(0.4, speed / WALK_SPEED)) * (1 + 0.5 * Math.max(0, (speed - WALK_SPEED) / (SPRINT_SPEED - WALK_SPEED)));
 const PECK_TIME = 0.25;         // s, design: dips 40° and back in 0.25 s
 const TAKEOFF_SQUASH = 0.14;    // s
 const FLY = { cruise: 11, glide: 7.5, boost: 17, boostTime: 2, dive: 20, turn: 1.9, climb: 3.2, glideSink: 0.8, diveSink: 9, ceiling: 190 };
@@ -223,7 +227,7 @@ export class Gus {
     if (this.mode === 'perch' && ps == null) this.mode = 'walk';
 
     // step cycle drives the head-bob; it keeps running until the head is back at rest
-    const stepLen = STEP_LEN * (1 + 0.5 * Math.max(0, (this.speed - WALK_SPEED) / (SPRINT_SPEED - WALK_SPEED)));
+    const stepLen = stepLength(this.speed);
     const stepRate = this.speed / stepLen;
     if (stepRate > 0.3) this.stepPhase += stepRate * dt;
     else if (this.stepPhase % 1 !== 0) this.stepPhase = Math.min(Math.ceil(this.stepPhase), this.stepPhase + dt * 5);
@@ -510,7 +514,7 @@ export class Gus {
     this.standPose.position.y = 0;
     this.standPose.rotation.set(0, 0, 0);
     this.standPose.scale.set(1 + sq * 0.45, 1 - sq, 1 + sq * 0.45);
-    const stepLen = STEP_LEN * (1 + 0.5 * Math.max(0, (this.speed - WALK_SPEED) / (SPRINT_SPEED - WALK_SPEED)));
+    const stepLen = stepLength(this.speed);
     this.skin.poseGround({
       dt, root: this.root, speed: this.mode === 'drive' ? 0 : this.speed, walkSpeed: WALK_SPEED, stepPhase: this.stepPhase, stepLen,
       peck: this.peckT >= 0 ? Math.min(1, this.peckT / PECK_TIME) : -1, spin: this.twirlT > 0, ride: this.mode === 'drive',

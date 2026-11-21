@@ -1,0 +1,7 @@
+# Scarf update cost, old (pre-pass scarf.js + gus-rig.js) vs new, alternating builds, test scene (game/test/gus.html), 600 updates each: median and best of 20 batches of 30 updates, ms per scarf.update. Container load avg ~15 during the run.
+old perf {"walk":{"medianMs":0.187,"minMs":0.057,"updates":600},"fly":{"medianMs":0.08,"minMs":0.03,"updates":600}}
+new perf {"walk":{"medianMs":0.713,"minMs":0.207,"updates":600,"surfaceVerts":902},"fly":{"medianMs":0.21,"minMs":0.127,"updates":600,"surfaceVerts":626}}
+old perf {"walk":{"medianMs":0.113,"minMs":0.063,"updates":600},"fly":{"medianMs":0.103,"minMs":0.057,"updates":600}}
+new perf {"walk":{"medianMs":0.367,"minMs":0.197,"updates":600,"surfaceVerts":902},"fly":{"medianMs":0.293,"minMs":0.107,"updates":600,"surfaceVerts":626}}
+old perf {"walk":{"medianMs":0.16,"minMs":0.063,"updates":600},"fly":{"medianMs":0.093,"minMs":0.047,"updates":600}}
+new perf {"walk":{"medianMs":0.4,"minMs":0.197,"updates":600,"surfaceVerts":902},"fly":{"medianMs":0.293,"minMs":0.12,"updates":600,"surfaceVerts":626}}

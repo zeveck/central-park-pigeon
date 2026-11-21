@@ -253,8 +253,9 @@ export class Guide {
     }
     // Polish-2: never on the context prompt ("C Land" under Gus): a pin that would touch it (with a clear GAP) goes up
     // above it. The prompt has just been placed this frame (hud.update runs first); it never moves for the pin.
-    const pr = want.length && G.hud.$?.prompt;
-    if (pr && pr.classList.contains('on')) {
+    // Flight hint / scarf: the same for the flight hint strip at the bottom centre (#flighthints)
+    for (const pr of want.length ? [G.hud.$?.prompt, G.hud.$?.flight] : []) {
+      if (!pr || !pr.classList.contains('on')) continue;
       const r = pr.getBoundingClientRect();
       if (r.width > 0) for (const w of want) {
         const half = w.label ? 24 : 10;                          // the pin, or its "240 m" label

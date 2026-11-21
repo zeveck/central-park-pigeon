@@ -123,6 +123,7 @@ export function pauseScreen(G) {
 // guidance (ui/guide.js): Subtle shows the marker near the target or on "Where to?" and suggests something to do after a
 // long idle; Normal always marks the target and suggests sooner; Off leaves only the goal card
 const GUIDANCE = [['subtle', 'Subtle'], ['normal', 'Normal'], ['off', 'Off']];
+const HINTS = [['auto', 'Auto'], ['always', 'Always'], ['off', 'Off']];   // Flight hint / scarf: the flight control hints (Auto: each drops out once learnt)
 export function settingsScreen(G) {
   const el = overlay('settings', `
     <h2>Settings</h2>
@@ -145,6 +146,7 @@ export function settingsScreen(G) {
     box.innerHTML = sliders.map(([k, label, lo, hi, , fmt]) => `<label>${label}</label><div class="slider"><div class="track focusable" tabindex="0" data-slider="${k}"><div class="fill" style="width:${((S[k] - lo) / (hi - lo)) * 100}%"></div></div><span class="val">${fmt(S[k])}</span></div>`).join('')
       + toggles.map(([k, label]) => `<label>${label}</label><button type="button" class="btn small" data-toggle="${k}">${S[k] ? 'On' : 'Off'}</button>`).join('')
       + `<label>Guidance</label><div class="choice">${GUIDANCE.map(([g, l]) => `<button type="button" class="btn small ${(S.guidance || 'subtle') === g ? 'on' : ''}" data-guide="${g}">${l}</button>`).join('')}</div>`
+      + `<label>Control hints</label><div class="choice">${HINTS.map(([g, l]) => `<button type="button" class="btn small ${(S.controlHints || 'auto') === g ? 'on' : ''}" data-hints="${g}">${l}</button>`).join('')}</div>`   // Flight hint / scarf
       + `<label>Graphics</label><div class="choice">${['auto', 'low', 'medium', 'high'].map((g) => `<button type="button" class="btn small ${S.graphics === g ? 'on' : ''}" data-gfx="${g}">${g[0].toUpperCase() + g.slice(1)}</button>`).join('')}</div>`;
     // Land/perf: say what is running (Auto may have stepped down)
     el.querySelector('.gfxnow').textContent = `Running: ${G.preset?.label || ''}${G.presetAuto ? ' (Auto)' : ''}. Changing the graphics reloads the park (your progress is saved first).`;
@@ -174,8 +176,15 @@ export function settingsScreen(G) {
   };
   wire(el, { back: () => G.menus.pop(), credits: () => G.menus.push('credits'), report: () => G.openReport() });
   el.addEventListener('click', (e) => {
-    const t = e.target.closest('[data-toggle], [data-gfx], [data-slider], [data-guide]');
+    const t = e.target.closest('[data-toggle], [data-gfx], [data-slider], [data-guide], [data-hints]');
     if (!t) return;
+    if (t.dataset.hints) {   // Flight hint / scarf: Control hints Auto / Always / Off
+      G.settings.controlHints = t.dataset.hints;
+      G.applySettings();
+      render();
+      box.querySelector(`[data-hints="${t.dataset.hints}"]`).focus();
+      return;
+    }
     if (t.dataset.guide) {   // guidance: Subtle / Normal / Off (saved with the other settings)
       G.settings.guidance = t.dataset.guide;
       G.applySettings();

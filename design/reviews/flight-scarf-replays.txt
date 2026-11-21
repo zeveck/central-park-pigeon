@@ -1,0 +1,6 @@
+# Flight hint / scarf pass: replays on the FINAL code (game/tools/sf-run.mjs replay, HTTP cache off, one headless browser on 8361), 2026-11-21 03:39
+# end game time 't' matches the baseline for each (visual/UI-only changes)
+prologue.json completed=yes consoleErrors=0 end "t": 103.4
+den-ducks.json completed=yes consoleErrors=0 end "t": 196.38
+part-talons.json completed=yes consoleErrors=0 end "t": 5466.73
+baselines: prologue 103.4, den-ducks 196.38, part-talons 5466.73

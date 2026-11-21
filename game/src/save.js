@@ -14,14 +14,17 @@ export const DEFAULT_SETTINGS = {
   music: 0.7, sfx: 0.85, muted: false,
   sensitivity: 1, invertY: false, autoFollow: true, vibration: true, graphics: 'auto', showFps: false,   // Land/perf: showFps
   guidance: 'subtle',   // guidance: 'subtle' | 'normal' | 'off' (ui/guide.js)
+  // Flight hint / scarf: the flight control hints ('auto': each of Flap, Land, Boost drops out once learnt; 'always'; 'off')
+  // and how often each has been used (main.js flightHints; kept here so it stays learnt across reloads and new games)
+  controlHints: 'auto', hintsLearnt: { flap: 0, land: 0, boost: 0 },
 };
 
 export function loadSettings() {
   try {
     const raw = localStorage.getItem(SETTINGS_KEY);
-    if (raw) return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };
+    if (raw) { const s = { ...DEFAULT_SETTINGS, ...JSON.parse(raw) }; s.hintsLearnt = { ...DEFAULT_SETTINGS.hintsLearnt, ...s.hintsLearnt }; return s; }
   } catch { /* private mode or broken JSON */ }
-  return { ...DEFAULT_SETTINGS };
+  return { ...DEFAULT_SETTINGS, hintsLearnt: { ...DEFAULT_SETTINGS.hintsLearnt } };   // Flight hint / scarf: its own copy of the counts
 }
 
 export function saveSettings(s) {

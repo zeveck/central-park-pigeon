@@ -44,8 +44,16 @@ export const GUS_STAND = {
     body: { x: 0, y: 0.09, z: 0.03, r: 0.088 },
     // Polish-2: the tails stay outside this (scarf.js buildHull): the body and folded wings below the wrap, the legs and
     // the tail feather left out; it rides the body bone. The old sphere above sat ~1 cm inside the folded wings.
-    hull: { c: [0, 0.11, 0], x: 0.13, y: [0.05, 0.178], z: [-0.135, 0.15], margin: 0.005, bone: 'body', face: true },
+    // Flight hint / scarf: rebuilt from the posed vertices each update, the torso only (a radial hull bulges wherever the
+    // shape isn't round from its centre: up the neck, out to the raised tail feather); the rest is the surface below
+    hull: [
+      { c: [0, 0.11, 0], x: 0.13, y: [0.05, 0.178], z: [-0.09, 0.15], margin: 0.006, bone: 'body', face: true },   // the torso (the raised tail feather made a bulge)
+    ],
+    // Flight hint / scarf: and the posed surface itself (scarf.js buildSurface): the neck and nape (which the head thrust
+    // moves; the tails' roots sank into it), the back, the wing tips
+    surface: { x: 0.14, y: [0.07, 0.245], z: [-0.26, 0.2], margin: 0.008, near: [0.014, 0.198, 0.046, 0.145] },   // near: within reach of the knot
     swing: 0.6,                          // Polish-2: radians either way of its rest direction (they had swung round his chest)
+    keep: { back: -0.055, rampY: 0.158, ramp: 1.0 },   // Flight hint / scarf: up and over the rump / raised-tail crease (scarf.js #keepOut)
   },
 };
 
@@ -73,13 +81,23 @@ export const GUS_FLY = {
     span: 0.22,
   },
   scarf: {
-    neck: { x: 0, y: 0.19, z: 0.04 },
+    neck: { x: 0, y: 0.19, z: 0.035 },   // Flight hint / scarf: z 0.04 → 0.035 and the knot -0.008 → -0.017: the knot sat 1 cm inside the nape
     radius: [0.047, 0.05],
     tube: 0.012,
     tilt: 0.1,
-    knot: { x: 0.012, y: 0.186, z: -0.008 },
+    knot: { x: 0.012, y: 0.186, z: -0.017 },
     tails: [{ x: -0.35, y: -1, z: -0.5 }, { x: 0.35, y: -1, z: -0.45 }], // down his back: ~25 deg below level in flight
     body: { x: 0, y: 0.13, z: 0.03, r: 0.07 },
-    hull: { c: [0, 0.11, -0.02], x: 0.06, y: [0.03, 0.17], z: [-0.12, 0.08], margin: 0.005 },   // Polish-2: the body, not the wings
+    // Polish-2: the body, not the wings. Flight hint / scarf: the torso only, the rest by the surface; corridor: the tails' centre lines stay within
+    // |x| 0.03 (edges 0.047); see keep below
+    hull: [
+      { c: [0, 0.11, -0.02], x: 0.06, y: [0.03, 0.17], z: [-0.07, 0.08], margin: 0.006, corridor: 0.03 },   // (the tail by the surface)
+    ],
+    surface: { x: 0.056, y: [0.085, 0.25], z: [-0.22, 0.16], margin: 0.005, near: [0.012, 0.186, -0.017, 0.145] },   // (above the legs: all on the root bone, so it is posed once)   // the body between the wings (never moved by the wingbeat)
+    // Flight hint / scarf: on a deep downstroke the wings' trailing feathers sweep in under the shoulders to |x| 0.015, from
+    // y 0.04 to 0.13 and z -0.08 to +0.04 (measured over every stroke the flight uses); below y 0.14 the tails trail off
+    // the back, clear of all of it, never lower than y 0.1 (the tail fan), and stay within |x| 0.03 above it (wing
+    // vertices there keep |x| > 0.048)
+    keep: { y0: 0.14, z0: -0.035, slope: 1.0, floorY: 0.1 },
   },
 };

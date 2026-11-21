@@ -54,11 +54,12 @@ export class Hud {
       </div>
       <div id="prompt"></div>
       <div id="tutor"></div>
+      <div id="flighthints"></div>
       <div id="panel"></div>
       <div id="drivehud"><div class="dial"><svg viewBox="0 0 120 70"><path class="trk" d="M10 64 A50 50 0 0 1 110 64"/><path class="val" d="M10 64 A50 50 0 0 1 110 64" pathLength="100" stroke-dasharray="0 100"/></svg><b class="spd">0</b><span class="unit">m/s</span><span class="vn"></span></div><div class="hopper"><span class="hl">Hopper</span><span class="bar"><i></i></span></div><div class="dp"></div></div>`;
     document.body.appendChild(el);
     const $ = (s) => el.querySelector(s);
-    this.$ = { portrait: $('.portrait'), pimg: $('.portrait img'), stam: $('.stam'), rkey: $('.rkey'), feathers: $('.feathers'), slot: $('.slot'), cool: $('.cool'), slotIco: $('.slot .ico'), carryLbl: $('.carry .lbl'), goal: $('.goal'), goalT: $('.goal b'), goalO: $('.goal .obst'), marks: $('#compass .marks'), toasts: $('#toasts'), crumbs: $('.chip.crumbs b'), crumbsChip: $('.chip.crumbs'), flock: $('.chip.flock b'), crews: $('.chip.crews b'), parts: $('.chip.crews .parts'), tod: $('.chip.phase'), meters: $('.meters'), prompt: $('#prompt'), tutor: $('#tutor'), mute: $('[data-act="mute"]'), panel: $('#panel'), drive: $('#drivehud'), spd: $('#drivehud .spd'), dial: $('#drivehud .val'), vn: $('#drivehud .vn'), hop: $('#drivehud .hopper'), hopBar: $('#drivehud .hopper i'), dp: $('#drivehud .dp') };
+    this.$ = { portrait: $('.portrait'), pimg: $('.portrait img'), stam: $('.stam'), rkey: $('.rkey'), feathers: $('.feathers'), slot: $('.slot'), cool: $('.cool'), slotIco: $('.slot .ico'), carryLbl: $('.carry .lbl'), goal: $('.goal'), goalT: $('.goal b'), goalO: $('.goal .obst'), marks: $('#compass .marks'), toasts: $('#toasts'), crumbs: $('.chip.crumbs b'), crumbsChip: $('.chip.crumbs'), flock: $('.chip.flock b'), crews: $('.chip.crews b'), parts: $('.chip.crews .parts'), tod: $('.chip.phase'), meters: $('.meters'), prompt: $('#prompt'), tutor: $('#tutor'), flight: $('#flighthints'), mute: $('[data-act="mute"]'), panel: $('#panel'), drive: $('#drivehud'), spd: $('#drivehud .spd'), dial: $('#drivehud .val'), vn: $('#drivehud .vn'), hop: $('#drivehud .hopper'), hopBar: $('#drivehud .hopper i'), dp: $('#drivehud .dp') };
     el.querySelector('.btns').addEventListener('click', (e) => {
       const b = e.target.closest('[data-act]');
       if (!b) return;
@@ -171,6 +172,11 @@ export class Hud {
       if (L.tt !== tt) { $.tutor.style.top = tt; L.tt = tt; }
       if (!L.tutorOn) { $.tutor.classList.add('on'); L.tutorOn = true; }
     } else if (L.tutorOn !== false) { $.tutor.classList.remove('on'); L.tutorOn = false; }
+    // Flight hints: a fixed strip at the bottom centre while flying (Flap, Land, Boost; each drops out once learnt).
+    // It never moves; it fades (ui.css), and keeps its last text while fading out.
+    const fh = v.flight || '';
+    if (fh && L.fh !== fh) { $.flight.innerHTML = fh; L.fh = fh; }
+    if (L.fhOn !== !!fh) { $.flight.classList.toggle('on', !!fh); L.fhOn = !!fh; }
   }
 
   /** Toasts age on the game clock (each fixed update), so stepped runs see what a player sees. */

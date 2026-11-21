@@ -399,6 +399,50 @@
 //     shows the title as a small muted .sch label over the line, and the nap/crumbs lines say "this one" instead.
 //     The card keeps the line's last two words together (span.nw, nowrap): no orphans at 960/1280/1366/1920 wide or on a phone.
 //   - ui/board.js: the foot's "Something to do" shows the title as a muted <small class="sch">. ui.css: .sch styles.
+// Flight hint / scarf notes (the user: "a jittery button telling me how to land all the time I'm flying in the middle of the
+// screen", "the scarf is still clipping through my body as it flutters", "the head movement when walking ... much too
+// fast"; design/reviews/flight-scarf-progress.md; shots design/screenshots/flight-hints/, scarf-fix/, flight-scarf/).
+// Visual/UI only: no rule, timer, random stream or input changed (prologue, den-ducks, part-talons replay to the same end
+// times). Shared-file edits:
+//   - Here: gameplay() sets gus.scarf.lod from the camera distance (visual only). The floating "C Land" prompt (landPromptWanted) is gone; hudView().flight = flightHints(): a fixed strip at the
+//     bottom centre while flying (after 0.5 s) with Flap, Land and Boost in the device's glyphs (touch: only "Tap [Land] to
+//     land"); hidden in scenes, dialogue, the wheel, a vehicle, an encounter/race panel and while a tutor bubble shows.
+//     learnHint(k) counts uses (gusEvents: a Flap press in flight, a boost, a landing made with Land held or tapped:
+//     hintLandArmed is read before gus.update) into settings.hintsLearnt; at Flap 5 / Land 3 / Boost 3 that hint drops out,
+//     and with all three learnt the strip is gone. The tap-to-land itself (gus.js landLatch) is unchanged.
+//   - save.js: settings.controlHints 'auto' | 'always' | 'off' and settings.hintsLearnt (in the settings key, so it stays
+//     learnt across reloads and new games; loadSettings copies the counts). ui/screens.js: Settings "Control hints: Auto /
+//     Always / Off". ui/hud.js: #flighthints (never moves; fades in/out over 0.6 s, keeps its text while fading).
+//     ui.css: #flighthints (above the bottom safe area; on touch the bottom-centre 40% is clear of the controls; the drive
+//     HUD and dialogue never show with it). ui/guide.js: the pin keeps clear of #flighthints the way it does of #prompt.
+//   - entities/scarf.js (the tails): a torso-only radial hull (48x24 bins, dilated so the smooth lookup never dips inside;
+//     riding the body bone; acting only up to the top of the box it was built from: a radial hull bulges up the neck and
+//     out to a raised tail feather and threw tail points there). New: the posed surface itself as a collider
+//     (buildSurface/posedSurface/surfacePush: the skinned vertices within reach of the knot, in a 1.5 cm grid rebuilt each
+//     update; the 3 nearest in the 3x3x3 cells round a point give a plane; pushed to 8 mm above it on the ground, 5 mm in
+//     flight) for the neck and nape (which the head thrust moves; the roots sank into it), the back and the wing tips;
+//     the ribbon's EDGES are pushed out too (only the centre line was); the second tail rides 2 mm higher (no z-fight
+//     where they overlap); cfg.keep keep-out limits (#keepOut, each pushing along its plane's normal) and
+//     cfg.hull.corridor; the tails leave from the back of the knot and gather to half width into it; tails 0.15 → 0.105 m
+//     (tile repeat to match); reset() lays them out outside too. Cost kept down: normals skinned only when a push asks;
+//     bone matrices in one typed array and the surface re-skinned only when its bones moved (in flight, never: it is all on
+//     the root); the stand surface leaves out what the torso hull covers exactly; no allocations. scarf.lod (set in
+//     gameplay() from the camera distance): > 12 m no surface pushes, > 40 m or the finale's alt scene the tails freeze.
+//     Cost per update in the test container (A/B, design/reviews/flight-scarf-perf.txt): walking ~0.40 ms median (old
+//     ~0.15), flying ~0.29 (old ~0.09).
+//   - entities/gus-rig.js: GUS_STAND.scarf hull (torso), surface (margin 8 mm: chords between pushed points sagged into
+//     the concave nape and neck/chest fillets at 5), keep (behind z -0.055 the tails go up a ramp over the rump /
+//     raised-tail crease, where no collider is reliable); GUS_FLY.scarf hull (torso, corridor |x| 0.03), surface (between
+//     the wings, above the legs), keep (on a deep downstroke the wings' trailing feathers sweep in under the shoulders to
+//     |x| 0.015: below y 0.14 the tails trail off the back, never below y 0.1, the tail fan), knot and wrap 7-9 mm further
+//     back (the knot sat 1 cm inside the nape). Checked with an in-page meter (winding number of ~280 ribbon samples
+//     against the posed mesh, wingbeat included, plus ribbon-line / triangle crossings) on every update of 14 sequences.
+//   - Head bob (visual only; stepPhase feeds nothing else): gus.js STEP_LEN 0.12 → 0.32 via stepLength(speed) (x1.5 at a
+//     sprint as before, and down to 0.4x when shuffling slowly so a slow turn keeps stepping): 3.83 thrusts a second
+//     walking, 5.17 sprinting (were 10 and 13.8). gus-skin.js REACH 0.055 → 0.075, HEAD_RANGE 0.03 → 0.04, stance-share
+//     floor 0.3 → 0.15, the re-plant distance kept at 0.132 m (DRAG; it was REACH * 2.4), and a planted foot keeps its
+//     heading (f.wyaw / f.yawOff: its toes no longer swivel round the ankle in a turn). Planted toes drift 0 mm walking,
+//     sprinting and turning (shots design/screenshots/flight-scarf/headbob-*). Footstep sounds are timed from speed.
 import * as THREE from 'three';
 import { choosePreset, PRESETS, AutoProbe, savePreset } from './presets.js';
 import { Progress, TextureStore } from './gfx/textures.js';
@@ -875,6 +919,8 @@ async function boot() {
     runTimers(dt);
     gus.input = control ? input : LOCKED_INPUT;
     const prevMode = gus.mode;
+    hintLandArmed = control && gus.mode === 'fly' && (gus.landLatch > 0 || input.held('dive'));   // Flight hint / scarf (read only)
+    { const cd = dataCam.position.distanceTo(gus.position); gus.scarf.lod = G.altView || cd > 40 ? 2 : cd > 12 ? 1 : 0; }   // Flight hint / scarf: scarf LOD (visual only)
     const driving = G.vehicles.driving;
     if (driving) G.vehicles.drive(dt, control ? input : LOCKED_INPUT, rig.yaw);
     else gus.update(dt, rig.yaw);
@@ -936,18 +982,21 @@ async function boot() {
     pendingSaveTick();
   }
 
+  let hintLandArmed = false;
   function gusEvents(prevMode, dt) {
     const p = gus.position;
+    if (gus.mode === 'fly' && gus.input === input && input.pressed('flap')) learnHint('flap');   // Flight hint / scarf
     if (prevMode !== 'takeoff' && gus.mode === 'takeoff') audio.play('take-off', { at: p, vol: 0.8 });
     if (gus.mode === 'fly' && input.held('flap') && gus.stamina > 0) { flapT -= dt; if (flapT <= 0) { audio.play('flap', { at: p, vol: 0.45 }); flapT = 0.32; } }
     if (gus.mode === 'walk' && gus.speed > 0.3) { footT -= dt * gus.speed; if (footT <= 0) { audio.play('footstep', { at: p, vol: 0.25 }); footT = 0.22; } }
     for (const e of gus.takeEvents()) {
       if (e.type === 'leaves') { particles.leafBurst(e.x, e.y, e.z); audio.play('leaves-crunch', { at: e, vol: 0.6 }); }
       else if (e.type === 'splash') { particles.splash(e.x, e.y, e.z); audio.play('splash-hop', { at: e }); }
-      else if (e.type === 'boost') audio.play('whoosh', { at: p, rate: 1.1 });
+      else if (e.type === 'boost') { audio.play('whoosh', { at: p, rate: 1.1 }); if (gus.input === input) learnHint('boost'); }
       else if (e.type === 'bump') { audio.synth('tick'); G.rumble(0.2, 0.1, 80); }
       else if (e.type === 'ceiling') { particles.burst('feathers', e.x, e.y + 0.2, e.z, 4); if (!G.saidCeiling) { G.saidCeiling = true; G.toast('Oof. Too heavy to go higher.'); } }   // fun pass (P10)
       else if (e.type === 'land' || e.type === 'perch') {
+        if (hintLandArmed || (gus.input === input && input.held('dive'))) learnHint('land');   // Flight hint / scarf: a landing made with Land (tap or hold)
         if (G.spikes.onLanding(e)) continue;
         audio.play('landing', { at: e, vol: 0.6 });
         particles.burst('feathers', e.x, e.y + 0.15, e.z, 3);
@@ -1506,7 +1555,7 @@ async function boot() {
     const panel = G.mods.map((m) => m.panel?.()).filter(Boolean).join('');
     // Fixes-2: no second "□ the sign" bubble while the context prompt already says "□ Peck the sign"
     const tutor = tu && !G.dialogue.open && !G.wheel.open && !(tu.action === 'peck' && G.interact.prompt && !G.cutscene.locked) ? `${glyph(tu.action, dev, fam)}<span>${tu.text}</span>` : '';
-    if (!prompt && !tutor && !panel && landPromptWanted(marks)) prompt = dev === 'touch' ? `<span>Tap</span>${glyph('dive', dev, fam)}<span>to land</span>` : `${glyph('dive', dev, fam)}<span>Land</span>`;   // Land/perf (touch: the button is named Land)
+    const flight = flightHints(dev, fam, tutor);   // Flight hint / scarf: the fixed strip at the bottom (replaces the floating "C Land")
     return {
       stamina: gus.stamina, boosting: gus.boostT > 0, portrait: G.gusPortrait(),   // polish: the HUD circle is always Gus (it previewed the wheel's selected ally, which read as the player changing; the wheel itself shows the pick)
       device: dev, family: fam, feathers: st.feathers,
@@ -1514,26 +1563,34 @@ async function boot() {
       goal: G.schemes.goal(), crumbs: st.crumbs, flock: d.flock, crews: d.crews, parts: d.parts,
       phase: st.phase, phaseLabel: PHASE_LABEL[st.phase], meters: metersFor(st, d), muted: G.settings.muted,
       compass: marks, camYaw, gusScreen: sp.visible ? sp : null, gusFeetY: feet.visible ? feet.y : null,
-      prompt, panel, drive: G.vehicles.hud(), tutor,
+      prompt, panel, drive: G.vehicles.hud(), tutor, flight,
     };
   }
-  /** Land/perf: the in-flight "C Land" prompt (render/UI only; reads Gus, never changes him). Shown while flying when he
-   *  is low (within ~10 m of the ground or of a perch below), near the goal or a compass target, or has been gliding a
-   *  few seconds; not over water, not while Land is already held or carrying him down, not in scenes or with the wheel. */
-  let landShownT = -1, landPerchT = 0, landPerch = false;
-  function landPromptWanted(marks) {
-    if (gus.mode !== 'fly' || G.vehicles.driving || G.cutscene.locked || G.dialogue.open || G.wheel.open || G.altView) { landShownT = -1; return false; }
-    if (gus.landLatch > 0 || input.held('dive')) return false;
-    const p = gus.position;
-    if ((landPerchT -= 1) <= 0) { landPerchT = 8; landPerch = !!collision.nearestPerch(p, 4, 0.2, 10); }   // every 8th frame
-    const overWater = !!collision.waterAt(p.x, p.z) && gus.lowAlt < 30;
-    const near = marks.some((m) => (m.icon === 'target' || m.icon === 'waypoint') && m.dist != null && m.dist <= 30);
-    const want = !overWater && (gus.lowAlt <= 10 || landPerch || near || gus.glideT >= 3);
-    if (want) { if (landShownT < 0) landShownT = G.simTime; return true; }
-    if (landShownT >= 0 && G.simTime - landShownT < 0.6) return true;   // no flicker at the edges
-    landShownT = -1;
-    return false;
+  /** Flight hint / scarf: the flight control hints, a steady strip at the bottom centre while flying (render/UI only: it
+   *  reads Gus and the input, never changes them). Each of Flap, Land and Boost drops out of the strip once learnt
+   *  (settings.controlHints 'auto'; counts in settings.hintsLearnt, bumped by learnHint()); 'always' keeps all three, 'off'
+   *  shows none. On touch the buttons are on screen, so only Land (its button) is named. Shown after 0.5 s of flight, not in
+   *  scenes, dialogue, the wheel, a vehicle, an encounter/race panel or while a tutor bubble teaches something. */
+  const HINT_LEARNT = { flap: 5, land: 3, boost: 3 };
+  const HINT_ROWS = [['flap', 'flap', 'Flap'], ['land', 'dive', 'Land'], ['boost', 'boost', 'Boost']];
+  function flightHints(dev, fam, tutor) {
+    const mode = G.settings.controlHints || 'auto';
+    if (mode === 'off' || gus.mode !== 'fly' || gus.modeT < 0.5 || G.vehicles.driving || G.cutscene.locked || G.dialogue.open || G.wheel.open || G.altView || tutor) return '';
+    if (G.mods.some((m) => m.panel?.())) return '';
+    const learnt = G.settings.hintsLearnt || {};
+    const rows = HINT_ROWS.filter(([k]) => (mode === 'always' || (learnt[k] || 0) < HINT_LEARNT[k]) && (dev !== 'touch' || k === 'land'));
+    if (!rows.length) return '';
+    if (dev === 'touch') return `<span class="t">Tap${glyph('dive', dev, fam)}to land</span>`;
+    return rows.map(([, a, label]) => `<span>${glyph(a, dev, fam)}${label}</span>`).join('');
   }
+  /** Flight hint / scarf: count a use toward retiring a hint (saved with the settings; a few writes in all). */
+  function learnHint(k) {
+    const L = (G.settings.hintsLearnt ||= { flap: 0, land: 0, boost: 0 });
+    if ((L[k] || 0) >= HINT_LEARNT[k]) return;
+    L[k] = (L[k] || 0) + 1;
+    saveSettings(G.settings);
+  }
+  G.learnHint = learnHint;
 
   function render() {
     const shaking = G.shakeT > 0 && G.screen === 'play';
