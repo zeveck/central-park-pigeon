@@ -93,37 +93,55 @@ export function instanceAttr(geometry, n) {
   return at;
 }
 
-/** Patch a dog material. Returns its uniforms (plain meshes set uGait per dog; instanced meshes read aGaitI). */
+/** The leg's pitch for this vertex (0 off the legs): shared by the position, the normal and the shadow pass. */
+const GLSL_HEAD = (instanced) => /* glsl */ `
+  uniform vec3 uGait; uniform float uGaitLift; uniform float uGaitLegs;
+  attribute vec4 aGait;
+  ${instanced ? 'attribute vec3 aGaitI;' : ''}
+  vec3 dogGs() { return ${instanced ? 'aGaitI' : 'uGait'}; }   // phase, amplitude 0..1, wag phase
+  float dogLegPh(vec3 gs) { return gs.x + (aGait.x > 1.5 ? 3.14159265 : 0.0); }
+  float dogLegAng(vec3 gs) {
+    if (aGait.x < 0.5 || aGait.x > 2.5 || uGaitLegs < 0.5) return 0.0;
+    float sw = sin(dogLegPh(gs));
+    // forward when positive (+z); the back-swing is shallower (further back, the paw's dark sole turned to the camera)
+    return 0.32 * gs.y * (sw > 0.0 ? sw : 0.55 * sw) * aGait.y;
+  }`;
+
+const GLSL_VERTEX = /* glsl */ `
+  vec3 gs = dogGs();
+  float grp = aGait.x;
+  if (grp > 0.5 && grp < 2.5 && uGaitLegs > 0.5) {
+    float ang = dogLegAng(gs);
+    vec2 d = vec2(transformed.z - aGait.w, transformed.y - aGait.z);
+    float c = cos(ang), s = sin(ang);
+    transformed.z = aGait.w + d.x * c - d.y * s;
+    transformed.y = aGait.z + d.x * s + d.y * c;
+    transformed.y += uGaitLift * gs.y * max(0.0, cos(dogLegPh(gs))) * aGait.y;   // the paw lifts as it swings forward
+  } else if (grp > 2.5 && grp < 3.5) {
+    transformed.y += uGaitLift * 0.35 * gs.y * sin(gs.x * 2.0 + 0.6) * aGait.y;   // the head nods twice a stride
+  } else if (grp > 3.5) {
+    float wag = sin(gs.z) * (0.25 + 0.2 * gs.y) * aGait.y;  // a wag about the tail's root
+    transformed.x += (aGait.w - transformed.z) * wag;
+  }`;
+
+// the leg's normals turn with it (same pitch about x); cheap, and the lit side follows the swing
+const GLSL_NORMAL = /* glsl */ `
+  float na = dogLegAng(dogGs());
+  if (na != 0.0) { float c = cos(na), s = sin(na); objectNormal = vec3(objectNormal.x, objectNormal.z * s + objectNormal.y * c, objectNormal.z * c - objectNormal.y * s); }`;
+
+/**
+ * Patch a dog material. Returns its uniforms (plain meshes set uGait per dog; instanced meshes read aGaitI).
+ * The shadow pass gets the same gait: material.userData.gaitDepth is a depth material sharing these uniforms; the
+ * hooks set it as the mesh's customDepthMaterial (the sun is the only shadow-casting light: no distance material).
+ */
 export function patch(material, geometry, { instanced = false } = {}) {
   const inf = prepare(geometry);
   const uniforms = { uGait: { value: new THREE.Vector3() }, uGaitLift: { value: inf.lift }, uGaitLegs: { value: inf.legs ? 1 : 0 } };
-  addShaderPatch(material, {
-    key: 'doggait' + (instanced ? 'I' : ''),
-    uniforms,
-    vertexHeader: /* glsl */ `
-      uniform vec3 uGait; uniform float uGaitLift; uniform float uGaitLegs;
-      attribute vec4 aGait;
-      ${instanced ? 'attribute vec3 aGaitI;' : ''}`,
-    vertex: /* glsl */ `
-      vec3 gs = ${instanced ? 'aGaitI' : 'uGait'};   // phase, amplitude 0..1, wag phase
-      float grp = aGait.x;
-      if (grp > 0.5 && grp < 2.5 && uGaitLegs > 0.5) {
-        float ph = gs.x + (grp > 1.5 ? 3.14159265 : 0.0);
-        float sw = sin(ph);
-        // forward when positive (+z); the back-swing is shallower (further back, the paw's dark sole turned to the camera)
-        float ang = 0.32 * gs.y * (sw > 0.0 ? sw : 0.55 * sw) * aGait.y;
-        vec2 d = vec2(transformed.z - aGait.w, transformed.y - aGait.z);
-        float c = cos(ang), s = sin(ang);
-        transformed.z = aGait.w + d.x * c - d.y * s;
-        transformed.y = aGait.z + d.x * s + d.y * c;
-        transformed.y += uGaitLift * gs.y * max(0.0, cos(ph)) * aGait.y;   // the paw lifts as it swings forward
-      } else if (grp > 2.5 && grp < 3.5) {
-        transformed.y += uGaitLift * 0.35 * gs.y * sin(gs.x * 2.0 + 0.6) * aGait.y;   // the head nods twice a stride
-      } else if (grp > 3.5) {
-        float wag = sin(gs.z) * (0.25 + 0.2 * gs.y) * aGait.y;  // a wag about the tail's root
-        transformed.x += (aGait.w - transformed.z) * wag;
-      }`,
-  });
+  const key = 'doggait' + (instanced ? 'I' : '');
+  addShaderPatch(material, { key, uniforms, vertexHeader: GLSL_HEAD(instanced), vertex: GLSL_VERTEX, normal: GLSL_NORMAL });
+  const depth = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking });
+  addShaderPatch(depth, { key, uniforms, vertexHeader: GLSL_HEAD(instanced), vertex: GLSL_VERTEX });
+  material.userData.gaitDepth = depth;
   return uniforms;
 }
 

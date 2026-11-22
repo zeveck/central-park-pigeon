@@ -154,6 +154,7 @@ export class Characters {
     }
     if (sp === 'dog') { c.gaitAttr = dogGaitAttr(geo, 1); c.gait = new DogGait((baked.bounds.max.y - baked.bounds.min.y) * (look.scale || 1), c.id.length); }
     const m = new THREE.InstancedMesh(geo, this.mats[key], 1);
+    if (sp === 'dog') m.customDepthMaterial = this.mats[key].userData.gaitDepth;   // batch-3 (#11): the shadow trots too
     m.name = 'char:' + c.id;
     m.setMatrixAt(0, new THREE.Matrix4());
     const t = sp === 'songbird' ? (SONGBIRD_TINTS[look.bird] || SONGBIRD_TINTS.sparrow).back : look.tint || [1, 1, 1];

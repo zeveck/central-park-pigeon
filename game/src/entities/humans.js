@@ -311,6 +311,7 @@ export class Humans {
           if (!b) break;
           const mesh = new THREE.Mesh(b.geometry, b.makeMaterial(DOG_TINTS[(n + j) % DOG_TINTS.length]));
           const gu = dogGait(mesh.material, b.geometry), gait = new DogGait((b.bounds.max.y - b.bounds.min.y) * 0.62, n + j);   // batch-3 (#11)
+          mesh.customDepthMaterial = mesh.material.userData.gaitDepth;   // batch-3 (#11): the shadow trots too
           mesh.castShadow = G.preset?.id === 'high';   // perf pass: High only
           const h = new THREE.Group(); h.add(mesh); h.scale.set(-0.62, 0.62, 0.62);
           const geo = new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3));

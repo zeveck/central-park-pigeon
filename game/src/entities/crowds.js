@@ -152,6 +152,7 @@ export class Crowds {
       });
     }
     const mesh = new THREE.InstancedMesh(geo, mat, cap);
+    if (mat.userData.gaitDepth) mesh.customDepthMaterial = mat.userData.gaitDepth;   // batch-3 (#11): the shadow trots too
     mesh.name = (full ? 'crowd:' : 'crowd-lod:') + id;
     mesh.count = 0;
     mesh.frustumCulled = false;

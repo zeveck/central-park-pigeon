@@ -450,3 +450,25 @@ errors, none re-recorded. `tools/check-schemes.mjs` passes.
 One harness fix on the way: six `.alt` solutions start from their own fixture (`goToScheme('gear-pen.alt')`) but
 have no `fixture` field, and `sf-run.mjs replay` fell back to the main scheme's fixture, so they failed when run
 plainly (they pass with `--fixture <id>.alt`). `replay` now takes the fixture from the solution's `start`.
+
+## Batch-3d (fences, 2026-11-22)
+
+The flat fence planes (the alpha-tested, double-sided `rail` material) are replaced by code-built 3D fences
+(`world/fences.js`), measured with `perf-probe.mjs` on the `den-meermob` fixture in the afternoon:
+
+| Spot | Low: tris / draws | High: tris / draws |
+|---|---|---|
+| Reservoir | 240k / 81 (above: 177k / 79) | 777k / 158 (above: 647k / 157) |
+| Great Lawn (new spot) | 273k / 85 | 929k / 161 |
+
+- The iron (Reservoir ring, the gate) is a code colour on the shared vertex-coloured `coded` material: no draw of its own.
+  The Reservoir ring costs ~17k triangles on Low and ~73k on High. The whole ring lies in one 512 m batch cell, so all of
+  it draws whenever that cell is in view. Its pickets and hoops are kept out of the static shadow proxy
+  (`Batcher.add(..., { shadow: false })`); only rails and posts cast (+~10k shadow triangles on High).
+- **Correction to the commit note "no new draw calls": the backstops' chain-link is its own alpha-tested,
+  double-sided material (`chainLink`).** It costs one main-pass draw per 512 m cell with a backstop, plus one shadow
+  draw there on High and Medium (alpha-tested materials cast from their own mesh, not the proxy). The `rail` material
+  it replaces had the same cost in those cells, and `rail` is no longer drawn anywhere (the Reservoir ring and the gate
+  used it too), so the net change is zero or one draw fewer per cell. The probe's +1–2 draws at the Reservoir match
+  the people the batch-3 placement work moved there (one body draw and one shadow draw).
+- About 46k of the Reservoir's triangle increase is those people, not the fences.
