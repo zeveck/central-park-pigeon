@@ -848,7 +848,7 @@ async function boot() {
   world.add(flock.mesh);
   G.flock = flock;
   if (preset.id !== 'high') simplifierReady.then(() => flock.mesh.geometry.setIndex(simplifiedGeometry(flock.mesh.geometry, 0.6, 0.05, 4).index));   // perf pass: 60% birds on Medium and Low
-  G.leader = () => ({ position: gus.position, velocity: gus.velocity, yaw: gus.yaw, grounded: gus.grounded });
+  G.leader = () => ({ position: gus.position, velocity: gus.velocity, yaw: gus.yaw, grounded: gus.grounded || gus.mode === 'hop' });   // Batch-2 (#5): a hop keeps the flock in ground formation
 
   const aspect = innerWidth / innerHeight;
   const dataCam = new THREE.PerspectiveCamera(60, aspect, 0.05, preset.far);
@@ -992,7 +992,8 @@ async function boot() {
     // Batch-2 (#5): old recordings replay with the old take-off (no hop); a Flap press on the ground learns whether a tap
     // may hop here (gus.js decides when the squash ends; it also checks the ground itself)
     gus.legacyTakeoff = !!G.legacyTakeoff;
-    if (gus.mode === 'walk' && input.pressed('flap')) gus.hopOk = control && hopAllowed();
+    // (any ground Flap press: a perch can turn to walk inside the same update, so a perch press must not leave a stale yes)
+    if ((gus.mode === 'walk' || gus.mode === 'perch') && input.pressed('flap')) gus.hopOk = control && hopAllowed();
     { const cd = dataCam.position.distanceTo(gus.position); gus.scarf.lod = G.altView || cd > 40 ? 2 : cd > 12 ? 1 : 0; }   // Flight hint / scarf: scarf LOD (visual only)
     const driving = G.vehicles.driving;
     if (driving) G.vehicles.drive(dt, control ? input : LOCKED_INPUT, rig.yaw);
@@ -1516,6 +1517,7 @@ async function boot() {
     const st = cloneState(G.state);
     st.saveRev = 3;   // Fixes-3: made by a build that never saves mid-scene (continueGame's repair treats saves without it as old)
     st.gus = { x: +gus.position.x.toFixed(3), y: +gus.position.y.toFixed(3), z: +gus.position.z.toFixed(3), yaw: +gus.yaw.toFixed(4), mode: gus.mode === 'takeoff' || gus.mode === 'hop' ? 'walk' : gus.mode };
+    if (gus.mode === 'hop' && gus.hopFrom) { st.gus.x = +gus.hopFrom.x.toFixed(3); st.gus.y = +gus.hopFrom.y.toFixed(3); st.gus.z = +gus.hopFrom.z.toFixed(3); }   // Batch-2 (#5): mid-hop: where he hopped from
     // playtest: saved while driving, Gus came back standing inside the vehicle (camera inside the cart). Save him
     // where getting out would put him: beside it, on the left (or the right), as vehicles.js #exit does.
     const v = G.vehicles?.cur;
@@ -1625,7 +1627,7 @@ async function boot() {
   }
   G.project = project;
 
-  function hudView() {
+  function hudView(dt = 0) {
     const st = G.state, d = derived(st);
     const camYaw = Math.atan2(gus.position.x - dataCam.position.x, gus.position.z - dataCam.position.z);
     const c = st.carried;
@@ -1649,7 +1651,7 @@ async function boot() {
     const panel = G.mods.map((m) => m.panel?.()).filter(Boolean).join('');
     // Fixes-2: no second "□ the sign" bubble while the context prompt already says "□ Peck the sign"
     const tutor = tu && !G.dialogue.open && !G.wheel.open && !(tu.action === 'peck' && G.interact.prompt && !G.cutscene.locked) ? `${glyph(tu.action, dev, fam)}<span>${tu.text}</span>` : '';
-    const flight = flightHints(dev, fam, tutor);   // Flight hint / scarf: the fixed strip at the bottom (replaces the floating "C Land")
+    const flight = flightHints(dev, fam, tutor, dt);   // Flight hint / scarf: the fixed strip at the bottom (replaces the floating "C Land")
     return {
       stamina: gus.stamina, boosting: gus.boostT > 0, portrait: G.gusPortrait(),   // polish: the HUD circle is always Gus (it previewed the wheel's selected ally, which read as the player changing; the wheel itself shows the pick)
       device: dev, family: fam, feathers: st.feathers,
@@ -1670,7 +1672,7 @@ async function boot() {
   // (.lt). Drop joins while carrying, Peck while over water (the swimmers can be talked to from the air).
   const HINT_ROWS = [['flap', 'flap', 'Flap · hold to climb'], ['land', 'dive', 'Land'], ['boost', 'boost', 'Boost']];
   let hintWaterT = 0;
-  function flightHints(dev, fam, tutor) {
+  function flightHints(dev, fam, tutor, dt = 0) {
     const mode = G.settings.controlHints || 'auto';
     if (mode === 'off' || gus.mode !== 'fly' || gus.modeT < 0.5 || G.vehicles.driving || G.cutscene.locked || G.dialogue.open || G.wheel.open || G.altView || tutor) return '';
     if (G.mods.some((m) => m.panel?.())) return '';
@@ -1679,7 +1681,7 @@ async function boot() {
     const rows = HINT_ROWS.map(([k, a, label]) => [a, label, mode !== 'always' && (learnt[k] || 0) >= HINT_LEARNT[k]]);
     if (G.state.carried) rows.push(['drop', 'Drop', false]);
     // over water (held a moment after the shore, so the strip doesn't flicker along a bank)
-    hintWaterT = collision.surface(gus.position.x, gus.position.z, gus.position.y + 0.1).kind === 'water' ? 1.5 : Math.max(0, hintWaterT - 1 / 60);
+    hintWaterT = collision.surface(gus.position.x, gus.position.z, gus.position.y + 0.1).kind === 'water' ? 1.5 : Math.max(0, hintWaterT - dt);
     if (hintWaterT > 0) rows.push(['peck', 'Peck to talk', false]);
     return rows.map(([a, label, dim]) => `<span${dim ? ' class="lt"' : ''}>${glyph(a, dev, fam)}${label}</span>`).join('');
   }
@@ -1730,7 +1732,7 @@ async function boot() {
       // Fixes-2 (P8): cinematic HUD while a cutscene holds the controls (scenes, showpieces, joins)
       const cine = !!G.cutscene.locked || !!G.vehicles.byId?.zamboni?.hop?.lane;   // Fixes-3 (R8): and the Zamboni's launch arc
       if (cine !== G.cineHud) { G.cineHud = cine; document.body.classList.toggle('cine', cine); }
-      G.hud.update(dt, hudView());
+      G.hud.update(dt, hudView(dt));
       G.bubbles.render(project);
     }
     G.openSky.render(dt);   // Batch-2 (#13): the badge and the shimmer (render only)

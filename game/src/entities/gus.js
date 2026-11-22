@@ -260,6 +260,7 @@ export class Gus {
     if (inp.pressed('flap')) {
       // Batch-2 (#5): may this one become a hop? Decided now (where he stands), used when the squash ends
       this.hopArmed = !this.legacyTakeoff && this.hopOk && this.mode === 'walk' && this.slideV <= 0 && this.#hopGround();
+      this.hopOk = false;   // used up: main.js sets it again on the next ground press
       this.flapAgain = false;
       this.mode = 'takeoff'; this.modeT = 0; this.peckT = -1; this.slideV = 0;
     }

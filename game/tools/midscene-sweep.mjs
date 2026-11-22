@@ -231,7 +231,7 @@ async function replayInto(page, c, secs) {
   const sol = JSON.parse(fs.readFileSync(path.join(ROOT, `design/solutions/${c.id}.json`), 'utf8'));
   const m = (sol.start || '').match(/goToScheme\('([^']+)'(?:,\s*(\d+))?\)/);
   await page.evaluate(([id, n]) => window.__game.goToScheme(id, n), [m ? m[1] : c.id, m?.[2] ? +m[2] : null]);
-  await page.evaluate((f) => window.__game.replay(f.map(([n, h, x, y]) => ({ n, h, x, y }))), sol.inputs);
+  await page.evaluate(([f, version]) => window.__game.replay(f.map(([n, h, x, y]) => ({ n, h, x, y })), { version }), [sol.inputs, sol.version || 0]);   // Batch-2 (#5)
   const ok = await stepUntil(page, sceneOn(c), 3000, 60, 60);   // stepped exactly as sf-run.mjs replays (60 updates, a render)
   await page.evaluate(() => { const G = window.__sfG; G.replayer = null; G.input.clearAuto?.(); });
   if (!ok) return { ok: false, why: 'the replay never reached the scene' };

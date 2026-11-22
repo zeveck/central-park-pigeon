@@ -468,7 +468,7 @@ export class AudioEngine {
       g.gain.cancelScheduledValues(n); g.gain.setTargetAtTime(0.0001, n, 0.08);
       for (const [o, l] of oscs) { o.stop(n + 0.5); l.stop(n + 0.5); }
     };
-    setTimeout(stop, (dur + 0.4) * 1000);   // never outlives its build (the warp itself stops it first)
+    setTimeout(stop, (dur + 3) * 1000);   // a safety net only: the warp (or a cancel) stops it first
     return { stop };
   }
 

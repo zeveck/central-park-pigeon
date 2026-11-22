@@ -81,7 +81,8 @@ export class OpenSky {
   #warp() {
     const G = this.G, gus = G.gus;
     this.cancel();
-    const y = G.terrain.heightAt(LAWN.x, LAWN.z) + ARRIVE_ALT;
+    // a heavy item caps his height (carryLimits.maxAlt): arrive under it, not 40 m up being dragged down
+    const y = G.terrain.heightAt(LAWN.x, LAWN.z) + Math.min(ARRIVE_ALT, gus.carryLimits?.maxAlt ?? ARRIVE_ALT);
     gus.place({ x: LAWN.x, z: LAWN.z, y, yaw: Math.cos(gus.yaw) >= 0 ? 0 : Math.PI, mode: 'fly', speed: 7.5 });   // along the park, never straight back out
     G.flock.place(G.leader());
     G.rig.yaw = gus.yaw;
@@ -103,8 +104,12 @@ export class OpenSky {
 
   /** Render only: the badge and the shimmer. */
   render(dt) {
+    // a menu or Pause mid-build: the build stops (tick doesn't run under menus) and starts again from 0 afterwards, sound
+    // and all, so nothing is drawn behind the menu and the warp never lands silent
+    const playing = this.G.screen === 'play' && !this.G.paused && !this.G.menus?.open;
+    if (!playing && this.warpT > 0) this.cancel();
     const k = this.arriveT > 0 ? (this.arriveT -= dt, Math.max(0, this.arriveT / 1.2)) : Math.min(1, this.warpT / BUILD);
-    const badge = this.on && this.G.screen === 'play';
+    const badge = this.on && playing;
     if (badge !== this.shown.badge) { this.badge.classList.toggle('on', badge); this.shown.badge = badge; }
     const kr = Math.round(k * 40) / 40;
     if (kr !== this.shown.k) {

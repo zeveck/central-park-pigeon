@@ -49,7 +49,7 @@ const log = (...a) => console.log(new Date().toISOString().slice(11, 19), ...a);
 
 async function main() {
   const browser = await chromium.launch({ headless: true, args: ['--no-sandbox', '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
-  const run = { started: new Date().toISOString(), segments: [], schemes: [] };
+  const run = { version: 2, started: new Date().toISOString(), segments: [], schemes: [] };   // Batch-2 (#5): bridge/pilot segments use the hop take-off; replay segments keep their file's version
   const errors = [];
   try {
     const page = await browser.newPage({ viewport: { width: 960, height: 540 } });
@@ -115,8 +115,8 @@ async function main() {
       const res = await page.evaluate(() => ({ result: window.__game.pilot().result, rec: window.__game.recording() }));
       return { ok: ok && res.result?.ok, failed: res.result?.failed || (ok ? null : 'stepped past max'), inputs: (res.rec || []).map((f) => [f.n, f.h, f.x, f.y]) };
     };
-    const replay = async (inputs) => {
-      await page.evaluate((f) => window.__game.replay(f.map(([n, h, x, y]) => ({ n, h, x, y }))), inputs);
+    const replay = async (inputs, version = 0) => {   // Batch-2 (#5): a solution's version (none → the old take-off)
+      await page.evaluate(([f, version]) => window.__game.replay(f.map(([n, h, x, y]) => ({ n, h, x, y })), { version }), [inputs, version]);
       const ok = await stepUntil('(G) => !G.replayStatus().active');
       await page.evaluate(() => window.__game.step(240, { render: 60 }));
       return ok;
@@ -189,7 +189,7 @@ async function main() {
       }
       if (sol) {
         await page.evaluate(() => { window.__wgSave = window.__game.dev.snapshot(); window.__wgSaveT = window.__sfG.state.time; });
-        const ok = await replay(sol.inputs);
+        const ok = await replay(sol.inputs, sol.version || 0);
         const after = await st();
         if (after.flags.includes(id)) {
           entry.how = 'recorded solution replayed raw';

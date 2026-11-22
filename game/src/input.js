@@ -122,14 +122,15 @@ export function createInput(target = window, { canvas = null, bindings = DEFAULT
   // key caps and back (the strip changed its glyphs and width every few frames): it takes a real move (MOUSE_SWITCH px
   // within half a second) to switch to the keyboard. The look itself is unchanged.
   const MOUSE_SWITCH = 24;
-  let mouseAcc = 0, mouseAt = 0;
+  let mouseAcc = 0, mouseWin = 0;   // a fixed window: it starts with the first move after a quiet spell and ends 500 ms later
   const mouseDevice = (e) => {
     if (device !== 'gamepad') { setDevice('keyboard'); return; }
     const now = performance.now();
-    if (now - mouseAt > 500) mouseAcc = 0;
-    mouseAt = now;
-    mouseAcc += Math.abs(e.movementX || 0) + Math.abs(e.movementY || 0);
-    if (mouseAcc >= MOUSE_SWITCH) { mouseAcc = 0; setDevice('keyboard'); }
+    if (now - mouseWin > 500) { mouseWin = now; mouseAcc = 0; }
+    const m = Math.abs(e.movementX || 0) + Math.abs(e.movementY || 0);
+    if (m <= 2) return;   // sensor noise: a resting mouse's 1-2 px twitches never add up to a switch
+    mouseAcc += m;
+    if (mouseAcc >= MOUSE_SWITCH) { mouseAcc = 0; mouseWin = 0; setDevice('keyboard'); }
   };
   const onMouseMove = (e) => {
     const locked = document.pointerLockElement === canvas;
