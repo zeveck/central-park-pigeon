@@ -40,6 +40,7 @@ const SPOTS = {
   ramble: { view: 'ramble' },
   'sheep-meadow': { view: { gus: { x: -52, z: 138, mode: 'walk', yaw: 0.15 } } },
   reservoir: { view: 'reservoir' },
+  'great-lawn': { view: { gus: { x: -20, z: 452, mode: 'walk', yaw: 0.2 } } },   // batch-3 (#12): the backstops, the Reservoir fence behind
   'fifth-110th': { view: { gus: { x: 119, z: 1062, mode: 'walk', yaw: -2.5 } } },
   'high-midpark': { view: { gus: { x: 0, z: 330, y: 95, mode: 'fly', yaw: 0 } } },
   stomp: { finale: 'stomp', settle: 120 },

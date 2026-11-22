@@ -12,6 +12,7 @@ import { fbm, rngFor } from '../core/rng.js';
 import { ellipsePoly, samplePolyline, smoothstep } from '../core/geo.js';
 import { mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
 import { simplifiedGeometry, simplifierReady } from '../gfx/simplify.js';
+import { reservoirPanel, backstop, conservatoryGate } from './fences.js';
 
 // ------------------------------------------------------------------ shape helpers
 /** An arch plate: span along local z, thickness along local x, from y0 up to y1 with an arch opening. */
@@ -557,13 +558,10 @@ B['ballfields'] = (L, ctx) => {
     const y = ctx.heightAt(x, z);
     const dia = new THREE.CircleGeometry(7, 4, Math.PI / 4).rotateX(-Math.PI / 2);
     ctx.batch.mesh('dirt', scaleUV(dia, 7), { x, y: y + 0.03, z, yaw });
-    // backstop fence
+    // backstop fence (batch-3 #12: a pipe frame and chain-link, fences.js; collision and perches as before)
     const c = Math.cos(yaw), s = Math.sin(yaw);
     const bx = x - s * 8.5, bz = z - c * 8.5;
-    const g = new THREE.PlaneGeometry(8, 3);
-    const uv = g.attributes.uv; for (let k = 0; k < uv.count; k++) uv.setXY(k, uv.getX(k) * 8, uv.getY(k) * 3);
-    g.translate(0, 1.5, 0);
-    ctx.batch.mesh('rail', g, { x: bx, y, z: bz, yaw });
+    backstop(ctx, { x: bx, z: bz, yaw, y });
     ctx.collision.addBox({ x: bx, z: bz, y0: y, h: 3, w: 8, d: 0.1, yaw, tag: 'fence', walkable: false });
     rimPerches(ctx, { x: bx, z: bz, y: y + 3, w: 8, d: 0.1, yaw, tag: 'fence', inset: 0, sides: [0] });
   }
@@ -589,13 +587,10 @@ B['fence-ring'] = (L, ctx) => {
     const mx = (a.x + b.x) / 2, mz = (a.z + b.z) / 2;
     const y = ctx.heightAt(mx, mz);
     const yaw = Math.atan2(b.x - a.x, b.z - a.z) + Math.PI / 2;
-    const g = new THREE.PlaneGeometry(len, 1.25);
-    const uv = g.attributes.uv; for (let k = 0; k < uv.count; k++) uv.setXY(k, uv.getX(k) * len, uv.getY(k) * 1.25);
-    g.translate(0, 0.62, 0);
-    ctx.batch.mesh('rail', g, { x: mx, y, z: mz, yaw });
+    // batch-3 (#12): a 3D iron picket fence on the ground at each picket and post (fences.js); collision and perches as before
+    reservoirPanel(ctx, a, b, { post: i % 2 === 0, postTop: y + 1.33 });
     ctx.collision.addBox({ x: mx, z: mz, y0: y, h: 1.25, w: len, d: 0.08, yaw, tag: 'fence', walkable: false });
     if (i % 2 === 0) {
-      ctx.batch.box('iron', { x: a.x, y, z: a.z }, { w: 0.09, h: 1.32, d: 0.09 });
       ctx.collision.addPerch({ x: a.x, y: y + 1.33, z: a.z, r: 0.12, id: `res-post-${i}`, kind: 'post' });
     }
   }
@@ -631,11 +626,7 @@ B['formal-garden'] = (L, ctx) => {
   ctx.batch.box('green', { x: L.x, y: y + 3, z: L.z + L.d / 2 - 2 }, { w: 14, h: 0.25, d: 2.4 });
   // the Fifth Avenue gates
   for (const dz of [-4, 4]) solid(ctx, 'stone', { x: 109.2, z: L.z + dz, y: 0, w: 1.4, h: 3.4, d: 1.4 }, { tag: 'gate-post' });
-  const g = new THREE.PlaneGeometry(6.6, 3.6);
-  const uv = g.attributes.uv; for (let k = 0; k < uv.count; k++) uv.setXY(k, uv.getX(k) * 4.4, uv.getY(k) * 2.4);
-  g.translate(0, 1.8, 0);
-  ctx.batch.mesh('rail', g, { x: 109.3, y: 0, z: L.z, yaw: Math.PI / 2 });
-  ctx.batch.box('gold', { x: 109.3, y: 3.5, z: L.z }, { w: 0.1, h: 0.6, d: 6.6 });
+  conservatoryGate(ctx, { x: 109.3, z: L.z });   // batch-3 (#12): wrought-iron leaves and an overthrow on the posts (fences.js)
   ctx.collision.addPerchEdge({ a: { x: 109.3, y: 4.1, z: L.z - 3 }, b: { x: 109.3, y: 4.1, z: L.z + 3 }, id: 'garden-gate-top', kind: 'gate', out: -Math.PI / 2 });
   block(ctx, L.x - L.w / 2, L.x + L.w / 2, L.z - L.d / 2, L.z + L.d / 2);
 };

@@ -44,7 +44,7 @@ export class Batcher {
   }
 
   /** Add a geometry (cloned and transformed). The cell is picked by the transformed centre. */
-  add(mat, geometry, matrix) {
+  add(mat, geometry, matrix, { shadow = true } = {}) {   // batch-3: shadow false keeps thin pieces (fence pickets) out of the shadow proxy
     if (!this.M[mat]) throw new Error(`no material ${mat}`);
     const g = geometry.index ? geometry.clone() : withIndex(geometry.clone());
     for (const k of Object.keys(g.attributes)) if (!['position', 'normal', 'uv'].includes(k)) g.deleteAttribute(k);
@@ -65,7 +65,7 @@ export class Batcher {
     this.#bucket(mat, _v.x, _v.z).geos.push(g);
     // perf pass: opaque, single-sided casters also go into a shadow-proxy cell (position only; see build())
     const mo = this.M[mat];
-    if (this.cast && !mo.userData.noShadow && !mo.alphaTest && mo.side === THREE.FrontSide) {
+    if (shadow && this.cast && !mo.userData.noShadow && !mo.alphaTest && mo.side === THREE.FrontSide) {
       const k = `${Math.floor(_v.x / PROXY_CELL)},${Math.floor(_v.z / PROXY_CELL)}`;
       if (!this.proxies.has(k)) this.proxies.set(k, []);
       const pg = new THREE.BufferGeometry();
