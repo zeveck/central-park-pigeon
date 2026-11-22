@@ -580,7 +580,7 @@ THREE.Object3D.prototype.updateMatrixWorld = function (force) {
 };
 const MIRROR = new THREE.Matrix4().makeScale(-1, 1, 1);
 const NAP_SECS = 3;
-const LOCKED_INPUT = { locked: true, held: () => false, pressed: () => false, axis: () => 0, move: () => ({ x: 0, y: 0, edge: false }) };
+const LOCKED_INPUT = { locked: true, scripted: true, held: () => false, pressed: () => false, axis: () => 0, move: () => ({ x: 0, y: 0, edge: false }) };
 
 const G = {
   DT, ready: false, frozen: false, paused: false, simTime: 0, updates: 0, fps: 60, lastStats: { triangles: 0, calls: 0 }, lastFarStats: null,

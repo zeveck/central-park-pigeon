@@ -44,6 +44,9 @@ const BODY_R = { ground: 0.12, air: 0.18 };
 // descent carries on after the key is up (gentler, slower forward speed) until he lands, and a perch within `perchR`
 // catches him. Flap, boost, a splash, a cutscene (locked input) or `max` seconds cancel it.
 const LAND = { tap: 0.3, calm: 0.25, alt: 10, max: 4, speed: 5, sink: 6.5, perchR: 1.0 };
+// Batch-2 (#2): the landing snap (up to 0.9 m in a dive, a perch catch) is eased on the visual root over this long (s).
+// Render-side only: gus.position, speed and every rule land exactly as before.
+const LAND_EASE = 0.24;
 
 const ease = (t) => 1 - Math.pow(1 - t, 3);
 const approach = (v, target, rate, dt) => v + (target - v) * Math.min(1, rate * dt);
@@ -115,6 +118,8 @@ export class Gus {
     this.glideT = 0;                // Land/perf: seconds flying without Flap or Land (the HUD's Land prompt reads it)
     this.sinceFlap = 0;             // Land/perf: seconds since Flap was last held in the air (a tap right after a climb is a trim, not a landing)
     this.lowAlt = Infinity;         // Land/perf: height over what's below him while flying (HUD only)
+    this.landEase = null;           // Batch-2 (#2): { t, x, y, z } the visual offset (data space) eased out after a landing
+    this._prevPos = new THREE.Vector3();
     this.useModel('stand');
   }
 
@@ -148,6 +153,7 @@ export class Gus {
     this.inCanopy = false;
     this.events = [];
     this.diveHeldT = 0; this.landLatch = 0; this.glideT = 0; this.lowAlt = Infinity; this.sinceFlap = 0;
+    this.landEase = null;
     this.speed = speed ?? (mode === 'fly' ? FLY.cruise : 0);
     this.velocity.set(Math.sin(yaw), 0, Math.cos(yaw)).multiplyScalar(this.speed);
     this.useModel(mode === 'fly' ? 'fly' : 'stand');
@@ -159,6 +165,7 @@ export class Gus {
 
   update(dt, cameraYaw) {
     const prev = _prev.copy(this.root.position);
+    this._prevPos.copy(prev);
     this.modeT += dt;
     switch (this.mode) {
       case 'walk':
@@ -279,7 +286,7 @@ export class Gus {
     this.sinceFlap = inp.held('flap') ? 0 : this.sinceFlap + dt;
     if (diveIn) this.diveHeldT += dt;
     else {
-      if (this.diveHeldT > 0 && this.diveHeldT <= LAND.tap + 1e-6 && this.sinceFlap - this.diveHeldT >= LAND.calm - 1e-6 && !inp.locked) {
+      if (this.diveHeldT > 0 && this.diveHeldT <= LAND.tap + 1e-6 && this.sinceFlap - this.diveHeldT >= LAND.calm - 1e-6 && !inp.scripted) {
         const pp = this.root.position, below = this.#surface(pp.x, pp.z, pp.y + 0.05);
         if (below.kind !== 'water' && pp.y - below.y <= LAND.alt) this.landLatch = LAND.max;
       }
@@ -287,7 +294,7 @@ export class Gus {
     }
     if (this.landLatch > 0) {
       this.landLatch -= dt;
-      if (inp.locked || inp.held('flap') || inp.pressed('sprint') || inp.pressed('boost') || this.boostT > 0) this.landLatch = 0;
+      if (inp.scripted || inp.held('flap') || inp.pressed('sprint') || inp.pressed('boost') || this.boostT > 0) this.landLatch = 0;
     }
     const landing = this.landLatch > 0 && !diveIn;
     const diving = diveIn || landing;
@@ -422,6 +429,10 @@ export class Gus {
   #splash() { const p = this.root.position; this.events.push({ type: 'splash', x: p.x, y: p.y, z: p.z }); }
 
   #land(mode, perch) {
+    // Batch-2 (#2): the visual root starts where he was drawn last update and eases onto the landing spot (looks only)
+    const pv = this._prevPos, pp = this.root.position;
+    const ex = pv.x - pp.x, ey = pv.y - pp.y, ez = pv.z - pp.z;
+    this.landEase = Math.hypot(ex, ey, ez) > 0.02 && Math.hypot(ex, ey, ez) < 3 ? { t: 0, x: ex, y: ey, z: ez } : null;
     this.mode = mode;
     this.modeT = 0;
     this.perch = perch ? { ...perch, r: perch.perch?.r ?? 0.15, edge: perch.perch?.t === 'edge', id: perch.perch?.id, kind: perch.perch?.kind } : null;
@@ -507,11 +518,25 @@ export class Gus {
     // ground poses: the take-off / landing squash stays on standPose; everything else is the skeleton (Gus rig)
     let sq = 0;
     if (this.mode === 'takeoff') sq = Math.sin(Math.min(1, this.modeT / TAKEOFF_SQUASH) * Math.PI * 0.5) * 0.24;
-    if (this.landSquash > 0) {
+    // Batch-2 (#2): the eased landing: the stand model glides the last bit forward and down onto the spot; the squash
+    // waits until the feet are down (looks only)
+    const le = this.landEase;
+    let ox = 0, oy = 0, oz = 0;
+    if (le) {
+      le.t += dt;
+      const k = le.t >= LAND_EASE ? 0 : 1 - ease(le.t / LAND_EASE);
+      if (k <= 0) this.landEase = null;
+      else {
+        // data-space offset → root space (root: yaw about y, then its x mirror)
+        const c = Math.cos(this.yaw), s = Math.sin(this.yaw), sx = this.root.scale.x || 1;
+        ox = (le.x * c - le.z * s) * k / sx; oy = le.y * k; oz = (le.x * s + le.z * c) * k;
+      }
+    }
+    if (this.landSquash > 0 && !(le && le.t < LAND_EASE * 0.7)) {
       sq = Math.max(sq, Math.sin(this.landSquash * Math.PI) * 0.18);
       this.landSquash = Math.max(0, this.landSquash - dt / 0.18);
     }
-    this.standPose.position.y = 0;
+    this.standPose.position.set(ox, oy, oz);
     this.standPose.rotation.set(0, 0, 0);
     this.standPose.scale.set(1 + sq * 0.45, 1 - sq, 1 + sq * 0.45);
     const stepLen = stepLength(this.speed);
