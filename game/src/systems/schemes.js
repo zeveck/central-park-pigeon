@@ -15,7 +15,7 @@
 import { SCHEMES, SCHEME } from '../data/schemes.js';
 import { THREAD } from '../data/threads.js';
 import { CREW, CHARACTERS, phaseList, PHASE_LABEL, awakeReason, HAULERS } from '../data/crews.js';
-import { PLACES, SIGNS, CLUES, TRADES } from '../world/layout.js';
+import { PLACES, SIGNS, CLUES, TRADES, SLICE } from '../world/layout.js';
 import { derived } from '../state/gamestate.js';
 import { FEUDS } from '../data/crews.js';
 
@@ -396,7 +396,19 @@ export class SchemeEngine {
     if (this.busy.has(id)) return null;   // Fixes-2 (P8): the step just done is playing out; its old goal would be stale
     const step = this.step(id);
     if (!step) return null;
-    return { key: `${id}.${this.stepIndex(id)}`, goal: step.goal, obstacle: step.obstacle, scheme: id };
+    const cold = this.coldSlice(step);   // fix-19: a cold slice where a hot one is wanted: the card says where to warm it
+    return { key: `${id}.${this.stepIndex(id)}${cold ? '.cold.' + this.st.phase : ''}`, goal: step.goal, obstacle: cold ? cold.text : step.obstacle, scheme: id };
+  }
+
+  /** fix-19: Gus carries a cold slice and this step (or one of its alternatives) wants a hot one: { text, griddle } (griddle:
+   *  where the halal cart is this phase, or null). UI only (the goal card and the compass). */
+  coldSlice(step) {
+    const G = this.G, c = this.st.carried;
+    if (!step || !c?.id?.startsWith('slice') || G.items.isHot(c)) return null;
+    if (![step.needs, ...(step.alts || []).map((a) => a.needs)].some((n) => n?.hot && n.item?.startsWith('slice'))) return null;
+    const gr = SLICE.griddle[this.st.phase];
+    const at = { afternoon: 'at Grand Army Plaza', dusk: 'at 110th & Fifth' }[this.st.phase];
+    return { griddle: gr || null, text: gr ? `Cold. The halal cart's griddle ${at} will warm\u00a0it.` : 'Cold. The halal cart\'s griddle will warm it: Grand Army Plaza in the Afternoon, 110th & Fifth at\u00a0Dusk.' };
   }
 
   /** Compass targets for the tracked step (or, Fixes-2, any open scheme's current step: the map's dim rings). */
@@ -413,6 +425,8 @@ export class SchemeEngine {
     if (tg.at) out.push({ x: tg.at.x, z: tg.at.z, y: this.G.terrain.heightAt(tg.at.x, tg.at.z) + 2.5, icon: 'target', label: tg.at.label });   // fun pass: a spot (the tourist's bench, the picnic)
     const who = tg.who || [step.on, ...(step.alts || []).map((a) => a.on)].map((o) => (o?.type === 'talk' ? o.who : o?.type === 'give' ? o.to : null)).find((w) => w && CHARACTERS[w]);
     if (who) { const c = this.G.chars?.find(who); if (c) out.push({ x: c.x, z: c.z, y: (c.y ?? this.G.terrain.heightAt(c.x, c.z)) + 1.1, icon: 'target', label: CHARACTERS[who].name }); }
+    const cold = this.coldSlice(step);   // fix-19: the griddle, while the slice is cold
+    if (cold?.griddle) out.push({ x: cold.griddle.x, z: cold.griddle.z, y: this.G.terrain.heightAt(cold.griddle.x, cold.griddle.z) + 2.2, icon: 'target', label: 'The halal griddle' });
     if (!out.length && step.needs?.place && !this.atPlace(step.needs.place)) { const p = PLACES[step.needs.place]; out.push({ x: p.x, z: p.z, y: this.G.terrain.heightAt(p.x, p.z) + 3, icon: 'target', label: p.name }); }
     return out;
   }

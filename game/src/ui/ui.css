@@ -101,6 +101,12 @@ svg.pad { display: inline-block; width: 1.6em; height: 1.6em; vertical-align: mi
 #hud .slot { transition: opacity 0.2s; }
 #hud .slot.empty { opacity: 0; }   /* polish (P19): no empty ring when Gus carries nothing (its space stays, so nothing below jumps) */
 #hud .carry .lbl { font-size: 14px; font-weight: 600; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6); white-space: nowrap; }
+/* fix-19: name · Hot / Cooling, still counts / Cold, and a Drop hint under it */
+#hud .carry .lbl { display: flex; flex-direction: column; line-height: 1.15; }
+#hud .carry .lbl b { font-weight: 600; }
+#hud .carry .lbl.cold b { color: #bfe3ff; }
+#hud .carry .lbl small { font-size: 12px; font-weight: 600; opacity: 0.85; display: flex; align-items: center; gap: 4px; }
+#hud .carry .lbl small .key, #hud .carry .lbl small .padpill, #hud .carry .lbl small .padtxt { transform: scale(0.85); transform-origin: left center; }
 #hud .goal { grid-column: 1 / -1; max-width: min(380px, 42vw); margin-top: 6px; padding: 8px 28px 8px 12px; border-radius: 12px; background: var(--hud-bg); font-family: 'Nunito', sans-serif; font-size: 14px; line-height: 1.3; pointer-events: auto; position: relative; }
 #hud .goal b { font-family: 'Fredoka', sans-serif; font-weight: 600; display: block; font-size: 15px; text-wrap: balance; }   /* playtest: 'grate.' alone on a phone */
 #hud .goal .obst { opacity: 0.85; }

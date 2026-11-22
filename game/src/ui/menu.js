@@ -61,7 +61,9 @@ export class Menus {
     // polish (P19): the default is the first item you can actually use (the Nest opened on a greyed-out Feather Up).
     // A recorded solution's raw menu presses (uiDown ×n from the old first item) were made with the old default, so a
     // replay (G.replayer) keeps it; focus is UI only, nothing in the park depends on it.
-    const usable = G.replayer?.active ? f[0] : (f.find((e) => !e.classList.contains('dis')) || f[0]);
+    // fix-19: the autopilot RECORDING a solution gets the same old default, or its presses don't match the replay's (a
+    // re-recorded den-cats.alt napped to Morning instead of Dusk on replay)
+    const usable = G.replayer?.active || G.pilot?.active ? f[0] : (f.find((e) => !e.classList.contains('dis')) || f[0]);
     (pref && f.includes(pref) ? pref : usable)?.focus({ preventScroll: !!s?.keepTop });
     // polish (P9): a reading screen (Controls, Credits) opens at its top, even when its only button is at the bottom
     if (s?.keepTop) { const c = s.el.querySelector('.card'); if (c) c.scrollTop = 0; }

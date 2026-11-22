@@ -98,22 +98,26 @@ export class Hud {
       $.feathers.innerHTML = [0, 1, 2].map((i) => icon('featherOn', i < v.feathers ? 'ic' : 'ic off')).join('');
       L.feathers = v.feathers;
     }
-    // carried item
+    // carried item. fix-19: the label is the name + Hot / Cooling, still counts / Cold, built from ONE key (the suffix was
+    // only written when the ring changed, so a new item with the same ring value kept a bare or stale label), and a Drop
+    // hint under it in the device's glyph (the owner: "stuck on your face with no obvious way to drop it")
     const c = v.carried;
+    if (!!c !== !L.slotOn) { $.slot.classList.toggle('empty', !c); L.slotOn = !!c; }
     const ckey = c ? c.id : '';
-    if (L.carry !== ckey) {
-      $.slot.classList.toggle('empty', !c);
-      $.slotIco.innerHTML = c ? itemIcon(c.id) : '';
-      $.carryLbl.textContent = c ? (ITEM_DEFS[c.id]?.name || c.id) : '';
-      L.carry = ckey;
-    }
+    if (L.carry !== ckey) { $.slotIco.innerHTML = c ? itemIcon(c.id) : ''; L.carry = ckey; }
     const heat = c && c.heat != null ? c.heat : null;
     // Land/perf: written only when they change
     const hk = heat == null ? 'none' : (125.7 * (1 - heat)).toFixed(1);
     if (L.heat !== hk) {
       L.heat = hk;
       $.cool.style.display = heat == null ? 'none' : '';
-      if (heat != null) { $.cool.style.strokeDashoffset = hk; $.carryLbl.textContent = (ITEM_DEFS[c.id]?.name || 'Slice') + (heat > 0 ? ' · hot' : ' · cold'); }
+      if (heat != null) $.cool.style.strokeDashoffset = hk;
+    }
+    const lk = c ? `${c.id}|${c.word || ''}|${dev}` : '';
+    if (L.lbl !== lk) {
+      L.lbl = lk;
+      $.carryLbl.classList.toggle('cold', c?.word === 'Cold');
+      $.carryLbl.innerHTML = c ? `<b>${ITEM_DEFS[c.id]?.name || c.id}${c.word ? ' · ' + c.word : ''}</b><small>${glyph('drop', v.device, v.family)} Drop</small>` : '';
     }
     // current goal
     const g = v.goal;

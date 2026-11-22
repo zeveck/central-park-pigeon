@@ -65,6 +65,7 @@ export class Characters {
       G.interact.register({
         id: 'char:' + id, kind: 'character', get x() { return c.x; }, get y() { return c.y; }, get z() { return c.z; }, r: onWater ? 3.4 : Math.max(1.4, sp.height * 1.2), dy: onWater ? 4 : 3, priority: 3, air: onWater,
         label: () => (this.out(c) ? (G.takers?.labelFor(id) || (c.here ? `Ask ${def.name}` : `Talk to ${def.name}`)) : null),
+        eaterGive: () => !!G.takers?.eaterGive(id),   // fix-19: a slice given away scores like small talk (interact.js)
         act: () => { if (onWater) this.#toShore(c); if (G.state.carried && G.takers?.labelFor(id)) { G.takers.give(id); return; } if (c.here) G.allies.ask(c); else this.talk(id); },
       });
     }
@@ -202,7 +203,9 @@ export class Characters {
       lines = T[i].map((text) => ({ who: id, text }));
     } else lines = [{ who: id, text: '…' }];
     if (c) c.yaw = Math.atan2(G.gus.position.x - c.x, G.gus.position.z - c.z);
-    G.bus.emit('talk', { who: id });
+    const ev = { who: id };
+    G.bus.emit('talk', ev);
+    if (ev.quiet) return;   // fix-19: a listener answered with a bubble of its own (Pickles giving way on a retry)
     // a scheme may have its own lines for this talk (the engine's step does): show the generic ones only if nothing else spoke
     G.later(0, () => { if (!G.dialogue.open) G.say(lines); });
   }

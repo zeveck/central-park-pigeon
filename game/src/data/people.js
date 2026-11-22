@@ -70,7 +70,7 @@ export const PEOPLE = [
   // the jogger who never stops… except at the north gatehouse's water fountain, once a lap
   { role: 'jogger', model: ['human-park', 'human-jogger'], n: 4, phases: ['morning', 'dusk'], act: 'jog', at: P(0, 662), loop: { rx: 94.5, rz: 97.5, exp: 2.25 }, acc: ['headband'], stop: { x: -4, z: 759.4, secs: 6 } },
   { role: 'cyclist', model: 'human-vendor', n: 1, phases: ['afternoon'], act: 'path', path: [P(100, 622), P(100.5, 680), P(97, 738)], acc: ['helmet', 'box'], holds: 'box' },
-  { role: 'halal', model: 'human-halal-cart-man', n: 1, phases: ['dusk'], act: 'work', at: P(112, 1060.5, 0), r: 0, acc: [] },
+  { role: 'halal', model: 'human-halal-cart-man', n: 1, phases: ['dusk'], act: 'work', at: P(108, 1051.6, 0), r: 0, acc: [] },   // fix-19: on the pavement (was in the road)
   // the Gapstow Bridge selfie (a postcard), the chess players' audience, kids at the statues (postcards)
   { role: 'gapstow-selfie', model: 'human-park', n: 1, phases: 'day', act: 'stand', at: P(61, 43.2, 0.1), r: 0, acc: ['selfie'] },
   { role: 'kid', model: ['human-child', 'human-park'], n: 2, phases: 'day', act: 'wander', at: P(37.4, 171.2), r: 2.2, kid: true },

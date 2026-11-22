@@ -706,7 +706,7 @@ export const SLICE = {
     { id: 'line-harlem', name: 'Harlem Meer', x: 50, z: 965 },
   ],
   // the halal cart's griddle: Afternoon at Grand Army Plaza, Dusk at 110th & Fifth
-  griddle: { afternoon: { x: 104, z: -22, yaw: 3.14 }, dusk: { x: 112, z: 1062, yaw: 3.14 }, warm: 3 },
+  griddle: { afternoon: { x: 104, z: -22, yaw: 3.14 }, dusk: { x: 108, z: 1053.1, yaw: 3.14 }, warm: 3 },   // fix-19: the Dusk cart was in the middle of 110th Street (road z 1054.6-1066.6); now on the park-side pavement
 };
 
 // ------------------------------------------------------------------ the Prologue (the first minute)

@@ -39,7 +39,9 @@ export class Interact {
       const facing = d > 0.05 ? (dx * Math.sin(g.yaw) + dz * Math.cos(g.yaw)) / d : 1;
       // Fixes-3 (R6): carrying something, the world's actions (grate travel, a give, a pick-up, a sign) win the prompt over
       // small talk ("Talk to Express" sat on the 72nd W grate during the hot-slice run; Chip at the slice joint)
-      const chat = carrying && t.kind === 'character' && !/^(Give|Offer)/.test(label);
+      // fix-19: a Give to an eater (a slice given away, systems/takers.js) scores like small talk too: it never takes the Peck
+      // from grate travel, a pick-up or a real hand-in
+      const chat = carrying && ((t.kind === 'character' && (!/^(Give|Offer)/.test(label) || t.eaterGive?.())) || t.kind === 'eater');
       const score = d * (1.4 - 0.4 * facing) - (t.priority || 0) * 0.5 + (chat ? 3 : 0);
       if (score < bs) { bs = score; best = { t, label }; }
     }

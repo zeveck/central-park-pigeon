@@ -753,7 +753,9 @@ export class Humans {
       if (!spec) continue;
       const h = c.hold[spec.bone];
       if (!h) continue;
-      const m = spec.make();
+      let m = spec.make();
+      // fix-19: the anchovy fan holds the real slice model in its anchovy texture (it was a plain yellow cone)
+      if (name === 'slice' && a.holds === 'slice-anchovy' && this.G.items?.anchovyMap) { m = this.G.items.makeMesh('slice-anchovy'); m.scale.setScalar(ANCHOVY_PROP.scale); m.position.set(...ANCHOVY_PROP.at); m.rotation.set(...ANCHOVY_PROP.rot); }
       h.add(m);
     }
   }
@@ -773,6 +775,7 @@ const DEFAULT_FLAVOUR = {
   'human-birder': ['look'], 'human-businessperson': ['phone'],
 };
 const CARRIAGE_BOX = { fwd: 0.9, up: 1.25 };
+const ANCHOVY_PROP = { scale: 1, at: [0, 0.06, 0.06], rot: [1.2, 0, 0] };   // fix-19: in the right hand's bone space
 const PEOPLE_FLOOR = { high: 4, medium: 3, low: 2 };   // perf pass: was 8 / 6 / 3, set while the world alone was over the caps
 const DOG_TINTS = [{}, { color: 0xd8c8b0 }, { color: 0x8a6a4a }, {}, { color: 0x404048 }];
 

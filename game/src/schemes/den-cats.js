@@ -60,13 +60,35 @@ export function installDenCats(G) {
   // the fan on the bench: the red herring
   G.humans.clings.push((a) => (a.role === 'sliceeater' && a.holds === 'slice-anchovy' && onStep(G, 'den-cats', 2) ? 'Mob me all you like, pigeon. This one\'s MINE. Go bother the CAT.' : null));
 
+  const fall = { x: SLICE_AT.x + 0.9, z: SLICE_AT.z + 0.2 };
+  /** The slice slides off the sill and lands hot on the pavement. */
+  const pushOff = (it) => {
+    if (G.items.world.includes(it)) G.items.remove(it);
+    const y0 = ground + SILL.y, y1 = G.surfaceY(fall.x, fall.z, y0 - 0.2);
+    const s = G.items.spawn('slice-anchovy', fall.x, fall.z, { born: G.state.time, y: y1 });
+    s.mesh.position.y = y0;
+    G.clues.anims.push({ t: 0, secs: 0.45, step: (k) => { s.mesh.position.set(SLICE_AT.x + (fall.x - SLICE_AT.x) * k, y0 + (y1 - y0) * k * k, SLICE_AT.z + (fall.z - SLICE_AT.z) * k); s.mesh.rotation.z = k * 2.5; }, done: () => { G.audio.play('knock-clatter', { at: fall }); G.particles.burst('steam', fall.x, y1 + 0.1, fall.z, 8); } });
+  };
+  /** fix-19: after the first push, a retry is quick: Pickles sighs and shoves it off (a bubble, no scene, no dialogue). */
+  const quickKnock = (it, p) => {
+    knocking = true;
+    const g = G.gus.position;
+    p.yaw = Math.atan2(g.x - p.x, g.z - p.z);
+    G.audio.play('cat-meow', { at: p, rate: 0.8 });
+    bubbleOver(G, 'pickles', 'Pickles: Sigh. You AGAIN. …Fine.', 2.6);
+    G.later(0.6, () => { p.yaw = Math.atan2(SLICE_AT.x - p.x, SLICE_AT.z - p.z); G.chars.animate(p, 'knock', 1.6); });
+    G.later(1.4, () => { if (G.items.world.includes(it)) pushOff(it); knocking = false; });
+    G.later(3.2, () => { p.yaw = Math.PI / 2; });
+    return true;
+  };
   /** Pickles wakes, stares, and slowly pushes the slice off the sill: it lands hot on the pavement. */
   const knock = () => {
     const it = sillSlice(), p = G.chars.find('pickles');
     if (!it || !p || knocking) return false;
+    if (G.state.flags['pickles.pushed'] || onStep(G, 'den-cats', 3)) return quickKnock(it, p);   // (on step 3 he has pushed one already: saves from before the flag too)
+    G.state.flags['pickles.pushed'] = true;
     knocking = true;
     const g = G.gus.position;
-    const fall = { x: SLICE_AT.x + 0.9, z: SLICE_AT.z + 0.2 };
     G.cutscene.run('pickles-knock', [
       { do: () => { p.yaw = Math.atan2(g.x - p.x, g.z - p.z); G.audio.play('cat-meow', { at: p, rate: 0.85 }); } },
       { cam: { ...G.shot({ x: SILL.x, y: ground + SILL.y, z: SILL.z + 0.3 }, { dist: 3.2, height: 0.7, yaw: Math.PI / 2 - 0.5, lookY: 0.1 }), secs: 0.8 } },
@@ -75,13 +97,7 @@ export function installDenCats(G) {
       { wait: 0.4 },
       { do: () => { p.yaw = Math.atan2(SLICE_AT.x - p.x, SLICE_AT.z - p.z); G.chars.animate(p, 'knock', 2.4); bubbleOver(G, 'pickles', '*stares at you* …*paw*', 2.2); } },
       { wait: 1.7 },
-      { do: () => {
-        if (G.items.world.includes(it)) G.items.remove(it);
-        const y0 = ground + SILL.y, y1 = G.surfaceY(fall.x, fall.z, y0 - 0.2);
-        const s = G.items.spawn('slice-anchovy', fall.x, fall.z, { born: G.state.time, y: y1 });
-        s.mesh.position.y = y0;
-        G.clues.anims.push({ t: 0, secs: 0.45, step: (k) => { s.mesh.position.set(SLICE_AT.x + (fall.x - SLICE_AT.x) * k, y0 + (y1 - y0) * k * k, SLICE_AT.z + (fall.z - SLICE_AT.z) * k); s.mesh.rotation.z = k * 2.5; }, done: () => { G.audio.play('knock-clatter', { at: fall }); G.particles.burst('steam', fall.x, y1 + 0.1, fall.z, 8); } });
-      } },
+      { do: () => pushOff(it) },
       { wait: 0.8 },
       { do: () => { p.yaw = Math.atan2(g.x - p.x, g.z - p.z); } },
       { say: [L('pickles', '…I didn\'t do that. You didn\'t see that.')] },
@@ -91,7 +107,7 @@ export function installDenCats(G) {
     return true;
   };
   // peck Pickles while the slice is on the sill: he wakes (instead of the usual chat)
-  G.bus.on('talk', (t, e) => { if (e.who === 'pickles' && onSliceStep() && sillSlice()) knock(); });
+  G.bus.on('talk', (t, e) => { if (e.who === 'pickles' && onSliceStep() && sillSlice()) { if (G.state.flags['pickles.pushed'] || onStep(G, 'den-cats', 3)) e.quiet = true; knock(); } });
   // or Coo right under the window
   G.bus.on('coo', (t, e) => {
     if (!onSliceStep() || !sillSlice()) return;
@@ -105,15 +121,41 @@ export function installDenCats(G) {
     G.later(2.2, () => G.say([L('queenie', G.state.crews.includes('rats') ? 'Over the park takes too long, darling. Under it, perhaps?' : 'The halal man\'s griddle is on 110th at Dusk, darling. I\'m only saying.')]));
   });
 
+  // fix-19: losing the anchovy slice any way at all (given away, a nap's rat, Ruffled, dropped where it can't be reached and
+  // floated back: items.js) puts the next one out on the sill early, and a toast names the place (the compass marks it).
+  // The sill is only stocked Morning to Dusk, so at Night it says when.
+  const SOON = 4;
+  let lostSaid = null;   // 'night' | 'day': what the last toast said
+  const anchovyAbout = () => G.state.carried?.id === 'slice-anchovy' || G.items.world.some((w) => w.id === 'slice-anchovy' && !w.sill);
+  const watchLost = () => {
+    const st = G.state;
+    if (!onStep(G, 'den-cats', 3) || knocking || anchovyAbout() || sillSlice()) { if (anchovyAbout()) lostSaid = null; return; }
+    if (!day()) {
+      if (lostSaid !== 'night') { lostSaid = 'night'; G.toast('No anchovy slice now. The counterman puts the next one on Pickles\' sill at CPW & 72nd. Out again in the morning.', { seconds: 5 }); }
+      readyAt = Math.min(readyAt, st.time);
+      return;
+    }
+    if (readyAt > st.time + SOON) readyAt = st.time + SOON;
+  };
+  let sillWasOut = false;
+
   let pT = 0;
   G.mods.push({
+    compass: () => (onStep(G, 'den-cats', 3) && sillSlice() && G.state.carried?.id !== 'slice-anchovy' ? [{ x: SLICE_AT.x, z: SLICE_AT.z, icon: 'target' }] : []),
     update: () => {
       const st = G.state;
+      watchLost();
       // the slice cooling on the sill, while the scheme wants one (step 2; step 3 again once a run has failed)
       const want = onSliceStep() && !hotAnchovy() && !knocking && (onStep(G, 'den-cats', 2) || st.time >= readyAt || (tookIn && tookIn !== st.phase));
       const it = sillSlice();
-      if (want && !it) G.items.spawn('slice-anchovy', SLICE_AT.x, SLICE_AT.z, { born: st.time, y: ground + SILL.y, extra: { sill: true, low: true } });
+      if (want && !it) {
+        G.items.spawn('slice-anchovy', SLICE_AT.x, SLICE_AT.z, { born: st.time, y: ground + SILL.y, extra: { sill: true, low: true } });
+        // fix-19: a fresh one for another try (step 3): say where
+        if (onStep(G, 'den-cats', 3) && !sillWasOut) G.toast('A fresh anchovy slice is cooling on Pickles\' sill at CPW & 72nd.', { seconds: 4.5 });
+        lostSaid = null;
+      }
       else if (it && !onSliceStep() && !knocking) G.items.remove(it);
+      sillWasOut = !!sillSlice();
       if (it && G.items.heat(it) < 0.4) { it.born = st.time; const sv = st.items.find((q) => q.uid === it.uid); if (sv) sv.born = it.born; }   // (fresh from the oven: it steams)
       // step 3: the first time it goes cold in the beak
       const c = st.carried;
@@ -128,7 +170,7 @@ export function installDenCats(G) {
         if (Math.hypot(g.x - p.x, g.z - p.z) < 25 && st.time - pT > 12) { pT = st.time; bubbleOver(G, 'pickles', ['Pickles: *snore*… anchovy…', 'Pickles: zzz… mine… zzz', 'Pickles: *twitch*'][(pT / 12 | 0) % 3], 3.5); }
       }
     },
-    restore: () => { knocking = false; readyAt = Infinity; tookIn = null; saidCold = false; },
+    restore: () => { knocking = false; readyAt = Infinity; tookIn = null; saidCold = false; lostSaid = null; sillWasOut = !!sillSlice(); },
   });
   // Express conducts a hot anchovy through the grates
   G.bus.on('grate', () => {

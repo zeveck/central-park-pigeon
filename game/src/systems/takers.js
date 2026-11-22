@@ -10,13 +10,22 @@ import { TAKERS, CHARACTERS, phaseList } from '../data/crews.js';
 import { ITEM_DEFS } from './items.js';
 
 const isSlice = (id) => !!id && id.startsWith('slice');
+// fix-19: who eats a slice Gus gives away (characters by crew; humans: anyone seated, or a dog walker's dog)
+const EATER_CREWS = ['rats', 'raccoons', 'biscuit'];
+const EAT_LINES = {
+  rats: ['Don\'t mind if I do. Mmm, crust.', 'A whole slice? You\'re a pal, Gus.'],
+  raccoons: ['Ooh, dinner. No union fee on gifts.', 'Into the drain kitchen it goes.'],
+  biscuit: ['PIZZA! Best day EVER!', 'For ME? Gone. All gone.'],
+  dog: ['The dog wolfs it down. Tail going like a propeller.', 'Gulp. The dog looks round for more.'],
+  person: ['Ooh, pizza! Thanks, little guy.', 'For me? Well, don\'t mind if I do.'],
+};
 const fits = (want, id) => want === id || (want === 'slice' && isSlice(id) && id !== 'slice-anchovy') || (want === 'slice' && id === 'slice-anchovy');
 
 export class Takers {
   constructor(G) { this.G = G; this.humanTargets = []; }
 
   build() {
-    const G = this.G;
+    const G = this.G, self = this;
     // humans who take things: an interact target that follows the agent
     for (const key of Object.keys(TAKERS)) {
       if (!key.startsWith('human:')) continue;
@@ -30,6 +39,56 @@ export class Takers {
         act: () => this.give(key),
       });
     }
+    // fix-19: one Give target that follows the nearest seated person or dog walker while Gus carries a slice
+    let cur = null;
+    G.interact.register({
+      id: 'eater:human', kind: 'eater',
+      get x() { cur = self.#eaterHuman(); return cur?.x ?? 1e6; }, get y() { return cur ? (cur.y ?? G.surfaceY(cur.x, cur.z, 5)) + 0.2 : -1e6; }, get z() { return cur?.z ?? 1e6; },
+      r: 1.8, dy: 2.2, priority: 0,
+      label: () => (cur && self.#eaterHuman() === cur ? (cur.role === 'dogwalker' ? `Give the ${self.itemName()} to the dog` : `Give the ${self.itemName()} away`) : null),
+      act: () => { const a = cur; if (!a) return; self.eat({ kind: a.role === 'dogwalker' ? 'dog' : 'person', id: 'human:' + a.role, at: () => ({ x: a.x, y: (a.y ?? 0) + 2.1, z: a.z }) }); if (a.role === 'dogwalker') G.humans.play?.(a, 'pulled', 1.2); },
+    });
+  }
+
+  // ------------------------------------------------------------ fix-19: Give (slices only, to someone who'd eat it)
+  // Peck a rat, a raccoon, a dog or a seated person while carrying a slice nobody's scheme wants from them: they eat it (a
+  // bubble, never dialogue). Takers and scheme hand-ins always win (entryFor / #stepWants first), the prompt scores like
+  // small talk so grate travel and real hand-ins keep the Peck, and there's no Give within 8 m of Queenie with the anchovy.
+  /** Would this character eat the slice Gus carries? */
+  eaterGive(charId) {
+    const G = this.G, c = G.state.carried;
+    if (!c || !isSlice(c.id) || !EATER_CREWS.includes(CHARACTERS[charId]?.crew)) return false;
+    if (G.chars?.find(charId)?.here) return false;   // a Called ally keeps its Ask
+    if (this.entryFor(charId) || this.#stepWants(charId, c.id)) return false;
+    return !this.#byQueenie();
+  }
+  #byQueenie() {
+    const G = this.G, q = G.chars?.find('queenie'), p = G.gus.position;
+    return G.state.carried?.id === 'slice-anchovy' && !!q && Math.hypot(q.x - p.x, q.z - p.z) < 8;
+  }
+  /** The nearest seated person or dog walker within reach who'd take a slice (no taker role, not busy), or null. */
+  #eaterHuman() {
+    const G = this.G, c = G.state.carried, p = G.gus.position;
+    if (!c || !isSlice(c.id) || this.#byQueenie()) return null;
+    let best = null, bd = 1.8;
+    for (const a of G.humans.agents) {
+      if (!a.out || a.busy || a.script || a.holds || TAKERS['human:' + a.role] || !(a.spec?.act === 'sit' || a.role === 'dogwalker')) continue;
+      const d = Math.hypot(a.x - p.x, a.z - p.z);
+      if (d < bd) { bd = d; best = a; }
+    }
+    return best;
+  }
+  /** They eat it: the slice is gone (den-cats puts the next anchovy out on the sill early). */
+  eat(who, name) {
+    const G = this.G, c = G.state.carried;
+    if (!c) return;
+    G.items.take();
+    G.audio.play('slice-handover', { at: G.gus.position, rate: 0.9 });
+    G.particles.burst('crumbs', G.gus.position.x, G.gus.position.y + 0.3, G.gus.position.z, 8);
+    const lines = EAT_LINES[who.kind] || EAT_LINES.person;
+    const text = (name ? name + ': ' : '') + lines[Math.floor(G.state.time * 3) % lines.length];
+    G.bubbles.add(text, { at: who.at, ttl: 3, range: 60 });
+    G.bus.emit('eaten', { item: c.id, by: who.id });
   }
 
   itemName() { const c = this.G.state.carried; return c ? (ITEM_DEFS[c.id]?.name || c.id).toLowerCase() : ''; }
@@ -50,6 +109,7 @@ export class Takers {
     const e = this.entryFor(charId);
     if (e?.keep) return `Offer the ${this.itemName()}`;
     if (e || this.#stepWants(charId, c.id)) return `Give the ${this.itemName()}`;
+    if (this.eaterGive(charId)) return `Give the ${this.itemName()} to ${CHARACTERS[charId].name}`;   // fix-19
     return null;
   }
 
@@ -75,6 +135,7 @@ export class Takers {
     if (e?.hot && !hot) { say(e.cold || "It's COLD, pal."); G.audio.synth('uiBack'); G.bus.emit('fail', { kind: 'cold', to: who, item: c.id }); return true; }   // fun pass (P7, P10)
     if (!e && !this.#stepWants(who, c.id)) {
       if (who.startsWith('human:')) return false;
+      if (this.eaterGive(who)) { const ch = G.chars.find(who); this.eat({ kind: CHARACTERS[who].crew, id: who, at: () => ({ x: ch.x, y: ch.y + 0.7, z: ch.z }) }, CHARACTERS[who].name); return true; }   // fix-19
       say('Not for me, Gus. Somebody else might want that.');
       return true;
     }

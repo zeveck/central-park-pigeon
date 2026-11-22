@@ -40,6 +40,8 @@ export const ITEM_DEFS = {
 export const HEAVY_LIMITS = { maxAlt: 2, maxSpeed: 6 };
 
 const HOT = SLICE.hotFor;
+const COOLING = 0.4;      // fix-19: below this much heat the label says "Cooling, still counts"
+const HOVER_WARM_R = 3;   // fix-19: the griddle warms a carried slice within this many metres
 
 export class Items {
   constructor(G) {
@@ -67,6 +69,16 @@ export class Items {
 
   async load(registry) {
     for (const id of ['pizza-slice', 'pizza-box', 'traffic-cone', 'battery']) this.models[id] = await registry.baked(id);
+    // fix-19: the anchovy slice's own texture (the slice's atlas repainted with anchovies, same UV islands: nanogen)
+    const base = this.models['pizza-slice']?.map;
+    if (base) {
+      try {
+        const t = await new THREE.TextureLoader().loadAsync('assets/textures/pizza-slice-anchovy.webp');
+        for (const k of ['flipY', 'colorSpace', 'wrapS', 'wrapT', 'magFilter', 'minFilter', 'anisotropy', 'channel']) t[k] = base[k];
+        t.needsUpdate = true;
+        this.anchovyMap = t;
+      } catch { this.anchovyMap = null; }   // (then the code anchovies below)
+    }
   }
 
   get state() { return this.G.state; }
@@ -80,11 +92,11 @@ export class Items {
     const add = (geo, mat, x = 0, y = 0, z = 0, rx = 0, ry = 0, rz = 0) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.rotation.set(rx, ry, rz); m.castShadow = true; g.add(m); return m; };
     if (d.model && this.models[d.model]) {
       const b = this.models[d.model];
-      const mat = b.makeMaterial();
+      const mat = b.makeMaterial(d.anchovy && this.anchovyMap ? { map: this.anchovyMap } : {});
       const m = add(b.geometry, mat);
       m.position.y = -b.bounds.min.y;
       if (d.slice) { g.userData.slice = m; g.userData.sliceMat = mat; }
-      if (d.anchovy) for (let k = 0; k < 4; k++) add(new THREE.BoxGeometry(0.012, 0.004, 0.05), this.mats.dark, (k - 1.5) * 0.03, -b.bounds.min.y + 0.022, 0.02 + (k % 2) * 0.03, 0, k * 0.5, 0);
+      if (d.anchovy && !this.anchovyMap) for (let k = 0; k < 4; k++) add(new THREE.BoxGeometry(0.012, 0.004, 0.05), this.mats.dark, (k - 1.5) * 0.03, -b.bounds.min.y + 0.022, 0.02 + (k % 2) * 0.03, 0, k * 0.5, 0);
       return g;
     }
     switch (d.code) {
@@ -150,6 +162,7 @@ export class Items {
 
   /** Rebuild meshes from the saved state (after a load). */
   restore() {
+    this.carryWarm = 0;   // fix-19
     for (const it of [...this.world]) { it.mesh?.removeFromParent(); this.G.interact.unregister('item:' + it.uid); this.G.interact.unregister('boxopen:' + it.uid); }
     this.world = [];
     for (const s of this.state.items) this.#addRuntime({ ...s });
@@ -232,6 +245,8 @@ export class Items {
     return Math.max(0, 1 - (this.G.state.time - c.born) / HOT);
   }
   isHot(c = this.state.carried) { const h = this.heat(c); return h != null && h > 0; }
+  /** fix-19: the carried label's word: 'Hot', 'Cooling, still counts' (still hot by every taker's rule) or 'Cold' (exactly !isHot). */
+  heatWord(c = this.state.carried) { const h = this.heat(c); return h == null ? null : !(h > 0) ? 'Cold' : h > COOLING ? 'Hot' : 'Cooling, still counts'; }
 
   // ------------------------------------------------------------ the box, the griddle
   openBox(it) {
@@ -298,6 +313,21 @@ export class Items {
         }
       } else it.onGriddle = 0;
     }
+    // fix-19: hovering or perching within about 3 m of the griddle warms a CARRIED slice by the same 3 s rule (no landing
+    // on the cart needed: the owner found the carts hard to land on). Only the halal griddle: not Vinnie's cart, not the
+    // ice-cream truck (a cart within 3 m of Queenie would remove the puzzle; the 820 m is the clever part).
+    const c = this.state.carried, gp = G.gus?.position;
+    if (gs && c && this.def(c.id).slice && gp && Math.hypot(gp.x - gs.x, gp.z - gs.z) < HOVER_WARM_R && gp.y - G.surfaceY(gs.x, gs.z, 2) < 4) {
+      this.carryWarm = (this.carryWarm || 0) + dt;
+      if (this.carryWarm >= SLICE.griddle.warm && (c.born == null || t - c.born > 1)) {
+        c.born = t;
+        G.audio.play('griddle-sizzle', { at: gp });
+        G.particles.burst('steam', gp.x + Math.sin(G.gus.yaw) * 0.25, gp.y + 0.25, gp.z + Math.cos(G.gus.yaw) * 0.25, 14);
+        G.toast('Warm again! Hot off the griddle.', { seconds: 2.6 });
+        G.bus.emit('sliceWarmed', { uid: c.uid, carried: true });
+        this.carryWarm = -99;
+      }
+    } else this.carryWarm = 0;
   }
 
   // ------------------------------------------------------------ naps and Ruffled

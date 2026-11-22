@@ -298,3 +298,12 @@ Meshy: **543 credits ($10.86)** of the 700 approved, with 157 of that allowance 
 The snow ramp is code (a vertex-coloured kicker mesh in entities/vehicles.js), so no texture was generated for it. Workshop props otherwise reuse existing models (raccoon-stand, rat-stand, traffic-cone, trash-can, pizza-box) and the park's schist texture.
 
 **Running total: ≈ $102.91** (working cap $150).
+
+## Fix #19 (2026-11-22): the anchovy slice's texture
+| What | Tool | Tries | ≈ Cost |
+|---|---|---|---|
+| pizza-slice-anchovy.webp (the pizza-slice GLB's own 1024² atlas, pulled out of game/assets/models/pizza-slice.glb, edited in place: every pepperoni patch repainted as silver-and-olive anchovy, UV islands kept) → game/assets/textures/. Take 1 painted fillets over the sauce but left the pepperoni discs red on the model (rejected after a render); take 2 accepted. Takes in .gamegen/candidates/anchovy/ | nanogen (gemini-nano-banana-2.1, 1K edit, `--image`) | 2 | $0.10 (2 × ≈$0.05: 2.1 isn't in the skill's price table, so this is estimated from 3.1 Flash 1K plus thinking tokens) |
+
+Used only by slice-anchovy items and the anchovy fan's prop (systems/items.js, entities/humans.js); other slices stay pepperoni.
+
+**Running total: ≈ $103.01** (working cap $150).

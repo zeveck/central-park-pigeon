@@ -450,6 +450,24 @@
 //     says when the picnic is out; "Got peas!" (stamp toast); the ducks bubble and quack when Gus arrives carrying peas.
 //     All toasts/bubbles, never G.say, so recorded Peck presses are not spent on dialogue.
 //   - debug only: sf-run.mjs serve takes `code <js>` (runs with Playwright's page: real key presses between steps).
+// Fix-19 notes (the owner: "The Hot Anchovy" slice; shots design/screenshots/fix-16-19-23/19-*). Shared-file edits:
+//   - Here: hudView().carried.word = G.items.heatWord(c): 'Hot' / 'Cooling, still counts' (heat ≤ 0.4, still hot by every
+//     taker) / 'Cold' (exactly !isHot). ui/hud.js builds the carry label from one key (the old suffix was only written when the
+//     ring changed) and shows a Drop hint in the device's glyph under it; ui.css .carry .lbl two lines.
+//   - systems/items.js: hover-warm: a CARRIED slice within 3 m of the halal griddle for 3 s comes back hot (same rule as one
+//     lying on it, which still works: den-cats.alt drops it there), 'sliceWarmed' { carried: true }, "Warm again!". Only the
+//     halal griddle (not Vinnie's cart or the ice-cream truck: a cart by Queenie would remove the puzzle). anchovyMap: the
+//     slice's atlas repainted with anchovies (assets/textures/pizza-slice-anchovy.webp, nanogen), for slice-anchovy only;
+//     humans.js gives the anchovy fan the real slice model in it.
+//   - systems/takers.js Give: Peck a rat, raccoon, dog (Biscuit's crew, a dog walker's dog) or a seated person while carrying
+//     a slice nobody's step wants from them: they eat it (a bubble). Takers and hand-ins win; it scores like small talk in
+//     interact.js (grate travel keeps the Peck); never by Queenie with the anchovy; never a Called ally (keeps Ask).
+//   - systems/schemes.js goal()/targets(): a cold slice where a step wants a hot one → the card says where the griddle is
+//     this phase, and the compass marks it. UI only.
+//   - schemes/den-cats.js: losing the anchovy any way puts the next one on the sill 4 s later with a toast naming CPW & 72nd
+//     (Night: "out again in the morning"); the compass marks the sill; on step 3 (or after the first push) Pickles gives way
+//     at once (a bubble; characters.js talk() honours e.quiet, so no chat dialogue). layout.js SLICE.griddle.dusk and the
+//     Dusk halal man (data/people.js) moved off 110th Street onto the park-side pavement: den-cats.alt re-recorded.
 import * as THREE from 'three';
 import { choosePreset, PRESETS, AutoProbe, savePreset } from './presets.js';
 import { Progress, TextureStore } from './gfx/textures.js';
@@ -1573,7 +1591,7 @@ async function boot() {
     return {
       stamina: gus.stamina, boosting: gus.boostT > 0, portrait: G.gusPortrait(),   // polish: the HUD circle is always Gus (it previewed the wheel's selected ally, which read as the player changing; the wheel itself shows the pick)
       device: dev, family: fam, feathers: st.feathers,
-      carried: c ? { id: c.id, heat: G.items.heat(c) } : null,
+      carried: c ? { id: c.id, heat: G.items.heat(c), word: G.items.heatWord(c) } : null,   // fix-19: word = Hot / Cooling, still counts / Cold
       goal: G.schemes.goal(), crumbs: st.crumbs, flock: d.flock, crews: d.crews, parts: d.parts,
       phase: st.phase, phaseLabel: PHASE_LABEL[st.phase], meters: metersFor(st, d), muted: G.settings.muted,
       compass: marks, camYaw, gusScreen: sp.visible ? sp : null, gusFeetY: feet.visible ? feet.y : null,
