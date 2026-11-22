@@ -58,7 +58,7 @@ async function main() {
     const url = `http://127.0.0.1:${port}/?preset=low`;
     await page.goto(url, { waitUntil: 'load' });
     const resume = opt('resume') ? fs.readFileSync(path.resolve(ROOT, opt('resume')), 'utf8') : null;
-    await page.evaluate((sv) => { if (sv) localStorage.setItem('cpp-save-v1', sv); else localStorage.removeItem('cpp-save-v1'); }, resume);
+    await page.evaluate((sv) => { localStorage.removeItem('cpp-saves'); for (const n of [1, 2, 3]) localStorage.removeItem('cpp-slot-' + n); if (sv) localStorage.setItem('cpp-slot-1', JSON.stringify({ version: 1, savedAt: Date.now(), summary: {}, data: JSON.parse(sv) })); }, resume);   // Saves: slot 1
     await page.reload({ waitUntil: 'load' });
     await page.waitForFunction(() => window.__game && window.__game.state().screen === 'title', null, { timeout: 900000, polling: 2000 });
     await page.evaluate(() => window.__game.ready());
@@ -128,7 +128,7 @@ async function main() {
 
     const CKPT = path.join(ROOT, 'scratchpad/playtest/wg');
     fs.mkdirSync(CKPT, { recursive: true });
-    const checkpoint = async (name) => { const sv = await page.evaluate(() => { window.__sfG.saveNow(); return localStorage.getItem('cpp-save-v1'); }); fs.writeFileSync(path.join(CKPT, `save-${name}.json`), sv); };
+    const checkpoint = async (name) => { const sv = await page.evaluate(() => { window.__sfG.saveNow(); const r = localStorage.getItem('cpp-slot-' + (window.__sfG.saves.current() || 1)); return r && JSON.stringify(JSON.parse(r).data); }); fs.writeFileSync(path.join(CKPT, `save-${name}.json`), sv); };
     const from = opt('from') ? ORDER.indexOf(opt('from')) : 0;
     for (const id of ORDER.slice(Math.max(0, from))) {
       let before = await st();

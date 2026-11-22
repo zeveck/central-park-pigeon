@@ -43,12 +43,17 @@ export function titleScreen(G) {
   const s = {
     id: 'title', el, base: true,
     open() {
-      const has = G.hasSave();
-      menuEl.innerHTML = (has ? btn('continue', 'Continue', 'play', 'primary') : '') + btn('new', 'New Game', has ? 'feather' : 'play', has ? '' : 'primary') + btn('settings', 'Settings', 'settings') + btn('credits', 'Credits', 'postcard');
+      s.drawMenu();
       s.updatePress();
       G.audio.setMusic('title');
       G.audio.setAmbience([]);
     },
+    // Saves: Continue (the slot played last), Load (any slot), New Game. Redrawn when a screen above closes (a delete).
+    drawMenu() {
+      const has = G.hasSave();
+      menuEl.innerHTML = (has ? btn('continue', 'Continue', 'play', 'primary') + btn('load', 'Load', 'save') : '') + btn('new', 'New Game', has ? 'feather' : 'play', has ? '' : 'primary') + btn('settings', 'Settings', 'settings') + btn('credits', 'Credits', 'postcard');
+    },
+    reopen() { s.drawMenu(); s.updatePress(); },
     updatePress() {
       const touch = G.input.device === 'touch' || matchMedia('(pointer: coarse)').matches;
       press.textContent = touch ? 'Tap to start' : 'Press any key or button';
@@ -62,12 +67,76 @@ export function titleScreen(G) {
   };
   wire(el, {
     continue: () => G.continueGame(),
-    new: () => {
-      if (G.hasSave()) G.confirm({ title: 'Start a new game?', text: 'Your saved park will be replaced. Gus starts again on his lamppost.', yes: 'New Game', no: 'Keep my save', onYes: () => G.newGame() });
-      else G.newGame();
-    },
+    load: () => G.menus.push('slots', 'load'),
+    // Saves: a free slot starts straight away; with all three taken, pick the one to replace (it asks first)
+    new: () => { const id = G.saves.free(); if (id != null) G.newGame(id); else G.menus.push('slots', 'new'); },
     settings: () => G.menus.push('settings'),
     credits: () => G.menus.push('credits'),
+  });
+  return s;
+}
+
+// ------------------------------------------------------------------ save slots
+const ago = (t) => {
+  const m = Math.round((Date.now() - t) / 60000);
+  if (!t || m < 1) return 'just now';
+  if (m < 60) return `${m} min ago`;
+  const h = Math.round(m / 60);
+  if (h < 24) return h === 1 ? 'an hour ago' : `${h} hours ago`;
+  const d = Math.round(h / 24);
+  return d === 1 ? 'yesterday' : d < 30 ? `${d} days ago` : new Date(t).toLocaleDateString();
+};
+const played = (secs) => { const m = Math.max(1, Math.round(secs / 60)); return m < 60 ? `${m} min` : `${Math.floor(m / 60)} h ${String(m % 60).padStart(2, '0')} min`; };
+/** "Afternoon, 6 of 17 crews": how the slot is named when asking to replace or delete it. */
+export const slotName = (r) => r.summary?.won ? 'Park won, all 17 crews' : `${PHASE_LABEL[r.summary?.phase] || 'Morning'}, ${r.summary?.crews ?? 0} of 17 crews`;
+
+/** The Load screen ('load'), or the pick-a-slot-to-replace screen New Game opens when every slot is taken ('new'). */
+export function slotsScreen(G) {
+  const el = overlay('slots', `<h2>Load</h2><p class="muted sub"></p><div class="slot-list"></div>${hints()}<div class="row" style="margin-top:10px">${btn('back', 'Back', 'back')}</div>`, 'slots');
+  const list = el.querySelector('.slot-list');
+  let mode = 'load';
+  const s = {
+    id: 'slots', el,
+    open(m) { mode = m || mode; s.draw(); },
+    reopen() { s.draw(); },
+    draw() {
+      el.querySelector('h2').textContent = mode === 'new' ? 'New Game' : 'Load';
+      el.querySelector('.sub').textContent = mode === 'new' ? 'Every save slot is in use. Pick one to replace.' : '';
+      el.querySelector('.sub').classList.toggle('hidden', mode !== 'new');
+      const last = G.saves.last();
+      list.innerHTML = G.saves.list().map((r) => {
+        const n = `Save ${r.id}`;
+        if (r.empty) return `<div class="slot empty"><button type="button" class="btn slot-main" data-act="pick" data-id="${r.id}"><span class="slot-n">${n}</span><span class="slot-l1">Empty</span><span class="slot-l2">${mode === 'new' ? 'Start here' : 'Start a new game here'}</span></button></div>`;
+        if (r.broken) return `<div class="slot broken"><div class="slot-main dis"><span class="slot-n">${n}</span><span class="slot-l1">This save can't be read</span><span class="slot-l2">Delete it to use the slot again</span></div><button type="button" class="btn slot-del" data-act="del" data-id="${r.id}" aria-label="Delete ${n}">${icon('close')}<span>Delete</span></button></div>`;
+        const u = r.summary || {};
+        const l1 = u.won ? `${icon('shiny')}Park won · all 17 crews` : `${PHASE_LABEL[u.phase] || 'Morning'} · ${u.crews ?? 0} of 17 crews · ${u.parts ?? 0} of 8 parts`;
+        return `<div class="slot${r.id === last ? ' last' : ''}"><button type="button" class="btn slot-main" data-act="pick" data-id="${r.id}"><span class="slot-n">${n}${r.id === last ? ' <em>last played</em>' : ''}</span><span class="slot-l1">${l1}</span><span class="slot-l2">${played(u.time || 0)} played · ${ago(r.savedAt)}</span></button><button type="button" class="btn slot-del" data-act="del" data-id="${r.id}" aria-label="Delete ${n}">${icon('close')}<span>Delete</span></button></div>`;
+      }).join('');
+    },
+    preferredFocus: () => list.querySelector('.slot.last .slot-main') || list.querySelector('.slot-main:not(.dis)'),
+    back() { G.menus.pop(); },
+  };
+  const find = (id) => G.saves.list().find((r) => r.id === Number(id));
+  wire(el, {
+    back: () => G.menus.pop(),
+    pick: (b) => {
+      const r = find(b.dataset.id);
+      if (!r || r.broken) return;
+      if (r.empty) { G.newGame(r.id); return; }
+      if (mode === 'load') { G.continueGame(r.id); return; }
+      G.confirm({ title: `Replace Save ${r.id}?`, text: `${slotName(r)} will be gone for good. Gus starts again on his lamppost.`, yes: 'Replace', no: 'Keep it', onYes: () => G.newGame(r.id) });
+    },
+    del: (b) => {
+      const r = find(b.dataset.id);
+      if (!r) return;
+      G.confirm({ title: `Delete Save ${r.id}?`, text: r.broken ? "This save can't be read, so nothing in it can be played." : `${slotName(r)} will be gone for good.`, yes: 'Delete', no: 'Keep it', onYes: () => {
+        G.saves.remove(r.id);
+        // the last save gone: nothing to load, so back to the title; otherwise the list shows the slot as Empty now
+        // (the confirm closed and redrew the list before this ran)
+        if (!G.saves.list().some((x) => !x.empty) && mode === 'load') G.menus.pop();
+        else if (G.menus.top === s) { s.draw(); G.menus.focusFirst(); }
+      } });
+    },
   });
   return s;
 }

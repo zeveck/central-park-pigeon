@@ -165,7 +165,7 @@ async function inject(page) {
         w.carried = g.state.carried?.id || null;
         return w;
       },
-      save() { const s = JSON.parse(localStorage.getItem('cpp-save-v1') || 'null'); return s && { t: +s.time.toFixed(1), steps: s.steps, carried: s.carried?.id || null, saveRev: s.saveRev || null }; },
+      save() { const s = (JSON.parse(localStorage.getItem('cpp-slot-' + (window.__sfG?.saves?.current() || 1)) || 'null')?.data || null); return s && { t: +s.time.toFixed(1), steps: s.steps, carried: s.carried?.id || null, saveRev: s.saveRev || null }; },
     };
   });
 }
@@ -303,7 +303,7 @@ async function runCase(env, c) {
   if (!(await page.evaluate(() => document.querySelector('#pause.on, #pause:not([hidden])') && window.__sfG.menus.top?.id === 'pause'))) { await page.evaluate(() => window.__sfG.pause()); }
   await page.click('#pause [data-act="quit"]');
   row.b.save = await page.evaluate(() => window.__sw.save());
-  const rawB = await page.evaluate(() => localStorage.getItem('cpp-save-v1'));
+  const rawB = await page.evaluate(() => localStorage.getItem('cpp-slot-' + (window.__sfG?.saves?.current() || 1)));
   await clickContinue(page);
   row.b.after = await page.evaluate(() => ({ step: window.__sfG.schemes.stepIndex(window.__swId), carried: window.__sfG.state.carried?.id || null, repaired: window.__sfG.repaired || null }));
   row.b.leftovers = await page.evaluate(() => window.__sw.leftovers());
@@ -327,11 +327,11 @@ async function runCase(env, c) {
   row.a.save = await page.evaluate(() => window.__sw.save());
   await page.reload({ waitUntil: 'load' }); await waitTitle(page);
   row.a.saveAfterClose = await page.evaluate(() => window.__sw.save());
-  const rawA = await page.evaluate(() => localStorage.getItem('cpp-save-v1'));
+  const rawA = await page.evaluate(() => localStorage.getItem('cpp-slot-' + (window.__sfG?.saves?.current() || 1)));
   await page.evaluate((id) => { window.__swId = id; }, c.id);
   await clickContinue(page);
   // (b)'s world check: the in-page Continue against a fresh boot of the same save (this one, when nothing saved since)
-  const same = (x, y) => { const f = (r) => { const o = JSON.parse(r); delete o.savedAt; return JSON.stringify(o); }; return f(x) === f(y); };
+  const same = (x, y) => { const f = (r) => { const o = JSON.parse(r); delete o.savedAt; if (o.data) delete o.data.savedAt; return JSON.stringify(o); }; return f(x) === f(y); };
   if (same(rawA, rawB)) row.b.worldDiff = diffWorld(worldB, await page.evaluate(() => window.__sw.world()));
   row.a.after = await page.evaluate(() => ({ step: window.__sfG.schemes.stepIndex(window.__swId), carried: window.__sfG.state.carried?.id || null, repaired: window.__sfG.repaired || null }));
   row.a.leftovers = await page.evaluate(() => window.__sw.leftovers());
@@ -342,7 +342,7 @@ async function runCase(env, c) {
   } else row.a.completed = /SPENT|NOT at hand|not haulable/.test(row.a.trigger) ? 'NO: ' + row.a.trigger : 'trigger available: ' + row.a.trigger;
   if (!row.b.worldDiff) {
     // a save was made between the two quits: boot (b)'s save fresh for the world check
-    await page.evaluate((r) => localStorage.setItem('cpp-save-v1', r), rawB);
+    await page.evaluate((r) => localStorage.setItem('cpp-slot-' + (window.__sfG?.saves?.current() || 1), r), rawB);
     await page.reload({ waitUntil: 'load' }); await waitTitle(page);
     await clickContinue(page);
     row.b.worldDiff = diffWorld(worldB, await page.evaluate(() => window.__sw.world()));

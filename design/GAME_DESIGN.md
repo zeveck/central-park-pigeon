@@ -684,9 +684,11 @@ Any open scheme can be done in any order; the acts describe the usual flow. Lane
 
 - **Win the game:** finish the finale. After the credits, the game returns to the park (sunny, signs all flipped, your flock huge) for free roaming and tidying up. A "Completionist" stamp on the Scheme Board marks all pretzels, strays, Summit Perches, Park Postcards, favours and full thread meters.
 - **Lose:** only feathers. Hawk dives, dog tackles, a broom, or getting caught by the owl cost one feather. Scenery, spikes and falls never do. At 0 you're Ruffled (above).
-- **Saved to localStorage** (`cpp-save-v1`): flags for every scheme step, crews, parts, gear, the scarf stash and the scarf being worn, items carried and dropped (with positions; a slice with its age), signs (flipped and permanent), carts sabotaged, spike sites, truces, Slice Lines, collectibles, postcards, favours, crumbs, flock count, time of day, last Nest and settings (including mute).
+- **Saved to localStorage** (one of three slots, below): flags for every scheme step, crews, parts, gear, the scarf stash and the scarf being worn, items carried and dropped (with positions; a slice with its age), signs (flipped and permanent), carts sabotaged, spike sites, truces, Slice Lines, collectibles, postcards, favours, crumbs, flock count, time of day, last Nest and settings (including mute).
   - Autosave on every scheme step, nap and Nest, plus a manual Save in pause.
-  - One save slot, with "New Game" asking to confirm.
+  - **Three save slots** (`--saves`; src/saves.js, keys `cpp-saves` + `cpp-slot-1..3`). Each slot shows: time of day (Morning to Night), crews won over (of 17), Mecha parts (of 8), time played and when it was last played; a finished game shows "Park won". Settings stay shared by every slot (their own key).
+  - Title: Continue (the slot played last), Load, New Game. New Game takes the first empty slot; with all three full it asks which to replace ("Replace Save 1? Afternoon, 3 of 17 crews…"). The Load screen lists every slot (Empty ones start a new game there) with Delete, which asks first; an unreadable slot says "This save can't be read" with Delete. Storage full: a toast, and play goes on.
+  - The single save from before slots (`cpp-save-v1`) moves into slot 1 the first time the new build loads. Autosaves still go where they did, into the slot being played.
 
 ## Screens
 

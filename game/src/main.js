@@ -477,13 +477,13 @@ import { TouchControls } from './ui/touch.js';
 import { installDebug } from './debug.js';
 // milestone 2
 import { freshState, derived, cloneState } from './state/gamestate.js';
-import { loadSettings, saveSettings, loadGame, saveGame, hasSave, clearGame, migrate } from './save.js';
+import { loadSettings, saveSettings, loadGame, saveGame, hasSave, clearGame, migrate, setSlot, currentSlot, freeSlot, listSlots, removeSlot, lastSlot } from './save.js';
 import { AudioEngine } from './audio.js';
 import { Hud, metersFor } from './ui/hud.js';
 import { Dialogue } from './ui/dialogue.js';
 import { Bubbles } from './ui/bubbles.js';
 import { Menus } from './ui/menu.js';
-import { titleScreen, pauseScreen, settingsScreen, controlsScreen, creditsScreen, confirmScreen, napScreen, nestScreen, scarfScreen, grateScreen } from './ui/screens.js';
+import { titleScreen, pauseScreen, settingsScreen, controlsScreen, creditsScreen, confirmScreen, slotsScreen, napScreen, nestScreen, scarfScreen, grateScreen } from './ui/screens.js';
 import { boardScreen } from './ui/board.js';
 import { mapScreen, renderMapImage, FogOfWar } from './ui/map.js';
 import { rosterScreen } from './ui/roster.js';
@@ -842,7 +842,7 @@ async function boot() {
   G.wheel = new Wheel(G);
   G.guide = new Guide(G);   // guidance (UI only)
   G.menus = new Menus(G);
-  for (const f of [titleScreen, pauseScreen, settingsScreen, controlsScreen, creditsScreen, confirmScreen, napScreen, nestScreen, scarfScreen, grateScreen, boardScreen, mapScreen, rosterScreen]) G.menus.add(f(G));
+  for (const f of [titleScreen, pauseScreen, settingsScreen, controlsScreen, creditsScreen, confirmScreen, slotsScreen, napScreen, nestScreen, scarfScreen, grateScreen, boardScreen, mapScreen, rosterScreen]) G.menus.add(f(G));
   installReport(G);
   new TouchControls(input, { onPause: () => G.pause(), blocked: () => G.menus.open || G.screen !== 'play' });
 
@@ -1083,7 +1083,7 @@ async function boot() {
   const timers = [];
   G.later = (secs, fn) => { timers.push({ t: secs, fn }); };
   let lastSave = -9;   // the autosave throttle (game seconds); reset with every applyState (Fixes-1, bughunter #2)
-  let savePending = null;   // Fixes-3 (B1): an autosave asked for mid-scene, made when the scene is over
+  let saveWarnAt = -Infinity, savePending = null;   // Fixes-3 (B1): an autosave asked for mid-scene, made when the scene is over
   function runTimers(dt) {
     for (let i = timers.length - 1; i >= 0; i--) { timers[i].t -= dt; if (timers[i].t <= 0) { const f = timers[i].fn; timers.splice(i, 1); f(); } }
   }
@@ -1458,7 +1458,10 @@ async function boot() {
     G.fog.save();
     const st = G.snapshot();
     G.state.gus = st.gus;
-    return saveGame(st, G.settings);
+    const ok = saveGame(st);
+    // Saves: the browser refused (storage full). Say so once a while, and keep playing; the last good save is still there.
+    if (!ok && currentSlot() != null && performance.now() - saveWarnAt > 120000) { saveWarnAt = performance.now(); G.toast?.("Couldn't save: this browser's storage is full."); }
+    return ok;
   };
   /** Returns true when it saved (false: throttled, not in play, or the save failed). */
   // Fixes-3 (bughunter-2 B1): NO autosave while a scene, a scheme's script, the finale, a nap, Ruffled or a grate trip is
@@ -1480,6 +1483,8 @@ async function boot() {
   }
   G.savePending = () => savePending;
   G.hasSave = () => hasSave();
+  // Saves: three slots (save.js). The title's Load screen lists them; New Game takes a free one or asks which to replace.
+  G.saves = { list: listSlots, free: freeSlot, remove: removeSlot, last: lastSlot, current: currentSlot };
 
   function enterPlay() {
     G.screen = 'play';
@@ -1491,16 +1496,18 @@ async function boot() {
     audio.unlock();
     G.resetClock?.();
   }
-  G.newGame = () => {
+  G.newGame = (slot = freeSlot() ?? currentSlot() ?? 1) => {
+    setSlot(slot);
     clearGame();
     applyState(freshState(), { placeGus: false });
     enterPlay();
     G.startPrologue();
     G.saveNow();
   };
-  G.continueGame = () => {
-    const st = loadGame();
-    if (!st) { G.newGame(); return; }
+  G.continueGame = (slot = lastSlot()) => {
+    const st = loadGame(slot);
+    // Saves: an unreadable slot never starts a game over it; the Load screen shows it with Delete
+    if (!st) { if (slot == null) G.newGame(); else G.toast?.("This save can't be read."); return false; }
     const old = !st.saveRev;   // Fixes-3: saves made before the mid-scene autosave fix carry no saveRev
     applyState(st);
     // Fixes-3 (B1 backstop, B5): a step whose trigger is already spent gets it back; a scheme past its last step finishes
@@ -1510,7 +1517,7 @@ async function boot() {
     G.toast(`Welcome back. ${PHASE_LABEL[st.phase]}.`);
     G.resumePrologue?.();   // Fixes-1 (#3): a save from the first minute gets its guidance back
   };
-  G.loadState = (st, opts) => { applyState(migrate(st) || st, opts); if (G.screen !== 'play') enterPlay(); };
+  G.loadState = (st, opts) => { if (currentSlot() == null) setSlot(freeSlot() ?? lastSlot() ?? 1); applyState(migrate(st) || st, opts); if (G.screen !== 'play') enterPlay(); };
   G.quitToTitle = () => {
     G.menus.closeAll();
     G.screen = 'title';

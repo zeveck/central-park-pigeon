@@ -99,7 +99,10 @@ There's no game over. A hawk, a dog or a broom costs a feather; lose all three
 and you're Ruffled, waking at your last Nest with nothing lost. Every puzzle
 has a gentle nudge and, if you wait a little longer, the answer. The game
 saves by itself at every step, nest and nap (and from the pause menu), and
-**Continue** picks up where you left off. After the finale the park is yours to
+**Continue** picks up where you left off. There are three save slots: **Load**
+on the title screen lists them (time of day, crews won over, Mecha parts, time
+played), so you can keep more than one park going or share the game with
+someone else in your house. After the finale the park is yours to
 roam, with postcards, Summit Perches and golden pretzels to collect.
 
 Found a bug? **Report a bug** in the pause menu (or Ctrl+Shift+L) sends it
@@ -185,6 +188,10 @@ And during the play-testing, when the budget was raised again so every fix
 could be made:
 
 > I'd rather raise the budget than not have stuff the play-tester finds get fixed.
+
+After it was online, three save slots were added with:
+
+> --saves --publish --no-confirm
 
 gamegen planned the game in a design document, had review agents vet it over
 three rounds (86 findings, every must-fix fixed), and shared the design as a
