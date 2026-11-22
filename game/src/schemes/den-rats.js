@@ -25,7 +25,7 @@ export function installDenRats(G) {
         const sl = G.items.makeMesh('slice'); sl.position.set(sue?.x ?? g.x, (sue?.y ?? g.y) + 0.15, sue?.z ?? g.z); G.items.group.add(sl); relay.push(sl);
       } },
       { cam: { ...G.shot({ x: g.x, y: g.y, z: g.z }, { dist: 3.6, height: 1.2, yaw: G.gus.yaw + Math.PI + 0.5, lookY: 0.2 }), secs: 0.8 } },
-      { say: [L('express', 'ALL ABOARD! One hot slice, express service! Mind the gap, mind the\u00a0cheese!')] },   // Polish-1: a no-break space (same length, same timing) so "cheese!" never wraps alone
+      { say: [L('express', 'ALL ABOARD! Hot slice, express service! Stand clear of the closing\u00a0cheese!')] },   // Polish-1: a no-break space (same length, same timing) so "cheese!" never wraps alone. batch-2 (#21): New York subway talk, not London's "Mind the gap"; still 74 characters
       { do: () => { G.audio.play('rat-squeak', { at: g }); G.audio.play('subway-rumble', { at: g, vol: 0.5 }); } },
       ...[0, 1, 2, 3, 4].map((k) => ({ do: () => { const s = relay[0]; if (s) { s.position.y -= 0.18; s.position.x += 0.12; s.rotation.z = k * 0.9; } G.audio.play('rat-squeak', { at: g, rate: 1 + k * 0.08 }); G.particles.burst('crumbs', s?.position.x ?? g.x, (s?.position.y ?? g.y) + 0.1, s?.position.z ?? g.z, 4); }, wait: 0.35 })),
       { do: () => { for (const s of relay) s.removeFromParent(); } },
