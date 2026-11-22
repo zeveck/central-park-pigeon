@@ -310,7 +310,7 @@ function computeHeights(S, masks) {
     for (const e of d.ends) {
       const g0 = sampleH(h, e.x + e.dx * 1, e.z + e.dz * 1);
       const gap = d.top - g0;
-      const R = clamp(Math.abs(gap) * 5, 3, 26), side = clamp(Math.abs(gap) * 1.5, 1.5, 8), hw = d.width / 2;
+      const R = clamp(Math.abs(gap) * 5, 3, 26), side = clamp(Math.abs(gap) * 0.6, 1.5, 4), hw = d.width / 2;   // (review: narrower sides, clear of the Ramble crows)
       const reach = R + hw + side + STEP;
       const i0 = Math.max(0, Math.floor((e.x - reach - WORLD.xMin) / STEP)), i1 = Math.min(NX - 1, Math.ceil((e.x + reach - WORLD.xMin) / STEP));
       const j0 = Math.max(0, Math.floor((e.z - reach - WORLD.zMin) / STEP)), j1 = Math.min(NZ - 1, Math.ceil((e.z + reach - WORLD.zMin) / STEP));

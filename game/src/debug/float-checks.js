@@ -90,7 +90,13 @@ export async function runFloatChecks(G, api) {
   const open = { x: -16, z: 303 };   // by Mrs Puddles, open water north of her
   const lv = C.waterAt(open.x, open.z).level;
   {
-    G.gus.place({ x: open.x, z: open.z, y: lv + 1.2, yaw: 0, mode: 'fly', speed: 6 }); seen.length = 0;
+    // a plain glide down (7.5 m/s) still splash-bounces (review: only a deliberate Land or a near-stall floats him)
+    G.gus.place({ x: open.x, z: open.z, y: lv + 1.0, yaw: 0, mode: 'fly', speed: 7.5 }); seen.length = 0;
+    let gl = 0; while (!seen.includes('splash') && gl++ < 240) ext(G, 1);
+    out.checks.glideBounces = { ok: seen.includes('splash') && !G.gus.floating, splash: seen.includes('splash'), floating: G.gus.floating };
+    // a tapped Land over the water settles him on it
+    G.gus.place({ x: open.x, z: open.z, y: lv + 2.5, yaw: 0, mode: 'fly', speed: 6 }); seen.length = 0;
+    ext(G, 30); ext(G, 8, { held: ['dive'] });
     let n = 0; while (G.gus.mode === 'fly' && n++ < 600) ext(G, 1);
     out.checks.settle = { ok: G.gus.mode === 'walk' && G.gus.floating && Math.abs(G.gus.position.y - lv) < 0.01, floatEvent: seen.includes('float'), mode: G.gus.mode, floating: G.gus.floating, y: r2(G.gus.position.y), level: lv, secs: r2(n / 60) };
   }
@@ -118,6 +124,23 @@ export async function runFloatChecks(G, api) {
     const mode = G.gus.mode;
     ext(G, 60);
     out.checks.takeoff = { ok: mode === 'fly' && G.gus.mode === 'fly' && G.gus.position.y > lv + 1.2, modeAfterFlap: mode, mode1s: G.gus.mode, height: r2(G.gus.position.y - lv) };
+  }
+  // ---- an old save with Gus on the lake bed: he rises and floats
+  {
+    const bed = G.terrain.heightAt(open.x, open.z);
+    G.gus.place({ x: open.x, z: open.z, y: bed, yaw: 0, mode: 'walk' });
+    ext(G, 5);
+    out.checks.bedSave = { ok: G.gus.floating && Math.abs(G.gus.position.y - lv) < 0.01, bed: r2(bed), y: r2(G.gus.position.y), floating: G.gus.floating };
+  }
+  // ---- the Rhoda fight: a tapped Land onto the water still bounces (no floating where Rhoda dives)
+  {
+    const F = G.fights, f0 = F.f, u0 = F.update;
+    F.f = { name: 'rhoda' }; F.update = () => {};
+    G.gus.place({ x: open.x, z: open.z, y: lv + 2.5, yaw: 0, mode: 'fly', speed: 6 }); seen.length = 0;
+    ext(G, 30); ext(G, 8, { held: ['dive'] });
+    let fl = false; for (let i = 0; i < 180; i++) { ext(G, 1); if (G.gus.floating) fl = true; }
+    F.f = f0; F.update = u0;
+    out.checks.rhodaNoFloat = { ok: !fl && seen.includes('splash'), floated: fl, splash: seen.includes('splash') };
   }
   // ---- a fast low skim (cruise) still bounces
   {

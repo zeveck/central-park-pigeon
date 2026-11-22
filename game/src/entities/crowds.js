@@ -199,6 +199,7 @@ export class Crowds {
       if (!gdef) continue;
       let k = 0;
       for (const h of haunts) {
+        if (h.kind !== 'water' && h.kind !== 'roof') { const hx = h.x ?? (h.a.x + h.b.x) / 2, hz = h.z ?? (h.a.z + h.b.z) / 2, hr = (h.r ?? h.rMax ?? Math.hypot(h.b.x - h.a.x, h.b.z - h.a.z) / 2) + 6; G.collision.warmWalk(hx, hz, hr); }   // batch-3 (review)
         for (let i = 0; i < h.n; i++) {
           const rnd = rngFor(`crowd:${group}:${k++}`);
           let x, z, y, onWater = null;
@@ -305,6 +306,7 @@ export class Crowds {
     this.rr = (this.rr + quarter) % n;
     // motion: every animal, every frame
     for (const a of this.animals) this.#move(a, dt);
+    this.G.collision.warmStep(2);   // batch-3 (review): the walk tiles round the haunts, built a couple per update
     // ambient barks and sounds
     this.barkT -= dt;
     if (this.barkT <= 0) { this.barkT = 5 + ((G.state.time * 7) % 5); this.#bark(g); }
@@ -383,7 +385,7 @@ export class Crowds {
         else if (this.#walkable(a, nx, nz)) {
           a.x = nx; a.z = nz;
           // batch-3 (#7): the height every step (the terrain and the bridge decks; it was fixed where it spawned)
-          if (a.kind !== 'roof') a.yBase = this.G.collision.walkFloor(nx, nz) + a.yOff;
+          if (a.kind !== 'roof') a.yBase = this.G.collision.walkFloor(nx, nz, a.yBase - a.yOff) + a.yOff;
         } else { a.tx = a.x; a.tz = a.z; }   // the water's edge, a wall, a rock, a roof's edge: stop there
         const want = Math.atan2(dx, dz);
         a.yaw += Math.atan2(Math.sin(want - a.yaw), Math.cos(want - a.yaw)) * Math.min(1, dt * 8);

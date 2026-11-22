@@ -243,7 +243,7 @@ export class Humans {
    *  nobody else's stream moves). Loops (jog, path, route, skate) keep their data: only where the loop starts. */
   #dryHome(home, spec) {
     const C = this.G.collision;
-    if (!C || spec.seat === 'carriage' || C.standable(home.x, home.z, { r: 0.3, h: 1.5 }) != null) return;
+    if (!C || spec.seat === 'carriage' || (C.standable(home.x, home.z, { r: 0.3, h: 1.5 }) != null && C.walkBlocked(home.x, home.z) !== 1)) return;
     const q = C.clearNear(home.x, home.z, { r: 0.3, h: 1.5, maxR: 30 });
     if (q) { home.x = q.x; home.z = q.z; }
   }
@@ -252,7 +252,7 @@ export class Humans {
    *  height on the walkers' ground. Returns false when the way is blocked (the caller gives up on the target). */
   #stepTo(a, nx, nz) {
     const C = this.G.collision;
-    if (C.walkBlocked(nx, nz) === 1) return false;   // the water's edge
+    if (C.walkBlocked(nx, nz) === 1 && C.walkBlocked(a.x, a.z) !== 1) return false;   // the water's edge (from a shore cell, any step is fine)
     const p = _wp;
     p.x = nx; p.z = nz; p.y = a.y ?? C.floorAt(nx, nz);
     const hit = C.pushOut(p, 0.28, 1.5, _wn);
@@ -343,6 +343,9 @@ export class Humans {
 
   /** A temporary or scripted agent (feeders, the ranger, Prickett). */
   addAgent({ role, model = 'human-park', at, act = 'stand', acc = [], script = false, tint = null }) {
+    // batch-3 (review): never onto the water (summonFeeders' walk-ins); a scene's own extras move only off water
+    const C = this.G.collision;
+    if (C && (C.walkBlocked(at.x, at.z) === 1 || (!script && C.standable(at.x, at.z) == null))) { const q = C.clearNear(at.x, at.z, { maxR: 20 }); if (q) at = { ...at, x: q.x, z: q.z }; }
     const spec = { role, model, act, at, r: 0, acc, tint, phases: 'any' };
     const ag = new Agent('x' + this.agents.length, spec, { ...at }, rngFor('agent:' + role + this.agents.length));
     ag.script = script;
@@ -613,7 +616,7 @@ export class Humans {
             const ang = a.rnd() * Math.PI * 2, r = Math.sqrt(a.rnd()) * (s.r || 6);
             const tx = s.at.x + Math.cos(ang) * r, tz = s.at.z + Math.sin(ang) * r;
             // batch-3 (#1): never a target on the water or inside a solid (the same two draws either way)
-            if (this.G.collision.standable(tx, tz, { r: 0.3, h: 1.5 }) != null) a.target = { x: tx, z: tz };
+            if (this.G.collision.standable(tx, tz, { r: 0.3, h: 1.5 }) != null && this.G.collision.walkBlocked(tx, tz) !== 1) a.target = { x: tx, z: tz };
             else a.t = 1;
           }
         }

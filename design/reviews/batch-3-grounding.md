@@ -135,3 +135,62 @@ perched animals with a height offset (the owl up its tree): that is the one "flo
 | t97@x-87 drive | N | 0.38 | 0.49, **-0.11** | 0.46, **-0.08** |
 | t97@x81 drive | S | 0.99 | 1.32, **-0.33** | 1.03, **-0.04** |
 | t97@x81 drive | N | 0.99 | 0.49, **0.5** | 0.93, **0.06** |
+
+## What is left after, and why it stays
+
+- **2 ambient commuters** (scenery people on 59th St's sidewalk) brush a lamppost or hydrant for one or two samples: they
+  walk a fixed `route` polyline, which never gets pushOut (it would jitter them back onto the line every frame).
+- **Crowd animals, 15 of 653**: mostly 0.15 m "float" at a kerb edge on 110th St (the crowd's ground is cached per 0.5 m
+  cell, so an animal standing on the cell's edge reads the kerb's height), and a few brief "under/solid" touches at the
+  edge of a rock or a trunk while they walk round it. None is in or on the water.
+- **The shallow 86th St crossing (x -105)** has no bridge (the cut is 0.74 m deep there); the cut walls now leave a gap,
+  so walkers cross down and up through the cut instead of through a wall.
+
+## Gus and the water: state checks (`game/src/debug/float-checks.js`, all pass)
+
+Every character out on the water or at its edge, talked to while Gus floats at the nearest open water (the nearest spot
+the check found, then Peck's target):
+
+| character | float distance (m) | Peck target |
+|---|---|---|
+| Commodore Puddles | 0.6 | Talk to Commodore Puddles |
+| Mrs. Puddles | 0.6 | Talk to Mrs. Puddles |
+| Bubbles | 0.6 | Talk to Bubbles |
+| Ensign Drake | 0.6 | Talk to Ensign Drake |
+| Gertrude | 1.4 | Talk to Gertrude |
+| Lieutenant Gander | 0.6 | Talk to Lieutenant Gander |
+| Slowpoke (moved to the bank) | 1.4 | Talk to Slowpoke |
+| Stilts (moved to the bank) | 1.4 | Talk to Stilts |
+| Nightcap (moved to the bank) | 1.4 | Talk to Nightcap |
+| The Eldest (Turtle Pond rock) | 1.6 | Talk to The Eldest |
+| Moss (rock) | 0.8 | Talk to Moss |
+| Shelly (rock) | 0.8 | Talk to Shelly |
+
+The reach is 4.5 m while floating (3.4 m otherwise), so each is reachable from much further than the nearest water.
+The other checks:
+
+| check | result |
+|---|---|
+| Peck while floating | opens Commodore Puddles' dialogue |
+| Walk into the Lake from the bank (4 s, stick held) | stops at the edge on dry ground, 0 frames over water, 3 small splashes |
+| A plain glide (7.5 m/s) down onto the Lake | splash-bounce, never floats (review: only a deliberate Land or a near-stall floats him) |
+| A tapped Land over the Lake | floats at the water level (a 'float' event, not a landing) |
+| An old save with Gus on the lake bed | he rises to the surface and floats |
+| The Rhoda fight (a tapped Land onto the Meer) | splash-bounce, never floats (floating counts as over the water and Rhoda dives) |
+| Paddle 3 s | 1.45 m (0.5 m/s top speed), still floating |
+| Drop the ball while floating | "The biscuit's ball floated back to where you found it." |
+| Flap from the water | flying; 2.8–4.5 m above the water a second later |
+| Fast low skim (11 m/s, Land held) | splash-bounce, never floats |
+| The strip while floating | "Space Flap to take off · E Talk to Mrs. Puddles" (one strip; the context bubble is hidden meanwhile: they overlapped at 844×390) |
+
+Found while testing: a steep dive (or one in the first 0.3 s of flight) could pass more than a step below the water's
+surface in one frame; `surface()` then dropped the water and he landed on the lake bed. The water is now a floor in
+flight too.
+
+## Shots (`design/screenshots/batch-3c/`)
+
+- `pond-bank.png`: the Pond's picnickers on their benches on the bank by 59th St (were in the Pond).
+- `gapstow-ends.png`, `gapstow-end-west.png`: Gapstow's deck meeting the ground at both ends; the selfie-taker on the deck.
+- `dogs-slope.png`: crowd dogs on the Cedar Hill slope, feet on the grass.
+- `t79-bridge-ramp.png`: the path ramped up through the Ramble to the 79th St bridge by Belvedere (was a 5.8 m drop).
+- `gus-floating-1280.png`, `gus-floating-844.png`: Gus floating by Mrs. Puddles with the take-off strip.

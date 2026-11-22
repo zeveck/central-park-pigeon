@@ -36,7 +36,7 @@ export class Collision {
   #insert(item, x0, z0, x1, z1) {
     const c = this.cell;
     if (this.walkTiles?.size) {   // batch-3: a shape added after the crowds' cells were cached (a scheme's table): forget those tiles
-      for (let tx = Math.floor(x0 / 16) - 1; tx <= Math.floor(x1 / 16) + 1; tx++) for (let tz = Math.floor(z0 / 16) - 1; tz <= Math.floor(z1 / 16) + 1; tz++) this.walkTiles.delete(tx * 100003 + tz);
+      for (let tx = Math.floor((x0 - 0.6) / 16); tx <= Math.floor((x1 + 0.6) / 16); tx++) for (let tz = Math.floor((z0 - 0.6) / 16); tz <= Math.floor((z1 + 0.6) / 16); tz++) this.walkTiles.delete(tx * 100003 + tz);
     }
     for (let ix = Math.floor(x0 / c); ix <= Math.floor(x1 / c); ix++) {
       for (let iz = Math.floor(z0 / c); iz <= Math.floor(z1 / c); iz++) {
@@ -184,9 +184,9 @@ export class Collision {
 
   /** Batch-3: a walker's floor with nothing on it: the terrain, a bridge deck over it, or the water's surface. The seed for
    *  groundFor (never a roof or a lamppost cap, which yRef 400 would find). */
-  floorAt(x, z) {
+  floorAt(x, z, yRef = Infinity) {
     let y = this.heightAt(x, z);
-    const dk = this.deckAt(x, z);
+    const dk = this.deckAt(x, z, yRef);
     if (dk > y) return dk;
     const w = this.waterAt(x, z);
     return w && w.level > y ? w.level : y;
@@ -225,7 +225,17 @@ export class Collision {
   walkBlocked(x, z) { const c = this.#walkTile(x, z); return c.tile.b[c.k]; }
 
   /** Batch-3: a crowd animal's floor at (x, z): the terrain, or the kerb or deck its cell stands on. */
-  walkFloor(x, z) { const c = this.#walkTile(x, z), y = c.tile.y[c.k]; return y === y ? y : this.heightAt(x, z); }
+  walkFloor(x, z, yRef = Infinity) { const c = this.#walkTile(x, z), y = c.tile.y[c.k]; return y === y && y <= yRef + 0.5 ? y : this.heightAt(x, z); }   // (a deck above an animal under it isn't its floor)
+
+  /** Batch-3 (review): queue the walk tiles round (x, z) out to r, built warmStep(n) a few per update (no first-touch hitch). */
+  warmWalk(x, z, r) {
+    const q = (this.warmQ ||= []);
+    for (let tx = Math.floor((x - r) / 16); tx <= Math.floor((x + r) / 16); tx++) for (let tz = Math.floor((z - r) / 16); tz <= Math.floor((z + r) / 16); tz++) q.push([tx * 16 + 8, tz * 16 + 8]);
+  }
+  warmStep(n = 1) {
+    const q = this.warmQ;
+    for (let i = 0; i < n && q?.length; i++) { const [x, z] = q.pop(); this.#walkTile(x, z); }
+  }
 
   /** Batch-3: can a walker (radius r, height h) stand at (x, z)? Not on water (a deck over it is fine) and not inside a
    *  box, cylinder or rock. Returns the ground y, or null. */
@@ -248,11 +258,12 @@ export class Collision {
   /** Batch-3: the nearest standable spot to (x, z) (rings 0.75 m apart, 16 bearings, out to maxR), or null. Deterministic:
    *  no random draw, so moving a spawn or a target off the water moves no one else's stream. */
   clearNear(x, z, { r = 0.3, h = 1.5, maxR = 40 } = {}) {
-    if (this.standable(x, z, { r, h }) != null) return { x, z };
+    // (and not in a shore cell the crowds' and walkers' step guard counts as water: never stuck at the edge)
+    if (this.standable(x, z, { r, h }) != null && this.walkBlocked(x, z) !== 1) return { x, z };
     for (let d = 0.75; d <= maxR; d += 0.75) {
       for (let k = 0; k < 16; k++) {
         const a = (k / 16) * Math.PI * 2, px = x + Math.cos(a) * d, pz = z + Math.sin(a) * d;
-        if (this.standable(px, pz, { r, h }) != null) return { x: px, z: pz };
+        if (this.standable(px, pz, { r, h }) != null && this.walkBlocked(px, pz) !== 1) return { x: px, z: pz };
       }
     }
     return null;

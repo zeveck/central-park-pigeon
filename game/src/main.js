@@ -1034,6 +1034,7 @@ async function boot() {
     gus.legacyTakeoff = !!G.legacyTakeoff;
     // (any ground Flap press: a perch can turn to walk inside the same update, so a perch press must not leave a stale yes)
     if ((gus.mode === 'walk' || gus.mode === 'perch') && input.pressed('flap')) gus.hopOk = control && hopAllowed();
+    gus.noFloat = G.fights.f?.name === 'rhoda';   // Batch-3 (review): in the Rhoda fight a touch on the Meer always splash-bounces
     { const cd = dataCam.position.distanceTo(gus.position); gus.scarf.lod = G.altView || cd > 40 ? 2 : cd > 12 ? 1 : 0; }   // Flight hint / scarf: scarf LOD (visual only)
     const driving = G.vehicles.driving;
     if (driving) G.vehicles.drive(dt, control ? input : LOCKED_INPUT, rig.yaw);
