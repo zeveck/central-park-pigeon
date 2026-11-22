@@ -20,6 +20,8 @@ import { pointInPoly } from '../core/geo.js';
 const DRAW_DIST = { high: 70, medium: 50, low: 22 };
 const MAX_DRAWN = { high: 24, medium: 14, low: 5 };
 const SHADOW_CASTERS = 6;   // perf pass (High only)
+const FOLLOW = new Set(['walk', 'hop', 'waddle', 'slink', 'road', 'bound']);   // batch-3: tweens that keep to the ground
+const _tg = { y: 0, kind: 'terrain', item: null };
 const ACC_DIST = { high: 40, medium: 26, low: 14 };   // perf pass
 // head units (m) for each species' own model (SPECIES[sp].model); another model of that species (the poodle, the sitting
 // cat, the owlet, the standing raccoon) scales it by its bounds (batch-2 #6: Fifi wore the 1.38 m dog's 11 cm unit)
@@ -64,9 +66,12 @@ export class Characters {
       // Fixes-2 (P5): someone sitting on the water (Puddles, the ducks, the geese) is talked to from the shore or while
       // hovering over the water: a 3.4 m reach (it was ~1.4 m: a 0.3 m window between the bank and the splash) and
       // `air`, so the prompt also shows in flight (interact.js)
-      const onWater = !!def.at.on?.startsWith('water:');
+      // batch-3 (#1): and from the water: floating, Gus reaches 4.5 m (Mrs Puddles, Gertrude and Gander sit well out). The
+      // shore birds (def.at.shore: Nightcap, Stilts, Slowpoke at the water's edge) have the same reach.
+      const onWater = !!def.at.on?.startsWith('water:') || !!def.at.shore;
+      const near = Math.max(1.4, sp.height * 1.2);
       G.interact.register({
-        id: 'char:' + id, kind: 'character', get x() { return c.x; }, get y() { return c.y; }, get z() { return c.z; }, r: onWater ? 3.4 : Math.max(1.4, sp.height * 1.2), dy: onWater ? 4 : 3, priority: 3, air: onWater,
+        id: 'char:' + id, kind: 'character', get x() { return c.x; }, get y() { return c.y; }, get z() { return c.z; }, get r() { return G.gus.floating ? (onWater ? 4.5 : Math.max(near, 2.2)) : onWater ? 3.4 : near; }, dy: onWater ? 4 : 3, priority: 3, air: onWater,
         label: () => (this.out(c) ? (G.takers?.labelFor(id) || (c.here ? `Ask ${def.name}` : `Talk to ${def.name}`)) : null),
         eaterGive: () => !!G.takers?.eaterGive(id),   // fix-19: a slice given away scores like small talk (interact.js)
         act: () => { if (onWater) this.#toShore(c); if (G.state.carried && G.takers?.labelFor(id)) { G.takers.give(id); return; } if (c.here) G.allies.ask(c); else this.talk(id); },
@@ -100,9 +105,9 @@ export class Characters {
     if (at.on && at.on.startsWith('water:')) {
       const w = G.terrain.shapes.water.find((q) => q.id === at.on.slice(6));
       if (w && pointInPoly(x, z, w.poly)) y = w.level - 0.12;   // sitting in the water
-      else y = G.surfaceY(x, z, G.terrain.heightAt(x, z) + 0.5);
+      else y = G.collision.groundFor(x, z, G.collision.floorAt(x, z) + 0.5).y;
     } else if (at.on === 'roof') y = G.collision.surface(x, z, 400).y;
-    else y = G.surfaceY(x, z, G.terrain.heightAt(x, z) + 0.5) + (at.y || 0);
+    else y = G.collision.groundFor(x, z, G.collision.floorAt(x, z) + 0.5).y + (at.y || 0);   // batch-3 (#1): never on a lake bed
     return { x, y, z };
   }
 
@@ -272,6 +277,13 @@ export class Characters {
         c.z = tw.from.z + (tw.to.z - tw.from.z) * e;
         const arc = tw.kind === 'drop' || tw.kind === 'swoop' || tw.kind === 'dive' || tw.kind === 'flutter' ? Math.sin(k * Math.PI) * 0.3 : 0;
         c.y = tw.from.y + (tw.to.y - tw.from.y) * (tw.kind === 'popup' || tw.kind === 'grate' || tw.kind === 'drain' ? Math.sqrt(k) : e) + arc;
+        // batch-3 (#7): on foot they follow the ground (the walkers' rule: water is a floor), not a straight line through a
+        // hill; the last stretch eases onto the spot they were sent to (a rock top, a step)
+        if (FOLLOW.has(tw.kind) && k < 1) {
+          const g = G.collision.groundFor(c.x, c.z, (tw.lastY ?? tw.from.y) + 0.5, _tg).y;
+          tw.lastY = g;
+          c.y = k > 0.85 ? g + (c.y - g) * ((k - 0.85) / 0.15) : g;
+        }
         c.yaw = Math.atan2(tw.to.x - tw.from.x, tw.to.z - tw.from.z) || c.yaw;
         if (k >= 1) { c.tween = null; c.y = tw.to.y; tw.done?.(); }
       } else if (vis && !c.script && !c.act && Math.hypot(c.x - g.x, c.z - g.z) < 5) {

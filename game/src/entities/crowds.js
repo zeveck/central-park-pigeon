@@ -45,6 +45,7 @@ const WARY_R = 2.6, GREET_R = 6;
 
 const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(0, 0, 0, 'YXZ'), _p = new THREE.Vector3(), _s = new THREE.Vector3();
 const _fr = new THREE.Frustum(), _pm = new THREE.Matrix4(), _sp = new THREE.Sphere();
+const _cs = { y: 0, kind: 'terrain', item: null };   // batch-3
 
 export class Crowds {
   constructor(G, preset) {
@@ -200,9 +201,11 @@ export class Crowds {
           if (h.kind === 'line') {
             const t = h.n > 1 ? i / (h.n - 1) : 0.5;
             x = h.a.x + (h.b.x - h.a.x) * t; z = h.a.z + (h.b.z - h.a.z) * t;
+            ({ x, z } = landSpot(G, x, z));   // batch-3 (#1)
           } else if (h.kind === 'ring') {
             const a = rnd() * 6.28, r = h.rMin + rnd() * (h.rMax - h.rMin);
             x = h.x + Math.cos(a) * r; z = h.z + Math.sin(a) * r;
+            ({ x, z } = landSpot(G, x, z));
           } else if (h.kind === 'water') {
             const w = water[h.water];
             let tries = 0;
@@ -211,8 +214,9 @@ export class Crowds {
           } else {
             const a = rnd() * 6.28, r = Math.sqrt(rnd()) * (h.r || 1);
             x = h.x + Math.cos(a) * r; z = h.z + Math.sin(a) * r;
-            // ground animals keep out of the water
-            for (const w of Object.values(water)) if (h.kind !== 'roof' && pointInPoly(x, z, w.poly)) { x = h.x; z = h.z; }
+            // ground animals keep out of the water, walls, trunks and rocks (batch-3 #1, #7: the nearest clear spot to where it
+            // was drawn; it used to go back to the haunt's centre, which could be in the water too). No random draw.
+            if (h.kind !== 'roof') ({ x, z } = landSpot(G, x, z));
           }
           // geese and herons on a lawn by the water may still be swimming
           if (gdef.swim === true && !onWater) continue;
@@ -236,11 +240,12 @@ export class Crowds {
           const lod = gdef.lodOf ? gdef.lodOf(model) : gdef.lod || null;
           if (h.kind === 'roof') y = G.collision.surface(x, z, 400).y;
           else if (onWater) y = onWater.level - (group === 'geese' ? 0.18 : 0.12);   // swimmers sit in the water
-          else y = G.surfaceY(x, z, G.terrain.heightAt(x, z) + 0.4) + (h.y || 0);
+          else y = G.collision.walkFloor(x, z) + (h.y || 0);   // batch-3: the same floor every step uses (terrain, kerb, deck)
           const a = {
             i: idx++, group, crew: gdef.crew, model, lod, x, z, y, home: { x: h.kind === 'line' || h.kind === 'ring' ? x : h.x, z: h.kind === 'line' || h.kind === 'ring' ? z : h.z, r: h.kind === 'line' ? 1.5 : h.kind === 'ring' ? 1.2 : (h.r || 2) }, kind: h.kind, water: onWater,
             yaw: h.yaw ?? rnd() * 6.28, state: 'idle', t: rnd() * 4, tx: x, tz: z, speed: 0, hopT: 0, phase: rnd() * 6.28, rnd,
             phases: h.night ? ['night', 'dusk'] : gdef.phases || null, scale: 1, layer: null, sheen: [1, 1, 1], tint: [1, 1, 1], yBase: y, air: 0,
+            yOff: h.kind === 'roof' || onWater ? 0 : h.y || 0,   // batch-3: perched this far above its ground (the owl)
           };
           // looks
           if (gdef.morph === 'pigeon-plain') {
@@ -315,6 +320,11 @@ export class Crowds {
   #decide(a, dt, g, gusLow) {
     if (!this.active(a)) { a.state = 'away'; return; }
     if (a.state === 'away') a.state = 'idle';
+    // batch-3: standing on the water or inside something built after it spawned (a scheme's table, a stall): to clear ground
+    if (!a.water && a.kind !== 'roof' && this.G.collision.walkBlocked(a.x, a.z)) {
+      const q = landSpot(this.G, a.x, a.z);
+      a.x = a.tx = q.x; a.z = a.tz = q.z; a.yBase = this.G.collision.walkFloor(q.x, q.z) + a.yOff;
+    }
     const dx = a.x - g.x, dz = a.z - g.z, d = Math.hypot(dx, dz);
     const friendly = this.friendly(a.crew);
     const gdef = GROUPS[a.group];
@@ -326,6 +336,7 @@ export class Crowds {
       const l = d || 1;
       const run = 3 + a.rnd() * 3;
       a.tx = a.x + (dx / l) * run; a.tz = a.z + (dz / l) * run;
+      this.#keepTarget(a);   // batch-3 (#1, #7): not onto the water, into a wall or off a roof
       a.t = 1.2 + a.rnd() * 1.4;
       if (gdef.fly) a.air = 1;
       this.#sound(a, gdef.sound);
@@ -334,6 +345,7 @@ export class Crowds {
     if (friendly && gusLow && d < GREET_R && d > 1.2 && a.state !== 'greet' && a.rnd() < 0.15 && this.G.gus.speed < 3) {
       a.state = 'greet';
       a.tx = g.x + (dx / d) * 1.1; a.tz = g.z + (dz / d) * 1.1;
+      this.#keepTarget(a);
       a.t = 3;
       return;
     }
@@ -343,6 +355,7 @@ export class Crowds {
     if (a.state === 'idle' && a.rnd() < 0.55) {
       const ang = a.rnd() * 6.28, r = Math.sqrt(a.rnd()) * a.home.r;
       a.tx = a.home.x + Math.cos(ang) * r; a.tz = a.home.z + Math.sin(ang) * r;
+      this.#keepTarget(a);
       a.state = 'wander';
       a.t = 3 + a.rnd() * 5;
     } else { a.state = 'idle'; a.t = 1.5 + a.rnd() * 4; }
@@ -361,13 +374,38 @@ export class Crowds {
       if (d > 0.08) {
         const step = Math.min(d, sp * dt);
         const nx = a.x + (dx / d) * step, nz = a.z + (dz / d) * step;
-        if (!a.water || pointInPoly(nx, nz, a.water.poly)) { a.x = nx; a.z = nz; }
+        if (a.water) { if (pointInPoly(nx, nz, a.water.poly)) { a.x = nx; a.z = nz; } }
+        else if (this.#walkable(a, nx, nz)) {
+          a.x = nx; a.z = nz;
+          // batch-3 (#7): the height every step (the terrain and the bridge decks; it was fixed where it spawned)
+          if (a.kind !== 'roof') a.yBase = this.G.collision.walkFloor(nx, nz) + a.yOff;
+        } else { a.tx = a.x; a.tz = a.z; }   // the water's edge, a wall, a rock, a roof's edge: stop there
         const want = Math.atan2(dx, dz);
         a.yaw += Math.atan2(Math.sin(want - a.yaw), Math.cos(want - a.yaw)) * Math.min(1, dt * 8);
         a.speed = sp;
       } else a.speed = 0;
     } else a.speed = 0;
     if (a.air > 0) a.air = Math.max(0, a.air - dt * 0.9);
+  }
+
+  /** Batch-3: may a land animal step onto (x, z)? Off the water and out of solids (collision.walkBlocked's cached cells);
+   *  a roof animal stays on its roof (the surface under it within a step of where it stands). */
+  #walkable(a, x, z) {
+    const C = this.G.collision;
+    if (a.kind === 'roof') return Math.abs(C.surface(x, z, a.yBase + 0.3, _cs).y - a.yBase) < 0.3;
+    return !C.walkBlocked(x, z);
+  }
+
+  /** Batch-3: a target that can't be walked to (the water, a solid, off a roof) is pulled back toward the animal (halves,
+   *  three tries) or dropped. No random draw. */
+  #keepTarget(a) {
+    if (a.water) return;
+    let tx = a.tx, tz = a.tz;
+    for (let k = 0; k < 4; k++) {
+      if (this.#walkable(a, tx, tz)) { a.tx = tx; a.tz = tz; return; }
+      tx = (tx + a.x) / 2; tz = (tz + a.z) / 2;
+    }
+    a.tx = a.x; a.tz = a.z;
   }
 
   #sound(a, name) {
@@ -514,6 +552,17 @@ export class Crowds {
 
 const _c = new THREE.Color();
 const _v = new THREE.Vector3();
+
+/** Batch-3: a ground animal's spawn spot, moved to the nearest clear cell if it is on the water or inside a solid. */
+function landSpot(G, x, z) {
+  const C = G.collision;
+  if (!C.walkBlocked(x, z)) return { x, z };
+  for (let d = 0.5; d <= 45; d += 0.5) for (let k = 0; k < 16; k++) {
+    const a = (k / 16) * Math.PI * 2, px = x + Math.cos(a) * d, pz = z + Math.sin(a) * d;
+    if (!C.walkBlocked(px, pz)) return { x: px, z: pz };
+  }
+  return { x, z };
+}
 
 function pickLayer(mix, rnd) {
   const entries = Object.entries(mix);

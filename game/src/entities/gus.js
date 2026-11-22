@@ -56,6 +56,13 @@ const BOOST_GRACE = 0.5;
 // Batch-2 (#2): the landing snap (up to 0.9 m in a dive, a perch catch) is eased on the visual root over this long (s).
 // Render-side only: gus.position, speed and every rule land exactly as before.
 const LAND_EASE = 0.24;
+// Batch-3 (#1): Gus and the water. On foot the water's edge is a low wall (a small splash, he stops). A gentle arrival on
+// the water floats him: walk mode with gus.floating (a tapped or held-slow Land, or any touch at up to FLOAT.speed m/s
+// across and FLOAT.sink down); a faster low touch (skimming at cruise, a dive) keeps the old splash-bounce (the Rhoda
+// fight's low passes). Floating: a slow paddle (FLOAT.paddle m/s; the owner asked for no moving at all, the review chose a
+// slow paddle so a bank is always reachable), turning, Peck and Drop as on the ground (main.js shows "Flap to take off";
+// characters.js reaches 4.5 m), and Flap is a strong take-off (FLOAT.vy, FLOAT.go) that ignores the water for FLOAT.grace s.
+const FLOAT = { speed: 8, sink: 7, paddle: 0.5, vy: 5.2, go: 5.5, grace: 1.2, edgeEvery: 0.9 };
 
 const ease = (t) => 1 - Math.pow(1 - t, 3);
 const approach = (v, target, rate, dt) => v + (target - v) * Math.min(1, rate * dt);
@@ -131,6 +138,8 @@ export class Gus {
     this.legacyTakeoff = false;     // Batch-2 (#5): set by main.js from G.legacyTakeoff (old replays: never hop)
     this.hopArmed = false; this.flapAgain = false; this.hopFrom = null;
     this.landEase = null;           // Batch-2 (#2): { t, x, y, z } the visual offset (data space) eased out after a landing
+    this.floating = false;          // Batch-3 (#1): walk mode on the water's surface (see FLOAT)
+    this.fromWater = false; this.waterGrace = 0; this.edgeT = 0;
     this._prevPos = new THREE.Vector3();
     this.useModel('stand');
   }
@@ -166,6 +175,7 @@ export class Gus {
     this.events = [];
     this.diveHeldT = 0; this.landLatch = 0; this.glideT = 0; this.lowAlt = Infinity; this.sinceFlap = 0;
     this.hopArmed = false; this.flapAgain = false; this.hopFrom = null; this.landEase = null;
+    this.floating = false; this.fromWater = false; this.waterGrace = 0;   // Batch-3: placed on the water, the first step floats him
     this.speed = speed ?? (mode === 'fly' ? FLY.cruise : 0);
     this.velocity.set(Math.sin(yaw), 0, Math.cos(yaw)).multiplyScalar(this.speed);
     this.useModel(mode === 'fly' ? 'fly' : 'stand');
@@ -176,6 +186,7 @@ export class Gus {
   }
 
   update(dt, cameraYaw) {
+    if (this.waterGrace > 0) this.waterGrace = Math.max(0, this.waterGrace - dt);
     const prev = _prev.copy(this.root.position);
     this._prevPos.copy(prev);
     this.modeT += dt;
@@ -209,7 +220,8 @@ export class Gus {
       this.yaw += Math.sign(diff) * Math.min(Math.abs(diff), TURN_RATE * dt);
       moving = Math.abs(diff) < 1.2;
     }
-    const top = (this.sprinting ? SPRINT_SPEED : WALK_SPEED) * Math.max(amount, 0.35);
+    if (this.floating) this.sprinting = false;
+    const top = this.floating ? FLOAT.paddle : (this.sprinting ? SPRINT_SPEED : WALK_SPEED) * Math.max(amount, 0.35);
     if (this.slideV > 0) {
       // a belly-slide on the ice: he keeps his landing speed and it bleeds off slowly
       const onIce = this.#surface(this.root.position.x, this.root.position.z, this.root.position.y + 0.05).kind === 'ice';
@@ -225,10 +237,27 @@ export class Gus {
     p.x += Math.sin(this.yaw) * this.speed * dt;
     p.z += Math.cos(this.yaw) * this.speed * dt;
     this.#collide(p, BODY_R.ground, 0.28);
-    const surf = this.#surface(p.x, p.z, p.y + 0.05);
+    let surf = this.#surface(p.x, p.z, p.y + 0.05);
     // a perch is support while he stays on it (a lamppost cap, a rail, a roof rim)
     const ps = this.mode === 'perch' ? this.#perchSupport(p) : null;
     if (ps != null && ps >= surf.y - 0.05) { surf.y = ps; surf.kind = 'perch'; }
+    // Batch-3 (#1): the water (its surface, never the bed under it: whatever yRef found)
+    this.edgeT = Math.max(0, this.edgeT - dt);
+    const wl = ps == null ? this.#waterFloor(p.x, p.z, surf) : null;
+    if (this.floating) {
+      if (wl != null) surf = { y: wl, kind: 'float' };
+      else if (surf.y > p.y + 0.3 || surf.y < p.y - 0.25) { p.x = ox; p.z = oz; this.speed *= 0.5; surf = { y: p.y, kind: 'float' }; }   // a high bank (a stone basin's rim): stay afloat
+      else this.floating = false;   // out onto a low bank
+    } else if (wl != null) {
+      const w0 = this.#waterFloor(ox, oz, this.#surface(ox, oz, p.y + 0.05));
+      if (w0 != null) { this.floating = true; surf = { y: w0, kind: 'float' }; p.x = ox; p.z = oz; this.speed = 0; }   // placed on the water (or an old save on its bed): up and afloat
+      else {
+        // the water's edge: a low wall, with a small splash
+        p.x = ox; p.z = oz; this.speed = 0;
+        if (this.edgeT <= 0) { this.edgeT = FLOAT.edgeEvery; this.events.push({ type: 'edge', x: p.x + Math.sin(this.yaw) * 0.3, y: wl, z: p.z + Math.cos(this.yaw) * 0.3 }); }
+        surf = { y: p.y, kind: 'terrain' };
+      }
+    }
     if (surf.y > p.y + 0.3) {
       // too steep a step: stay put
       p.x = ox; p.z = oz;
@@ -258,8 +287,10 @@ export class Gus {
     }
     if (inp.pressed('peck') && this.peckT < 0) this.peckT = 0;
     if (inp.pressed('flap')) {
+      // Batch-3 (#1): off the water, the strong take-off (no hop)
+      this.fromWater = this.floating;
       // Batch-2 (#5): may this one become a hop? Decided now (where he stands), used when the squash ends
-      this.hopArmed = !this.legacyTakeoff && this.hopOk && this.mode === 'walk' && this.slideV <= 0 && this.#hopGround();
+      this.hopArmed = !this.fromWater && !this.legacyTakeoff && this.hopOk && this.mode === 'walk' && this.slideV <= 0 && this.#hopGround();
       this.hopOk = false;   // used up: main.js sets it again on the next ground press
       this.flapAgain = false;
       this.mode = 'takeoff'; this.modeT = 0; this.peckT = -1; this.slideV = 0;
@@ -280,7 +311,7 @@ export class Gus {
   }
 
   /** Sit in a vehicle (vehicles.js moves him) or get out. cam: { dist, height, look }. */
-  sit(cam) { this.mode = 'drive'; this.modeT = 0; this.speed = 0; this.vy = 0; this.perch = null; this.slideV = 0; this.driveCam = cam; this.useModel('stand'); }
+  sit(cam) { this.floating = false; this.mode = 'drive'; this.modeT = 0; this.speed = 0; this.vy = 0; this.perch = null; this.slideV = 0; this.driveCam = cam; this.useModel('stand'); }
   stand() { this.mode = 'walk'; this.modeT = 0; this.driveCam = null; this.speed = 0; }
   twirl() { this.twirlT = 0.8; }
 
@@ -295,9 +326,10 @@ export class Gus {
     if (this.input.pressed('flap')) this.flapAgain = true;   // Batch-2 (#5): a second press during the squash flies
     if (this.modeT >= TAKEOFF_SQUASH) {
       // Batch-2 (#5): released before the squash ended (and not pressed again) → a hop; otherwise the take-off as before
-      if (this.hopArmed && !this.flapAgain && !this.input.held('flap') && !this.input.scripted) this.#startHop();
+      if (this.fromWater) { this.#startFly(FLOAT.vy, FLOAT.go); this.waterGrace = FLOAT.grace; }   // Batch-3 (#1): up and away
+      else if (this.hopArmed && !this.flapAgain && !this.input.held('flap') && !this.input.scripted) this.#startHop();
       else this.#startFly(3.2, Math.max(4.5, this.speed));
-      this.hopArmed = false;
+      this.hopArmed = false; this.fromWater = false;
     }
   }
 
@@ -355,6 +387,7 @@ export class Gus {
 
   #startFly(vy, speed) {
     this.liftT = this.mode === 'fly' ? this.liftT : 0;   // Batch-2 (#5): seconds since leaving the ground (the touch boost grace)
+    this.floating = false;   // Batch-3
     this.mode = 'fly';
     this.modeT = 0;
     this.vy = vy;
@@ -379,7 +412,7 @@ export class Gus {
     else {
       if (this.diveHeldT > 0 && this.diveHeldT <= LAND.tap + 1e-6 && this.sinceFlap - this.diveHeldT >= LAND.calm - 1e-6 && !inp.scripted) {
         const pp = this.root.position, below = this.#surface(pp.x, pp.z, pp.y + 0.05);
-        if (below.kind !== 'water' && pp.y - below.y <= LAND.alt) this.landLatch = LAND.max;
+        if (pp.y - below.y <= LAND.alt) this.landLatch = LAND.max;   // Batch-3 (#1): over the water too (he floats)
       }
       this.diveHeldT = 0;
     }
@@ -467,6 +500,15 @@ export class Gus {
       p.y = surf.y;
     }
     this.lowAlt = p.y - surf.y;   // Land/perf: for the HUD's Land prompt (read only)
+    // Batch-3 (#1): the water's surface is a floor in flight too. A steep dive (or one in the first 0.3 s, before landings
+    // count) could pass more than a step below it in one frame; surface() then dropped the water and he landed on the bed.
+    const wf = this.#waterFloor(p.x, p.z, surf);
+    if (wf != null && p.y < wf) {
+      p.y = wf;
+      if (this.waterGrace > 0) this.vy = Math.max(this.vy, 0.5);   // just off the water: up, not back down
+      else if (landing || (this.speed <= FLOAT.speed && this.vy > -FLOAT.sink)) { this.#floatDown(); return; }
+      else { this.vy = 3.2; this.speed = Math.max(this.speed * 0.6, 4); this.landLatch = 0; this.#splash(); return; }   // the splash-bounce
+    }
 
     this.bank = approach(this.bank, THREE.MathUtils.clamp(yawRate * 0.42, -0.85, 0.85), 4, dt);
     // wings: fast hard beats when climbing, slower beats in a glide, tucked in a dive
@@ -494,6 +536,8 @@ export class Gus {
       const ground = this.#surface(p.x, p.z, p.y + 0.05);
       const nearGround = diving && p.y - ground.y < 0.9;
       if (p.y <= ground.y + 0.02 || nearGround) {
+        if (ground.kind === 'water' && this.waterGrace > 0) { p.y = Math.max(p.y, ground.y + 0.02); this.vy = Math.max(this.vy, 0.5); return; }   // Batch-3: just off the water
+        if (ground.kind === 'water' && (landing || (this.speed <= FLOAT.speed && this.vy > -FLOAT.sink))) { p.y = ground.y; this.#floatDown(); return; }   // Batch-3 (#1): a gentle arrival floats him
         if (ground.kind === 'water') {
           // splash-hop back up: water never swallows a pigeon
           p.y = ground.y + 0.02;
@@ -520,6 +564,15 @@ export class Gus {
 
   /** Take off from a script (the shoo in the first minute). */
   launch(vy = 3.2, speed = 4.5) { this.#startFly(vy, speed); }
+
+  /** Batch-3 (#1): settle on the water (walk mode, floating). Not a 'land' event: nothing that waits for a landing counts it. */
+  #floatDown() {
+    this.#land('walk', null);
+    this.floating = true;
+    this.events.pop();
+    const p = this.root.position;
+    this.events.push({ type: 'float', x: p.x, y: p.y, z: p.z });
+  }
 
   #splash() { const p = this.root.position; this.events.push({ type: 'splash', x: p.x, y: p.y, z: p.z }); }
 
@@ -574,6 +627,14 @@ export class Gus {
   }
 
   #ground(x, z, yRef) { return this.#surface(x, z, yRef).y; }
+
+  /** Batch-3 (#1): the water's level if the water is the floor here (over the surface found, or that surface itself), else
+   *  null. A bridge deck or a rock above the water is not water. */
+  #waterFloor(x, z, surf) {
+    if (surf.kind === 'water') return surf.y;
+    const w = this.world.collision?.waterAt(x, z);
+    return w && w.level > surf.y ? w.level : null;
+  }
 
   /** Push Gus out of walls; returns the hit normal {x, z, tag} or null. */
   #collide(p, r, h) {
@@ -631,6 +692,7 @@ export class Gus {
       sq = Math.max(sq, Math.sin(this.landSquash * Math.PI) * 0.18);
       this.landSquash = Math.max(0, this.landSquash - dt / 0.18);
     }
+    if (this.floating && this.mode === 'walk') oy += -0.035 + Math.sin((this.bobT = (this.bobT || 0) + dt) * 2.4) * 0.018;   // Batch-3: a gentle bob, low in the water (looks only)
     this.standPose.position.set(ox, oy, oz);
     this.standPose.rotation.set(0, 0, 0);
     this.standPose.scale.set(1 + sq * 0.45, 1 - sq, 1 + sq * 0.45);

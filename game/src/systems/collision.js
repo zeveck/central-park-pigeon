@@ -5,7 +5,8 @@
 //            (rocks). Boxes and cylinders are walls below their top and ground
 //            on top; rocks behave like terrain (their surface is ground).
 //   soft     canopy spheres: Gus passes through with a leaf burst.
-//   water    outlines with a level: a surface Gus splash-hops off.
+//   water    outlines with a level: a surface Gus splash-hops off (or floats on: batch-3); a floor for every walker
+//            (groundFor), never a lake bed under it.
 //   perches  points (lamppost caps, finials) and edges (roof rims, rails, walls);
 //            landing within 0.6 m snaps Gus on.
 //
@@ -24,6 +25,7 @@ export class Collision {
     this.count = { box: 0, cyl: 0, rock: 0, soft: 0, water: 0, perch: 0, edge: 0 };
     this.perchList = [];
     this.camBlockers = [];   // Fixes-1: camera-only shapes (see addCamBlocker)
+    this.decks = [];         // Batch-3: the bridge deck boxes (tag 'bridge'), for deckAt (the crowds' cheap ground)
   }
 
   /** Fixes-1: a camera-only cylinder: a part of a model with no collision (a slim spire, a finial) that the follow camera
@@ -33,6 +35,9 @@ export class Collision {
   // ---------------------------------------------------------------- building
   #insert(item, x0, z0, x1, z1) {
     const c = this.cell;
+    if (this.walkTiles?.size) {   // batch-3: a shape added after the crowds' cells were cached (a scheme's table): forget those tiles
+      for (let tx = Math.floor(x0 / 16) - 1; tx <= Math.floor(x1 / 16) + 1; tx++) for (let tz = Math.floor(z0 / 16) - 1; tz <= Math.floor(z1 / 16) + 1; tz++) this.walkTiles.delete(tx * 100003 + tz);
+    }
     for (let ix = Math.floor(x0 / c); ix <= Math.floor(x1 / c); ix++) {
       for (let iz = Math.floor(z0 / c); iz <= Math.floor(z1 / c); iz++) {
         const k = ix * 100003 + iz;
@@ -50,7 +55,9 @@ export class Collision {
     const c = Math.cos(yaw), s = Math.sin(yaw);
     const r = Math.hypot(w, d) / 2;
     this.count.box++;
-    return this.#insert({ t: 'box', x, z, y0, y1: y0 + h, hx: w / 2, hz: d / 2, c, s, walkable, tag, id }, x - r, z - r, x + r, z + r);
+    const it = this.#insert({ t: 'box', x, z, y0, y1: y0 + h, hx: w / 2, hz: d / 2, c, s, walkable, tag, id }, x - r, z - r, x + r, z + r);
+    if (tag === 'bridge') this.decks.push({ it, x0: x - r, x1: x + r, z0: z - r, z1: z + r });
+    return it;
   }
 
   addCylinder({ x, z, y0 = 0, h, r, walkable = true, tag = 'solid', id }) {
@@ -147,6 +154,109 @@ export class Collision {
   }
 
   groundAt(x, z, yRef = Infinity) { return this.surface(x, z, yRef, _surf).y; }
+
+  /**
+   * Batch-3 (#1, #7): the one ground rule for everything that walks (people, dogs, named animals): surface() at or below
+   * yRef, except that water is a floor for everyone. surface() drops a water body whose level is more than a step above
+   * yRef, so a walker seeded with terrain.heightAt (the lake bed) walked the bed under the water. Seed with yRef 400 (or
+   * surfaceY) the first time, then the walker's own height. A bridge deck over the water is still the deck.
+   */
+  groundFor(x, z, yRef = Infinity, out = { y: 0, kind: 'terrain', item: null }) {
+    this.surface(x, z, yRef, out);
+    if (out.kind !== 'water') {
+      const w = this.waterAt(x, z);
+      if (w && w.level > out.y) { out.y = w.level; out.kind = 'water'; out.item = w; }
+    }
+    return out;
+  }
+
+  /** Batch-3: the highest bridge deck top under (x, z) at or below yRef + a step, or -Infinity (cheap: decks only). */
+  deckAt(x, z, yRef = Infinity) {
+    let top = -Infinity;
+    const lim = yRef + STEP_UP;
+    for (const d of this.decks) {
+      if (x < d.x0 || x > d.x1 || z < d.z0 || z > d.z1) continue;
+      const it = d.it;
+      if (it.y1 <= lim && it.y1 > top && Collision.inBox(it, x, z)) top = it.y1;
+    }
+    return top;
+  }
+
+  /** Batch-3: a walker's floor with nothing on it: the terrain, a bridge deck over it, or the water's surface. The seed for
+   *  groundFor (never a roof or a lamppost cap, which yRef 400 would find). */
+  floorAt(x, z) {
+    let y = this.heightAt(x, z);
+    const dk = this.deckAt(x, z);
+    if (dk > y) return dk;
+    const w = this.waterAt(x, z);
+    return w && w.level > y ? w.level : y;
+  }
+
+  /** Batch-3: small walkers (the crowds): is the 0.5 m cell at (x, z) water (with no deck over it: 1) or inside a solid at
+   *  ground level (a box, a cylinder, a rock taller than a step: 2), or clear (0)? Cached in 16 m tiles, built when first
+   *  asked, with each clear cell's floor when it isn't the terrain (a kerb, a bridge deck: walkFloor). */
+  #walkTile(x, z) {
+    const ix = Math.floor(x * 2), iz = Math.floor(z * 2);
+    const tx = ix >> 5, tz = iz >> 5, key = tx * 100003 + tz;
+    let tile = (this.walkTiles ||= new Map()).get(key);
+    if (!tile) {
+      tile = { b: new Uint8Array(1024), y: new Float32Array(1024).fill(NaN) };
+      for (let j = 0; j < 32; j++) for (let i = 0; i < 32; i++) {
+        const cx = ((tx << 5) + i + 0.5) / 2, cz = ((tz << 5) + j + 0.5) / 2, k = j * 32 + i;
+        // the whole cell: wet if its centre or any corner is (a shore cell is water), solid within a cell's reach of the centre
+        let wet = false;
+        for (const [ox, oz] of _CORNERS) {
+          const x = cx + ox, z = cz + oz;
+          if (this.deckAt(x, z) !== -Infinity) continue;
+          const w = this.waterAt(x, z);
+          if (w && w.level > this.heightAt(x, z) - 0.05) { wet = true; break; }
+        }
+        if (wet) { tile.b[k] = 1; continue; }
+        if (this.standable(cx, cz, { r: 0.3, h: 0.45 }) == null) { tile.b[k] = 2; continue; }
+        const t = this.heightAt(cx, cz), g = this.surface(cx, cz, this.floorAt(cx, cz) + 0.05, _surf).y;
+        if (g > t + 0.02) tile.y[k] = g;
+      }
+      this.walkTiles.set(key, tile);
+    }
+    _cell.tile = tile; _cell.k = (iz - (tz << 5)) * 32 + (ix - (tx << 5));
+    return _cell;
+  }
+
+  walkBlocked(x, z) { const c = this.#walkTile(x, z); return c.tile.b[c.k]; }
+
+  /** Batch-3: a crowd animal's floor at (x, z): the terrain, or the kerb or deck its cell stands on. */
+  walkFloor(x, z) { const c = this.#walkTile(x, z), y = c.tile.y[c.k]; return y === y ? y : this.heightAt(x, z); }
+
+  /** Batch-3: can a walker (radius r, height h) stand at (x, z)? Not on water (a deck over it is fine) and not inside a
+   *  box, cylinder or rock. Returns the ground y, or null. */
+  standable(x, z, { r = 0.3, h = 1.5 } = {}) {
+    // the walkers' ground: the terrain or a bridge deck (never a roof, a wall top or a lamppost cap)
+    let y = this.heightAt(x, z);
+    const dk = this.deckAt(x, z);
+    if (dk > y) y = dk;
+    else { const w = this.waterAt(x, z); if (w && w.level > y - 0.05) return null; }
+    let bad = false;
+    this.#near(x, z, r, (it) => {
+      if (it.t === 'box') { if (y + h > it.y0 && y < it.y1 - STEP_UP && Collision.inBox(it, x, z, r)) bad = true; }
+      else if (it.t === 'cyl') { if (y + h > it.y0 && y < it.y1 - STEP_UP && (x - it.x) ** 2 + (z - it.z) ** 2 < (it.r + r) ** 2) bad = true; }
+      else if (it.t === 'rock') { const lim = y + STEP_UP; if (Collision.rockTop(it, x, z) > lim || Collision.rockTop(it, x + r, z) > lim || Collision.rockTop(it, x - r, z) > lim || Collision.rockTop(it, x, z + r) > lim || Collision.rockTop(it, x, z - r) > lim) bad = true; }
+      if (bad) return false;
+    });
+    return bad ? null : y;
+  }
+
+  /** Batch-3: the nearest standable spot to (x, z) (rings 0.75 m apart, 16 bearings, out to maxR), or null. Deterministic:
+   *  no random draw, so moving a spawn or a target off the water moves no one else's stream. */
+  clearNear(x, z, { r = 0.3, h = 1.5, maxR = 40 } = {}) {
+    if (this.standable(x, z, { r, h }) != null) return { x, z };
+    for (let d = 0.75; d <= maxR; d += 0.75) {
+      for (let k = 0; k < 16; k++) {
+        const a = (k / 16) * Math.PI * 2, px = x + Math.cos(a) * d, pz = z + Math.sin(a) * d;
+        if (this.standable(px, pz, { r, h }) != null) return { x: px, z: pz };
+      }
+    }
+    return null;
+  }
 
   waterAt(x, z) {
     let res = null;
@@ -263,3 +373,5 @@ export class Collision {
 }
 
 const _surf = { y: 0, kind: 'terrain', item: null };
+const _cell = { tile: null, k: 0 };
+const _CORNERS = [[0, 0], [-0.25, -0.25], [0.25, -0.25], [-0.25, 0.25], [0.25, 0.25]];

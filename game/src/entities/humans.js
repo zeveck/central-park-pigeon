@@ -50,6 +50,7 @@ const WALK = 1.25, RUN = 3.6, JOG = 2.8;
 const FADE = 0.2;
 
 const _v = new THREE.Vector3();
+const _wp = { x: 0, y: 0, z: 0 }, _wn = { x: 0, z: 0, tag: null }, _wg = { y: 0, kind: 'terrain', item: null };   // batch-3 (#1)
 const _fr = new THREE.Frustum(), _pm = new THREE.Matrix4(), _sp = new THREE.Sphere();
 
 class Agent {
@@ -207,6 +208,7 @@ export class Humans {
           if (spec.role === 'driver') home = { x: spec.at.x + (k - 1) * 24, z: spec.at.z, yaw: 1.57 };
           if (spec.role === 'doorman') home = { x: spec.at.x, z: spec.at.z + (k ? 260 : -120), yaw: -1.57 };
         } else home = { ...spec.at };
+        this.#dryHome(home, spec);
         const ag = new Agent('h' + id, spec, home, rnd, k);
         ag.seedKey = 'human:' + spec.role + ':' + id; id++;
         ag.loopT = (k / spec.n) + rnd() * 0.1;
@@ -225,6 +227,7 @@ export class Humans {
         if (spec.spots) home = { ...spec.spots[k] };
         else if (spec.act === 'wander') { const a = rnd() * Math.PI * 2, d = Math.sqrt(rnd()) * spec.r; home = { x: spec.at.x + Math.cos(a) * d, z: spec.at.z + Math.sin(a) * d, yaw: rnd() * 6.28 }; }
         else home = { ...(spec.at || spec.path[0]) };
+        this.#dryHome(home, spec);
         const ag = new Agent('a' + e, spec, home, rnd, k);
         ag.seedKey = key; e++;
         ag.ambient = true;
@@ -233,6 +236,30 @@ export class Humans {
         this.extras.push(ag);
       }
     }
+  }
+
+  /** Batch-3 (#1): a home on the water or inside a solid moves to the nearest spot a person can stand (no random draw, so
+   *  nobody else's stream moves). Loops (jog, path, route, skate) keep their data: only where the loop starts. */
+  #dryHome(home, spec) {
+    const C = this.G.collision;
+    if (!C || spec.seat === 'carriage' || C.standable(home.x, home.z, { r: 0.3, h: 1.5 }) != null) return;
+    const q = C.clearNear(home.x, home.z, { r: 0.3, h: 1.5, maxR: 30 });
+    if (q) { home.x = q.x; home.z = q.z; }
+  }
+
+  /** Batch-3 (#1, #7): a free walker's step (wander, goto): never onto the water, pushed out of walls and trunks, its
+   *  height on the walkers' ground. Returns false when the way is blocked (the caller gives up on the target). */
+  #stepTo(a, nx, nz) {
+    const C = this.G.collision;
+    if (C.walkBlocked(nx, nz) === 1) return false;   // the water's edge
+    const p = _wp;
+    p.x = nx; p.z = nz; p.y = a.y ?? C.floorAt(nx, nz);
+    const hit = C.pushOut(p, 0.28, 1.5, _wn);
+    const moved = Math.hypot(p.x - a.x, p.z - a.z);
+    a.x = p.x; a.z = p.z;
+    if (a.y != null) a.y = C.groundFor(a.x, a.z, a.y + 0.35, _wg).y;
+    // pushed back where it stood: a wall across the way
+    return !(hit && moved < 0.002);
   }
 
   /** Visual furniture and companions: stools under the seated chess players, dogs on leashes. */
@@ -402,7 +429,8 @@ export class Humans {
       const ax = a.x - point.x, az = a.z - point.z, l = Math.hypot(ax, az) || 1;
       a.busy = true;
       this.G.bubbles.add(by === 'bully' ? 'AAH!' : 'Whoa!', { at: () => ({ x: a.x, y: a.y + 2.05, z: a.z }), ttl: 1.6 });
-      this.goTo(a, { x: a.x + (ax / l) * 9, z: a.z + (az / l) * 9 }, RUN, () => { a.mode = 'linger'; a.t = 10; });
+      const fx = a.x + (ax / l) * 9, fz = a.z + (az / l) * 9, fq = this.G.collision.clearNear(fx, fz, { maxR: 8 }) || { x: fx, z: fz };   // batch-3: not into the water
+      this.goTo(a, fq, RUN, () => { a.mode = 'linger'; a.t = 10; });
     }
     if (clung) this.G.bus.emit('fail', { kind: 'cling', by });
     return hit;
@@ -456,7 +484,7 @@ export class Humans {
     for (const list of [this.agents, this.extras]) for (const a of list) {
       const c = a.clone;
       if (!c) { if (a.dogs?.[0]?.h.visible) for (const d of a.dogs) d.h.visible = d.leash.visible = false; continue; }
-      if (!a.seated) a.y = G.surfaceY(a.x, a.z, (a.y ?? G.terrain.heightAt(a.x, a.z)) + 0.35);
+      if (!a.seated) a.y = G.collision.groundFor(a.x, a.z, (a.y ?? G.collision.floorAt(a.x, a.z)) + 0.35, _wg).y;   // batch-3 (#1): water is a floor
       const seat = this.#seat(a);
       if (seat) { c.holder.position.set(seat.x, seat.y, seat.z); c.holder.rotation.y = seat.yaw; }
       else { c.holder.position.set(a.x, a.y + (a.seatY || 0), a.z); c.holder.rotation.y = a.yaw; }
@@ -519,10 +547,14 @@ export class Humans {
       const lead = moving ? 1.9 : 1.2;
       const tx = px + Math.sin(yaw) * lead + Math.cos(yaw) * d.side * 0.7, tz = pz + Math.cos(yaw) * lead - Math.sin(yaw) * d.side * 0.7;
       const k = Math.min(1, dt * 4);
-      d.x += (tx - d.x) * k; d.z += (tz - d.z) * k;
+      // batch-3 (#7): a dog never steps onto the water or into a wall or a rock (it waits at the walker's heel)
+      const nx = d.x + (tx - d.x) * k, nz = d.z + (tz - d.z) * k;
+      if (!this.G.collision.walkBlocked(nx, nz)) { d.x = nx; d.z = nz; }
+      else if (Math.hypot(d.x - px, d.z - pz) > 2.5) { d.x = px; d.z = pz; }
       d.yaw = moving ? yaw : d.yaw + Math.sin(this.tick * 0.02 + d.bob) * 0.01;
       d.bob += dt * (moving ? 9 : 1.5);
-      const y = this.G.terrain.heightAt(d.x, d.z) + (moving ? Math.abs(Math.sin(d.bob)) * 0.04 : 0);
+      d.gy = this.G.collision.groundFor(d.x, d.z, (d.gy ?? this.G.collision.floorAt(d.x, d.z)) + 0.35, _wg).y;   // batch-3 (#7): the ground rule
+      const y = d.gy + (moving ? Math.abs(Math.sin(d.bob)) * 0.04 : 0);
       d.h.position.set(d.x, y, d.z); d.h.rotation.y = d.yaw;
       d.h.visible = d.leash.visible = true;
       const pa = d.leash.geometry.attributes.position;
@@ -545,7 +577,9 @@ export class Humans {
       a.speed = Math.min(t.speed, d * 3 + 0.3);
       const turn = Math.atan2(dx, dz);
       a.yaw = turnTo(a.yaw, turn, 6 * dt);
-      a.x += (dx / d) * a.speed * dt; a.z += (dz / d) * a.speed * dt;
+      // batch-3 (#1): blocked (the water's edge, a wall) for a second: as far as they can get counts as there
+      if (this.#stepTo(a, a.x + (dx / d) * a.speed * dt, a.z + (dz / d) * a.speed * dt)) t.stuck = 0;
+      else if ((t.stuck = (t.stuck || 0) + dt) > 1) { a.speed = 0; a.mode = 'idle'; const f = t.done; a.target = null; f?.(); }
       return;
     }
     if (a.mode === 'linger') {
@@ -566,13 +600,16 @@ export class Humans {
           if (d < 0.2) { a.target = null; a.t = 2 + a.rnd() * 5; a.speed = 0; break; }
           a.speed = WALK * 0.85;
           a.yaw = turnTo(a.yaw, Math.atan2(dx, dz), 4 * dt);
-          a.x += (dx / d) * a.speed * dt; a.z += (dz / d) * a.speed * dt;
+          if (!this.#stepTo(a, a.x + (dx / d) * a.speed * dt, a.z + (dz / d) * a.speed * dt)) { a.target = null; a.t = 1; a.speed = 0; }   // batch-3: blocked: pick again
         } else {
           a.speed = 0;
           a.t -= dt;
           if (a.t <= 0) {
             const ang = a.rnd() * Math.PI * 2, r = Math.sqrt(a.rnd()) * (s.r || 6);
-            a.target = { x: s.at.x + Math.cos(ang) * r, z: s.at.z + Math.sin(ang) * r };
+            const tx = s.at.x + Math.cos(ang) * r, tz = s.at.z + Math.sin(ang) * r;
+            // batch-3 (#1): never a target on the water or inside a solid (the same two draws either way)
+            if (this.G.collision.standable(tx, tz, { r: 0.3, h: 1.5 }) != null) a.target = { x: tx, z: tz };
+            else a.t = 1;
           }
         }
         break;

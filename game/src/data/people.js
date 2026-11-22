@@ -24,8 +24,8 @@ const SKATE_TINTS = [null, [0.62, 0.78, 1.25], [1.2, 0.72, 0.68], [0.72, 1.12, 0
 
 export const PEOPLE = [
   // ---------------------------------------------------------------- the south end
-  { role: 'parkgoer', model: MIX.walkers, n: 3, phases: 'day', act: 'wander', at: P(60, 18), r: 18, acc: ['phone'], feeder: true },
-  { role: 'picnicker', model: MIX.sitters, n: 2, phases: ['afternoon'], act: 'sit', at: P(52, 22), r: 4, feeder: true },
+  { role: 'parkgoer', model: MIX.walkers, n: 3, phases: 'day', act: 'wander', at: P(96, 22), r: 10, acc: ['phone'], feeder: true },   // batch-3 (#1): the Pond's east bank (was (60, 18) r 18: mid-Pond)
+  { role: 'picnicker', model: MIX.sitters, n: 2, phases: ['afternoon'], act: 'sit', at: P(52, 5), r: 4, feeder: true },   // batch-3 (#1): on the bank by 59th, benches too (was (52, 22): in the Pond)
   { role: 'tourist', model: MIX.tourists, n: 3, phases: 'day', act: 'wander', at: P(-10, 70), r: 30, acc: ['camera'], feeder: true },
   { role: 'parkgoer', model: MIX.walkers, mix: 3, n: 2, phases: 'day', act: 'wander', at: P(-40, 50), r: 15, feeder: true },
   { role: 'chess', model: 'human-chess-player', n: 2, phases: ['morning', 'afternoon'], act: 'sit', at: P(-6.6, 64), r: 1.5, seat: 'stool' },   // Fixes-3 (R5)
@@ -74,9 +74,9 @@ export const PEOPLE = [
   // the Gapstow Bridge selfie (a postcard), the chess players' audience, kids at the statues (postcards)
   { role: 'gapstow-selfie', model: 'human-park', n: 1, phases: 'day', act: 'stand', at: P(61, 43.2, 0.1), r: 0, acc: ['selfie'] },
   { role: 'kid', model: ['human-child', 'human-park'], n: 2, phases: 'day', act: 'wander', at: P(37.4, 171.2), r: 2.2, kid: true },
-  { role: 'kid', model: ['human-child', 'human-park'], n: 2, phases: ['afternoon'], act: 'wander', at: P(77, 325), r: 3, kid: true },
+  { role: 'kid', model: ['human-child', 'human-park'], n: 2, phases: ['afternoon'], act: 'wander', at: P(77.4, 326.4), r: 3, kid: true },   // batch-3 (#1): clear of Conservatory Water
   { role: 'parkgoer', model: MIX.walkers, mix: 5, n: 3, phases: 'day', act: 'wander', at: P(0, 830), r: 40, feeder: true },
-  { role: 'parkgoer', model: MIX.walkers, mix: 1, n: 2, phases: 'day', act: 'wander', at: P(60, 960), r: 25, feeder: true },
+  { role: 'parkgoer', model: MIX.walkers, mix: 1, n: 2, phases: 'day', act: 'wander', at: P(58.3, 956.9), r: 22, feeder: true },   // batch-3 (#1): off the Meer (was (60, 960) r 25)
   // ---------------------------------------------------------------- the city ring
   { role: 'walter', model: 'human-walter', n: 1, phases: 'any', act: 'work', at: P(129, 318.6, -1.57), r: 0, named: 'walter', acc: ['capbraid'] },
   { role: 'doorman', model: 'human-walter', n: 2, phases: 'day', act: 'work', at: P(129, 230, -1.57), r: 120, street: true, tint: [0.75, 0.8, 1.0] },

@@ -123,7 +123,7 @@ export const CHARACTERS = {
   eldest: { name: 'The Eldest', crew: 'turtles', role: 'boss', bio: 'Older than the park. Seals every truce.', at: { x: 8.8, z: 432.6, on: 'roof' }, out: 'any', voice: 'eldest' },
   moss: { name: 'Moss', crew: 'turtles', role: 'regular', bio: 'Mostly asleep.', at: { x: 7.6, z: 433.4, on: 'roof' }, out: 'any' },
   shelly: { name: 'Shelly', crew: 'turtles', role: 'regular', bio: "Knows all the park's gossip.", at: { x: 10, z: 431.8, on: 'roof' }, out: 'any' },
-  slowpoke: { name: 'Slowpoke', crew: 'turtles', role: 'regular', bio: 'Always arriving.', at: { x: 14, z: 428 }, out: 'any' },
+  slowpoke: { name: 'Slowpoke', crew: 'turtles', role: 'regular', bio: 'Always arriving.', at: { x: 12.8, z: 422.6, shore: true }, out: 'any' },   // batch-3 (#1): on the bank (was 4 m out in the pond, on its bed)
   // Cedar Hill Pack
   biscuit: { name: 'Biscuit', crew: 'biscuit', role: 'boss', bio: 'A huge fluffy off-leash dog. Lost his ball.', at: { x: 44, z: 380 }, out: 'day', voice: 'biscuit' },
   pretzel: { name: 'Pretzel', crew: 'biscuit', role: 'regular', bio: 'A dachshund. First to chase anything.', at: { x: 48, z: 377 }, out: 'day' },
@@ -137,7 +137,7 @@ export const CHARACTERS = {
   rigby: { name: 'Rigby', crew: 'raccoons', role: 'boss', bio: 'The Night Crew\'s mechanic. Needs a wrench.', at: { x: -33, z: 930 }, out: 'dusk-night', voice: 'rigby' },
   socket: { name: 'Socket', crew: 'raccoons', role: 'regular', bio: 'The welder.', at: { x: -29, z: 934 }, out: 'dusk-night' },
   ringo: { name: 'Ringo', crew: 'raccoons', role: 'regular', bio: 'The driver. Wants to race.', at: { x: -37, z: 927 }, out: 'dusk-night' },
-  mamamask: { name: 'Mama Mask', crew: 'raccoons', role: 'regular', bio: 'Runs the drain kitchen. Strict about union rules.', at: { x: -31, z: 925 }, out: 'dusk-night' },
+  mamamask: { name: 'Mama Mask', crew: 'raccoons', role: 'regular', bio: 'Runs the drain kitchen. Strict about union rules.', at: { x: -32, z: 927.3 }, out: 'dusk-night' },   // batch-3 (#1): on the Loch's bank (was in it)
   // Bethesda Choir
   vibrato: { name: 'Maestro Vibrato', crew: 'choir', role: 'boss', bio: 'Conducts the Choir. Needs an audience that stays.', at: { x: 6.6, z: 279, on: 'ground' }, out: 'any', voice: 'vibrato' },
   bella: { name: 'Soprano Bella', crew: 'choir', role: 'regular', bio: 'Hits the high coo.', at: { x: 9, z: 277, on: 'ground' }, out: 'any' },
@@ -160,7 +160,7 @@ export const CHARACTERS = {
   // Meer Mob
   bigsal: { name: 'Big Sal', crew: 'meermob', role: 'boss', bio: 'Runs the Meer. Show him your crew.', at: { x: -79, z: 1027 }, out: 'any', voice: 'bigsal' },
   knuckles: { name: 'Knuckles', crew: 'meermob', role: 'regular', bio: 'Tough. Bandana on his head.', at: { x: -76, z: 1029 }, out: 'any' },
-  tiny: { name: 'Tiny', crew: 'meermob', role: 'regular', bio: 'Huge.', at: { x: -83, z: 1026 }, out: 'any' },
+  tiny: { name: 'Tiny', crew: 'meermob', role: 'regular', bio: 'Huge.', at: { x: -82.4, z: 1027.4 }, out: 'any' },   // batch-3: out of the Blockhouse's wall
   feathers: { name: 'Sister Feathers', crew: 'meermob', role: 'regular', bio: 'The brains. Counts heads.', at: { x: -80, z: 1023 }, out: 'any' },
   // Bodega Cats
   queenie: { name: 'Queenie', crew: 'cats', role: 'boss', bio: 'A regal tabby. Wants a hot anchovy slice.', at: { x: 61, z: 1066.3 }, out: 'any', voice: 'queenie' },
@@ -180,8 +180,8 @@ export const CHARACTERS = {
   // The Honk
   gertrude: { name: 'Gertrude', crew: 'geese', role: 'boss', bio: 'A Canada goose. LOUD.', at: { x: -33, z: 316, on: 'water:lake' }, out: 'day', voice: 'gertrude' },
   gander: { name: 'Lieutenant Gander', crew: 'geese', role: 'regular', bio: 'Her enforcer.', at: { x: -37, z: 318, on: 'water:lake' }, out: 'day' },
-  stilts: { name: 'Stilts', crew: 'geese', role: 'regular', bio: 'A great blue heron. Very Zen.', at: { x: -66, z: 866 }, out: 'day' },
-  nightcap: { name: 'Nightcap', crew: 'geese', role: 'regular', bio: 'A black-crowned night heron.', at: { x: -60, z: 330 }, out: 'dusk' },
+  stilts: { name: 'Stilts', crew: 'geese', role: 'regular', bio: 'A great blue heron. Very Zen.', at: { x: -64.9, z: 860.1, shore: true }, out: 'day' },   // batch-3 (#1): wading at the Pool's edge (was under it)
+  nightcap: { name: 'Nightcap', crew: 'geese', role: 'regular', bio: 'A black-crowned night heron.', at: { x: -70.5, z: 317.9, shore: true }, out: 'dusk' },   // batch-3 (#1): at the Lake's edge (was 15 m out, under it)
   // humans with names
   walter: { name: 'Walter', role: 'human', bio: 'The Fifth Avenue doorman. Takes hot slices.', at: { x: 129, z: 318.6 }, out: 'any' },
   prickett: { name: 'Del Prickett', role: 'human', bio: 'Prickett Pest-Pro. Cheerful, relentless, on contract.', at: { x: 88, z: -14 }, out: 'any' },
@@ -218,7 +218,7 @@ export const CROWD_HAUNTS = {
   turtles: [{ kind: 'roof', x: 8.8, z: 432.6, r: 2, n: 12 }, { kind: 'water', water: 'turtle', x: 8, z: 430, r: 14, n: 4 }, { kind: 'water', water: 'lake', x: -40, z: 330, r: 20, n: 4 }],
   swells: [{ kind: 'ring', x: 97, z: -40, rMin: 6, rMax: 10.5, n: 20 }],
   choir: [{ kind: 'lawn', x: 6.6, z: 270, r: 10, n: 20 }],
-  racers: [{ kind: 'line', a: { x: -40, z: 572 }, b: { x: 40, z: 572 }, n: 20 }],
+  racers: [{ kind: 'line', a: { x: -40, z: 563 }, b: { x: 40, z: 563 }, n: 20 }],   // batch-3 (#1): z 572 ran through the Reservoir
   meermob: [{ kind: 'lawn', x: -76, z: 1024, r: 12, n: 10 }, { kind: 'lawn', x: 64, z: 958, r: 12, n: 10 }],
   dogs: [{ kind: 'lawn', x: 44, z: 380, r: 18, n: 9 }, { kind: 'line', a: { x: 70, z: 320 }, b: { x: 72, z: 440 }, n: 8 }],
   owls: [{ kind: 'trees', x: -44, z: 391, r: 15, n: 1, y: 4 }],
@@ -237,7 +237,8 @@ export const CROWD_HAUNTS = {
     { kind: 'water', water: 'lake', x: -35, z: 318, r: 25, n: 10 }, { kind: 'lawn', x: -6.6, z: 489, r: 36, n: 14 },
     { kind: 'water', water: 'reservoir', x: 0, z: 662, r: 70, n: 8 }, { kind: 'water', water: 'meer', x: 64, z: 1000, r: 25, n: 8 },
   ],
-  herons: [{ kind: 'lawn', x: -66, z: 866, r: 6, n: 1 }, { kind: 'lawn', x: -62, z: 330, r: 8, n: 1 }, { kind: 'lawn', x: -70, z: 340, r: 12, n: 6, night: true }],
+  // batch-3 (#1): on the shore (they stood in the Pool and the Lake)
+  herons: [{ kind: 'lawn', x: -65.3, z: 858, r: 3, n: 1 }, { kind: 'lawn', x: -46, z: 349, r: 3, n: 1 }, { kind: 'lawn', x: -78.5, z: 351.7, r: 6, n: 6, night: true }],
 };
 
 // ------------------------------------------------------------------ lines

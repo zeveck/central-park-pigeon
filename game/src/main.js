@@ -497,6 +497,33 @@
 //   - #4 flightHints(): in flight the rows always show ('off' hides); learnt rows dim (.lt); Drop while carrying; Peck over water.
 //   - #13 systems/open-sky.js (G.openSky; tick in gameplay, render in frameUi, reset in abandonScene): see its header. gus.skyMul;
 //     audio.js swell(dur) → { stop } and synth 'warpArrive'; ui.css #opensky, #warpfx.
+//
+// Batch-3 notes, the world holds together (#1 water, #7 grounding, #17 bridges; design/changes/batch-3.md, audit
+// design/reviews/batch-3-grounding.md, shots design/screenshots/batch-3c/). Shared-file edits:
+//   - systems/collision.js: groundFor(x, z, yRef) is the one ground rule for walkers (surface(), but water is a floor for everyone:
+//     surface() drops a water body more than a step above yRef, and walkers seeded with terrain.heightAt walked the lake bed);
+//     floorAt (the seed: terrain, a bridge deck or the water, never a roof), standable / clearNear (a person's spot, deterministic),
+//     walkBlocked / walkFloor (the crowds: 0.5 m cells cached in 16 m tiles, forgotten when a shape is added there), deckAt.
+//   - world/terrain.js step 7: every stone and transverse bridge deck height is fixed there (bridgeDecks: the old formula) and the
+//     ground is ramped to it at both ends (up to 26 m for the 5.8 m step at the 79th St cut by Belvedere); terrain.deckTops →
+//     ctx.deckTops (here) → landmarks.js builds the decks at those heights, caps the cut walls under a deck, and leaves a gap in the
+//     walls where a shallow crossing has no bridge.
+//   - humans.js: homes on water / in solids move to the nearest standable spot (no random draw); wander targets must be standable
+//     (same draws); flee targets clearNear; wander/goto steps stop at the water and pushOut of walls (a goto blocked 1 s is done);
+//     heights by groundFor; leash dogs by groundFor and never onto water or into solids. Loops (jog, path, route) keep their data.
+//   - crowds.js: spawns, wander/scatter/greet targets and every step keep to walkBlocked cells (a roof animal to its roof), the
+//     height follows walkFloor each step (it was fixed at spawn: dogs floating downhill, squirrels inside hills), and an animal
+//     found in a blocked cell (something built after it spawned) moves to clear ground. Crowds feed no gameplay.
+//   - characters.js: #resolve uses groundFor; walk/hop/waddle/slink/road/bound tweens follow the ground (not a straight line
+//     through a hill); the water talk reach is 4.5 m while Gus floats (3.4 m otherwise) and def.at.shore gives it to the shore birds.
+//   - data: the Pond's picnickers (+ benches) and parkgoers, the Conservatory kid, the Meer parkgoers, the racers' line, the
+//     herons, Nightcap, Stilts, Slowpoke (to the bank, shore: true), Mama Mask and Tiny moved to dry, clear ground.
+//   - entities/gus.js: gus.floating (walk mode on the water): see FLOAT there. The edge is a wall on foot (event 'edge'), a gentle
+//     arrival floats him (event 'float', not 'land'), a fast low touch still splash-bounces, and the water is a floor in flight too
+//     (a steep dive used to pass a step below it and land on the bed). Here: 'edge'/'float' splashes, and flightHints() shows
+//     "Flap to take off" + the Peck line while afloat (hudView hides the context prompt meanwhile: they overlapped on a phone).
+//   - debug only: src/debug/ground-audit.js (runGroundAudit: every walker's feet for ~60 s, and each bridge end's step) and
+//     src/debug/float-checks.js (every water conversation from the water; edge, settle, paddle, drop, take-off, skim).
 import * as THREE from 'three';
 import { choosePreset, PRESETS, AutoProbe, savePreset } from './presets.js';
 import { Progress, TextureStore } from './gfx/textures.js';
@@ -1077,6 +1104,8 @@ async function boot() {
     for (const e of gus.takeEvents()) {
       if (e.type === 'leaves') { particles.leafBurst(e.x, e.y, e.z); audio.play('leaves-crunch', { at: e, vol: 0.6 }); }
       else if (e.type === 'splash') { particles.splash(e.x, e.y, e.z); audio.play('splash-hop', { at: e }); }
+      else if (e.type === 'edge') { particles.splash(e.x, e.y, e.z, 6); audio.play('splash-hop', { at: e, vol: 0.35 }); }   // Batch-3 (#1): the water's edge stops him
+      else if (e.type === 'float') { particles.splash(e.x, e.y, e.z, 14); audio.play('splash-hop', { at: e, vol: 0.7 }); }   // Batch-3 (#1): he settles on the water
       else if (e.type === 'boost') { audio.play('whoosh', { at: p, rate: 1.1 }); if (gus.input === input) learnHint('boost'); }
       else if (e.type === 'bump') { audio.synth('tick'); G.rumble(0.2, 0.1, 80); }
       else if (e.type === 'ceiling') { particles.burst('feathers', e.x, e.y + 0.2, e.z, 4); if (!G.saidCeiling) { G.saidCeiling = true; G.toast('Oof. Too heavy to go higher.'); } }   // fun pass (P10)
@@ -1652,6 +1681,7 @@ async function boot() {
     // Fixes-2: no second "□ the sign" bubble while the context prompt already says "□ Peck the sign"
     const tutor = tu && !G.dialogue.open && !G.wheel.open && !(tu.action === 'peck' && G.interact.prompt && !G.cutscene.locked) ? `${glyph(tu.action, dev, fam)}<span>${tu.text}</span>` : '';
     const flight = flightHints(dev, fam, tutor, dt);   // Flight hint / scarf: the fixed strip at the bottom (replaces the floating "C Land")
+    if (flight && gus.floating) prompt = '';   // Batch-3 (#1): afloat, the strip carries the Peck too (the two overlapped on a phone)
     return {
       stamina: gus.stamina, boosting: gus.boostT > 0, portrait: G.gusPortrait(),   // polish: the HUD circle is always Gus (it previewed the wheel's selected ally, which read as the player changing; the wheel itself shows the pick)
       device: dev, family: fam, feathers: st.feathers,
@@ -1674,6 +1704,15 @@ async function boot() {
   let hintWaterT = 0;
   function flightHints(dev, fam, tutor, dt = 0) {
     const mode = G.settings.controlHints || 'auto';
+    // Batch-3 (#1): afloat on the water, the strip says how to leave it (and that the swimmers can be talked to)
+    if (gus.floating && gus.mode === 'walk' && mode !== 'off' && !(G.vehicles.driving || G.cutscene.locked || G.dialogue.open || G.wheel.open || G.altView || tutor || G.mods.some((m) => m.panel?.()))) {
+      if (dev === 'touch') return `<span class="t">Tap${glyph('flap', dev, fam)}to take off</span>` + (G.interact.label ? `<span>${glyph('peck', dev, fam)}${G.interact.label}</span>` : '');
+      // one strip: take off, and what Peck does here (the context prompt's own line; hudView hides that bubble meanwhile)
+      const rows = [['flap', 'Flap to take off']];
+      if (G.interact.label) rows.push(['peck', G.interact.label]);
+      if (G.state.carried) rows.push(['drop', 'Drop']);
+      return rows.map(([a, label]) => `<span>${glyph(a, dev, fam)}${label}</span>`).join('');
+    }
     if (mode === 'off' || gus.mode !== 'fly' || gus.modeT < 0.5 || G.vehicles.driving || G.cutscene.locked || G.dialogue.open || G.wheel.open || G.altView || tutor) return '';
     if (G.mods.some((m) => m.panel?.())) return '';
     if (dev === 'touch') return `<span class="t">Tap${glyph('dive', dev, fam)}to land</span>`;
