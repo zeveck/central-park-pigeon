@@ -116,9 +116,14 @@ export class Collect {
     st.flockFrom['stray:' + s.def.id] = 1;
     G.flock.setRoster(st.flockFrom);
     G.audio.play('coo-gather', { at: s.p });
-    G.particles.burst('feathers', s.p.x, s.p.y + 0.2, s.p.z, 8);
     G.bubbles.add(STRAY_LINES[this.C.strays.length % STRAY_LINES.length], { at: { x: s.p.x, y: s.p.y + 0.6, z: s.p.z }, ttl: 2.6 });
-    G.toast(`A stray joins your flock (${this.C.strays.length}/40)`, { kind: 'stamp' });
+    // batch-3 (#10): it doesn't vanish: a coo, a hop where it stands (drawn below), then it flaps up and flies to its
+    // place in the flock (flock.arrive); the stamp toast comes when it gets there. The state, the bus event and the
+    // autosave stay right here, at the Peck, as before (nothing waits on the toast).
+    const HOP = 0.36, n = this.C.strays.length, state = st;
+    s.leaving = 0; s.hop = HOP;
+    G.flock.arrive(s.p, { delay: HOP, layer: this.strayLayers?.[s.i], sheen: this.straySheen?.subarray(s.i * 3, s.i * 3 + 3), particles: G.particles,
+      onArrive: () => { if (G.state === state) { G.toast(`A stray joins your flock (${n}/40)`, { kind: 'stamp' }); G.audio.play('coo', { at: G.gus.position }); } } });
     G.bus.emit('stray', { id: s.def.id });
     this.#drawStrays();
     G.autosave('stray');
@@ -129,11 +134,13 @@ export class Collect {
     const M = new THREE.Matrix4(), Q = new THREE.Quaternion(), S = new THREE.Vector3(1, 1, 1), P = new THREE.Vector3(), up = new THREE.Vector3(0, 1, 0);
     const g = this.G.gus.position, R = this.strayRange;
     // only the nearest few are drawn (each is a full 6k-triangle pigeon)
-    const near = this.strays.filter((s) => this.#strayHere(s) && Math.abs(s.p.x - g.x) < R && Math.abs(s.p.z - g.z) < R)
+    const near = this.strays.filter((s) => (this.#strayHere(s) || s.leaving != null) && Math.abs(s.p.x - g.x) < R && Math.abs(s.p.z - g.z) < R)
       .map((s) => [Math.hypot(s.p.x - g.x, s.p.z - g.z), s]).filter(([d]) => d < R).sort((a, b) => a[0] - b[0]).slice(0, this.strayCap);
     const geo = this.strayMesh.geometry, la = geo.getAttribute('aLayer'), sh = geo.getAttribute('aSheen');
     near.forEach(([, s], k) => {
-      const bob = Math.abs(Math.sin(this.t * 1.7 + s.bob)) * 0.006;
+      let bob = Math.abs(Math.sin(this.t * 1.7 + s.bob)) * 0.006;
+      // batch-3 (#10): the joining stray's hop, a crouch then a little jump, before the flock's flyer takes over
+      if (s.leaving != null) { const k = s.leaving / s.hop; bob = k < 0.3 ? -0.02 * Math.sin(Math.PI * k / 0.3) : 0.16 * Math.sin(Math.PI * (k - 0.3) / 0.7); }
       M.compose(P.set(s.p.x, s.p.y + bob, s.p.z), Q.setFromAxisAngle(up, s.yaw + Math.sin(this.t * 0.4 + s.bob) * 0.6), S);
       this.strayMesh.setMatrixAt(k, M);
       if (la) { la.array[k] = this.strayLayers[s.i]; sh.array.set(this.straySheen.subarray(s.i * 3, s.i * 3 + 3), k * 3); }
@@ -429,6 +436,7 @@ export class Collect {
   // ------------------------------------------------------------ the fixed update
   update(dt) {
     this.t += dt;
+    if (this.strays) for (const s of this.strays) if (s.leaving != null && (s.leaving += dt) >= s.hop) { s.leaving = null; this.G.audio.play('flap', { at: s.p }); }   // batch-3 (#10)
     if (this.ride) this.#rideTick(dt);
     if (this.G.blockNapFor > 0) this.G.blockNapFor -= dt;
     this.#drawStrays();

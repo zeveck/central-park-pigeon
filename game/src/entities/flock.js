@@ -11,6 +11,13 @@
 //
 // Coo: a tap bursts the flock out and lets it regather; a hold sends it to
 // swarm a point ahead of Gus.
+//
+// Batch-3 (#10): arrive(p) flies a newly joined stray in from where it stood: hidden for `delay` (the stray's own
+// hop, drawn by collect.js), a flap straight up with a feather puff, then a ~1 s arc to its slot, which keeps moving
+// with Gus, so a flying Gus is caught up with. The flock opens out a little meanwhile. Past the drawn cap a temporary
+// flyer (one instance on the flock's geometry and material: no new shader) does the flight and vanishes into the
+// flock beside a drawn bird. onArrive fires on arrival (collect.js shows the toast then). Visual only: nothing in the
+// game reads a flock bird's position.
 
 import * as THREE from 'three';
 import { addWingPhaseAttribute } from '../anim/wingbeat.js';
@@ -94,6 +101,76 @@ export class Flock {
     this.burstT = 0;
     this.swarm = null;    // { point, t }
     this.roster = [];
+    // batch-3 (#10): arrivals in flight and the temporary flyer for a bird past the drawn cap
+    this.arrivals = [];
+    this.widenT = 0;
+    this.flyer = new THREE.InstancedMesh(geo, material, 1);
+    this.flyer.name = 'flock-flyer';
+    this.flyer.frustumCulled = false;
+    this.flyer.visible = false;
+    this.mesh.add(this.flyer);
+  }
+
+  /**
+   * batch-3 (#10): a stray that just joined (setRoster already counts it) flies in from p. opts: delay (s, hidden
+   * while the stray hops), layer / sheen (its colour, kept from the stray), onArrive(), particles (G.particles).
+   */
+  arrive(p, { delay = 0, layer = null, sheen = null, onArrive = null, particles = null } = {}) {
+    const n = this.count;
+    // the newest seat is the last of the active slots when the flock grew; past the cap there is no new seat
+    const grew = n > 0 && n <= this.capacity && this.total <= this.capacity;
+    const idx = grew ? n - 1 : -1;
+    const bird = grew ? this.birds[this.active[idx]] : null;
+    const A = { p: new THREE.Vector3(p.x, p.y, p.z), t: -delay, bird, idx, onArrive, particles, up: 1.3, from: null, done: false };
+    if (bird) {
+      bird.pos.copy(A.p); bird.vel.set(0, 0.01, 0);
+      bird.arriving = A;
+      const L = this.mesh.geometry.attributes.aLayer, S = this.mesh.geometry.attributes.aSheen;
+      if (L && layer != null) { L.array[idx] = layer; L.needsUpdate = true; this.roster[idx] = { ...this.roster[idx], layer }; }
+      if (S && sheen) { S.array.set(sheen, idx * 3); S.needsUpdate = true; }
+    } else {
+      // past the cap: the flyer, merging into a drawn bird at the end (its colour is that bird's: instance 0's attributes)
+      A.flyer = true;
+      A.target = this.active?.length ? this.birds[this.active[this.active.length - 1]] : null;
+      A.pos = A.p.clone(); A.vel = new THREE.Vector3();
+    }
+    this.arrivals.push(A);
+    return A;
+  }
+
+  /** Finish every arrival now (a teleport, a load): their callbacks fire, birds return to the flock. */
+  #finishArrivals() {
+    for (const A of this.arrivals) this.#arrived(A);
+    this.arrivals.length = 0;
+    this.flyer.visible = false;
+  }
+
+  #arrived(A) {
+    if (A.done) return;
+    A.done = true;
+    if (A.bird) A.bird.arriving = null;
+    A.onArrive?.();
+  }
+
+  /** The arc's point and velocity at time t ≥ 0: up (flap-up), then a 1 s curve from the top of it to the slot. */
+  #arcAt(A, t, target, out) {
+    const UP = 0.32, ARC = 1.0;
+    if (t < UP) {
+      const k = t / UP, e = 1 - (1 - k) * (1 - k);
+      out.copy(A.p); out.y += A.up * e;
+      return false;
+    }
+    const top = _tmp.copy(A.p); top.y += A.up;
+    const k = Math.min(1, (t - UP) / ARC), e = k * k * (3 - 2 * k);
+    // a quadratic curve: the control point above the middle, so it climbs and swings in
+    const cx = (top.x + target.x) / 2, cz = (top.z + target.z) / 2;
+    const cy = Math.max(top.y, target.y) + 1.2 + 0.08 * Math.hypot(target.x - top.x, target.z - top.z);
+    const u = 1 - e;
+    const px = u * u * top.x + 2 * u * e * cx + e * e * target.x;
+    const py = u * u * top.y + 2 * u * e * cy + e * e * target.y;
+    const pz = u * u * top.z + 2 * u * e * cz + e * e * target.z;
+    out.set(px, py, pz);
+    return k >= 1;
   }
 
   /**
@@ -151,6 +228,7 @@ export class Flock {
 
   /** Put every bird at its slot around the leader right now (after a teleport). */
   place(leader) {
+    this.#finishArrivals();   // batch-3 (#10)
     for (const b of this.birds) {
       this.#slotWorld(b, leader, b.pos);
       b.vel.set(Math.sin(leader.yaw), 0, Math.cos(leader.yaw)).multiplyScalar(Math.max(4, leader.velocity.length()));
@@ -165,17 +243,21 @@ export class Flock {
     if (leader.grounded) {
       const o = b.orbit;
       const a = o.phase + o.dir * this.time * 0.45;
-      const k = this.burstT > 0 ? 2.6 : 1;
+      const k = this.burstT > 0 ? 2.6 : this.#widen();
       return out.set(Math.cos(a) * o.r * k, o.h * (this.burstT > 0 ? 1.8 : 1), Math.sin(a) * o.r * k).add(leader.position);
     }
     const c = Math.cos(leader.yaw), s = Math.sin(leader.yaw);
-    const k = this.burstT > 0 ? 2.4 : 1;
+    const k = this.burstT > 0 ? 2.4 : this.#widen();
     return out.set((b.slot.x * c + b.slot.z * s) * k, b.slot.y * k, (-b.slot.x * s + b.slot.z * c) * k).add(leader.position);
   }
+
+  /** batch-3 (#10): the flock opens out (up to 1.35×) while a newcomer flies in, and closes up again after. */
+  #widen() { return 1 + 0.35 * Math.min(1, this.widenT / 0.4); }
 
   /** leader: {position, velocity, yaw, grounded}; avoid: optional point to keep clear of (the camera). */
   update(dt, leader, avoid = null) {
     if (this.burstT > 0) this.burstT -= dt;
+    if (this.arrivals.length) this.widenT = Math.min(1.2, this.widenT + dt * 2); else if (this.widenT > 0) this.widenT = Math.max(0, this.widenT - dt * 0.8);
     if (this.swarm) { this.swarm.t -= dt; if (this.swarm.t <= 0) this.swarm = null; }
     const act = this.active || [];
     const birds = act.map((i) => this.birds[i]);
@@ -185,6 +267,7 @@ export class Flock {
     for (let i = 0; i < birds.length; i++) {
       const b = birds[i];
       this.#slotWorld(b, leader, _target);
+      if (b.arriving && this.#arriveStep(b.arriving, dt, _target, leader, b.pos, b.vel, i)) continue;
       _tmp.subVectors(_target, b.pos);
       _steer.copy(_tmp).multiplyScalar(this.swarm ? 2.2 : 1.2).clampLength(0, this.swarm ? 7 : 4);
       if (this.swarm) {
@@ -225,7 +308,10 @@ export class Flock {
       const horiz = Math.hypot(b.vel.x, b.vel.z);
       b.yaw = Math.atan2(b.vel.x, b.vel.z);
       const dy = Math.atan2(Math.sin(b.yaw - prevYaw), Math.cos(b.yaw - prevYaw));
-      b.bank = THREE.MathUtils.lerp(b.bank, THREE.MathUtils.clamp(-dy / dt * 0.35, -0.9, 0.9), Math.min(1, dt * 4));
+      // batch-3: a zero-dt update (debug goToScheme / the finale's goTo call G.update(0)) made this 0/0 = NaN for good, and
+      // the whole flock vanished (NaN matrices); now it holds its bank
+      if (dt > 0) b.bank = THREE.MathUtils.lerp(b.bank, THREE.MathUtils.clamp(-dy / dt * 0.35, -0.9, 0.9), Math.min(1, dt * 4));
+      if (!Number.isFinite(b.bank)) b.bank = 0;
       const climb = Math.atan2(b.vel.y, horiz);
       _e.set(this.pitch - climb * 0.6, b.yaw, b.bank);
       _q.setFromEuler(_e);
@@ -234,8 +320,63 @@ export class Flock {
       this.mesh.setMatrixAt(i, _m);
     }
     this.mesh.instanceMatrix.needsUpdate = true;
+    this.#flyerStep(dt, leader);
     this.time += dt;
     if (this.wingbeat) this.wingbeat.advance(dt, this.swarm ? 7 : leader.grounded ? 4.5 : 5);
+  }
+
+  /** batch-3 (#10): one update of an arrival; writes pos/vel and (for a flock bird) its instance matrix. True while
+   *  the arrival owns the bird (the boids skip it). */
+  #arriveStep(A, dt, target, leader, pos, vel, i) {
+    if (A.done) return false;
+    A.t += dt;
+    const draw = (m, k) => {
+      const horiz = Math.hypot(vel.x, vel.z);
+      const yaw = horiz > 0.4 ? Math.atan2(vel.x, vel.z) : Math.atan2(target.x - pos.x, target.z - pos.z);
+      A.yaw = yaw;
+      const climb = Math.atan2(vel.y, Math.max(horiz, 1e-4));
+      _e.set(this.pitch - THREE.MathUtils.clamp(climb, -0.6, 1.2) * 0.6, yaw, 0);
+      _q.setFromEuler(_e);
+      _s.setScalar(A.t < 0 ? 0 : this.scale);
+      _m.compose(pos, _q, _s).multiply(this.centerOffset);
+      m.setMatrixAt(k, _m);
+    };
+    if (A.t < 0) { pos.copy(A.p); vel.set(0, 0.01, 0); if (i >= 0) draw(this.mesh, i); return true; }
+    if (!A.puffed) { A.puffed = true; A.particles?.burst('feathers', A.p.x, A.p.y + 0.15, A.p.z, 10); }
+    const prev = pos.clone();
+    const end = this.#arcAt(A, A.t, target, pos);
+    vel.copy(pos).sub(prev).divideScalar(Math.max(dt, 1e-4));
+    if (i >= 0) draw(this.mesh, i);
+    else draw(this.flyer, 0);
+    if (end) {
+      // hand back to the boids moving with the leader, so it doesn't stall in its slot
+      vel.copy(leader.velocity).add(_tmp.set(0, 0.2, 0));
+      if (vel.lengthSq() < 4) vel.setLength(2.5);
+      this.#arrived(A);
+      return false;
+    }
+    return true;
+  }
+
+  #flyerStep(dt, leader) {
+    if (!this.arrivals.length) return;
+    let any = false;
+    for (const A of this.arrivals) {
+      if (A.done) continue;
+      if (A.bird) {
+        // its seat was reshuffled away (the roster changed mid-flight): finish on time anyway
+        if (!(this.active || []).some((k) => this.birds[k] === A.bird)) { A.t += dt; if (A.t > 1.4) this.#arrived(A); }
+        continue;
+      }
+      // past the cap: aim at a drawn bird (or the leader), vanish into it on arrival
+      const tgt = A.target && (this.active || []).some((k) => this.birds[k] === A.target) ? A.target.pos : leader.position;
+      _target.copy(tgt);
+      if (!this.#arriveStep(A, dt, _target, leader, A.pos, A.vel, -1)) continue;
+      any = true;
+    }
+    this.flyer.visible = any;
+    if (any) this.flyer.instanceMatrix.needsUpdate = true;
+    this.arrivals = this.arrivals.filter((A) => !A.done);
   }
 
   /** The birds as drawn (debug): index → { layer, gang, dove, nearSlot }. */
