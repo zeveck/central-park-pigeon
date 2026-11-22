@@ -479,6 +479,24 @@
 //   - schemes/den-cats.js: an anchovy left lying 90 s with Gus far away floats back (the sill refills). entities/vehicles.js
 //     onNap: Vinnie's rigged cart / the pedicab left away from home is towed back while its scheme is open.
 //   - tools/check-schemes.mjs 5c: every step that needs a one-time item has an ITEM_SOURCES rule.
+// Batch-2 notes, part A (#5 hop, #2 landing, #18 jitter, #4 flight strip, #13 open sky; design/changes/batch-2.md; shots
+// design/screenshots/batch-2a/). Shared-file edits:
+//   - #5 entities/gus.js mode 'hop': a Flap tap on ordinary ground hops (~1 m up, ~1.9 m on, then walking). Decided when the
+//     0.14 s squash ends: held or pressed again → the old take-off, no added delay; a press mid-hop takes off. Here: hopAllowed()
+//     (gus.hopOk, set on the ground press: not carrying, no scene/script/panel/wheel/drive, no step.flight or reach alt); gus.js
+//     #hopGround() adds terrain only, no water, drop or step just ahead. A hop's touchdown is a 'land' event with hop: true: soft
+//     sound only, no bus event (no scheme, spike or postcard sees it); saved as 'walk'. Touch double-tap Boost waits 0.5 s
+//     after liftoff (gus.liftT). REPLAYS: G.legacyTakeoff (debug.js replay(frames, { version }): no version → legacy, never hops);
+//     sf-run record writes version 2; the autopilot holds Flap through the squash ({ hop: true } goals may tap); human-check
+//     holds 12 frames. Checks: node game/tools/sf-run.mjs check hop (src/debug/hop-checks.js). Prologue tutor "hold to fly".
+//   - #2 gus.js landEase: the landing snap is eased on standPose (render only, 0.24 s, from last update's drawn spot; squash
+//     after). Also gus.js tap-to-land read input.locked (= POINTER LOCK) as "scene lock", so on desktop with mouse look the tap
+//     never latched: now LOCKED_INPUT.scripted. Headless replays never lock the pointer: unchanged.
+//   - #18 the frame loop calls syncCameras() before frameUi (bubbles/prompts used last frame's camera: ~12 px lag in a turn, now
+//     <0.5 px); debug step() too. input.js: mouse jitter (<24 px in 0.5 s) doesn't switch a controller player to keyboard glyphs.
+//   - #4 flightHints(): in flight the rows always show ('off' hides); learnt rows dim (.lt); Drop while carrying; Peck over water.
+//   - #13 systems/open-sky.js (G.openSky; tick in gameplay, render in frameUi, reset in abandonScene): see its header. gus.skyMul;
+//     audio.js swell(dur) → { stop } and synth 'warpArrive'; ui.css #opensky, #warpfx.
 import * as THREE from 'three';
 import { choosePreset, PRESETS, AutoProbe, savePreset } from './presets.js';
 import { Progress, TextureStore } from './gfx/textures.js';
@@ -524,7 +542,8 @@ import { boardScreen } from './ui/board.js';
 import { mapScreen, renderMapImage, FogOfWar } from './ui/map.js';
 import { rosterScreen } from './ui/roster.js';
 import { Wheel } from './ui/wheel.js';
-import { Guide } from './ui/guide.js';   // guidance: the soft marker, "Where to?", "Something to do"
+import { Guide } from './ui/guide.js';
+import { OpenSky } from './systems/open-sky.js';   // Batch-2 (#13)   // guidance: the soft marker, "Where to?", "Something to do"
 import { glyph } from './ui/glyphs.js';
 import { Interact } from './systems/interact.js';
 import { Items, grateBlockedReason } from './systems/items.js';
@@ -890,6 +909,7 @@ async function boot() {
   G.bubbles = new Bubbles();
   G.wheel = new Wheel(G);
   G.guide = new Guide(G);   // guidance (UI only)
+  G.openSky = new OpenSky(G);   // Batch-2 (#13)
   G.menus = new Menus(G);
   for (const f of [titleScreen, pauseScreen, settingsScreen, controlsScreen, creditsScreen, confirmScreen, slotsScreen, napScreen, nestScreen, scarfScreen, grateScreen, boardScreen, mapScreen, rosterScreen]) G.menus.add(f(G));
   installReport(G);
@@ -977,6 +997,7 @@ async function boot() {
     const driving = G.vehicles.driving;
     if (driving) G.vehicles.drive(dt, control ? input : LOCKED_INPUT, rig.yaw);
     else gus.update(dt, rig.yaw);
+    G.openSky.tick(dt);   // Batch-2 (#13): the badge, the ×2 and the warp (far outside WORLD only)
     // the lamppost wobble in the first minute
     if (G.wobble > 0) { G.wobble -= dt; gus.root.rotation.z = Math.sin(G.wobble * 22) * 0.06 * G.wobble; }
     gusEvents(prevMode, dt);
@@ -1413,6 +1434,7 @@ async function boot() {
     G.slowT = 0; G.hitStop = 0; G.shakeT = 0;
     rig.setFree(null);
     G.dialogue.clear(); G.bubbles.clear();
+    G.openSky?.reset();   // Batch-2 (#13)
     TouchControls.current?.setLabels(null);
     savePending = null;
   };
@@ -1711,6 +1733,7 @@ async function boot() {
       G.hud.update(dt, hudView());
       G.bubbles.render(project);
     }
+    G.openSky.render(dt);   // Batch-2 (#13): the badge and the shimmer (render only)
     G.guide.render(project);   // guidance: the world marker, the "Where to?" line, the "Something to do" card
     audio.setListener(dataCam.position.x, dataCam.position.y, dataCam.position.z, Math.atan2(gus.position.x - dataCam.position.x, gus.position.z - dataCam.position.z));
     audio.update(dt);

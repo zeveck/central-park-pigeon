@@ -440,6 +440,38 @@ export class AudioEngine {
     s.start(t);
   }
 
+  /** Batch-2 (#13): a rising shimmer over `dur` s (the open-sky warp). Returns { stop() } (a fade), or null without audio. */
+  swell(dur = 2.6) {
+    const c = this.ctx;
+    if (!c) return null;
+    const t = c.currentTime;
+    const g = c.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.16, t + dur);
+    g.connect(this.busSfx);
+    const oscs = [196, 293.66, 392, 587.33].map((f, i) => {
+      const o = c.createOscillator();
+      o.type = i % 2 ? 'triangle' : 'sine';
+      o.frequency.setValueAtTime(f, t);
+      o.frequency.exponentialRampToValueAtTime(f * 2, t + dur);
+      o.detune.value = (i - 1.5) * 7;
+      const lfo = c.createOscillator(), lg = c.createGain();
+      lfo.frequency.value = 5 + i * 1.3; lg.gain.value = 14;
+      lfo.connect(lg).connect(o.detune);
+      o.connect(g); o.start(t); lfo.start(t);
+      return [o, lfo];
+    });
+    let done = false;
+    const stop = () => {
+      if (done) return; done = true;
+      const n = c.currentTime;
+      g.gain.cancelScheduledValues(n); g.gain.setTargetAtTime(0.0001, n, 0.08);
+      for (const [o, l] of oscs) { o.stop(n + 0.5); l.stop(n + 0.5); }
+    };
+    setTimeout(stop, (dur + 0.4) * 1000);   // never outlives its build (the warp itself stops it first)
+    return { stop };
+  }
+
   /** Synthesized sounds. kind: uiMove uiSelect uiBack tick staminaLow ding napChime phoneRing carAlarm jingle bikeBell boing meterTick. wobble: Mimic's pitch wobble. */
   synth(kind, { wobble = false, vol = 1 } = {}) {
     if (!this.ctx) return;
@@ -473,6 +505,7 @@ export class AudioEngine {
         lfo.start(); lfo.stop(this.ctx.currentTime + 0.5);
         break;
       }
+      case 'warpArrive': [392, 523.25, 783.99, 1046.5].forEach((f, i) => this.#tone({ type: 'sine', f: f * 1.5, f2: f, t0: i * 0.05, dur: 1.1, vol: 0.09 * vol, detune: (i - 1.5) * 9 })); this.#noise({ dur: 0.5, vol: 0.05 * vol, hp: 5000 }); break;   // Batch-2 (#13)
       case 'whistle': this.#tone({ f: 2300, f2: 2600, dur: 0.35, vol: 0.12 * vol, detune: dt() }); this.#tone({ f: 2600, f2: 2000, t0: 0.4, dur: 0.4, vol: 0.12 * vol }); break;
       default: break;
     }

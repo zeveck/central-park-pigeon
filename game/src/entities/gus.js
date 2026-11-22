@@ -413,6 +413,7 @@ export class Gus {
     const lim = this.carryLimits;
     if (lim) this.boostT = 0;   // a heavy item: low and slow
     let targetSpeed = this.boostT > 0 ? FLY.boost : landing ? LAND.speed : diving ? FLY.dive : amount > 0.1 ? FLY.cruise : FLY.glide;
+    if (this.skyMul > 1) targetSpeed *= this.skyMul;   // Batch-2 (#13): Open sky (main.js sets it far outside the city), before the heavy clamp
     if (lim) targetSpeed = Math.min(targetSpeed, lim.maxSpeed);
     this.speed = approach(this.speed, targetSpeed, this.boostT > 0 ? 4 : landing ? 2.5 : diving ? 1.8 : 1.6, dt);
     const targetVy = landing ? -LAND.sink : diving ? -FLY.diveSink : flapping ? FLY.climb : -FLY.glideSink;

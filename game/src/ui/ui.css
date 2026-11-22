@@ -152,6 +152,14 @@ svg.pad { display: inline-block; width: 1.6em; height: 1.6em; vertical-align: mi
 #flighthints > span.t { padding-left: 12px; }
 #flighthints > span.lt { font-size: 13px; opacity: 0.7; padding: 3px 10px 3px 5px; }   /* Batch-2 (#4): learnt rows dim, never go */
 #flighthints > span.lt .key, #flighthints > span.lt .padpill { font-size: 11px; }
+/* Batch-2 (#13): Open sky badge and the warp shimmer */
+#opensky { position: fixed; top: calc(64px + var(--safe-t, 0px)); left: 50%; transform: translateX(-50%); z-index: 8; display: flex; gap: 8px; align-items: baseline; padding: 5px 14px; border-radius: 16px; background: linear-gradient(90deg, rgba(90, 160, 255, 0.78), rgba(160, 110, 255, 0.78)); color: #fff; font-family: 'Fredoka', sans-serif; font-size: 17px; letter-spacing: 0.02em; box-shadow: 0 2px 12px rgba(80, 120, 255, 0.45); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.5s ease, visibility 0s linear 0.5s; }
+#opensky.on { opacity: 1; visibility: visible; transition: opacity 0.5s ease, visibility 0s; }
+#opensky span { font-weight: 700; color: #fff7b0; }
+body.cine #opensky { opacity: 0; }
+#warpfx { position: fixed; inset: 0; z-index: 7; pointer-events: none; opacity: 0; display: none; mix-blend-mode: screen; background: radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0) 30%, rgba(170, 140, 255, 0.55) 70%, rgba(120, 220, 255, 0.85) 100%), repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12) 0 6px, rgba(255, 255, 255, 0) 6px 18px); animation: warpfx 1.1s linear infinite; }
+#warpfx.on { display: block; }
+@keyframes warpfx { from { background-size: 100% 100%, 100% 100%; } 50% { background-size: 112% 112%, 130% 130%; } to { background-size: 100% 100%, 100% 100%; } }
 #flighthints .key, #flighthints .padpill { font-size: 13px; }
 body.cine #flighthints { opacity: 0; }
 #tutor::after { content: ''; position: absolute; left: 50%; bottom: -9px; margin-left: -9px; border: 9px solid transparent; border-bottom: 0; border-top-color: var(--paper); }
