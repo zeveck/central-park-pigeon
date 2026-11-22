@@ -97,7 +97,8 @@ const B = {};
 B['stone-bridge'] = (L, ctx) => {
   const W = local(L);
   const endA = W(0, -L.span / 2 - 1.5), endB = W(0, L.span / 2 + 1.5);
-  const top = Math.max(ctx.heightAt(endA.x, endA.z), ctx.heightAt(endB.x, endB.z)) + 0.35;
+  // batch-3 (#17): the deck height terrain.js worked out (from the ends before it ramped the ground up to it)
+  const top = ctx.deckTops?.[L.id] ?? Math.max(ctx.heightAt(endA.x, endA.z), ctx.heightAt(endB.x, endB.z)) + 0.35;
   const water = ctx.collision.waterAt(L.x, L.z);
   const base = water ? water.level - 0.6 : ctx.heightAt(L.x, L.z) - 0.5;
   const g = archSlab({ span: L.span + 3, y0: base, y1: top, thickness: L.width, openW: L.span * 0.62, springY: base + 0.6, crownY: top - 0.9 });
@@ -697,17 +698,38 @@ export function buildRocks(ctx) {
 export function buildTransverses(ctx, crossings) {
   for (const t of TRANSVERSES) {
     const bed = (x) => -t.depth * smoothstep(0, TRANSVERSE_RAMP, Math.min(x - PARK.xMin, PARK.xMax - x));
+    // batch-3 (#17): where the paths cross. A bridge's deck (terrain.js fixed its height and ramped the ground to it) caps
+    // the walls under it (they poked up through the deck at its ends); a shallow crossing (no bridge) leaves a gap in them
+    const mine = crossings.filter((q) => q.t === t).map((c) => {
+      const deep = -bed(c.x) >= 1.5, w = c.width + 1.6;
+      return { c, deep, w, top: deep ? ctx.deckTops?.[`${t.id}:${Math.round(c.x * 10)}`] : null, x0: c.x - (deep ? w / 2 : c.width / 2 + 0.6), x1: c.x + (deep ? w / 2 : c.width / 2 + 0.6) };
+    });
     // retaining walls, stepped to follow the ground above
     for (const side of [-1, 1]) {
       const wz = t.z + side * (t.halfWidth + 0.35);
-      for (let x = PARK.xMin + 1; x < PARK.xMax - 1; x += 6) {
-        const x1 = Math.min(PARK.xMax - 1, x + 6);
-        const mx = (x + x1) / 2;
-        const top = Math.max(ctx.heightAt(x, wz + side * 2.2), ctx.heightAt(x1, wz + side * 2.2), ctx.heightAt(mx, wz + side * 2.2)) + 0.3;
-        const b = Math.min(bed(x), bed(x1)) - 0.3;
-        if (top - b < 0.5) continue;
-        ctx.batch.box('stone', { x: mx, y: b, z: wz }, { w: x1 - x + 0.02, h: top - b, d: 0.7 });
-        ctx.collision.addBox({ x: mx, z: wz, y0: b, h: top - b, w: x1 - x, d: 0.7, tag: 'cut-wall' });
+      for (let xs = PARK.xMin + 1; xs < PARK.xMax - 1; xs += 6) {
+        const xe = Math.min(PARK.xMax - 1, xs + 6);
+        // the segment, less any shallow crossing's gap; the pieces under a deck end just below it
+        let pieces = [[xs, xe, Infinity]];
+        for (const m of mine) {
+          const next = [];
+          for (const [a, b, cap] of pieces) {
+            if (m.x1 <= a || m.x0 >= b) { next.push([a, b, cap]); continue; }
+            if (m.x0 > a) next.push([a, m.x0, cap]);
+            if (m.deep && m.top != null) next.push([Math.max(a, m.x0), Math.min(b, m.x1), Math.min(cap, m.top - 0.02)]);
+            if (m.x1 < b) next.push([m.x1, b, cap]);
+          }
+          pieces = next;
+        }
+        for (const [x, x1, cap] of pieces) {
+          if (x1 - x < 0.05) continue;
+          const mx = (x + x1) / 2;
+          const top = Math.min(cap, Math.max(ctx.heightAt(x, wz + side * 2.2), ctx.heightAt(x1, wz + side * 2.2), ctx.heightAt(mx, wz + side * 2.2)) + 0.3);
+          const b = Math.min(bed(x), bed(x1)) - 0.3;
+          if (top - b < 0.5) continue;
+          ctx.batch.box('stone', { x: mx, y: b, z: wz }, { w: x1 - x + 0.02, h: top - b, d: 0.7 });
+          ctx.collision.addBox({ x: mx, z: wz, y0: b, h: top - b, w: x1 - x, d: 0.7, tag: 'cut-wall' });
+        }
       }
     }
     // a stone bridge wherever a drive or path crosses
@@ -717,7 +739,7 @@ export function buildTransverses(ctx, crossings) {
       const L = t.halfWidth * 2 + 5;
       const w = c.width + 1.6;
       const yS = ctx.heightAt(c.x, t.z - t.halfWidth - 2.5), yN = ctx.heightAt(c.x, t.z + t.halfWidth + 2.5);
-      const top = Math.max(yS, yN) + 0.15;
+      const top = ctx.deckTops?.[`${t.id}:${Math.round(c.x * 10)}`] ?? Math.max(yS, yN) + 0.15;   // batch-3 (#17): terrain.js's deck height
       const g = archSlab({ span: L, y0: bed(c.x) - 0.2, y1: top, thickness: w, openW: t.halfWidth * 2 - 0.6, springY: bed(c.x) + 2.6, crownY: top - 1.1 });
       ctx.batch.mesh('stone', g, { x: c.x, z: t.z });
       ctx.batch.box(c.drive ? 'asphalt' : 'gravel', { x: c.x, y: top, z: t.z }, { w: w - 0.9, h: 0.02, d: L });

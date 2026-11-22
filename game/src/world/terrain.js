@@ -7,9 +7,11 @@
 //   const terrain = await buildTerrain({ textures });   // CPU data + masks
 //   terrain.heightAt(x, z)                         // matches the rendered triangles exactly
 //   scene.add(terrain.mesh)                        // chunked (128 m), frustum-culled
+//   terrain.deckTops[key]                          // batch-3: each bridge deck's height (the ground is ramped to it)
 
 import * as THREE from 'three';
-import { WORLD, PARK, HILLS, FLATS, TRANSVERSES, TRANSVERSE_RAMP, AVENUE, CITY, GATES } from './layout.js';
+import { WORLD, PARK, HILLS, FLATS, TRANSVERSES, TRANSVERSE_RAMP, AVENUE, CITY, GATES, LANDMARKS } from './layout.js';
+import { findCrossings } from './landmarks.js';   // batch-3 (#17): the bridge approaches
 import { shapes } from './shapes.js';
 import { fbm } from '../core/rng.js';
 import { pointInPoly, smoothstep, lerp, clamp } from '../core/geo.js';
@@ -299,7 +301,69 @@ function computeHeights(S, masks) {
       }
     }
   }
-  return { h, woodsId, waterId, waterOut };
+
+  // 7. Batch-3 (#17): bridge approaches. Each stone bridge's and transverse bridge's deck height is fixed here, from the
+  // ground at its ends exactly as landmarks.js used to work it out (the higher end + 0.35 / + 0.15), and the ground at both
+  // ends is ramped to it, so nobody steps (or is stuck) at a deck end. landmarks.js builds the decks at these heights.
+  const decks = bridgeDecks(S, (x, z) => sampleH(h, x, z));
+  for (const d of decks) {
+    for (const e of d.ends) {
+      const g0 = sampleH(h, e.x + e.dx * 1, e.z + e.dz * 1);
+      const gap = d.top - g0;
+      const R = clamp(Math.abs(gap) * 5, 3, 26), side = clamp(Math.abs(gap) * 1.5, 1.5, 8), hw = d.width / 2;
+      const reach = R + hw + side + STEP;
+      const i0 = Math.max(0, Math.floor((e.x - reach - WORLD.xMin) / STEP)), i1 = Math.min(NX - 1, Math.ceil((e.x + reach - WORLD.xMin) / STEP));
+      const j0 = Math.max(0, Math.floor((e.z - reach - WORLD.zMin) / STEP)), j1 = Math.min(NZ - 1, Math.ceil((e.z + reach - WORLD.zMin) / STEP));
+      for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) {
+        const k = j * NX + i;
+        if (waterId[k]) continue;   // never fill a basin
+        const x = WORLD.xMin + i * STEP, z = WORLD.zMin + j * STEP;
+        const ox = x - e.x, oz = z - e.z;
+        const u = ox * e.dx + oz * e.dz, v = Math.abs(-ox * e.dz + oz * e.dx);
+        if (u < -STEP || u > R || v > hw + side) continue;
+        const wv = 1 - smoothstep(hw, hw + side, v);
+        if (u < 0) { h[k] = lerp(h[k], d.top - 0.12, wv); continue; }   // just under the deck's end (masonry, or behind a cut wall): meets it
+        const target = lerp(d.top, h[k], smoothstep(0, R, u));
+        h[k] = lerp(h[k], target, wv);
+      }
+    }
+  }
+  return { h, woodsId, waterId, waterOut, decks };
+}
+
+/** Height at a point from a raw grid (the same triangles as heightAt). */
+function sampleH(h, x, z) {
+  let fx = (x - WORLD.xMin) / STEP, fz = (z - WORLD.zMin) / STEP;
+  if (fx < 0 || fz < 0 || fx >= NX - 1 || fz >= NZ - 1) return 0;
+  const i = Math.floor(fx), j = Math.floor(fz);
+  fx -= i; fz -= j;
+  const k = j * NX + i;
+  const ha = h[k], hb = h[k + 1], hc = h[k + NX + 1], hd = h[k + NX];
+  return fx >= fz ? ha + (hb - ha) * fx + (hc - hb) * fz : ha + (hc - hd) * fx + (hd - ha) * fz;
+}
+
+/** Batch-3 (#17): every stone and transverse bridge deck: { key, top, width, ends: [{ x, z, dx, dz }] } (an end on the deck's
+ *  axis at its edge; dx/dz point away from the bridge). Keys: the landmark id, or `${transverse id}:${round(x * 10)}`. */
+export function bridgeDecks(S, hAt) {
+  const out = [];
+  for (const L of LANDMARKS) {
+    if (L.kind !== 'stone-bridge') continue;
+    const c = Math.cos(L.yaw || 0), s = Math.sin(L.yaw || 0);
+    const W = (lx, lz) => ({ x: L.x + lx * c + lz * s, z: L.z - lx * s + lz * c });
+    const half = L.span / 2 + 1.5;
+    const A = W(0, -half), B = W(0, half);
+    const top = Math.max(hAt(A.x, A.z), hAt(B.x, B.z)) + 0.35;
+    out.push({ key: L.id, top, width: L.width, ends: [{ ...A, dx: -s, dz: -c }, { ...B, dx: s, dz: c }] });
+  }
+  for (const cr of findCrossings(S)) {
+    const t = cr.t;
+    const bed = -t.depth * smoothstep(0, TRANSVERSE_RAMP, Math.min(cr.x - PARK.xMin, PARK.xMax - cr.x));
+    if (-bed < 1.5) continue;   // a shallow crossing has no bridge (landmarks.js leaves a gap in the cut walls there)
+    const half = t.halfWidth + 2.5;
+    const top = Math.max(hAt(cr.x, t.z - half), hAt(cr.x, t.z + half)) + 0.15;
+    out.push({ key: `${t.id}:${Math.round(cr.x * 10)}`, top, width: cr.width + 1.6, ends: [{ x: cr.x, z: t.z - half, dx: 0, dz: -1 }, { x: cr.x, z: t.z + half, dx: 0, dz: 1 }] });
+  }
+  return out;
 }
 
 function nearestWater(waterId, nx, nz, maxDist) {
@@ -396,7 +460,7 @@ export async function buildTerrain({ textures, onStage = () => {} }) {   // boot
   onStage('Painting paths');
   const masks = await paintMasks(S);
   onStage('Raising hills');
-  const { h, woodsId, waterId } = computeHeights(S, masks);
+  const { h, woodsId, waterId, decks } = computeHeights(S, masks);
 
   const heightAt = (x, z) => {
     let fx = (x - WORLD.xMin) / STEP, fz = (z - WORLD.zMin) / STEP;
@@ -415,6 +479,7 @@ export async function buildTerrain({ textures, onStage = () => {} }) {   // boot
 
   const terrain = {
     heightAt, normalAt, masks, grid: { h, NX, NZ, STEP, x0: WORLD.xMin, z0: WORLD.zMin }, woodsId, waterId, shapes: S,
+    deckTops: Object.fromEntries(decks.map((d) => [d.key, d.top])),   // batch-3 (#17): landmarks.js builds the decks at these
     /** Read the painted masks at a point: { path, pavers, asphalt, leaves, mud, dirt } (0..1). */
     maskAt(x, z) {
       const px = clamp(Math.round((x - WORLD.xMin) * MASK_RES), 0, masks.w - 1);

@@ -719,7 +719,7 @@ async function boot() {
   const batch = new Batcher(M, { name: 'static', cell: 512, castShadow: preset.casters.static, flatten: preset.id === 'low' ? LOW_FLATTEN : null });   // perf pass: 512 m cells (was 256): fewer draws per material
   const dynamic = new THREE.Group();
   dynamic.name = 'dynamic';
-  const ctx = { batch, collision, heightAt: terrain.heightAt, registry, dynamic, blockers: [], summits: {}, streams: [], M };
+  const ctx = { batch, collision, heightAt: terrain.heightAt, deckTops: terrain.deckTops, registry, dynamic, blockers: [], summits: {}, streams: [], M };
 
   await stage('Building the landmarks', 0.08);
   buildLandmarks(ctx);
