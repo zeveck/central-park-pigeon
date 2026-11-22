@@ -14,7 +14,8 @@
 import { SCHEMES, SCHEME, NAP_CLEARS, PARTS } from '../src/data/schemes.js';
 import { CREW, CREWS, HAULERS, FEUDS, CHARACTERS, phaseList } from '../src/data/crews.js';
 import { PEOPLE } from '../src/data/people.js';
-import { PLACES, SIGNS, SLICE, GRATES, RINK, SPIKE_SITES } from '../src/world/layout.js';
+import { PLACES, SIGNS, SLICE, GRATES, RINK, SPIKE_SITES, TRADES } from '../src/world/layout.js';
+import { ITEM_SOURCES, RENEWING } from '../src/data/item-sources.js';   // fix-23
 
 const fails = [], passes = [], notes = [];
 const fail = (m) => fails.push(m);
@@ -242,6 +243,31 @@ pass('nap rule: no step needs a phase-scoped effect from an earlier step (Walter
   // and every place a step names exists (the compass, the nudge clock)
   for (const s of SCHEMES) s.steps.forEach((st, i) => { for (const nd of [st.needs, ...(st.alts || []).map((a) => a.needs)]) if (nd?.place && !PLACES[nd.place]) fail(`${s.id} step ${i + 1}: unknown place ${nd.place}`); });
   pass(`every one of the ${n} puzzle steps (not talk / reach / auto) has a nudge and an answer; every named place exists`);
+}
+// ---------------------------------------------------------------- 5c. fix-23: every needed item has a source that comes back
+// A step that needs Gus to hold an item (needs / reachNeeds / the item a give or drop hands over / a trade's wants) can only
+// be played while that item exists. Renewing items (slices, boxes, shinies, gear) come back by themselves and huge ones can't
+// be carried off; every other one needs an ITEM_SOURCES rule for that scheme and step (the keeper, systems/schemes.js), unless
+// another alternative of the step doesn't need it.
+{
+  const HUGE = ['pipe', 'cone', 'battery', 'cart'];
+  let n = 0;
+  const kept = (item, id, k) => ITEM_SOURCES.some((r) => r.item === item && r.scheme === id && r.steps.includes(k));
+  for (const s of SCHEMES) s.steps.forEach((st, i) => {
+    const opts = (st.alts || [st]).map((o) => {
+      const on = o.on || st.on || {};
+      const items = [o.needs?.item, o.reachNeeds?.item, ['give', 'drop'].includes(on.type) ? on.item : null, on.type === 'trade' ? TRADES.find((t) => t.id === on.id)?.wants : null];
+      return [...new Set(items.filter((x) => x && !RENEWING.includes(x) && !HUGE.includes(x)))];
+    });
+    const ok = opts.map((items) => items.every((it) => kept(it, s.id, i + 1)));
+    const needy = opts.some((items) => items.length);
+    if (!needy) return;
+    n++;
+    if (!ok.some(Boolean)) fail(`${s.id} step ${i + 1}: needs ${opts.flat().join(', ')} but nothing puts it back if it's lost (add an ITEM_SOURCES rule, src/data/item-sources.js)`);
+    else if (!ok.every(Boolean)) notes.push(`${s.id} step ${i + 1}: one alternative needs ${opts.filter((_, k) => !ok[k]).flat().join(', ')} (one-time); another alternative doesn't`);
+  });
+  for (const r of ITEM_SOURCES) { const sc = SCHEME[r.scheme]; if (!sc || r.steps.some((k) => !sc.steps[k - 1])) fail(`ITEM_SOURCES: ${r.item} names ${r.scheme} steps ${r.steps} that don't exist`); }
+  pass(`every one of the ${n} steps that needs a one-time item has a source that puts it back (ITEM_SOURCES: ${ITEM_SOURCES.length} rules)`);
 }
 // ---------------------------------------------------------------- 6. never 0 open before the finale (every completion order)
 {

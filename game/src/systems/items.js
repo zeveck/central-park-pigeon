@@ -207,11 +207,33 @@ export class Items {
     const x = g.position.x + Math.sin(g.yaw) * 0.25, z = g.position.z + Math.cos(g.yaw) * 0.25;
     this.state.carried = null;
     this.#syncCarried();
+    // fix-23: dropped over water it would lie where Gus can't stand to peck it (a dead end for one-time items): a slice
+    // sinks (there are always more; den-cats puts the next anchovy out on the sill), anything else floats back to its
+    // source (systems/schemes.js keeper), or where it was found, or the nearest dry ground
+    if (this.G.collision.waterAt(x, z) && this.def(c.id).cls !== 'huge') {
+      const d = this.def(c.id), name = d.name.toLowerCase();
+      this.G.audio.play('duck-dive-bloop', { vol: 0.6, at: g.position });
+      this.G.particles.splash?.(x, g.position.y, z, 8);
+      this.G.bus.emit('drop', { item: c.id, x, z, water: true });
+      if (d.slice) { this.G.toast(`The ${name} sank. There are always more.`); return null; }
+      const to = this.homeFor(c);
+      this.G.toast(`The ${name} floated back to ${to.label}.`, { seconds: 4 });
+      return this.spawn(c.id, to.x, to.z, { origin: c.origin, uid: c.uid });
+    }
     const y = Math.min(g.position.y, this.G.surfaceY(x, z, g.position.y + 0.1));
     const it = this.spawn(c.id, x, z, { born: c.born, origin: c.origin, uid: c.uid, y, placed: true });
     this.G.audio.play(this.def(c.id).cls === 'heavy' ? 'drop-thud' : 'drop-thud', { vol: 0.6, at: g.position });
     this.G.bus.emit('drop', { item: c.id, x, z });
     return it;
+  }
+
+  /** fix-23: where a lost item goes back to: its keeper source, else where it was found (if dry), else dry ground by Gus. */
+  homeFor(c) {
+    const G = this.G, r = G.schemes?.keeperRule(c.id);
+    if (r) return G.schemes.keeperSpot(r);
+    if (c.origin && !G.collision.waterAt(c.origin.x, c.origin.z)) return { x: c.origin.x, z: c.origin.z, label: 'where you found it' };
+    const p = G.dryNear(G.gus.position.x, G.gus.position.z);
+    return { x: p.x, z: p.z, label: 'the shore' };
   }
 
   /** Take the carried item away (it was given). */
@@ -220,7 +242,9 @@ export class Items {
   /** Give Gus an item directly (scheme rewards, dev). */
   give(id, { born = null } = {}) {
     if (this.state.carried) this.drop();
-    this.state.carried = { uid: 'i' + this.seq++, id, born: this.def(id).slice ? (born ?? this.G.state.time) : born, origin: null };
+    // (fix-23: origin = where Gus got it, so Ruffled / a water drop can float it back to somewhere dry and reachable)
+    const gp = this.G.gus?.position, home = gp ? this.G.dryNear(gp.x, gp.z) : null;
+    this.state.carried = { uid: 'i' + this.seq++, id, born: this.def(id).slice ? (born ?? this.G.state.time) : born, origin: home ? { x: home.x, z: home.z } : null };
     this.#syncCarried();
   }
 
@@ -349,10 +373,11 @@ export class Items {
     const d = this.def(c.id);
     this.take();
     if (d.slice) return `The ${d.name.toLowerCase()} is gone. There are always more.`;
-    if (d.cls === 'heavy') { const g = this.G.gus.position; this.spawn(c.id, g.x, g.z, { origin: c.origin }); return `You dropped the ${d.name.toLowerCase()}. It's marked on the compass.`; }
-    const o = c.origin || this.G.gus.position;
-    this.spawn(c.id, o.x, o.z, { origin: c.origin });
-    return `The ${d.name.toLowerCase()} floated back to where you found it.`;
+    // fix-23: never onto the water (a heavy item dropped in the Rhoda fight over the Meer was out of reach for good)
+    if (d.cls === 'heavy' && !this.G.collision.waterAt(this.G.gus.position.x, this.G.gus.position.z)) { const g = this.G.gus.position; this.spawn(c.id, g.x, g.z, { origin: c.origin }); return `You dropped the ${d.name.toLowerCase()}. It's marked on the compass.`; }
+    const to = this.homeFor(c);
+    this.spawn(c.id, to.x, to.z, { origin: c.origin });
+    return `The ${d.name.toLowerCase()} floated back to ${to.label}.`;
   }
 }
 

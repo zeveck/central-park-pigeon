@@ -12,6 +12,7 @@
 import * as THREE from 'three';
 import { L, joinScene, mechaLine, onStep, bubbleOver } from './_ssf-common.js';
 import { PLACES } from '../world/layout.js';
+import { KEEP } from '../data/item-sources.js';
 import { ruleMaterial } from '../gfx/load-model.js';
 
 // the bodega window sill (the storefront's face is at x -129.8; data/crews.js has Pickles at -129.5, 247.2 on the pavement)
@@ -127,8 +128,13 @@ export function installDenCats(G) {
   const SOON = 4;
   let lostSaid = null;   // 'night' | 'day': what the last toast said
   const anchovyAbout = () => G.state.carried?.id === 'slice-anchovy' || G.items.world.some((w) => w.id === 'slice-anchovy' && !w.sill);
+  let awayT = 0;
   const watchLost = () => {
     const st = G.state;
+    // fix-23: one left lying with Gus far away for 90 s floats back (the next one goes out on the sill)
+    const lying = onStep(G, 'den-cats', 3) && G.items.world.find((w) => w.id === 'slice-anchovy' && !w.sill), g = G.gus.position;
+    awayT = lying && Math.hypot(lying.x - g.x, lying.z - g.z) > KEEP.awayR ? awayT + 1 / 60 : 0;
+    if (lying && awayT > KEEP.awaySecs) { awayT = 0; G.items.remove(lying); }
     if (!onStep(G, 'den-cats', 3) || knocking || anchovyAbout() || sillSlice()) { if (anchovyAbout()) lostSaid = null; return; }
     if (!day()) {
       if (lostSaid !== 'night') { lostSaid = 'night'; G.toast('No anchovy slice now. The counterman puts the next one on Pickles\' sill at CPW & 72nd. Out again in the morning.', { seconds: 5 }); }
@@ -170,7 +176,7 @@ export function installDenCats(G) {
         if (Math.hypot(g.x - p.x, g.z - p.z) < 25 && st.time - pT > 12) { pT = st.time; bubbleOver(G, 'pickles', ['Pickles: *snore*… anchovy…', 'Pickles: zzz… mine… zzz', 'Pickles: *twitch*'][(pT / 12 | 0) % 3], 3.5); }
       }
     },
-    restore: () => { knocking = false; readyAt = Infinity; tookIn = null; saidCold = false; lostSaid = null; sillWasOut = !!sillSlice(); },
+    restore: () => { awayT = 0; knocking = false; readyAt = Infinity; tookIn = null; saidCold = false; lostSaid = null; sillWasOut = !!sillSlice(); },
   });
   // Express conducts a hot anchovy through the grates
   G.bus.on('grate', () => {

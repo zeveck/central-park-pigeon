@@ -182,6 +182,15 @@ export class Vehicles {
   onNap() {
     const notes = [];
     if (this.piles.length) { for (const p of this.piles) p.mesh.removeFromParent(); this.piles = []; this.#savePiles(); notes.push('The rink crew resurfaced.'); }
+    // fix-23: a rigged vehicle left wedged somewhere goes home on a nap while its scheme still needs it (never a dead end)
+    for (const [id, scheme, line] of [['hotdog-cart', 'part-body', 'Vinnie\'s cart was towed back to the Mall.'], ['pedicab', 'den-racers', 'The pedicab is back at its stand.']]) {
+      const v = this.list.find((q) => q.id === id), s = this.st.vehicles?.[id];
+      if (!v || !s || this.st.flags[scheme] || this.cur === v || Math.hypot(s.x - v.def.home.x, s.z - v.def.home.z) < 3) continue;
+      delete this.st.vehicles[id];
+      const h = v.def.home; v.x = h.x; v.z = h.z; v.yaw = v.moveYaw = h.yaw; v.speed = 0; v.hop = null; v.y = null; v.tilt = 0;
+      this.#place(v);
+      notes.push(line);
+    }
     return notes;
   }
   napBlock() { return this.cur ? 'Not while driving' : this.auto ? 'Not now' : null; }

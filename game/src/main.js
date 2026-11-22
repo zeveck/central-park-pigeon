@@ -468,6 +468,17 @@
 //     (Night: "out again in the morning"); the compass marks the sill; on step 3 (or after the first push) Pickles gives way
 //     at once (a bubble; characters.js talk() honours e.quiet, so no chat dialogue). layout.js SLICE.griddle.dusk and the
 //     Dusk halal man (data/people.js) moved off 110th Street onto the park-side pavement: den-cats.alt re-recorded.
+// Fix-23 notes (the owner: "You shouldn't be able to fail a mission in a way that makes it so you can never do it";
+// table design/reviews/fix-23-solvable.md; shots design/screenshots/fix-16-19-23/23-*). Shared-file edits:
+//   - Here: G.dryNear(x, z) (the nearest dry ground; nothing comes back onto water, where Gus can't stand to peck it).
+//   - systems/items.js: drop() over water: a slice sinks, anything else floats back (homeFor: the keeper's source, else where
+//     it was found if dry, else dry ground by Gus); onRuffled never puts an item on water; give() records a dry origin.
+//   - systems/schemes.js: the item keeper (#keep, twice a second, not mid-scene; data/item-sources.js ITEM_SOURCES): a
+//     one-time quest item that's nowhere is put back at its source; one in water, or with Gus > 40 m away for 90 s, floats
+//     back. Toasts only. keeperRule/keeperSpot. repairSpent runs it too (old saves: den-ducks step 3 with no peas, …).
+//   - schemes/den-cats.js: an anchovy left lying 90 s with Gus far away floats back (the sill refills). entities/vehicles.js
+//     onNap: Vinnie's rigged cart / the pedicab left away from home is towed back while its scheme is open.
+//   - tools/check-schemes.mjs 5c: every step that needs a one-time item has an ITEM_SOURCES rule.
 import * as THREE from 'three';
 import { choosePreset, PRESETS, AutoProbe, savePreset } from './presets.js';
 import { Progress, TextureStore } from './gfx/textures.js';
@@ -671,6 +682,16 @@ async function boot() {
   for (const wb of terrain.shapes.water) collision.addWater({ outline: wb.poly, level: wb.level, id: wb.id, name: wb.name });
   G.terrain = terrain; G.collision = collision;
   G.surfaceY = (x, z, yRef = 400) => collision.surface(x, z, yRef).y;
+  // fix-23: the nearest dry ground to a point (items never come back onto the water, where Gus can't stand to peck them):
+  // rings out 1 m at a time, 24 bearings; the first dry spot, then 1.2 m further from the water
+  G.dryNear = (x, z) => {
+    if (!collision.waterAt(x, z)) return { x, z };
+    for (let r = 1; r <= 60; r += 1) for (let k = 0; k < 24; k++) {
+      const a = (k / 24) * Math.PI * 2, px = x + Math.cos(a) * r, pz = z + Math.sin(a) * r;
+      if (!collision.waterAt(px, pz)) { const qx = px + Math.cos(a) * 1.2, qz = pz + Math.sin(a) * 1.2; return collision.waterAt(qx, qz) ? { x: px, z: pz } : { x: qx, z: qz }; }
+    }
+    return { x, z };
+  };
   const { M, noise } = createMaterials(textures);
   G.M = M; G.worldTex = textures;   // Fixes-2: the finale's ESB scene reuses the world's materials, facades and skyline
   const batch = new Batcher(M, { name: 'static', cell: 512, castShadow: preset.casters.static, flatten: preset.id === 'low' ? LOW_FLATTEN : null });   // perf pass: 512 m cells (was 256): fewer draws per material

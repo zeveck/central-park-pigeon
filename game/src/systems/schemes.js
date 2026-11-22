@@ -18,6 +18,7 @@ import { CREW, CHARACTERS, phaseList, PHASE_LABEL, awakeReason, HAULERS } from '
 import { PLACES, SIGNS, CLUES, TRADES, SLICE } from '../world/layout.js';
 import { derived } from '../state/gamestate.js';
 import { FEUDS } from '../data/crews.js';
+import { ITEM_SOURCES, KEEP } from '../data/item-sources.js';   // fix-23
 
 const NUDGE_AFTER = 180;   // game seconds on one step
 // Fun pass (P7): the nudge clock counts time spent stuck, not time flying about: only within NEAR m of one of the step's
@@ -332,9 +333,58 @@ export class SchemeEngine {
         }
       }
     }
+    this.#keep(0, notes);   // fix-23: a one-time item lost in an old save (den-ducks step 3 with no peas, …) is put back
     if (notes.length) { G.clues?.refresh(); this.refreshLanes(); }
     return notes;
   }
+  // ------------------------------------------------------------ fix-23: the item keeper
+  /** The ITEM_SOURCES rule for this item on its scheme's current step (and its flag set), or null. */
+  keeperRule(item) {
+    return ITEM_SOURCES.find((r) => r.item === item && this.isOpen(r.scheme) && !this.busy.has(r.scheme) && r.steps.includes(this.stepIndex(r.scheme) + 1) && (!r.flag || this.flag(r.flag))) || null;
+  }
+  /** Where a rule's item comes back to (on dry ground for a source out on the water). */
+  keeperSpot(r) {
+    const at = r.dry ? this.G.dryNear(r.at.x, r.at.z) : r.at;
+    return { x: at.x, z: at.z, label: r.label };
+  }
+  /** fix-23: a one-time quest item that's nowhere (lost in water, eaten, taken by Ruffled) is put back at its source; one
+   *  left lying out of reach (in water) or with Gus far away for KEEP.awaySecs floats back too. A toast names the place.
+   *  notes (repairSpent on Continue): only the missing ones, listed. */
+  #keep(dt, notes = null) {
+    const G = this.G, st = this.st, g = G.gus.position;
+    if (this.keepFor !== st) { this.keepFor = st; this.keepAway = {}; this.keepMissing = {}; }   // (a load or New Game starts clean)
+    for (const r of ITEM_SOURCES) {
+      if (r !== this.keeperRule(r.item)) continue;
+      const k = r.scheme + ':' + r.item;
+      if (st.carried?.id === r.item) { this.keepAway[k] = 0; this.keepMissing[k] = 0; continue; }
+      const it = G.items.world.find((w) => w.id === r.item);
+      const name = G.items.def(r.item).name.toLowerCase();
+      if (!it) {
+        // (a beat's grace: a scene or clue may be about to put it down)
+        if (!notes && (this.keepMissing[k] = (this.keepMissing[k] || 0) + dt) < 1.5) continue;
+        this.keepMissing[k] = 0;
+        const at = this.keeperSpot(r);
+        G.items.spawn(r.item, at.x, at.z, { origin: { x: at.x, z: at.z } });
+        if (notes) notes.push(`${r.scheme}: ${r.item} put back at ${r.label}`);
+        else G.toast(`The ${name} ${['peas', 'spectacles'].includes(r.item) ? 'are' : 'is'} back at ${r.label}.`, { seconds: 4.5 });
+        continue;
+      }
+      this.keepMissing[k] = 0;
+      if (notes) continue;
+      const at = this.keeperSpot(r);
+      if (Math.hypot(it.x - at.x, it.z - at.z) < 3) { this.keepAway[k] = 0; continue; }
+      const wet = !!G.collision.waterAt(it.x, it.z) && G.items.def(r.item).cls !== 'huge';
+      const far = Math.hypot(g.x - it.x, g.z - it.z) > KEEP.awayR;
+      this.keepAway[k] = far ? (this.keepAway[k] || 0) + dt : 0;
+      if (wet || this.keepAway[k] > KEEP.awaySecs) {
+        this.keepAway[k] = 0;
+        G.items.remove(it);
+        G.items.spawn(r.item, at.x, at.z, { origin: { x: at.x, z: at.z } });
+        G.toast(`The ${name} floated back to ${r.label}.`, { seconds: 4.5 });
+      }
+    }
+  }
+
   /** Is Gus within 5 m of this taker (a character id, or a human role)? */
   #byTaker(to) {
     const G = this.G, p = G.gus.position;
@@ -363,6 +413,7 @@ export class SchemeEngine {
     const G = this.G;
     this.pollT += dt;
     if (this.pollT >= 0.25) { this.pollT = 0; this.#poll(); }
+    if ((this.keepT = (this.keepT || 0) + dt) >= 0.5) { if (!G.midScene?.()) this.#keep(this.keepT); this.keepT = 0; }   // fix-23
     // the nudge timer for the tracked step
     if (!this.st.tracked && this.activeList().includes('prologue')) this.st.tracked = 'prologue';
     const id = this.st.tracked;
