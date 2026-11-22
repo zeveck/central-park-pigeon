@@ -488,3 +488,8 @@ body.cine #whereto, body.cine #hud .suggest, body.wheel-open #hud .suggest { opa
   #slots .slot-l2 { font-size: 12px; }
   #slots h2 { margin: 0 0 4px; }
 }
+/* batch-2 (#15): what a chip is for, on hover or keyboard focus (data-tip on the crumbs chip and the Bread Power meter) */
+#hud .chip[data-tip] { pointer-events: auto; cursor: help; position: relative; outline: none; }
+#hud .chip[data-tip]:focus-visible { box-shadow: 0 0 0 2px var(--gold); }
+#hud .chip[data-tip]::after { content: attr(data-tip); position: absolute; right: 0; top: calc(100% + 6px); width: max-content; max-width: min(260px, 70vw); padding: 6px 10px; border-radius: 10px; background: rgba(38, 32, 28, 0.9); color: #fff7e8; font: 600 13px/1.3 'Nunito', sans-serif; white-space: normal; text-align: left; text-wrap: pretty; opacity: 0; visibility: hidden; transition: opacity 0.15s; z-index: 3; pointer-events: none; }
+#hud .chip[data-tip]:hover::after, #hud .chip[data-tip]:focus-visible::after { opacity: 1; visibility: visible; }

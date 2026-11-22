@@ -45,7 +45,7 @@ export class Hud {
           <button type="button" class="hb" data-act="pause" aria-label="Pause">${icon('pause')}</button>
         </div>
         <div class="stats">
-          <span class="chip crumbs" title="Crumbs">${icon('crumb')}<b>0</b></span>
+          <span class="chip crumbs" tabindex="0" aria-label="Crumbs" data-tip="${TIP.crumbs}">${icon('crumb')}<b>0</b></span>
           <span class="chip flock" title="Flock">${icon('pigeon')}<b>0</b></span>
           <span class="chip crews" title="Crews and Mecha parts">${icon('paw')}<b>0/17</b>${icon('part')}<b class="parts">0/8</b></span>
           <span class="chip phase" title="Time of day"></span>
@@ -131,14 +131,17 @@ export class Hud {
       } else $.goal.classList.add('off');
     }
     // stats
-    if (L.crumbs !== v.crumbs) { if (L.crumbs != null && v.crumbs > L.crumbs) this.bump($.crumbsChip); $.crumbs.textContent = v.crumbs; L.crumbs = v.crumbs; }
+    if (L.crumbs !== v.crumbs) { if (L.crumbs != null && v.crumbs > L.crumbs) { this.bump($.crumbsChip); this.#firstTip('crumbs'); } $.crumbs.textContent = v.crumbs; L.crumbs = v.crumbs; }
     if (L.flock !== v.flock) { $.flock.textContent = v.flock; L.flock = v.flock; }
     const cp = `${v.crews}/${CREW_COUNT}|${v.parts}/8`;
     if (L.cp !== cp) { $.crews.textContent = `${v.crews}/${CREW_COUNT}`; $.parts.textContent = `${v.parts}/8`; L.cp = cp; }
     if (L.phase !== v.phase) { $.tod.innerHTML = phaseIcon(v.phase) + `<b>${v.phaseLabel}</b>`; L.phase = v.phase; }
-    const mk = v.meters.map((m) => m.id + m.value).join('|');
+    const mk = v.meters.map((m) => m.id + m.value + '+' + (m.flipped || 0)).join('|');
     if (L.meters !== mk) {
-      $.meters.innerHTML = v.meters.map((m) => `<span class="chip" title="${esc(m.label)}">${icon(m.icon)}<b>${esc(m.label)} ${m.value}/${m.max}</b></span>`).join('');
+      // batch-2 (#15): Bread Power also shows the live flips ("Bread Power 0/30 · 3 flipped"), and says what it counts on
+      // hover/focus and the first time it shows
+      $.meters.innerHTML = v.meters.map((m) => `<span class="chip"${TIP[m.id] ? ` tabindex="0" data-tip="${TIP[m.id]}"` : ` title="${esc(m.label)}"`}>${icon(m.icon)}<b>${esc(m.label)} ${m.value}/${m.max}${m.flipped ? ` · ${m.flipped} flipped` : ''}</b></span>`).join('');
+      if (v.meters.some((m) => m.id === 'sign')) this.#firstTip('sign');
       L.meters = mk;
     }
     if (L.muted !== v.muted) { $.mute.innerHTML = icon(v.muted ? 'muted' : 'speaker'); L.muted = v.muted; }
@@ -261,6 +264,15 @@ export class Hud {
     }
   }
 
+  /** batch-2 (#15): the one-line explanation of a chip, as a toast the first time it matters (once per save: a seen.tip
+   *  flag; UI only, nothing reads it). */
+  #firstTip(id) {
+    const st = this.G.state, key = 'seen.tip.' + id;
+    if (!st?.flags || st.flags[key]) return;
+    st.flags[key] = true;
+    this.G.toast(TOAST_TIP[id], { seconds: 6 });
+  }
+
   toast(text, { kind = '', seconds = 2.6, now = false } = {}) {
     if (this.toastList.some((t) => t.text === text) || this.toastQueue.some((q) => q.text === text)) return;
     // a scene's own note jumps the queue; a full screen makes room for it
@@ -273,11 +285,24 @@ export class Hud {
   clearToasts() { for (const t of this.toastList) t.el.remove(); this.toastList = []; this.toastQueue = []; }
 }
 
+// batch-2 (#15): what the crumbs and Bread Power chips are for (hover/focus tip, and a toast the first time each shows)
+const TIP = {
+  crumbs: 'Crumbs: spend 15 at a Nest to Feather Up (get a feather back).',
+  sign: 'Bread Power: signs made permanent. The rangers fix flipped signs until you stop their cart.',
+};
+const TOAST_TIP = {
+  crumbs: 'Crumbs! 15 buys a feather back at a Nest.',
+  sign: 'Bread Power counts PERMANENT signs: stop a ranger cart.',
+};
+
 export function metersFor(state, d) {
   const out = [];
   for (const t of THREADS) {
     if (!state.lanes.includes(t.id)) continue;
-    out.push({ id: t.id, label: t.meter.label, value: d[t.meter.of], max: t.meter.max, icon: t.icon });
+    const m = { id: t.id, label: t.meter.label, value: d[t.meter.of], max: t.meter.max, icon: t.icon };
+    // live flips that aren't permanent yet (they count toward nothing until their region's cart is stopped)
+    if (t.id === 'sign') m.flipped = Object.values(state.signs || {}).filter((s) => s.flipped && !s.permanent).length;
+    out.push(m);
   }
   return out;
 }
