@@ -524,6 +524,19 @@
 //     "Flap to take off" + the Peck line while afloat (hudView hides the context prompt meanwhile: they overlapped on a phone).
 //   - debug only: src/debug/ground-audit.js (runGroundAudit: every walker's feet for ~60 s, and each bridge end's step) and
 //     src/debug/float-checks.js (every water conversation from the water; edge, settle, paddle, drop, take-off, skim).
+// Batch-3d notes (#12 fences, #10 flock join, #11/#7 the dogs' walk; design/changes/batch-3.md; shots
+// design/screenshots/batch-3d/). Visual only: no collision, perch, timer, random stream or input changed.
+//   - world/fences.js (new): the Reservoir ring, the ball-field backstops and the Conservatory Garden gate are code-built
+//     3D iron / chain-link merged into the static batch (was a tiled alpha plane: doubled, floating). landmarks.js keeps
+//     every collision box and perch exactly as it was. gfx/batch.js add(..., { shadow: false }) keeps thin pieces out of
+//     the static shadow proxy. tools/perf-probe.mjs has a great-lawn spot.
+//   - entities/flock.js arrive(p, { delay, layer, sheen, onArrive }): a joined stray flaps up and arcs ~1 s to its slot (a
+//     one-instance flyer past the drawn cap); systems/collect.js: the stray hops first, the stamp toast comes on arrival
+//     (state, the 'stray' event and the autosave stay at the Peck). flock.update(0) no longer NaNs the birds' bank.
+//   - anim/dog-gait.js (new): a vertex-shader trot for the unrigged dog GLBs (legs by quadrant, diagonal pairs, head nod,
+//     tail wag; stride from ground covered; legs straight when still; the lying mastiff gets no legs). Hooks: humans.js
+//     leash dogs (uniforms per dog, no bounce), characters.js named dogs and crowds.js crowd dogs (an instanced aGaitI;
+//     crowd dogs no longer roll).
 import * as THREE from 'three';
 import { choosePreset, PRESETS, AutoProbe, savePreset } from './presets.js';
 import { Progress, TextureStore } from './gfx/textures.js';

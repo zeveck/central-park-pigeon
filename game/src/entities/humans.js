@@ -27,6 +27,7 @@
 // lead leashed dogs.
 
 import * as THREE from 'three';
+import { patch as dogGait, DogGait } from '../anim/dog-gait.js';   // batch-3 (#11): the dogs' coded trot
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
@@ -309,13 +310,15 @@ export class Humans {
           const b = baked[(n + j) % kinds.length] || baked.find(Boolean);
           if (!b) break;
           const mesh = new THREE.Mesh(b.geometry, b.makeMaterial(DOG_TINTS[(n + j) % DOG_TINTS.length]));
+          const gu = dogGait(mesh.material, b.geometry), gait = new DogGait((b.bounds.max.y - b.bounds.min.y) * 0.62, n + j);   // batch-3 (#11)
           mesh.castShadow = G.preset?.id === 'high';   // perf pass: High only
           const h = new THREE.Group(); h.add(mesh); h.scale.set(-0.62, 0.62, 0.62);
           const geo = new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3));
           const leash = new THREE.Line(geo, leashMat); leash.frustumCulled = false;
-          h.visible = leash.visible = false;
+          h.visible = true; leash.visible = false;   // batch-3 (#11): drawn in the shader warm-up (the trot is its own program); pose() hides it
+          h.position.set(a.x, a.y ?? 0, a.z);
           this.group.add(h, leash);
-          a.dogs.push({ h, leash, side: j - (a.spec.dogs - 1) / 2, x: a.x, z: a.z, yaw: a.yaw, bob: j * 1.7 });
+          a.dogs.push({ h, leash, side: j - (a.spec.dogs - 1) / 2, x: a.x, z: a.z, yaw: a.yaw, bob: j * 1.7, gu, gait });
         }
         n += a.spec.dogs;
       }
@@ -548,13 +551,14 @@ export class Humans {
       const tx = px + Math.sin(yaw) * lead + Math.cos(yaw) * d.side * 0.7, tz = pz + Math.cos(yaw) * lead - Math.sin(yaw) * d.side * 0.7;
       const k = Math.min(1, dt * 4);
       // batch-3 (#7): a dog never steps onto the water or into a wall or a rock (it waits at the walker's heel)
-      const nx = d.x + (tx - d.x) * k, nz = d.z + (tz - d.z) * k;
+      const nx = d.x + (tx - d.x) * k, nz = d.z + (tz - d.z) * k, ox = d.x, oz = d.z;
       if (!this.G.collision.walkBlocked(nx, nz)) { d.x = nx; d.z = nz; }
       else if (Math.hypot(d.x - px, d.z - pz) > 2.5) { d.x = px; d.z = pz; }
       d.yaw = moving ? yaw : d.yaw + Math.sin(this.tick * 0.02 + d.bob) * 0.01;
       d.bob += dt * (moving ? 9 : 1.5);
       d.gy = this.G.collision.groundFor(d.x, d.z, (d.gy ?? this.G.collision.floorAt(d.x, d.z)) + 0.35, _wg).y;   // batch-3 (#7): the ground rule
-      const y = d.gy + (moving ? Math.abs(Math.sin(d.bob)) * 0.04 : 0);
+      const y = d.gy;   // batch-3 (#11): no bounce; the legs trot at the speed it covers ground (anim/dog-gait.js)
+      d.gait.step(dt, Math.hypot(d.x - ox, d.z - oz) / Math.max(dt, 1e-4)).apply(d.gu);
       d.h.position.set(d.x, y, d.z); d.h.rotation.y = d.yaw;
       d.h.visible = d.leash.visible = true;
       const pa = d.leash.geometry.attributes.position;

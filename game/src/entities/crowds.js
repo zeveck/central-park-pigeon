@@ -18,6 +18,7 @@ import { pointInPoly } from '../core/geo.js';
 import { loadMorphArray, patchMorphArray } from '../gfx/morphs.js';
 import { addShaderPatch } from '../anim/shader-patch.js';
 import { ruleMaterial } from '../gfx/load-model.js';
+import { patch as dogGait, instanceAttr as dogGaitAttr, DogGait } from '../anim/dog-gait.js';   // batch-3 (#11)
 
 // crowd group → crew, models, behaviour
 const GROUPS = {
@@ -121,6 +122,8 @@ export class Crowds {
     const mat = b.makeMaterial();
     let geo = b.geometry;
     const morph = full && sample?.morph ? this.morphs[sample.morph] : null;
+    // batch-3 (#11): full-detail dogs trot (a per-instance phase); their own copy of the geometry
+    if (full && GROUPS.dogs.models.includes(id)) { geo = geo.clone(); dogGait(mat, geo, { instanced: true }); dogGaitAttr(geo, cap); }
     if (morph) {
       geo = geo.clone();
       geo.setAttribute('aLayer', new THREE.InstancedBufferAttribute(new Float32Array(cap), 1).setUsage(THREE.DynamicDrawUsage));
@@ -365,6 +368,7 @@ export class Crowds {
     if (a.state === 'away') return;
     const gdef = GROUPS[a.group];
     a.phase += dt * 6;
+    a.gait?.step(dt, a.speed);   // batch-3 (#11): visual only (made when a dog is first drawn)
     let sp = 0;
     if (a.state === 'wander') sp = gdef.speed * 0.5;
     else if (a.state === 'scatter') sp = gdef.speed * (gdef.fly ? 2.6 : 1.8);
@@ -499,7 +503,9 @@ export class Crowds {
       const cheer = a.state === 'cheer' ? Math.abs(Math.sin(a.phase * 2)) * 0.15 : 0;
       const nod = a.model === 'horse' ? Math.sin(a.phase * 0.15 + a.i) * 0.02 : 0;
       _p.set(a.x, a.yBase + hop + bob + fl + cheer, a.z);
-      _e.set(nod + (moving ? 0.05 : 0), a.yaw, moving ? Math.sin(a.phase * 1.4) * 0.06 : 0);
+      const gaitA = im.geometry.attributes.aGaitI;   // batch-3 (#11): a dog trots with a level back (no roll, no bounce)
+      if (gaitA) (a.gait ||= new DogGait((im.geometry.boundingBox?.max.y ?? 1) * a.scale, a.i)).write(gaitA, i);
+      _e.set(gaitA ? 0 : nod + (moving ? 0.05 : 0), a.yaw, moving && !gaitA ? Math.sin(a.phase * 1.4) * 0.06 : 0);
       _q.setFromEuler(_e);
       _s.setScalar(a.scale);
       im.setMatrixAt(i, _m.compose(_p, _q, _s));
@@ -531,7 +537,7 @@ export class Crowds {
       if (m.n) {
         im.instanceMatrix.needsUpdate = true;
         im.instanceColor.needsUpdate = true;
-        for (const k of ['aLayer', 'aSheen', 'aHead', 'aBreast']) if (im.geometry.attributes[k]) im.geometry.attributes[k].needsUpdate = true;
+        for (const k of ['aLayer', 'aSheen', 'aHead', 'aBreast', 'aGaitI']) if (im.geometry.attributes[k]) im.geometry.attributes[k].needsUpdate = true;
       }
     }
     for (const h of Object.values(this.hats || {})) { h.visible = h.count > 0; h.instanceMatrix.needsUpdate = true; }

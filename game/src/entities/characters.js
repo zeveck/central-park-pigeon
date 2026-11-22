@@ -16,6 +16,7 @@ import { patchMorphArray } from '../gfx/morphs.js';
 import { addShaderPatch } from '../anim/shader-patch.js';
 import { headPoint, crownPoint, seatY } from './crowds.js';
 import { pointInPoly } from '../core/geo.js';
+import { patch as dogGait, instanceAttr as dogGaitAttr, DogGait } from '../anim/dog-gait.js';   // batch-3 (#11)
 
 const DRAW_DIST = { high: 70, medium: 50, low: 22 };
 const MAX_DRAWN = { high: 24, medium: 14, low: 5 };
@@ -118,6 +119,7 @@ export class Characters {
     const key = model + (morph ? ':m' : '') + (sp === 'songbird' ? ':s' : '');
     if (!this.mats[key]) {
       const mat = baked.makeMaterial();
+      if (sp === 'dog') dogGait(mat, baked.geometry, { instanced: true });   // batch-3 (#11): the trot (before geo copies the attributes)
       if (morph) patchMorphArray(mat, morph.texture, { sheen: sp === 'pigeon' });
       if (sp === 'songbird') {
         const bb = baked.bounds;
@@ -150,6 +152,7 @@ export class Characters {
       geo.setAttribute('aHead', new THREE.InstancedBufferAttribute(new Float32Array(T.head), 3));
       geo.setAttribute('aBreast', new THREE.InstancedBufferAttribute(new Float32Array(T.breast), 3));
     }
+    if (sp === 'dog') { c.gaitAttr = dogGaitAttr(geo, 1); c.gait = new DogGait((baked.bounds.max.y - baked.bounds.min.y) * (look.scale || 1), c.id.length); }
     const m = new THREE.InstancedMesh(geo, this.mats[key], 1);
     m.name = 'char:' + c.id;
     m.setMatrixAt(0, new THREE.Matrix4());
@@ -314,11 +317,16 @@ export class Characters {
         }
         if (k >= 1 && a.secs > 0) { c.act = null; a.done?.(); }
       }
+      if (c.gait) {   // batch-3 (#11): the dogs trot at the speed they cover ground (their tweens), and stand when still
+        const sp = dt > 0 ? Math.hypot(c.x - (c.gpx ?? c.x), c.z - (c.gpz ?? c.z)) / dt : 0;
+        c.gpx = c.x; c.gpz = c.z;
+        c.gait.step(dt, sp).write(c.gaitAttr, 0); c.gaitAttr.needsUpdate = true;
+      }
       if (!vis) continue;
       // perf pass (render only): no accessories past ACC_DIST (a draw call each, a few pixels at that range)
       if (c.acc) { const near = d < ACC_DIST[G.preset?.id ?? 'medium']; if (c.acc.visible !== near) c.acc.visible = near; }
       c.bobT += dt;
-      c.root.position.set(c.x + ox, c.y + oy + Math.abs(Math.sin(c.bobT * 1.3)) * 0.004, c.z);
+      c.root.position.set(c.x + ox, c.y + oy + (c.gait ? 0 : Math.abs(Math.sin(c.bobT * 1.3)) * 0.004), c.z);   // batch-3 (#11): a dog's back stays level
       c.root.rotation.set(rx, c.yaw, rz, 'YXZ');
       if (sx !== 1 || sy !== 1) c.root.scale.set((c.look.scale || 1) * sx, (c.look.scale || 1) * sy, (c.look.scale || 1) * sx);
       else if (c.root.scale.y !== (c.look.scale || 1)) c.root.scale.setScalar(c.look.scale || 1);
