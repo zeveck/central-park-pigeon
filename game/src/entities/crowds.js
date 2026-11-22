@@ -396,7 +396,7 @@ export class Crowds {
       G.audio.play('gang-coo-murmur', { at: { x: near[0].x, y: near[0].yBase, z: near[0].z }, vol: 0.6 });
       // the reply comes from another Swell once the first bubble has gone (two at once overlapped on screen)
       const b = near.slice(1).sort((p, q) => Math.hypot(q.x - near[0].x, q.z - near[0].z) - Math.hypot(p.x - near[0].x, p.z - near[0].z))[0] || near[0];
-      if (lines[1]) G.later(2.7, () => say(b, lines[1]));
+      if (lines[1]) G.later(2.7, () => { if (!G.cutscene?.locked && !G.dialogue?.open && !G.midScene?.()) say(b, lines[1]); });   // not over a scene that started meanwhile
       this.barkT = Math.max(this.barkT, 8);   // no generic bark on top of the hello
     }
   }

@@ -361,14 +361,15 @@ export class Items {
     const c = this.state.carried;
     if (c && this.def(c.id).slice) c.born = null;   // a carried slice goes cold
     const gone = {};
-    for (const it of [...this.world]) if (this.def(it.id).slice || it.id === 'box') { this.remove(it); gone[it.id] = (gone[it.id] || 0) + 1; }
+    let others = false;   // something Gus never had (the anchovy on the sill, a slice a human dropped): "the", not "your"
+    for (const it of [...this.world]) if (this.def(it.id).slice || it.id === 'box') { this.remove(it); gone[it.id] = (gone[it.id] || 0) + 1; if (!it.placed) others = true; }
     // batch-2 (#20): say what went ("A rat took your slice while you napped."; it was "A rat got it.")
     const ids = Object.keys(gone);
     if (ids.length) {
       const word = (id) => { const w = { slice: 'slice', 'slice-anchovy': 'anchovy slice', box: 'pizza box' }[id] || this.def(id).name.toLowerCase(); return gone[id] > 1 ? w + 'es'.slice(w.endsWith('x') ? 0 : 1) : w; };
       const what = ids.map(word).join(' and ');
       const many = ids.length > 1 || gone[ids[0]] > 1;
-      notes.push(`${many ? 'Rats' : 'A rat'} took your ${what} while you napped.`);
+      notes.push(`${many ? 'Rats' : 'A rat'} took ${others ? 'the' : 'your'} ${what} while you napped.`);
     }
     return notes;
   }

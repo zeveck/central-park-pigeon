@@ -140,7 +140,11 @@ export class Hud {
     if (L.meters !== mk) {
       // batch-2 (#15): Bread Power also shows the live flips ("Bread Power 0/30 · 3 flipped"), and says what it counts on
       // hover/focus and the first time it shows
-      $.meters.innerHTML = v.meters.map((m) => `<span class="chip"${TIP[m.id] ? ` tabindex="0" data-tip="${TIP[m.id]}"` : ` title="${esc(m.label)}"`}>${icon(m.icon)}<b>${esc(m.label)} ${m.value}/${m.max}${m.flipped ? ` · ${m.flipped} flipped` : ''}</b></span>`).join('');
+      const text = (m) => `${m.label} ${m.value}/${m.max}${m.flipped ? ` · ${m.flipped} flipped` : ''}`;
+      const ids = v.meters.map((m) => m.id).join('|');
+      if (L.meterIds === ids) v.meters.forEach((m, i) => { $.meters.children[i].querySelector('b').textContent = text(m); });   // in place: an open tip stays open
+      else $.meters.innerHTML = v.meters.map((m) => `<span class="chip"${TIP[m.id] ? ` tabindex="0" data-tip="${TIP[m.id]}"` : ` title="${esc(m.label)}"`}>${icon(m.icon)}<b>${esc(text(m))}</b></span>`).join('');
+      L.meterIds = ids;
       if (v.meters.some((m) => m.id === 'sign')) this.#firstTip('sign');
       L.meters = mk;
     }
@@ -287,11 +291,11 @@ export class Hud {
 
 // batch-2 (#15): what the crumbs and Bread Power chips are for (hover/focus tip, and a toast the first time each shows)
 const TIP = {
-  crumbs: 'Crumbs: spend 15 at a Nest to Feather Up (get a feather back).',
+  crumbs: 'Crumbs: spend 15 at a Nest to Feather Up (get a feather back), or on a shiny at the Exchange.',
   sign: 'Bread Power: signs made permanent. The rangers fix flipped signs until you stop their cart.',
 };
 const TOAST_TIP = {
-  crumbs: 'Crumbs! 15 buys a feather back at a Nest.',
+  crumbs: 'Crumbs! 15 buys a feather at a Nest, or a shiny at the Exchange.',
   sign: 'Bread Power counts PERMANENT signs: stop a ranger cart.',
 };
 

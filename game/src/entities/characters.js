@@ -171,11 +171,11 @@ export class Characters {
     const sink = (ri) => (seatY(c.baked, K, ri * u) - K.y) / u;
     // on a model the sizes weren't drawn for, a waistcoat is fitted to the body (fitRing); neck rings take the look's scale
     const fit = c.ref && c.ref !== c.baked ? (p, R, half) => fitRing(c.baked, p, R, half) : null;
-    const ringK = NK?.[3] || 1;
+    const ringK = NK?.[3] || 1, ringTilt = NK?.[4] ?? Math.PI / 2.3, lift = c.look.lift || 0;
     const parts = [];
     for (const code of codes) {
       const [name, col] = code.split(':');
-      for (const p of accessory(name, col, u, H, N, B, c.baked.bounds, K, sink, fit, ringK)) parts.push(p);
+      for (const p of accessory(name, col, u, H, N, B, c.baked.bounds, K, sink, fit, ringK, ringTilt, lift)) parts.push(p);
     }
     if (!parts.length) return null;
     const geos = parts.map(({ geo, color }) => {
@@ -367,12 +367,12 @@ function fitRing(b, p, R, half) {
 // Head-top pieces are placed from the crown: atTop(dx, dy, dz) is at(K, dx, dy - TOP, dz), TOP being where the crown sat
 // above H on the models the sizes were drawn for (0.6 u), so a hat's height above its wearer's head no longer depends on
 // how far headPoint lands under the crown.
-function accessory(name, col, u, H, N, B, bb, K = H, sink = () => 0, fit = null, ringK = 1) {
+function accessory(name, col, u, H, N, B, bb, K = H, sink = () => 0, fit = null, ringK = 1, ringTilt = Math.PI / 2.3, lift = 0) {
   const out = [];
   const add = (geo, color, p, rx = 0, ry = 0, rz = 0) => { geo.rotateX(rx); geo.rotateY(ry); geo.rotateZ(rz); geo.translate(p.x, p.y, p.z); out.push({ geo, color }); };
   const at = (base, dx = 0, dy = 0, dz = 0) => new THREE.Vector3(base.x + dx * u, base.y + dy * u, base.z + dz * u);
   const TOP = 0.6;
-  const atTop = (dx = 0, dy = 0, dz = 0) => at(K, dx, dy - TOP, dz);
+  const atTop = (dx = 0, dy = 0, dz = 0) => at(K, dx, dy - TOP + lift, dz);   // lift: the look's own raise (Fifi's bow)
   // a neck ring round `base` (scaled by the look's ring scale); a body ring (the waistcoat) fitted on other models
   const ring = (base) => ({ p: base.clone(), k: ringK });
   const body = (base, R, dy, half) => { const p = at(base, 0, dy, 0); return fit ? fit(p, R * u, half * u) : { p, k: 1 }; };
@@ -429,7 +429,7 @@ function accessory(name, col, u, H, N, B, bb, K = H, sink = () => 0, fit = null,
     case 'pocketwatch': add(cyl(0.22, 0.22, 0.08, 12), '#d4a02a', at(B, 0.4, 0.3, 1.05), Math.PI / 2); break;
     case 'tie': add(box(0.3, 1.1, 0.06), C(col, '#c4302b'), at(N, 0, -0.7, 0.95)); break;
     case 'crust': add(box(0.3, 1.0, 0.25), '#c9823e', at(B, 1.1, 0.3, 0.6), 0, 0, 0.4); break;
-    case 'collar': { const r = ring(N); add(tor(0.9 * r.k, 0.12), C(col, '#c4302b'), onRing(r, 0, 0, 0.1), Math.PI / 2.3); add(cyl(0.18, 0.18, 0.05, 10), '#d4a02a', onRing(r, 0, -0.8, 0.85), Math.PI / 2); break; }
+    case 'collar': { const r = ring(N); add(tor(0.9 * r.k, 0.12), C(col, '#c4302b'), onRing(r, 0, 0, 0.1), ringTilt); add(cyl(0.18, 0.18, 0.05, 10), '#d4a02a', onRing(r, 0, -0.8, 0.85), Math.PI / 2); break; }
     case 'bow': add(box(0.9, 0.4, 0.2), C(col, '#e87aa8'), atTop(0, 0.55, -0.2)); break;
     case 'mortarboard': { const d = 0; /* the board rests on the crown, whatever the head's shape */ add(box(1.5, 0.08, 1.5), '#161616', atTop(0, 0.7 + d, -0.1)); add(cyl(0.55, 0.55, 0.3, 10), '#161616', atTop(0, 0.52 + d, -0.1)); break; }
     case 'collar-bell': { const r = ring(N); add(tor(0.9 * r.k, 0.1), '#c4302b', onRing(r, 0, 0, 0.1), Math.PI / 2.3); add(sph(0.22), '#d4a02a', onRing(r, 0, -0.8, 0.85)); break; }
