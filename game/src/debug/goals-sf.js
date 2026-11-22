@@ -177,7 +177,9 @@ export const GOALS_SF = {
     ...((window.__sfG?.state.crumbs ?? 0) >= 30 ? [] : [{ sfLandNear: { x: 6, z: 562 }, r: 2.5 }, { coo: { hold: false } }]), flag('den-racers', 60), idle(),
   ],
   'den-racers.alt': () => [
-    ...talk('wingate', { x: 0, z: -3 }), flag('den-racers.s1', 30), idle(),
+    // batch-3: come in from the east bank, over the Reservoir, as the main route does (from the south the dive onto Wingate's narrow 86th St bridge deck
+    // dropped Gus into the cut beside it; the Reservoir fence blocks walking up from the north bank)
+    { flyTo: { x: 92, z: 716 }, alt: 7, r: 4, timeout: 200 }, ...talk('wingate', { x: 0, z: -3 }), flag('den-racers.s1', 30), idle(),
     ...napAt('nest-reservoir', 'dusk'), idle(),
     { sfLandNear: { x: 18.6, z: 563.2 }, alt: 6, r: 2.5, timeout: 60 }, { call: 'raccoons' }, { wait: 3.6 }, { ask: 'raccoons' }, flag('pedicab.rigged', 60), idle(),
     { enter: 'pedicab' }, { drive: { to: { x: PEDICAB_RACE.start.x, z: PEDICAB_RACE.start.z }, r: 1, speed: 1 } },
@@ -215,8 +217,10 @@ export const GOALS_SF = {
   'den-geese': () => [
     ...talk('gertrude'), flag('den-geese.s1', 30), idle(),
     ...napAt('nest-greatlawn', 'afternoon'), idle(),
-    ...go(front(sign('N1'), 2.2)), { walkTo: front(sign('N1'), 0.9), r: 0.35 }, { peck: 'sign:N1' },
-    ...go(front(sign('N2'), 2.2)), { walkTo: front(sign('N2'), 0.9), r: 0.35 }, { peck: 'sign:N2' }, flag('den-geese.s2', 30), idle(),
+    // batch-3: a lower approach (alt 4) to the Great Lawn signs: at 6 m the autopilot circled N1 without landing after the re-shaped
+    // bridge approaches changed where it took off from
+    ...go(front(sign('N1'), 2.2), 4), { walkTo: front(sign('N1'), 0.9), r: 0.35 }, { peck: 'sign:N1' },
+    ...go(front(sign('N2'), 2.2), 4), { walkTo: front(sign('N2'), 0.9), r: 0.35 }, { peck: 'sign:N2' }, flag('den-geese.s2', 30), idle(),
     { sfLandNear: { x: 8.8, z: 432.5 }, from: { x: 8.8, z: 418 }, r: 1.6, alt: 6, timeout: 200 }, flag('den-geese.s3', 60), flag('den-geese', 60), idle(),
   ],
   'truce-dogs-squirrels': () => [
@@ -235,7 +239,9 @@ export const GOALS_SF = {
     ...go({ x: -20, z: 537 }, 6, 1.5), { call: 'horses' }, { wait: 3.8 }, { ask: 'horses' }, flag('part-legs', 60), idle(120),
   ],
   'part-power': () => [
-    ...go({ x: -24.5, z: 298.5 }, 6, 2), flag('part-power.s1', 30), idle(),
+    // batch-3: land a few metres inland of the spot and walk to it (go()'s flyTo overshot over the Lake and came down on the far bank, where the water's edge
+    // now stops a walk back; it used to splash-launch him)
+    { flyTo: { x: -21, z: 293 }, alt: 4, r: 4, timeout: 120 }, { walkTo: { x: -24.5, z: 298.5 }, r: 0.6 }, flag('part-power.s1', 30), idle(),
     { walkTo: { x: -25.6, z: 296.6 }, r: 0.5 }, { peck: 'wedding-basket' }, flag('part-power.s2', 60), idle(),
     { walkTo: { x: -31.4, z: 300.6 }, r: 0.8 }, { call: 'geese' }, { wait: 3.8 }, { ask: 'geese' }, flag('battery.up', 90), flag('part-power', 90), idle(120),   // Fixes-2: the battery comes up in the stampede
   ],

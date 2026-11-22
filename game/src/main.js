@@ -505,7 +505,9 @@
 //     floorAt (the seed: terrain, a bridge deck or the water, never a roof), standable / clearNear (a person's spot, deterministic),
 //     walkBlocked / walkFloor (the crowds: 0.5 m cells cached in 16 m tiles, forgotten when a shape is added there), deckAt.
 //   - world/terrain.js step 7: every stone and transverse bridge deck height is fixed there (bridgeDecks: the old formula) and the
-//     ground is ramped to it at both ends (up to 26 m for the 5.8 m step at the 79th St cut by Belvedere); terrain.deckTops →
+//     ground is ramped to it at both ends (1 in 6 along, 1 in 2 down the sides; ends more than 3 m apart put the deck halfway:
+//     the 79th St bridge by Belvedere had a 5.8 m step); trees placed on an approach are dropped (onRamp, after placement: no
+//     random draw moves; a tree on a raised bank lifted its canopy into flight paths). terrain.deckTops →
 //     ctx.deckTops (here) → landmarks.js builds the decks at those heights, caps the cut walls under a deck, and leaves a gap in the
 //     walls where a shallow crossing has no bridge.
 //   - humans.js: homes on water / in solids move to the nearest standable spot (no random draw); wander targets must be standable
@@ -553,7 +555,7 @@ import { buildTerrain } from './world/terrain.js';
 import { buildWater, createWaterMaterial } from './world/water.js';
 import { placeTrees, addTreeCollision, TreeSystem } from './world/trees.js';
 import { placeProps, buildProps, buildWall, buildNests, buildGrates } from './world/props.js';
-import { buildLandmarks, buildTransverses, findCrossings, Streamer } from './world/landmarks.js';
+import { buildLandmarks, buildTransverses, findCrossings, Streamer, onRamp } from './world/landmarks.js';
 import { buildCity, buildTaxis } from './world/city.js';
 import { buildFarLayer, FAR, FAR_CULL } from './world/farlayer.js';
 import { skyUniforms } from './world/sky.js';
@@ -772,7 +774,7 @@ async function boot() {
   await stage('Planting the trees', 0.24);
   const propsData = placeProps(terrain, { blockers: ctx.blockers });
   const props = buildProps(propsData, { noise, collision, glb: Object.fromEntries(propGlbs.filter(([, b]) => b)), pools: preset.propPool, range: { high: 300, medium: 220, low: 120 }[preset.id] });   // perf pass: range
-  const trees = placeTrees(terrain, ctx.blockers);
+  const trees = placeTrees(terrain, ctx.blockers).filter((t) => !onRamp(terrain.deckRamps, t.x, t.z));   // batch-3 (review): none on a bridge approach
   addTreeCollision(trees, collision);
   terrain.finish(trees);
   terrain.lodDistance = { high: 130, medium: 85, low: 15 }[preset.id];   // perf pass: was 130 / 100 / 60

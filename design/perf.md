@@ -472,3 +472,31 @@ The flat fence planes (the alpha-tested, double-sided `rail` material) are repla
   used it too), so the net change is zero or one draw fewer per cell. The probe's +1–2 draws at the Reservoir match
   the people the batch-3 placement work moved there (one body draw and one shadow draw).
 - About 46k of the Reservoir's triangle increase is those people, not the fences.
+
+## Batch-3c (grounding, bridges, water; 2026-11-22)
+
+The Low probe after batch 3 showed Bethesda at 313k and Bow Bridge at 325k by day (cap 300k), the governor at its 0.2 floor.
+A probe of the same spots on each commit (Low, day, fixture den-meermob) found they were already over before batch 3:
+
+| commit | Bethesda | Bow Bridge |
+|---|---|---|
+| e866280 (before batch 3) | 308k / 122 (governor 0.33) | 308k / 123 (0.2) |
+| 52d79a4 (batch-3d fences) | 312k / 118 (0.2) | 325k / 123 (0.2) |
+| 25c314c (batch-3c grounding) | 313k / 118 (0.2) | 326k / 124 (0.2) |
+| e78c589 (dog gait) | 313k / 118 (0.2) | 326k / 124 (0.2) |
+
+The common cost was the 17 sitter benches (Fixes-3, `humans.js`): one InstancedMesh whose bounding sphere covered the
+whole park, so all 17 drew at every spot, in the main pass and the shadow pass (23k triangles each, even at the
+Reservoir at night). Now only the benches within 70 m of the camera are in its instance list (refreshed with the people's
+draw assignment), and they cast shadows on Medium and High only. Render only: nothing reads a bench, no replay moves.
+
+After (`perf-probe.mjs --spots bethesda,bow-bridge,reservoir`, phases afternoon and night):
+
+| spot | Low day | Low night | High day | High night |
+|---|---|---|---|---|
+| Bethesda | **295k / 124** (governor 0.51; 12 people drawn, was 8) | 253k / 104 (1) | 1073k / 238 (1) | 887k / 175 (1) |
+| Bow Bridge | **299k / 125** (0.33; 12 people, was 10) | 250k / 108 (1) | 1131k / 263 (1) | 898k / 185 (1) |
+| Reservoir | 194k / 79 (1) | 187k / 73 (1) | 734k / 159 (1) | 719k / 146 (1) |
+
+Every spot is inside its preset's cap again (Low 300k / 150, High 1200k / 300); the freed triangles go back to people
+the governor had been trimming.

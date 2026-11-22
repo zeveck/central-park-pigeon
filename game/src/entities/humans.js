@@ -48,6 +48,7 @@ const LOOPS = new Set(['idle', 'walk', 'run', 'sit', 'jog', 'balance', 'scan-wal
 // seats (visual): where a seated agent's model is drawn
 const SEAT = { stool: 0.12, bench: 0.08, carriage: 0 };
 const WALK = 1.25, RUN = 3.6, JOG = 2.8;
+const BENCH_DIST = 70;   // perf: sitter benches drawn within this of the camera (people are drawn out to ~60 m)
 const FADE = 0.2;
 
 const _v = new THREE.Vector3();
@@ -253,14 +254,30 @@ export class Humans {
   #stepTo(a, nx, nz) {
     const C = this.G.collision;
     if (C.walkBlocked(nx, nz) === 1 && C.walkBlocked(a.x, a.z) !== 1) return false;   // the water's edge (from a shore cell, any step is fine)
+    // the sim's own height (a.gy), never the drawn one (a.y: only people the camera draws have it, and how many are drawn
+    // depends on the preset): positions must not depend on what is drawn
     const p = _wp;
-    p.x = nx; p.z = nz; p.y = a.y ?? C.floorAt(nx, nz);
+    p.x = nx; p.z = nz; p.y = a.gy ?? C.floorAt(nx, nz);
     const hit = C.pushOut(p, 0.28, 1.5, _wn);
     const moved = Math.hypot(p.x - a.x, p.z - a.z);
     a.x = p.x; a.z = p.z;
-    if (a.y != null) a.y = C.groundFor(a.x, a.z, a.y + 0.35, _wg).y;
+    a.gy = C.groundFor(a.x, a.z, p.y + 0.35, _wg).y;
     // pushed back where it stood: a wall across the way
     return !(hit && moved < 0.002);
+  }
+
+  /** Perf (render only): the sitter benches within BENCH_DIST of the camera, packed at the front of the instance list. */
+  #nearBenches(camera) {
+    const B = this.benches, cp = camera?.position;
+    if (!B || !cp) return;
+    const near = B.all.filter((b) => (b.x - cp.x) ** 2 + (b.z - cp.z) ** 2 < BENCH_DIST * BENCH_DIST);
+    const key = near.map((b) => B.all.indexOf(b)).join(',');
+    if (key === B.key) return;
+    B.key = key;
+    near.forEach((b, i) => B.m.setMatrixAt(i, b.mat));
+    B.m.count = near.length; B.m.visible = near.length > 0;
+    B.m.instanceMatrix.needsUpdate = true;
+    if (near.length) B.m.computeBoundingSphere();
   }
 
   /** Visual furniture and companions: stools under the seated chess players, dogs on leashes. */
@@ -285,7 +302,10 @@ export class Humans {
       if (!list.length) return;
       const cg = b.geometry.clone().translate(-(bb.min.x + bb.max.x) / 2, 0, -(bb.min.z + bb.max.z) / 2);   // centred under the sitter
       const m = new THREE.InstancedMesh(cg, b.makeMaterial(), list.length);
-      m.castShadow = true; m.receiveShadow = true; m.name = 'sitter-benches';
+      // perf (batch-3 probe): one bounding sphere over the whole park drew all of them, and their shadows, at every spot (~23k
+      // triangles twice on Low). Now only the benches near the camera are in the instance list (#nearBenches), and they cast
+      // shadows on Medium and High only. Render only: nothing reads a bench.
+      m.castShadow = G.preset?.id !== 'low'; m.receiveShadow = true; m.name = 'sitter-benches';
       const mm = new THREE.Matrix4(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0), sc = new THREE.Vector3(-k, k, k), pos = new THREE.Vector3();
       list.forEach((a, i) => {
         const back = 0.22, p = a.home;
@@ -294,7 +314,8 @@ export class Humans {
         mm.compose(pos, q.setFromAxisAngle(up, p.yaw ?? 0), sc);
         m.setMatrixAt(i, mm);
       });
-      m.computeBoundingSphere();
+      this.benches = { m, all: list.map((a, i) => { const t = new THREE.Matrix4(); m.getMatrixAt(i, t); return { x: a.home.x, z: a.home.z, mat: t }; }), key: '' };
+      m.count = 0; m.visible = false;
       this.group.add(m);
     });
     // dogs: baked crowd models, one mesh each, led on a leash line from the walker's hand
@@ -363,7 +384,7 @@ export class Humans {
       if (a.script || a.temp) continue;
       const spec = a.spec;
       a.out = phaseList(spec.phases).includes(phase) && !(spec.until && this.G.state?.flags[spec.until]);
-      a.x = a.home.x; a.z = a.home.z; a.yaw = a.home.yaw ?? 0; a.y = undefined;
+      a.x = a.home.x; a.z = a.home.z; a.yaw = a.home.yaw ?? 0; a.y = undefined; a.gy = undefined;
       a.mode = 'home'; a.target = null; a.busy = false; a.oneShot = null; a.speed = 0;
       a.holds = spec.holds || null;
       if (!a.out) this.#release(a);
@@ -485,7 +506,7 @@ export class Humans {
       this.#sim(a, dt);
     }
     for (const a of this.extras) if (a.out && !a.script) this.#sim(a, dt);
-    if (this.tick++ % 8 === 0) this.#assign(camera);
+    if (this.tick++ % 8 === 0) { this.#assign(camera); this.#nearBenches(camera); }
     // pose and animate the drawn ones
     let anim = 0, frozen = 0;
     for (const list of [this.agents, this.extras]) for (const a of list) {

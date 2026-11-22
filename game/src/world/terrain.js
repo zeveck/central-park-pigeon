@@ -310,7 +310,9 @@ function computeHeights(S, masks) {
     for (const e of d.ends) {
       const g0 = sampleH(h, e.x + e.dx * 1, e.z + e.dz * 1);
       const gap = d.top - g0;
-      const R = clamp(Math.abs(gap) * 5, 3, 26), side = clamp(Math.abs(gap) * 0.6, 1.5, 4), hw = d.width / 2;   // (review: narrower sides, clear of the Ramble crows)
+      // the gentlest approach that meets the deck: 1 in 6 along the path, 1 in 2 down its sides (review)
+      const R = clamp(Math.abs(gap) * 6, 3, 30), side = clamp(Math.abs(gap) * 2, 1.5, 6), hw = d.width / 2;
+      e.ramp = { R, side, hw };   // (landmarks.js keeps trees off it)
       const reach = R + hw + side + STEP;
       const i0 = Math.max(0, Math.floor((e.x - reach - WORLD.xMin) / STEP)), i1 = Math.min(NX - 1, Math.ceil((e.x + reach - WORLD.xMin) / STEP));
       const j0 = Math.max(0, Math.floor((e.z - reach - WORLD.zMin) / STEP)), j1 = Math.min(NZ - 1, Math.ceil((e.z + reach - WORLD.zMin) / STEP));
@@ -360,7 +362,11 @@ export function bridgeDecks(S, hAt) {
     const bed = -t.depth * smoothstep(0, TRANSVERSE_RAMP, Math.min(cr.x - PARK.xMin, PARK.xMax - cr.x));
     if (-bed < 1.5) continue;   // a shallow crossing has no bridge (landmarks.js leaves a gap in the cut walls there)
     const half = t.halfWidth + 2.5;
-    const top = Math.max(hAt(cr.x, t.z - half), hAt(cr.x, t.z + half)) + 0.15;
+    // (review) ends more than 3 m apart (only the 79th St bridge by Belvedere: a 5.8 m step): the deck sits halfway, two ~2.9 m
+    // ramps (one up, one cut down) instead of one 4 m bank lifting the trees. Smaller steps keep the higher end (the Racers'
+    // start line stands on the 86th St bridge's deck).
+    const yS = hAt(cr.x, t.z - half), yN = hAt(cr.x, t.z + half);
+    const top = (Math.abs(yS - yN) > 3 ? (yS + yN) / 2 : Math.max(yS, yN)) + 0.15;
     out.push({ key: `${t.id}:${Math.round(cr.x * 10)}`, top, width: cr.width + 1.6, ends: [{ x: cr.x, z: t.z - half, dx: 0, dz: -1 }, { x: cr.x, z: t.z + half, dx: 0, dz: 1 }] });
   }
   return out;
@@ -480,6 +486,7 @@ export async function buildTerrain({ textures, onStage = () => {} }) {   // boot
   const terrain = {
     heightAt, normalAt, masks, grid: { h, NX, NZ, STEP, x0: WORLD.xMin, z0: WORLD.zMin }, woodsId, waterId, shapes: S,
     deckTops: Object.fromEntries(decks.map((d) => [d.key, d.top])),   // batch-3 (#17): landmarks.js builds the decks at these
+    deckRamps: decks.flatMap((d) => d.ends.filter((e) => e.ramp).map((e) => ({ ...e }))),   // batch-3 (review): no trees on the approaches
     /** Read the painted masks at a point: { path, pavers, asphalt, leaves, mud, dirt } (0..1). */
     maskAt(x, z) {
       const px = clamp(Math.round((x - WORLD.xMin) * MASK_RES), 0, masks.w - 1);

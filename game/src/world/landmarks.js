@@ -752,6 +752,16 @@ export function buildTransverses(ctx, crossings) {
   }
 }
 
+/** Batch-3 (review): is (x, z) on a bridge approach terrain.js ramped (the path and its side slopes)? main.js drops the trees
+ *  placed there after placement (no random draw moves): a tree seated on a raised bank lifted its canopy into flight paths. */
+export function onRamp(ramps, x, z) {
+  for (const e of ramps || []) {
+    const ox = x - e.x, oz = z - e.z, u = ox * e.dx + oz * e.dz, v = Math.abs(-ox * e.dz + oz * e.dx);
+    if (u > -1 && u < e.ramp.R && v < e.ramp.hw + e.ramp.side) return true;
+  }
+  return false;
+}
+
 /** Where drives and paths cross the transverse cuts: [{t, x, width, drive}]. */
 export function findCrossings(shapes) {
   const out = [];
