@@ -44,6 +44,15 @@ const BODY_R = { ground: 0.12, air: 0.18 };
 // descent carries on after the key is up (gentler, slower forward speed) until he lands, and a perch within `perchR`
 // catches him. Flap, boost, a splash, a cutscene (locked input) or `max` seconds cancel it.
 const LAND = { tap: 0.3, calm: 0.25, alt: 10, max: 4, speed: 5, sink: 6.5, perchR: 1.0 };
+// Batch-2 (#5): a quick tap of Flap on ordinary ground is a hop. The choice is made when the take-off squash ends
+// (TAKEOFF_SQUASH): Flap still held, or pressed again during the squash → the full take-off exactly as before (no added
+// delay); let go → a hop: about 1 m up and ~1.8 m forward, then walking again on the same ground. A press during the hop
+// takes off at once. Only from ordinary ground: main.js sets gus.hopOk each update (not carrying, no scene, encounter, race,
+// scheme script...), and here: walk mode on terrain (no perch, roof, rock or kerb), nothing lower just ahead, no water.
+// gus.legacyTakeoff (G.legacyTakeoff: replays of solutions recorded before the hop) never hops: the old take-off exactly.
+const HOP = { vy: 4.4, gravity: 9.8, speed: 2.1, turn: 3, max: 1.6 };
+// Batch-2 (#5): on touch a double-tapped Flap is Boost; the second tap of a hop-then-fly is not a boost for this long (s)
+const BOOST_GRACE = 0.5;
 // Batch-2 (#2): the landing snap (up to 0.9 m in a dive, a perch catch) is eased on the visual root over this long (s).
 // Render-side only: gus.position, speed and every rule land exactly as before.
 const LAND_EASE = 0.24;
@@ -118,6 +127,9 @@ export class Gus {
     this.glideT = 0;                // Land/perf: seconds flying without Flap or Land (the HUD's Land prompt reads it)
     this.sinceFlap = 0;             // Land/perf: seconds since Flap was last held in the air (a tap right after a climb is a trim, not a landing)
     this.lowAlt = Infinity;         // Land/perf: height over what's below him while flying (HUD only)
+    this.hopOk = false;             // Batch-2 (#5): set by main.js each update (ordinary play: a tap may hop)
+    this.legacyTakeoff = false;     // Batch-2 (#5): set by main.js from G.legacyTakeoff (old replays: never hop)
+    this.hopArmed = false; this.flapAgain = false; this.hopFrom = null;
     this.landEase = null;           // Batch-2 (#2): { t, x, y, z } the visual offset (data space) eased out after a landing
     this._prevPos = new THREE.Vector3();
     this.useModel('stand');
@@ -153,7 +165,7 @@ export class Gus {
     this.inCanopy = false;
     this.events = [];
     this.diveHeldT = 0; this.landLatch = 0; this.glideT = 0; this.lowAlt = Infinity; this.sinceFlap = 0;
-    this.landEase = null;
+    this.hopArmed = false; this.flapAgain = false; this.hopFrom = null; this.landEase = null;
     this.speed = speed ?? (mode === 'fly' ? FLY.cruise : 0);
     this.velocity.set(Math.sin(yaw), 0, Math.cos(yaw)).multiplyScalar(this.speed);
     this.useModel(mode === 'fly' ? 'fly' : 'stand');
@@ -171,6 +183,7 @@ export class Gus {
       case 'walk':
       case 'perch': this.#updateGround(dt, cameraYaw); break;
       case 'takeoff': this.#updateTakeoff(dt); break;
+      case 'hop': this.#updateHop(dt, cameraYaw); break;
       case 'fly': this.#updateFly(dt, cameraYaw); break;
       case 'drive': break;   // vehicles.js seats him and moves him with the vehicle
     }
@@ -244,7 +257,25 @@ export class Gus {
       if (this.peckT >= PECK_TIME) this.peckT = -1;
     }
     if (inp.pressed('peck') && this.peckT < 0) this.peckT = 0;
-    if (inp.pressed('flap')) { this.mode = 'takeoff'; this.modeT = 0; this.peckT = -1; this.slideV = 0; }
+    if (inp.pressed('flap')) {
+      // Batch-2 (#5): may this one become a hop? Decided now (where he stands), used when the squash ends
+      this.hopArmed = !this.legacyTakeoff && this.hopOk && this.mode === 'walk' && this.slideV <= 0 && this.#hopGround();
+      this.flapAgain = false;
+      this.mode = 'takeoff'; this.modeT = 0; this.peckT = -1; this.slideV = 0;
+    }
+  }
+
+  /** Batch-2 (#5): ordinary ground: terrain under him and along the hop (no water, no drop or wall-top just ahead). */
+  #hopGround() {
+    const p = this.root.position;
+    const here = this.#surface(p.x, p.z, p.y + 0.05);
+    if (here.kind !== 'terrain' || Math.abs(here.y - p.y) > 0.05) return false;
+    const fx = Math.sin(this.yaw), fz = Math.cos(this.yaw);
+    for (const d of [0.6, 1.2, 1.9, 2.6]) {
+      const s = this.#surface(p.x + fx * d, p.z + fz * d, p.y + 0.6);
+      if (s.kind === 'water' || s.y < p.y - 0.35 || s.y > p.y + 0.5) return false;
+    }
+    return true;
   }
 
   /** Sit in a vehicle (vehicles.js moves him) or get out. cam: { dist, height, look }. */
@@ -260,10 +291,69 @@ export class Gus {
 
   // ---------------------------------------------------------------- take-off
   #updateTakeoff() {
-    if (this.modeT >= TAKEOFF_SQUASH) this.#startFly(3.2, Math.max(4.5, this.speed));
+    if (this.input.pressed('flap')) this.flapAgain = true;   // Batch-2 (#5): a second press during the squash flies
+    if (this.modeT >= TAKEOFF_SQUASH) {
+      // Batch-2 (#5): released before the squash ended (and not pressed again) → a hop; otherwise the take-off as before
+      if (this.hopArmed && !this.flapAgain && !this.input.held('flap') && !this.input.scripted) this.#startHop();
+      else this.#startFly(3.2, Math.max(4.5, this.speed));
+      this.hopArmed = false;
+    }
+  }
+
+  // ---------------------------------------------------------------- hop (Batch-2, #5)
+  #startHop() {
+    this.mode = 'hop';
+    this.modeT = 0;
+    this.vy = HOP.vy;
+    this.speed = Math.max(HOP.speed, this.speed);
+    this.perch = null;
+    this.hopFrom = { x: this.root.position.x, y: this.root.position.y, z: this.root.position.z };
+    this.flyAnim.freq = 7; this.flyAnim.amp = 0.9;
+    this.useModel('fly');
+    this.events.push({ type: 'hop', x: this.hopFrom.x, y: this.hopFrom.y, z: this.hopFrom.z });
+  }
+
+  #updateHop(dt, cameraYaw) {
+    const inp = this.input;
+    // pressed again in the air: the full take-off at once (from the hop's height and speed)
+    if (inp.pressed('flap') && !inp.scripted) { this.#startFly(3.2, Math.max(4.5, this.speed)); return; }
+    const mv = inp.move ? inp.move() : { x: inp.axis('left', 'right'), y: inp.axis('back', 'forward') };
+    if (Math.hypot(mv.x, mv.y) > 0.1) {
+      const sn = Math.sin(cameraYaw), cs = Math.cos(cameraYaw);
+      const dx = mv.y * sn + mv.x * cs, dz = mv.y * cs - mv.x * sn;
+      const diff = wrapAngle(Math.atan2(dx, dz) - this.yaw);
+      this.yaw += Math.sign(diff) * Math.min(Math.abs(diff), HOP.turn * dt);
+    }
+    const p = this.root.position;
+    p.x += Math.sin(this.yaw) * this.speed * dt;
+    p.z += Math.cos(this.yaw) * this.speed * dt;
+    this.vy -= HOP.gravity * dt;
+    p.y += this.vy * dt;
+    if (this.#collide(p, BODY_R.ground, 0.28)) this.speed *= 0.5;
+    const surf = this.#surface(p.x, p.z, p.y + 0.05);
+    this.lowAlt = p.y - surf.y;
+    this.flare = this.vy < 0;   // the legs reach down on the way back (looks only)
+    const a = this.flyAnim;
+    a.freq = approach(a.freq, this.vy > 0 ? 8 : 6, 6, dt);
+    a.amp = approach(a.amp, this.vy > 0 ? 0.95 : 0.8, 6, dt);
+    a.offset = approach(a.offset, this.vy > 0 ? -0.5 : -0.2, 8, dt);
+    this.wings.advance(dt, a.freq);
+    this.wings.setStroke(a.amp, a.offset);
+    if (this.vy <= 0 && p.y <= surf.y + 0.01) {
+      if (surf.kind === 'water') {
+        // never into the water and never into flight: a splash and back where he hopped from
+        this.#splash();
+        const h = this.hopFrom;
+        p.set(h.x, h.y, h.z);
+      } else p.y = surf.y;
+      this.#land('walk', null, true);
+      return;
+    }
+    if (this.modeT > HOP.max) this.#startFly(0.4, Math.max(2, this.speed));   // off an unseen drop: flutter, as walking off an edge does
   }
 
   #startFly(vy, speed) {
+    this.liftT = this.mode === 'fly' ? this.liftT : 0;   // Batch-2 (#5): seconds since leaving the ground (the touch boost grace)
     this.mode = 'fly';
     this.modeT = 0;
     this.vy = vy;
@@ -300,7 +390,10 @@ export class Gus {
     const diving = diveIn || landing;
     this.glideT = flapping || diving ? 0 : this.glideT + dt;
     // boost: Shift (or L3) pressed in the air, or a double-tapped Flap on touch
-    if ((inp.pressed('sprint') || inp.pressed('boost')) && this.boostT <= 0 && this.stamina >= STAMINA.boostCost * 0.5) {
+    // Batch-2 (#5): the touch double-tap is no boost in the first BOOST_GRACE s after leaving the ground (tap-hop, tap-fly)
+    this.liftT = (this.liftT || 0) + dt;
+    const tapBoost = inp.pressed('boost') && (this.legacyTakeoff || this.liftT >= BOOST_GRACE);
+    if ((inp.pressed('sprint') || tapBoost) && this.boostT <= 0 && this.stamina >= STAMINA.boostCost * 0.5) {
       this.boostT = FLY.boostTime * (this.boostMul || 1);   // Draft: the Racers double it
       this.stamina = Math.max(0, this.stamina - STAMINA.boostCost);
       this.events.push({ type: 'boost' });
@@ -428,21 +521,21 @@ export class Gus {
 
   #splash() { const p = this.root.position; this.events.push({ type: 'splash', x: p.x, y: p.y, z: p.z }); }
 
-  #land(mode, perch) {
+  #land(mode, perch, hop = false) {
     // Batch-2 (#2): the visual root starts where he was drawn last update and eases onto the landing spot (looks only)
     const pv = this._prevPos, pp = this.root.position;
     const ex = pv.x - pp.x, ey = pv.y - pp.y, ez = pv.z - pp.z;
-    this.landEase = Math.hypot(ex, ey, ez) > 0.02 && Math.hypot(ex, ey, ez) < 3 ? { t: 0, x: ex, y: ey, z: ez } : null;
+    this.landEase = !hop && Math.hypot(ex, ey, ez) > 0.02 && Math.hypot(ex, ey, ez) < 3 ? { t: 0, x: ex, y: ey, z: ez } : null;
     this.mode = mode;
     this.modeT = 0;
     this.perch = perch ? { ...perch, r: perch.perch?.r ?? 0.15, edge: perch.perch?.t === 'edge', id: perch.perch?.id, kind: perch.perch?.kind } : null;
     this.boostT = 0;
     this.landLatch = 0; this.diveHeldT = 0;
-    this.events.push({ type: mode === 'perch' ? 'perch' : 'land', x: this.root.position.x, y: this.root.position.y, z: this.root.position.z });
+    this.events.push({ type: mode === 'perch' ? 'perch' : 'land', x: this.root.position.x, y: this.root.position.y, z: this.root.position.z, hop });
     this.vy = 0;
     this.speed = 0;
     this.stepPhase = Math.ceil(this.stepPhase);
-    this.landSquash = 1;
+    this.landSquash = hop ? 0.7 : 1;
     this.skin.replant = true;   // Gus rig: he lands with both feet on their rest spots
     this.useModel('stand');
   }
@@ -503,13 +596,13 @@ export class Gus {
     let spin = 0;
     if (this.twirlT > 0) { this.twirlT = Math.max(0, this.twirlT - dt); spin = Math.PI * 2 * ease(1 - this.twirlT / 0.8); }
     this.root.rotation.set(0, this.yaw + spin, 0);
-    if (this.mode === 'fly') {
+    if (this.mode === 'fly' || this.mode === 'hop') {
       const climb = THREE.MathUtils.clamp(this.vy * 0.07, -0.35, 0.3);
       // Gus rig: in the landing flare he pitches up a little and reaches down with his feet (looks only)
       this.flareK = approach(this.flareK || 0, this.flare ? 1 : 0, 8, dt);
       this.pitch = approach(this.pitch, GUS_FLY.flightPitch - climb - this.flareK * 0.45, 6, dt);
       this.flyPose.rotation.set(this.pitch, 0, this.bank, 'YXZ');
-      const stretch = Math.max(0, 1 - this.modeT / 0.25) * 0.15;
+      const stretch = this.mode === 'hop' ? 0 : Math.max(0, 1 - this.modeT / 0.25) * 0.15;
       this.flyPose.scale.set(1 - stretch * 0.4, 1 + stretch, 1 - stretch * 0.4);
       this.skin.poseFly({ dt, modeT: this.modeT, flare: this.flare, lowAlt: this.lowAlt, vy: this.vy });
       return;

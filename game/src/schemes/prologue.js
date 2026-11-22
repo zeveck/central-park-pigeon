@@ -56,7 +56,7 @@ export function installPrologue(G) {
       { do: () => {
         // the ranger walks back to his cart
         G.humans.goTo(ranger, { x: cart.x + Math.cos(cart.yaw) * 1.1, z: cart.z - Math.sin(cart.yaw) * 1.1 }, 1.4, () => { ranger.script = true; cart.state = 'parked'; G.rangers.setPhase(G.state.phase); });
-        G.tutor('flap', 'to fly');
+        G.tutor('flap', 'hold to fly');   // Batch-2 (#5): a tap is a hop
         G.intro.stage = 'flap';
       } },
     ]);
@@ -73,7 +73,7 @@ export function installPrologue(G) {
     const lamp = G.prologueLamp, g = G.gus;
     if (st.time < 1) { G.startPrologue(); return; }   // saved by New Game itself: the opening, from the top
     G.intro = { stage: 'flap', t: 0 };
-    if (g.mode === 'perch' && Math.hypot(g.position.x - lamp.x, g.position.z - lamp.z) < 1.5) { G.tutor('flap', 'to fly'); return; }
+    if (g.mode === 'perch' && Math.hypot(g.position.x - lamp.x, g.position.z - lamp.z) < 1.5) { G.tutor('flap', 'hold to fly'); return; }
     // already off the lamppost: point at the sign (prologueTick runs the rest, as in the first minute)
     G.intro.stage = 'find'; G.intro.findT = 0;
     const s = S1();

@@ -966,6 +966,10 @@ async function boot() {
     gus.input = control ? input : LOCKED_INPUT;
     const prevMode = gus.mode;
     hintLandArmed = control && gus.mode === 'fly' && (gus.landLatch > 0 || input.held('dive'));   // Flight hint / scarf (read only)
+    // Batch-2 (#5): old recordings replay with the old take-off (no hop); a Flap press on the ground learns whether a tap
+    // may hop here (gus.js decides when the squash ends; it also checks the ground itself)
+    gus.legacyTakeoff = !!G.legacyTakeoff;
+    if (gus.mode === 'walk' && input.pressed('flap')) gus.hopOk = control && hopAllowed();
     { const cd = dataCam.position.distanceTo(gus.position); gus.scarf.lod = G.altView || cd > 40 ? 2 : cd > 12 ? 1 : 0; }   // Flight hint / scarf: scarf LOD (visual only)
     const driving = G.vehicles.driving;
     if (driving) G.vehicles.drive(dt, control ? input : LOCKED_INPUT, rig.yaw);
@@ -1028,6 +1032,16 @@ async function boot() {
     pendingSaveTick();
   }
 
+  /** Batch-2 (#5): a tap of Flap may hop only in ordinary play: not carrying, no scene or scheme script, no encounter, race
+   *  or chase (a mod's panel), not on the wheel, and not on a step that wants flight (step.flight or a reach with alt). */
+  function hopAllowed() {
+    if (G.state.carried || G.midScene() || G.cutscene.locked || G.dialogue.open || G.wheel.open || G.vehicles.driving) return false;
+    if (G.mods.some((m) => m.panel?.())) return false;
+    const id = G.state.tracked, step = id ? G.schemes.step(id) : null;
+    if (step && (step.flight || step.on?.alt != null)) return false;
+    return true;
+  }
+
   let hintLandArmed = false;
   function gusEvents(prevMode, dt) {
     const p = gus.position;
@@ -1041,6 +1055,8 @@ async function boot() {
       else if (e.type === 'boost') { audio.play('whoosh', { at: p, rate: 1.1 }); if (gus.input === input) learnHint('boost'); }
       else if (e.type === 'bump') { audio.synth('tick'); G.rumble(0.2, 0.1, 80); }
       else if (e.type === 'ceiling') { particles.burst('feathers', e.x, e.y + 0.2, e.z, 4); if (!G.saidCeiling) { G.saidCeiling = true; G.toast('Oof. Too heavy to go higher.'); } }   // fun pass (P10)
+      else if (e.type === 'hop') audio.play('flap', { at: e, vol: 0.4 });   // Batch-2 (#5)
+      else if (e.type === 'land' && e.hop) audio.play('landing', { at: e, vol: 0.3 });   // Batch-2 (#5): a hop's touchdown is no landing for the schemes
       else if (e.type === 'land' || e.type === 'perch') {
         if (hintLandArmed || (gus.input === input && input.held('dive'))) learnHint('land');   // Flight hint / scarf: a landing made with Land (tap or hold)
         if (G.spikes.onLanding(e)) continue;
@@ -1474,7 +1490,7 @@ async function boot() {
   G.snapshot = () => {
     const st = cloneState(G.state);
     st.saveRev = 3;   // Fixes-3: made by a build that never saves mid-scene (continueGame's repair treats saves without it as old)
-    st.gus = { x: +gus.position.x.toFixed(3), y: +gus.position.y.toFixed(3), z: +gus.position.z.toFixed(3), yaw: +gus.yaw.toFixed(4), mode: gus.mode === 'takeoff' ? 'walk' : gus.mode };
+    st.gus = { x: +gus.position.x.toFixed(3), y: +gus.position.y.toFixed(3), z: +gus.position.z.toFixed(3), yaw: +gus.yaw.toFixed(4), mode: gus.mode === 'takeoff' || gus.mode === 'hop' ? 'walk' : gus.mode };
     // playtest: saved while driving, Gus came back standing inside the vehicle (camera inside the cart). Save him
     // where getting out would put him: beside it, on the left (or the right), as vehicles.js #exit does.
     const v = G.vehicles?.cur;

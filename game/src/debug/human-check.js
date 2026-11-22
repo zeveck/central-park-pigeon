@@ -63,7 +63,7 @@ export class HumanCheck {
       else { this.steer(t.x, t.z, out, Math.min(1, d / 6)); out.held.add('dive'); }
       return d;
     }
-    if (d > 22) { s.fk = (s.fk || 0) + 1; if (s.fk % 24 < 4) out.held.add('flap'); this.steer(t.x, t.z, out, 0.6); return d; }
+    if (d > 22) { s.fk = (s.fk || 0) + 1; if (s.fk % 24 < 12) out.held.add('flap');   /* Batch-2 (#5): a hold, not a hop */ this.steer(t.x, t.z, out, 0.6); return d; }
     if (d > r) { this.steer(t.x, t.z, out, d > 3 ? 1 : 0.6); if (d > 4) out.held.add('sprint'); }
     // stuck walking (a rim, a bench): hop
     s.stuckT = (s.lastD != null && Math.abs(s.lastD - d) < 0.002 && d > r) ? (s.stuckT || 0) + 1 : 0;
@@ -99,7 +99,7 @@ export class HumanCheck {
     s.menuT = 0;
     if (sc.cutscene && G.cutscene.locked) { G.input.setAuto(out); return out; }
     // the tutor line says to fly: fly (a tap now and then, like a player trying the key)
-    if (/^flap:/.test(sc.tutor || '')) { s.fl = (s.fl || 0) + 1; if (s.fl % 20 < 4) out.held.add('flap'); G.input.setAuto(out); return out; }
+    if (/^flap:/.test(sc.tutor || '')) { s.fl = (s.fl || 0) + 1; if (s.fl % 20 < 12) out.held.add('flap'); G.input.setAuto(out); return out; }   // Batch-2 (#5): "hold to fly" (a tap hops)
     // the Prologue's crumbs: "move over the crumbs to eat"
     if (/crumbs to eat/.test(sc.tutor || '')) { const pile = this.nearestPile(); if (pile) { this.goTo(pile, out, { r: 0.3 }); G.input.setAuto(out); return out; } }
     const plan = this.plan(sc, out);

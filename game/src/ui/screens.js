@@ -289,7 +289,7 @@ export function settingsScreen(G) {
 
 // ------------------------------------------------------------------ controls cards
 const CARDS = [
-  { title: 'Move and fly', rows: [['move', 'Waddle / steer'], ['look', 'Camera'], ['flap', 'Hop, take off; hold to climb'], ['dive', 'Land / Dive: tap when low to land, hold to dive'], ['sprint', 'Waddle-sprint; boost in the air']] },
+  { title: 'Move and fly', rows: [['move', 'Waddle / steer'], ['look', 'Camera'], ['flap', 'Tap to hop; hold to take off and climb'], ['dive', 'Land / Dive: tap when low to land, hold to dive'], ['sprint', 'Waddle-sprint; boost in the air']] },
   { title: 'Peck and coo', rows: [['peck', 'Peck: talk, pick up, give, flip a sign'], ['coo', 'Coo: tap to gather the flock, hold to swarm'], ['drop', 'Drop what you carry'], ['nap', 'Nap (on a perch, when it shows)']] },
   { title: 'Calling allies', rows: [['wheel', 'Hold the Ally wheel, pick, release'], ['peck', 'Peck an ally who is here: Ask'], ['board', 'Scheme Board'], ['map', 'Map'], ['where', 'Where to? Shows where your goal is']] },
   { title: 'Driving', rows: [['move', 'Steer'], ['flap', 'Gas'], ['dive', 'Brake, reverse'], ['coo', 'Horn (Dump / Spray on the Zamboni)'], ['peck', 'Get out']] },

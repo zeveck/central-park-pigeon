@@ -57,6 +57,9 @@ export class Autopilot {
     s.t = (s.t || 0) + dt;
     let finished = false;
     try { finished = this.#goal(g, s, out, dt); } catch (e) { this.#fail(String(e)); }
+    // Batch-2 (#5): a Flap from the ground is a hold through the take-off squash (12+ frames), never a hop, unless the goal
+    // asks for a tap ({ hop: true }, the hop checks). The goals' own 4-frame ground taps stay as written.
+    if (G.gus.mode === 'takeoff' && !g?.hop) out.held.add('flap');
     if (s.t > (g.timeout || this.timeout)) this.#fail('timeout on goal ' + this.i + ' ' + JSON.stringify(g).slice(0, 80));
     if (finished) { this.log.push({ goal: this.i, frame: this.frame, t: +G.state.time.toFixed(2) }); this.i++; this.state = {}; }
     // the stick is quantised before it's applied, so the recording is exactly what was pressed

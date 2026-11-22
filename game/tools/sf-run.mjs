@@ -9,6 +9,8 @@
 //   node game/tools/sf-run.mjs record <goal> [--fixture id[.sN]] [--out design/solutions/<goal>.json] [--until flag]
 //   node game/tools/sf-run.mjs replay <solution.json> [--fixture id[.sN]] [--until flag]
 //   node game/tools/sf-run.mjs fixture <id> <out-name> --from <fixture> --goal <goal>   (run a goal, save the state as a fixture)
+//   node game/tools/sf-run.mjs check hop | hop-tap | hop-fly | hold-fly | legacy   (Batch-2: the hop checks, src/debug/hop-checks.js)
+// Batch-2 (#5): record writes version 2; replay passes the file's version to __game.replay (none → G.legacyTakeoff).
 // Options: --port 8141 · --shots dir (a screenshot whenever the cutscene/dialogue changes) · --max secs
 //
 // Goals live in src/debug/goals-sf.js (GOALS_SF). The server must be running:
@@ -154,6 +156,7 @@ async function runJob(page) {
           scheme: goal.replace(/\.(alt|s\d+).*$/, ''), start: `__game.goToScheme('${fixture.split('.s')[0]}'${fixture.includes('.s') ? ', ' + fixture.split('.s')[1] : ''})`, fixture: `game/data/fixtures/${fixture}.json`,
           recordedBy: `__game.autopilot(GOALS_SF['${goal}']()) (game/src/debug/goals-sf.js), game/tools/sf-run.mjs`,
           note: 'Raw inputs per fixed 1/60 s update, run-length encoded: [frames, held actions (comma list), stick x, stick y]. Replay with __game.replay() (autopilot off): node game/tools/sf-run.mjs replay <this file>.',
+          version: 2,   // Batch-2 (#5): recorded with the hop take-off (no version = replay with G.legacyTakeoff)
           frames, end: res.end, inputs: res.rec.map((f) => [f.n, f.h, f.x, f.y]),
         };
         fs.writeFileSync(path.join(ROOT, out), JSON.stringify(sol));
@@ -184,7 +187,8 @@ async function runJob(page) {
       const fixture = opt('fixture') || (sol.fixture ? path.basename(sol.fixture, '.json') : st ? st[1] + (st[2] ? '.s' + st[2] : '') : sol.scheme);
       await load(page, fixture);
       const frames = sol.inputs.map(([n, h, x, y]) => ({ n, h, x, y }));
-      await page.evaluate((f) => window.__game.replay(f), frames);
+      await page.evaluate(([f, version]) => window.__game.replay(f, { version }), [frames, sol.version || 0]);   // Batch-2 (#5)
+      console.log('takeoff:', sol.version >= 2 ? 'hop (version ' + sol.version + ')' : 'legacy');
       const ok = await stepUntil(page, (G) => !G.replayStatus().active, opt('shots'));
       // let the last cutscene settle
       await page.evaluate(() => window.__game.step(240, { render: 60 }));
@@ -192,6 +196,15 @@ async function runJob(page) {
       const res = await page.evaluate((u) => { const s = window.__game.state({ measure: false }); return { flag: s.flags.includes(u), end: { t: s.gameTime, crumbs: s.crumbs, flock: s.flock, x: s.player.x, z: s.player.z, crews: s.crews, parts: s.parts } }; }, until);
       console.log(JSON.stringify({ replayed: ok, completed: res.flag, until, end: res.end, recordedEnd: sol.end }, null, 1));
       if (!res.flag) process.exitCode = 1;
+    } else if (mode === 'check') {
+      // Batch-2 (#5): the hop checks (src/debug/hop-checks.js): check hop-tap | hop-fly | hold-fly | legacy | hop (all four)
+      const names = args[1] === 'hop' ? ['hop-tap', 'hop-fly', 'hold-fly', 'legacy'] : [args[1]];
+      await load(page, opt('fixture') || 'den-ducks');
+      for (const n of names) {
+        const r = await page.evaluate(async (n) => (await import('/src/debug/hop-checks.js')).runHopCheck(window.__game, n), n);
+        console.log(JSON.stringify(r));
+        if (!r.ok) process.exitCode = 1;
+      }
     } else {
       console.log('usage: record <goal> | replay <file> | fixture <id> <out> --from <fx> --goal <goal> | serve --jobs <dir>');
     }

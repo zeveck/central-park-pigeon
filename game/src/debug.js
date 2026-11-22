@@ -197,6 +197,7 @@ export function installDebug(G) {
       const { Autopilot } = await import('./debug/autopilot.js');
       G.pilot = G.pilot || new Autopilot(G);
       G.replayer = null;
+      G.legacyTakeoff = false;   // Batch-2 (#5): the autopilot records against today's take-off (and writes version 2)
       const p = G.pilot.run(typeof goals === 'string' ? (await import('./debug/goals.js')).GOALS[goals](G) : goals, opts);
       p.then((res) => { G.pilotResult = res; });
       G.pilotResult = null;
@@ -205,8 +206,10 @@ export function installDebug(G) {
     pilot() { return G.pilot?.active ? { running: true, goal: G.pilot.i, of: G.pilot.goals.length, frame: G.pilot.frame } : { running: false, result: G.pilotResult || null }; },
     recording() { return G.pilot?.recording || null; },
 
-    async replay(frames) {
+    async replay(frames, { version } = {}) {
       const { Replay } = await import('./debug/autopilot.js');
+      // Batch-2 (#5): recordings made before the hop (no version) replay with the old take-off; version 2+ with the hop
+      G.legacyTakeoff = !(version >= 2);
       G.replayer = new Replay(G, frames);
       return { frames: G.replayer.total };
     },
