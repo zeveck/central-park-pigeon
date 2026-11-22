@@ -26,6 +26,7 @@ export class Interact {
     const p = g.position;
     const carrying = !!this.G.state.carried;
     let best = null, bs = Infinity;
+    let pickup = null, ps = Infinity;   // #23: the best plain pick-up within reach
     for (const t of this.targets.values()) {
       if (air && !t.air) continue;   // Fixes-2: in flight only `air` targets (characters out on the water)
       const dx = t.x - p.x, dz = t.z - p.z;
@@ -44,7 +45,11 @@ export class Interact {
       const chat = carrying && ((t.kind === 'character' && (!/^(Give|Offer)/.test(label) || t.eaterGive?.())) || t.kind === 'eater');
       const score = d * (1.4 - 0.4 * facing) - (t.priority || 0) * 0.5 + (chat ? 3 : 0);
       if (score < bs) { bs = score; best = { t, label }; }
+      if (t.kind === 'item' && (t.priority || 0) >= 5 && label.startsWith('Pick up') && score < ps) { ps = score; pickup = { t, label }; }
     }
+    // #23: an item within reach beats a character's Ask or Talk (Hazel standing by the dug-up sack, Commodore Puddles by a
+    // shiny), so a pick-up never turns into small talk. A guarded item (priority below 5) and a Give or Offer still win.
+    if (pickup && best?.t.kind === 'character' && /^(Ask|Talk)/.test(best.label)) return pickup;
     return best;
   }
 
