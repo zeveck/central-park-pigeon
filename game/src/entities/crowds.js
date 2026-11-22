@@ -11,8 +11,8 @@
 // when Gus comes close. Once it joins they greet him: hop over, chatter hello.
 
 import * as THREE from 'three';
-import { CROWD_HAUNTS, CREW, BARKS } from '../data/crews.js';
-import { GANG_MIX, PIGEON_LAYERS, SONGBIRD_TINTS } from '../data/looks.js';
+import { CROWD_HAUNTS, CREW, BARKS, CHARACTERS } from '../data/crews.js';
+import { GANG_MIX, PIGEON_LAYERS, SONGBIRD_TINTS, LOOKS, SPECIES } from '../data/looks.js';
 import { rngFor } from '../core/rng.js';
 import { pointInPoly } from '../core/geo.js';
 import { loadMorphArray, patchMorphArray } from '../gfx/morphs.js';
@@ -210,6 +210,12 @@ export class Crowds {
           }
           // geese and herons on a lawn by the water may still be swimming
           if (gdef.swim === true && !onWater) continue;
+          // batch-2 (#22): no standing look-alike within ~4 m of a named animal of the same species (a crowd horse stood
+          // 1.3 m from Dapple, inside her talk radius, and read as a second Dapple; Clementine and Big Ben had one each).
+          // Only crowds that never move (horses, owls, hawks): the others wander off, and skipping theirs emptied the
+          // Elders' rock and half the Plaza. Each animal's random stream is keyed by its own slot (k), so skipping a slot
+          // moves nobody else; crowds feed no gameplay.
+          if (gdef.speed === 0 && nearNamed(gdef.models[0], x, z)) { this.skipped = (this.skipped || 0) + 1; continue; }
           // model
           let model = gdef.models[0];
           if (gdef.weights) {
@@ -481,6 +487,16 @@ function pickLayer(mix, rnd) {
   let r = rnd() * tot;
   for (const [k, w] of entries) { r -= w; if (r <= 0) return PIGEON_LAYERS[k]; }
   return 0;
+}
+
+/** batch-2 (#22): the species of a crowd model (pigeon-plain → pigeon, night-heron → heron, dog-poodle → dog). */
+function speciesOf(model) { return Object.keys(SPECIES).find((k) => model.includes(k)) || model; }
+let NAMED = null;
+/** Is (x, z) within 4 m of a named animal of the same species as `model`? */
+function nearNamed(model, x, z) {
+  NAMED ||= Object.entries(CHARACTERS).filter(([id, c]) => LOOKS[id] && SPECIES[LOOKS[id].species] && typeof c.at?.x === 'number').map(([id, c]) => ({ sp: LOOKS[id].species, x: c.at.x, z: c.at.z }));
+  const sp = speciesOf(model);
+  return NAMED.some((n) => n.sp === sp && Math.hypot(n.x - x, n.z - z) < 4);
 }
 
 /** The top-front of a baked model: where a head (and a hat) sits. */
