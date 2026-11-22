@@ -9,12 +9,23 @@
 // - The screenshot is the play canvas taken as the game pauses (G.takePauseShot,
 //   called by G.openMenu before the pause screen goes up), rendered and read in
 //   the same task, since WebGL's picture is gone once the frame ends.
-// - While the form is open the game ignores every key, touch and controller
-//   input (G.reportOpen(); input.js and touch.js check it). Escape closes the
-//   form and leaves the game on its pause menu.
+// - While the form is open the game ignores every key and touch (G.reportOpen();
+//   input.js and touch.js check it). Escape closes the form and leaves the game
+//   on its pause menu.
+// - Controllers (Fixes-4, #8: a pad player was stuck in the form): input.js keeps
+//   tracking the pad but hands its presses to padPress below. ○ / B closes the
+//   form, the D-pad and stick move focus through it, ✕ / A presses the focused
+//   button. A pad can't type, so the form has one-press choices that fill the
+//   title. Sending opens GitHub in a new tab; a controller press isn't a browser
+//   "user gesture", so the browser may block that tab: the form then says
+//   plainly that the last step needs a mouse, touch or keyboard.
+
+import { glyph } from './glyphs.js';
 
 const FEEDBACK = 'on';                 // 'on' or 'hidden' (design/STATUS.md)
 const KEY = 'cpp-feedback';
+// Fixes-4 (#8): one press fills the title (a controller can't type)
+const CHOICES = ['I\u2019m stuck', 'A button doesn\u2019t work', 'Something looks wrong', 'Confusing', 'I lost progress', 'Other'];
 
 export function installReport(G) {
   const fb = document.getElementById('report');
@@ -86,24 +97,167 @@ export function installReport(G) {
       .shot { margin: 2px 0 6px; } .shot img { height: 34px; width: auto; }
       .submit-btn { padding-top: 7px; padding-bottom: 7px; }
       .link-hint { margin-top: 4px; }
-    }`);
+    }
+      /* Fixes-4 (#8): the one-press choices, and a clear focus ring for a controller */
+      .quick { margin: 0 0 12px; }
+      .quick-label { font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 14px; margin-bottom: 6px; color: #26351f; }
+      .quick-row { display: flex; flex-wrap: wrap; gap: 6px; }
+      .quick-pill { font: 600 13px/1.2 'Fredoka', sans-serif; padding: 6px 11px; border-radius: 999px; cursor: pointer;
+        border: 1.5px solid rgba(38, 53, 31, 0.25); background: #fffaf0; color: #26351f; }
+      .quick-pill:hover { border-color: #E07B39; }
+      .quick-pill.active { background: #E07B39; border-color: #E07B39; color: #fff; }
+      .quick-hint, .pad-send { font-size: 13px; line-height: 1.35; color: #5a4a2e; text-wrap: balance; }
+      .quick-hint { margin-top: 6px; color: #9a3d12; font-weight: 700; }
+      .pad-send { margin-top: 8px; text-align: center; }
+      .pad-note { margin-top: 10px; font-weight: 700; color: #9a3d12; text-wrap: balance; }
+      :host(.ghf-pad) .link-hint { display: none; }
+      :host(:not(.ghf-pad)) .pad-send { display: none; }
+      :host(.ghf-pad) .popup :focus { outline: 3px solid #26351f; outline-offset: 2px; }
+      svg.pad { display: inline-block; width: 1.5em; height: 1.5em; vertical-align: middle; }
+      .padtxt { display: inline-flex; align-items: center; justify-content: center; width: 1.5em; height: 1.5em; border-radius: 50%;
+        color: #fff; font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 0.85em; vertical-align: middle; }
+      @media (max-height: 820px) and (min-height: 501px) {
+        .header { margin-bottom: 10px; }
+        .type-selector, .severity-selector { margin-bottom: 10px; }
+        .field { margin-bottom: 10px; }
+        .field textarea { height: 58px; min-height: 58px; }
+        .char-count { display: none; }
+        .shot { margin: 4px 0 10px; } .shot img { height: 40px; width: auto; }
+      }
+      @media (max-height: 500px) {
+        .quick { margin-bottom: 6px; } .quick-label { margin-bottom: 3px; font-size: 13px; }
+        .quick-row { gap: 4px; } .quick-pill { padding-top: 3px; padding-bottom: 3px; }
+      }`);
     if (fb.shadowRoot) fb.shadowRoot.adoptedStyleSheets = [...fb.shadowRoot.adoptedStyleSheets, sheet];
   } catch { /* older browsers: the form scrolls */ }
-  // polish (P7): the form's title says what it is in this game ("Send Feedback" is the component's generic one);
-  // it re-renders its shadow DOM, so rename it whenever it does
-  const rename = () => { const h = fb.shadowRoot?.querySelector('.header h2'); if (h && h.textContent !== 'Report a bug') h.textContent = 'Report a bug'; const pop = fb.shadowRoot?.querySelector('.popup'); if (pop && pop.getAttribute('aria-label') !== 'Report a bug') pop.setAttribute('aria-label', 'Report a bug'); };
-  if (fb.shadowRoot) { rename(); new MutationObserver(rename).observe(fb.shadowRoot, { childList: true, subtree: true }); }
   if (window.desktop) fb.openLink = (url) => { window.open(url, '_blank'); return true; };
 
   // pause first (taking the picture), then open the form; the game stays paused after it closes
-  window.reportShortcut = () => { if (G.screen === 'play') G.pause(); };
+  const pauseFirst = () => { if (G.screen === 'play') G.pause(); };
+  // Ctrl+Shift+L: the keyboard opened it (the game never sees that key, so its last device may still be the pad)
+  window.reportShortcut = () => { G.reportByKeys = true; pauseFirst(); };
   G.openReport = () => {
     if (!G.reportAvailable()) return;
-    window.reportShortcut();
+    pauseFirst();
     fb.open();
   };
+  installQuickAndPad(G, fb);
   // when the form closes, put the focus back on the menu underneath (controller and keys keep working)
   fb.addEventListener('focusout', () => setTimeout(() => {
     if (!G.reportOpen() && G.menus.open && !G.menus.top.el.contains(document.activeElement)) G.menus.focusFirst();
   }, 200));
+}
+
+// Fixes-4 (#8): the one-press choices (added to the form's open shadow root each time it opens, since the form
+// re-renders itself when its attributes change) and controller support while the form is open.
+function installQuickAndPad(G, fb) {
+  const sr = fb.shadowRoot;
+  if (!sr) return;
+  const fam = () => G.input?.gamepad?.family || 'xbox';
+  const pg = (a) => glyph(a, 'gamepad', fam());
+  const setPad = (on) => fb.classList.toggle('ghf-pad', on);
+  // the last device used decides which hints show; a mouse, touch or key in the form switches back
+  for (const t of ['pointerdown', 'keydown']) fb.addEventListener(t, () => setPad(false), true);
+
+  const ensure = () => {
+    let q = sr.querySelector('.quick');
+    if (!q) {
+      q = document.createElement('div');
+      q.className = 'quick';
+      q.setAttribute('role', 'group');
+      q.setAttribute('aria-labelledby', 'quick-label');
+      q.innerHTML = `<div class="quick-label" id="quick-label">What happened? Pick one, or type your own title.</div>
+        <div class="quick-row">${CHOICES.map((c) => `<button type="button" class="quick-pill">${c}</button>`).join('')}</div>
+        <div class="quick-hint" role="status" hidden></div>`;
+      sr.querySelector('.header')?.after(q);
+      q.querySelectorAll('.quick-pill').forEach((b) => b.addEventListener('click', () => pick(b)));
+    }
+    let ps = sr.querySelector('.pad-send');
+    if (!ps) {
+      ps = document.createElement('div');
+      ps.className = 'pad-send';
+      sr.querySelector('.submit-btn')?.after(ps);
+    }
+    // honest about what a controller can do: GitHub's page is where the report is finished
+    ps.innerHTML = `Opens GitHub to finish, which needs a mouse, touch or keyboard (and a GitHub account). ${pg('uiBack')} closes this.`;
+    sr.querySelector('.quick-hint').hidden = true;
+    sr.querySelectorAll('.quick-pill').forEach((b) => b.classList.remove('active'));
+    return q;
+  };
+  const pick = (b) => {
+    const title = sr.querySelector('#ghf-title');
+    if (!title) return;
+    title.value = b.textContent;
+    title.dispatchEvent(new Event('input', { bubbles: true }));   // the form clears its "title needed" error
+    sr.querySelectorAll('.quick-pill').forEach((p) => p.classList.toggle('active', p === b));
+    sr.querySelector('.quick-hint').hidden = true;
+    const send = sr.querySelector('.submit-btn');
+    send?.focus();
+    (fb.classList.contains('ghf-pad') ? sr.querySelector('.pad-send') : send)?.scrollIntoView?.({ block: 'nearest' });
+  };
+
+  fb.addEventListener('gh-feedback:open', () => {
+    ensure();
+    setPad(!G.reportByKeys && G.input?.device === 'gamepad');
+    G.reportByKeys = false;
+    // focus starts on the first choice (the form would otherwise focus the title box after 50 ms)
+    sr.querySelector('.quick-pill')?.focus();
+  });
+  // a send that couldn't open the tab: say what finishing takes, and wait for that click
+  fb.addEventListener('gh-feedback:opened', (e) => {
+    if (e.detail?.opened || !fb.classList.contains('ghf-pad')) return;
+    const note = sr.querySelector('.link-note');
+    if (!note || note.querySelector('.pad-note')) return;
+    const p = document.createElement('p');
+    p.className = 'pad-note';
+    p.innerHTML = `A controller can’t open GitHub here. To finish, click or tap the link above (or Tab to it and press Enter). ${pg('uiBack')} closes this.`;
+    note.querySelector('.done-btn')?.before(p);
+  });
+
+  const focusables = () => [...sr.querySelectorAll('.popup a[href], .popup button:not([disabled]), .popup input:not([disabled]), .popup textarea:not([disabled])')]
+    .filter((e) => e.getClientRects().length > 0);
+  const move = (dir) => {
+    const f = focusables();
+    if (!f.length) return;
+    const cur = sr.activeElement;
+    if (!f.includes(cur)) { f[0].focus(); return; }
+    const a = cur.getBoundingClientRect();
+    const ax = a.left + a.width / 2, ay = a.top + a.height / 2;
+    let best = null, bs = Infinity;
+    for (const e of f) {
+      if (e === cur) continue;
+      const b = e.getBoundingClientRect();
+      const dx = b.left + b.width / 2 - ax, dy = b.top + b.height / 2 - ay;
+      const [along, across] = dir === 'uiUp' ? [-dy, Math.abs(dx)] : dir === 'uiDown' ? [dy, Math.abs(dx)] : dir === 'uiLeft' ? [-dx, Math.abs(dy)] : [dx, Math.abs(dy)];
+      if (along <= 2) continue;
+      const score = along + across * 2.2;
+      if (score < bs) { bs = score; best = e; }
+    }
+    if (!best && (dir === 'uiUp' || dir === 'uiDown')) {
+      const i = f.indexOf(cur);
+      best = f[(i + (dir === 'uiDown' ? 1 : f.length - 1)) % f.length];
+    }
+    if (best) { best.focus(); best.scrollIntoView?.({ block: 'nearest', inline: 'nearest' }); G.audio?.synth('uiMove'); }
+  };
+  const padPress = (a) => {
+    if (!fb.isOpen) return;
+    setPad(true);
+    if (a === 'uiBack') { G.audio?.synth('uiBack'); fb.close(); return; }
+    if (a === 'uiUp' || a === 'uiDown' || a === 'uiLeft' || a === 'uiRight') { move(a); return; }
+    if (a !== 'uiOk') return;
+    const cur = sr.activeElement;
+    if (!cur || !focusables().includes(cur)) { focusables()[0]?.focus(); return; }
+    if (cur.matches('input, textarea')) {
+      // a controller can't type here (Chrome on a computer has no on-screen keyboard): point at the choices
+      const hint = sr.querySelector('.quick-hint');
+      if (hint) { hint.hidden = false; hint.textContent = 'Typing needs a keyboard. With a controller, pick one of these instead.'; }
+      sr.querySelector('.quick-pill')?.focus();
+      sr.querySelector('.quick')?.scrollIntoView?.({ block: 'nearest' });
+      return;
+    }
+    G.audio?.synth('uiSelect');
+    cur.click();
+  };
+  if (G.input) G.input.onIgnoredPad = padPress;
+  G.reportPad = padPress;   // for play-tests
 }

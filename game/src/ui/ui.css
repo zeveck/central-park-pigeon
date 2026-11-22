@@ -64,7 +64,7 @@ svg.ic { width: 1em; height: 1em; vertical-align: -0.14em; fill: currentColor; }
 
 /* key caps and pad glyphs */
 .key { display: inline-flex; align-items: center; justify-content: center; min-width: 1.6em; height: 1.6em; padding: 0 0.4em; border-radius: 0.35em; background: #fffdf8; color: #2a2a2a; border: 1px solid rgba(0, 0, 0, 0.25); border-bottom-width: 3px; font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 0.85em; line-height: 1; box-sizing: border-box; }
-.pad { display: inline-block; width: 1.6em; height: 1.6em; vertical-align: middle; }
+svg.pad { display: inline-block; width: 1.6em; height: 1.6em; vertical-align: middle; }
 .padtxt { display: inline-flex; align-items: center; justify-content: center; width: 1.6em; height: 1.6em; border-radius: 50%; color: #fff; font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 0.85em; }
 .padpill { display: inline-flex; align-items: center; justify-content: center; height: 1.5em; padding: 0 0.45em; border-radius: 0.5em; background: #333; color: #fff; font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 0.8em; }
 

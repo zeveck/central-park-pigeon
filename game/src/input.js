@@ -12,8 +12,10 @@
 // - Menus: uiUp/uiDown/uiLeft/uiRight/uiOk/uiBack come from the arrows, WASD,
 //   Enter/Space and Esc/Backspace, and from the pad's D-pad, left stick, ✕ and
 //   ○. Directions repeat after 350 ms, then every 120 ms (on the game clock).
-// - ignore(e): while it says so (the bug report form is open), keys, clicks and
-//   the pad do nothing and nothing is preventDefault-ed, so the form can type.
+// - ignore(e): while it says so (the bug report form is open), keys and clicks
+//   do nothing and nothing is preventDefault-ed, so the form can type. The pad
+//   is still tracked but drives no game action: its presses go to onIgnoredPad
+//   (the form's controller support, ui/report.js).
 // - Autopilot (debug): setAuto({ held, stick }) writes into the same queue as
 //   the keyboard and pad, so a recorded run replays exactly.
 
@@ -159,7 +161,6 @@ export function createInput(target = window, { canvas = null, bindings = DEFAULT
     const pads = navigator.getGamepads ? navigator.getGamepads() : [];
     const gp = [...pads].find((p) => p && p.connected);
     if (!gp) return;
-    if (ignore?.()) { padDown.clear(); pad.x = pad.y = pad.rx = pad.ry = 0; return; }
     pad.connected = true;
     pad.id = gp.id;
     // polish (P19): a different controller (Xbox ↔ PlayStation) redraws the hints at once, not at the next device change
@@ -178,6 +179,17 @@ export function createInput(target = window, { canvas = null, bindings = DEFAULT
     // the left stick also moves menu focus
     if (Math.abs(pad.y) > 0.5 && Math.abs(pad.y) >= Math.abs(pad.x)) now.add(pad.y > 0 ? 'uiUp' : 'uiDown');
     else if (Math.abs(pad.x) > 0.5) now.add(pad.x > 0 ? 'uiRight' : 'uiLeft');
+    // Fixes-4 (#8): while the bug report form is open the pad keeps being tracked (so the press that closes the form
+    // does nothing in the game afterwards) but drives no game action: its new presses go to onIgnoredPad (the form's
+    // own focus, ✕ / A and ○ / B), and the sticks move nothing.
+    if (ignore?.()) {
+      for (const a of now) if (!padDown.has(a)) input.onIgnoredPad?.(a);
+      padDown.clear();
+      for (const a of now) padDown.add(a);
+      pad.x = pad.y = pad.rx = pad.ry = 0; pad.sprintLatch = false;
+      if (any || now.size) { setDevice('gamepad'); firstInput(); }
+      return;
+    }
     for (const a of now) if (!padDown.has(a)) edges.add(a);
     padDown.clear();
     for (const a of now) padDown.add(a);
@@ -191,11 +203,13 @@ export function createInput(target = window, { canvas = null, bindings = DEFAULT
   const isHeld = (a) => down.has(a) || virt.has(a) || padDown.has(a) || auto.has(a) || (a === 'sprint' && pad.sprintLatch);
 
   function pollRepeat(dt) {
-    const held = UI_DIRS.find((d) => isHeld(d));
+    // Fixes-4 (#8): a direction held on the pad while the report form is open repeats into the form, never the menu under it
+    const blocked = !!ignore?.();
+    const held = UI_DIRS.find((d) => (blocked ? padDown.has(d) : isHeld(d)));
     if (!held) { repeat.dir = null; return; }
     if (repeat.dir !== held) { repeat.dir = held; repeat.t = REPEAT_FIRST; return; }
     repeat.t -= dt;
-    if (repeat.t <= 0) { edges.add(held); repeat.t += REPEAT_NEXT; }
+    if (repeat.t <= 0) { if (blocked) input.onIgnoredPad?.(held); else edges.add(held); repeat.t += REPEAT_NEXT; }
   }
 
   const input = {
@@ -252,6 +266,8 @@ export function createInput(target = window, { canvas = null, bindings = DEFAULT
     setSensitivity(s) { sensitivity = 0.0024 * s; },
     setInvertY(v) { invertY = v; },
     onPadLost: null,
+    /** Fixes-4 (#8): called with each new pad press (uiOk, uiBack, uiUp…) while ignore() holds (the report form is open). */
+    onIgnoredPad: null,
     onAnyInput: null,
     get hadInput() { return first; },
     dispose() {
