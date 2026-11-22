@@ -97,7 +97,7 @@ perched animals with a height offset (the owl up its tree): that is the one "flo
 | huddlestone | A | 0.16 | -0.16, **0.32** | 0.03, **0.13** |
 | huddlestone | B | 0.16 | -0.25, **0.4** | 0.01, **0.15** |
 | t65@x-81 drive | S | 0.92 | 0.52, **0.41** | 0.74, **0.18** |
-| t65@x-81 drive | N | 0.92 | 1.57, **-0.64** | 0.95, **-0.03** |
+| t65@x-81 drive | N | 0.92 | 1.57, **-0.64** | 0.95, **-0.02** |
 | t65@x25 drive | S | 0.75 | 0.61, **0.14** | 0.67, **0.08** |
 | t65@x25 drive | N | 0.75 | 0.23, **0.52** | 0.72, **0.03** |
 | t65@x-13 | S | 0.95 | 0.8, **0.15** | 0.84, **0.11** |
@@ -108,32 +108,32 @@ perched animals with a height offset (the owl up its tree): that is the one "flo
 | t65@x-97 | N | 0.94 | 0.91, **0.03** | 0.94, **0** |
 | t65@x95 | S | 0.55 | 0.4, **0.15** | 0.44, **0.11** |
 | t65@x95 | N | 0.55 | 0.88, **-0.33** | 0.57, **-0.02** |
-| t79@x-75 drive | S | 0.48 | 0.59, **-0.11** | 0.53, **-0.05** |
+| t79@x-75 drive | S | 0.48 | 0.59, **-0.11** | 0.51, **-0.03** |
 | t79@x-75 drive | N | 0.48 | 0.53, **-0.05** | 0.53, **-0.05** |
-| t79@x63 drive | S | 2.2 | 2.79, **-0.59** | 2.22, **-0.02** |
+| t79@x63 drive | S | 2.2 | 2.79, **-0.59** | 2.21, **-0.01** |
 | t79@x63 drive | N | 2.2 | 2.19, **0.01** | 2.24, **-0.04** |
-| t79@x30 | S | 2.89 | 3.58, **-0.69** | 2.9, **-0.01** |
-| t79@x30 | N | 2.89 | 1.13, **1.77** | 2.78, **0.11** |
-| t79@x-11 | S | 7.53 | 1.75, **5.78** | 7.5, **0.03** |
-| t79@x-11 | N | 7.53 | 7.78, **-0.24** | 7.61, **-0.08** |
+| t79@x30 | S | 2.89 | 3.58, **-0.69** | 2.89, **0** |
+| t79@x30 | N | 2.89 | 1.13, **1.77** | 2.8, **0.09** |
+| t79@x-11 | S | 7.53 | 1.75, **5.78** | 4.33, **0.04** |
+| t79@x-11 | N | 7.53 | 7.78, **-0.24** | 4.34, **0.03** |
 | t79@x99 | S | 1.55 | 1.22, **0.33** | 1.52, **0.03** |
 | t79@x99 | N | 1.55 | 1.51, **0.04** | 1.55, **0** |
 | t79@x-99 | S | 0.48 | 0.29, **0.19** | 0.47, **0.01** |
 | t79@x-99 | N | 0.48 | 0.42, **0.06** | 0.46, **0.03** |
 | t86@x-97 drive | S | 1.85 | 1.86, **-0.01** | 1.9, **-0.04** |
-| t86@x-97 drive | N | 1.85 | 1.99, **-0.13** | 1.9, **-0.05** |
+| t86@x-97 drive | N | 1.85 | 1.99, **-0.13** | 1.89, **-0.04** |
 | t86@x75 drive | S | 1.16 | 1.24, **-0.07** | 1.23, **-0.06** |
-| t86@x75 drive | N | 1.16 | 1.36, **-0.19** | 1.21, **-0.05** |
+| t86@x75 drive | N | 1.16 | 1.36, **-0.19** | 1.19, **-0.03** |
 | t86@x3 | S | 0.61 | 0.68, **-0.07** | 0.67, **-0.06** |
-| t86@x3 | N | 0.61 | -0.85, **1.46** | 0.54, **0.07** |
+| t86@x3 | N | 0.61 | -0.85, **1.46** | 0.56, **0.06** |
 | t86@x-105 | none (cut 0.74 m deep) | – | a cut wall across the path: yes | a cut wall across the path: no |
 | t86@x-29 | S | 0.88 | 0.96, **-0.08** | 0.95, **-0.07** |
 | t86@x-29 | N | 0.88 | 0.29, **0.59** | 0.83, **0.06** |
 | t86@x29 | S | 1.22 | 1.28, **-0.06** | 1.27, **-0.05** |
-| t86@x29 | N | 1.22 | 0.3, **0.92** | 1.13, **0.09** |
-| t97@x-87 drive | S | 0.38 | 0.61, **-0.23** | 0.43, **-0.05** |
-| t97@x-87 drive | N | 0.38 | 0.49, **-0.11** | 0.46, **-0.08** |
-| t97@x81 drive | S | 0.99 | 1.32, **-0.33** | 1.03, **-0.04** |
+| t86@x29 | N | 1.22 | 0.3, **0.92** | 1.15, **0.07** |
+| t97@x-87 drive | S | 0.38 | 0.61, **-0.23** | 0.41, **-0.03** |
+| t97@x-87 drive | N | 0.38 | 0.49, **-0.11** | 0.45, **-0.07** |
+| t97@x81 drive | S | 0.99 | 1.32, **-0.33** | 1.01, **-0.02** |
 | t97@x81 drive | N | 0.99 | 0.49, **0.5** | 0.93, **0.06** |
 
 ## What is left after, and why it stays
@@ -192,5 +192,50 @@ flight too.
 - `pond-bank.png`: the Pond's picnickers on their benches on the bank by 59th St (were in the Pond).
 - `gapstow-ends.png`, `gapstow-end-west.png`: Gapstow's deck meeting the ground at both ends; the selfie-taker on the deck.
 - `dogs-slope.png`: crowd dogs on the Cedar Hill slope, feet on the grass.
-- `t79-bridge-ramp.png`: the path ramped up through the Ramble to the 79th St bridge by Belvedere (was a 5.8 m drop).
+- `t79-bridge-ramp.png`: the 79th St bridge by Belvedere (was a 5.8 m drop at its south end). After the review and the replay
+  bisect its deck sits halfway between its ends (4.37 m, was 7.53): a ~2.6 m ramp up from the south and a ~3.4 m cut down
+  from Vista Rock, 1 in 6 along the path and 1 in 2 down the sides, with no trees on the approaches (they are dropped after
+  placement, so no random draw moves). The first, 4 m / 26 m bank lifted tree canopies into Gus's flight paths, which is what
+  broke the truce-dogs-squirrels and den-crows replays.
 - `gus-floating-1280.png`, `gus-floating-844.png`: Gus floating by Mrs. Puddles with the take-off strip.
+
+## Replays (all 40, final round, two browsers; preset Low)
+
+All 40 pass (each solution's last replay in the final round; 0 console errors). Every solution replayed from its fixture with `sf-run.mjs serve` jobs that also log its route footprint (read-only) into
+`design/solutions/route-index.json`; `node game/tools/affected-solutions.mjs --rect x0,z0,x1,z1 | --point x,z,r |
+--system water` lists the solutions a future change touches. 0 console errors.
+
+Re-recorded, each because an intended change moved its route (autopilot goal scripts re-run with `sf-run.mjs record`):
+
+| solution | why it diverged |
+|---|---|
+| truce-dogs-squirrels, den-crows | #17: the first, 4 m / 26 m ramp at the 79th St bridge by Belvedere lifted tree canopies into the low flight past it (bisect: pass at ac1e577, fail from 3d9acc6). Re-recorded after the ramp was reshaped (deck halfway, gentle slopes, no trees on approaches). |
+| den-geese | #17, the same flight past Belvedere; its goal now approaches the Great Lawn signs at 4 m (at 6 m the autopilot circled N1). |
+| den-turtles | #1: Slowpoke moved from the pond bed to the bank. |
+| den-racers.alt | #17: the race route crosses the ramped north ends of the 86th St bridges; its goal now flies in over the Reservoir from the east bank and lands on Wingate's deck (from the south it dropped into the cut; the Reservoir fence blocks the north bank). |
+| part-beak, part-beak.alt | #1: the foreman and the people by the 79th St east shed walk differently (wall push, dry targets). |
+| part-talons | #1: the Pond carriage stop's slice leg: the Pond's people moved to the bank, and Gus's water edge. |
+| part-wings, part-wings.alt | #1: the sail comes up out of Conservatory Water (water edge / floating). |
+| part-power | #1: the wedding's opening scene leaves Gus across the Bow Bridge channel; the walk back used to splash-launch him over it, now the water's edge stops him. Its goal flies back instead. |
+| truce-cats-rats.alt | #1: people keep off water and out of walls (the cyclist leg). |
+
+Found by the replays and fixed: people's wall push used their *drawn* height, so where they walked depended on the preset and
+the camera; it now uses a sim-only height (`humans.js` `#stepTo`, `a.gy`).
+
+An earlier note in the progress file said truce-dogs-squirrels failed identically on a pre-batch worktree: wrong. Port
+8172 was already serving the current tree, so that "A/B" ran the new code. The bisect (above) is the correct result.
+
+## Perf (Low, `perf-probe.mjs --preset low`, fixture den-meermob)
+
+| spot | phase | now: tris / draws (governor) | design/perf.md "after": tris / draws |
+|---|---|---|---|
+| Bethesda (the Mall's end) | day | 313k / 118 (0.2) | 272k / 123 (1) |
+| Bow Bridge (the Lake) | day | 325k / 124 (0.2) | 284k / 130 (1) |
+| Reservoir | day | 240k / 81 (1) | 177k / 79 (1); batch-3d measured 240k / 81 after the fences |
+| Bethesda | night | 294k / 105 (0.512) | 230k / 103 |
+| Bow Bridge | night | 296k / 110 (0.512) | 233k / 114 |
+| Reservoir | night | 233k / 75 (1) | 170k / 73 |
+
+Draws are flat or down. The extra triangles are in rows this batch-3c work doesn't add to: the static `coded` batch
+(+16k at Bethesda: batch-3d's iron fences), a people shadow row (23k) and +10k people triangles. Batch-3c adds no meshes
+(it drops the trees standing on bridge approaches); the governor holds Bethesda and Bow Bridge by day at 0.2.

@@ -241,7 +241,8 @@ export const GOALS_SF = {
   'part-power': () => [
     // batch-3: land a few metres inland of the spot and walk to it (go()'s flyTo overshot over the Lake and came down on the far bank, where the water's edge
     // now stops a walk back; it used to splash-launch him)
-    { flyTo: { x: -21, z: 293 }, alt: 4, r: 4, timeout: 120 }, { walkTo: { x: -24.5, z: 298.5 }, r: 0.6 }, flag('part-power.s1', 30), idle(),
+    // (the wedding's opening scene puts Gus across the Bow Bridge channel: fly back over it, don't walk into it)
+    { flyTo: { x: -21, z: 293 }, alt: 4, r: 4, timeout: 120 }, idle(), { flyTo: { x: -21, z: 293 }, alt: 4, r: 4, timeout: 120 }, { walkTo: { x: -24.5, z: 298.5 }, r: 0.6 }, flag('part-power.s1', 30), idle(),
     { walkTo: { x: -25.6, z: 296.6 }, r: 0.5 }, { peck: 'wedding-basket' }, flag('part-power.s2', 60), idle(),
     { walkTo: { x: -31.4, z: 300.6 }, r: 0.8 }, { call: 'geese' }, { wait: 3.8 }, { ask: 'geese' }, flag('battery.up', 90), flag('part-power', 90), idle(120),   // Fixes-2: the battery comes up in the stampede
   ],
