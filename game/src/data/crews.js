@@ -260,17 +260,28 @@ export const WRONG_PLACE = {
 export const BARKS = {
   wary: {
     squirrels: ['That\'s HIM. The pigeon.', 'Don\'t look at my acorn.'], ducks: ['Bread-pusher.', 'Paddle away, pigeon.'],
-    crows: ['Caw. Move along.', 'We see you, pigeon.'], pigeon: ['Who invited HIM?', 'Coo... no.'],
+    crows: ['Caw. Move along.', 'We see you, pigeon.'], pigeon: ['Who invited HIM?', 'Coo... no.'], swells: ['Members only, darling.', 'Is that a STREET pigeon?'],
     cats: ['Hssst.', 'Mine.'], geese: ['HONK. Off the lawn.', 'HONK.'], songbirds: ['Tweet. Pigeon.', 'Chirp! Shoo!'],
     rats: ['Squeak. Not our guy.', 'No crumbs, no chat.'], dogs: ['Woof?', 'Squirrel? No. Pigeon.'], horses: ['Hrrm.', 'Mind the hooves.'],
     raccoons: ['Union members only.', 'Psst. Scram.'], turtles: ['...', 'Mm.'],
   },
   friendly: {
     squirrels: ['Gus! Hey Gus!', 'That\'s HIM! Our pigeon!'], ducks: ['Quack-quack, Commodore\'s friend!', 'Ahoy, Gus!'],
-    crows: ['Caw! Good doing business.', 'The pigeon! Respect.'], pigeon: ['Coo! It\'s Gus!', 'FEED the birds!'],
+    crows: ['Caw! Good doing business.', 'The pigeon! Respect.'], pigeon: ['Coo! It\'s Gus!', 'FEED the birds!'], swells: ['Gus, darling!', 'Simply divine to see you.'],
     cats: ['Mrrp. Hello, pigeon.', 'Purr.'], geese: ['HONK! (friendly)', 'HONK honk!'], songbirds: ['Coo! (tweet)', 'Chirp-coo!'],
     rats: ['Gus! Big fan!', 'Got any crusts?'], dogs: ['Woof! Gus!', 'Friend! FRIEND!'], horses: ['Mornin\', kid.', 'Hup.'],
     raccoons: ['Boss pigeon!', 'Union\'s with you.'], turtles: ['Mm. Good bird.', 'Hello... Gus...'],
+  },
+};
+
+// batch-2 (#14): a gang's greeting, said once (state flag seen.greet.<group>) the first time Gus comes within r of its
+// haunt: two bubbles over two crowd members, one after the other, in the gang's voice (crowds.js). Not a scene:
+// nothing waits on it. The gang's barks (BARKS swells) are in the same voice.
+export const GREETS = {
+  swells: {
+    at: { x: 97, z: -40 }, r: 16,
+    friendly: ['Gus, darling! Welcome to the Plaza.', 'Do mind the hats. They\'re vintage.'],
+    wary: ['Ahem. The Plaza Swells, darling.', 'We do NOT eat off the ground.'],
   },
 };
 

@@ -11,7 +11,7 @@
 // when Gus comes close. Once it joins they greet him: hop over, chatter hello.
 
 import * as THREE from 'three';
-import { CROWD_HAUNTS, CREW, BARKS, CHARACTERS } from '../data/crews.js';
+import { CROWD_HAUNTS, CREW, BARKS, CHARACTERS, GREETS } from '../data/crews.js';
 import { GANG_MIX, PIGEON_LAYERS, SONGBIRD_TINTS, LOOKS, SPECIES } from '../data/looks.js';
 import { rngFor } from '../core/rng.js';
 import { pointInPoly } from '../core/geo.js';
@@ -27,7 +27,7 @@ const GROUPS = {
   raccoons: { crew: 'raccoons', models: ['raccoon-scurry'], lod: 'raccoon-scurry-lod', speed: 2, phases: ['dusk', 'night'], sound: 'raccoon-chitter', bark: 'raccoons' },
   rats: { crew: 'rats', models: ['rat'], lod: 'rat-lod', speed: 2.4, sound: 'rat-squeak', bark: 'rats' },
   turtles: { crew: 'turtles', models: ['turtle'], lod: 'turtle-lod', speed: 0.15, bark: 'turtles' },
-  swells: { crew: 'swells', models: ['pigeon-plain'], lod: 'pigeon-plain-lod', speed: 1.1, hop: 0.15, fly: true, morph: 'pigeon-plain', gang: 'swells', hat: 'tophat', sound: 'coo', bark: 'pigeon' },
+  swells: { crew: 'swells', models: ['pigeon-plain'], lod: 'pigeon-plain-lod', speed: 1.1, hop: 0.15, fly: true, morph: 'pigeon-plain', gang: 'swells', hat: 'tophat', sound: 'coo', bark: 'swells' },
   choir: { crew: 'choir', models: ['pigeon-plain'], lod: 'pigeon-plain-lod', speed: 1.1, hop: 0.15, fly: true, morph: 'pigeon-plain', gang: 'choir', hat: 'beret', sound: 'coo', bark: 'pigeon' },
   racers: { crew: 'racers', models: ['pigeon-plain'], lod: 'pigeon-plain-lod', speed: 1.4, hop: 0.15, fly: true, morph: 'pigeon-plain', gang: 'racers', hat: 'sweatband', sound: 'coo', bark: 'pigeon' },
   meermob: { crew: 'meermob', models: ['pigeon-plain'], lod: 'pigeon-plain-lod', speed: 1.1, hop: 0.15, fly: true, morph: 'pigeon-plain', gang: 'meermob', hat: 'bandana', sound: 'coo', bark: 'pigeon' },
@@ -176,6 +176,12 @@ export class Crowds {
       bandana: mk(new THREE.TorusGeometry(0.034, 0.008, 5, 12).rotateX(Math.PI / 2), 0xc4302b),
     };
     this.hatPoint = baked ? headPoint(baked) : new THREE.Vector3(0, 0.29, 0.1);
+    // batch-2 (#14): hats that sit ON the head (top hat, beret) go on the crown, the highest point over the head point;
+    // headPoint is an average of the top-front vertices, ~2 cm under the crown on the pigeon, so the hats sat inside the head
+    const K = baked ? crownPoint(baked, this.hatPoint) : this.hatPoint;
+    this.crown = K;
+    // each hat rests where the head is as wide as the hat (top hat crown r 2 cm, beret 2.6 cm)
+    this.seat = baked ? { tophat: seatY(baked, K, 0.02), beret: seatY(baked, K, 0.026) } : { tophat: K.y, beret: K.y };
   }
 
   #populate() {
@@ -293,6 +299,7 @@ export class Crowds {
     // ambient barks and sounds
     this.barkT -= dt;
     if (this.barkT <= 0) { this.barkT = 5 + ((G.state.time * 7) % 5); this.#bark(g); }
+    this.#greet(g);
     // Land/perf: drawing (nearest-N, instance matrices) is visual only: once per drawn frame (draw(), from main.js
     // render()), not once per update (two or three updates a frame when the frame rate drops)
     this.drawCam = camera; this.drawDirty = true;
@@ -371,6 +378,29 @@ export class Crowds {
     this.G.audio.play(name, { at: { x: a.x, y: a.yBase, z: a.z }, vol: 0.7, range: 30 });
   }
 
+  /** batch-2 (#14): a gang says hello once, the first time Gus comes by its haunt (data/crews.js GREETS). Bubbles only. */
+  #greet(g) {
+    const G = this.G;
+    if ((this.greetT = (this.greetT || 0) + 1) % 15) return;   // four checks a second
+    for (const [group, gr] of Object.entries(GREETS)) {
+      const key = 'seen.greet.' + group;
+      if (G.state.flags[key] || Math.hypot(g.x - gr.at.x, g.z - gr.at.z) > gr.r) continue;
+      if (G.cutscene?.locked || G.dialogue?.open || G.midScene?.() || g.y - G.terrain.heightAt(g.x, g.z) > 8) continue;
+      const near = this.animals.filter((a) => a.group === group && a.state !== 'away' && Math.hypot(a.x - g.x, a.z - g.z) < 14)
+        .sort((p, q) => Math.hypot(p.x - g.x, p.z - g.z) - Math.hypot(q.x - g.x, q.z - g.z));
+      if (!near.length) continue;
+      G.state.flags[key] = true;
+      const lines = this.friendly(GROUPS[group].crew) ? gr.friendly : gr.wary;
+      const say = (a, text) => G.bubbles.add(text, { at: () => ({ x: a.x, y: a.yBase + 0.6, z: a.z }), ttl: 2.6, range: 30 });
+      say(near[0], lines[0]);
+      G.audio.play('gang-coo-murmur', { at: { x: near[0].x, y: near[0].yBase, z: near[0].z }, vol: 0.6 });
+      // the reply comes from another Swell once the first bubble has gone (two at once overlapped on screen)
+      const b = near.slice(1).sort((p, q) => Math.hypot(q.x - near[0].x, q.z - near[0].z) - Math.hypot(p.x - near[0].x, p.z - near[0].z))[0] || near[0];
+      if (lines[1]) G.later(2.7, () => say(b, lines[1]));
+      this.barkT = Math.max(this.barkT, 8);   // no generic bark on top of the hello
+    }
+  }
+
   #bark(g) {
     let best = null, bd = 9;
     for (const a of this.animals) {
@@ -446,7 +476,11 @@ export class Crowds {
         const h = this.hats[hatName];
         if (h.count < 40) {
           const hp = this.hatPoint;
-          _v.set(hp.x, hp.y + (hatName === 'bandana' ? -0.07 : 0), hp.z).multiplyScalar(a.scale).applyQuaternion(_q).add(_p);
+          // batch-2 (#14): a top hat or beret sits on the crown, where the head is as wide as the hat (it was at headPoint,
+          // 2 cm down inside the head)
+          if (hatName === 'tophat' || hatName === 'beret') _v.set(this.crown.x, this.seat[hatName], this.crown.z);
+          else _v.set(hp.x, hp.y + (hatName === 'bandana' ? -0.07 : 0), hp.z);
+          _v.multiplyScalar(a.scale).applyQuaternion(_q).add(_p);
           h.setMatrixAt(h.count++, _m.compose(_v, _q, _s));
         }
       }
@@ -487,6 +521,32 @@ function pickLayer(mix, rnd) {
   let r = rnd() * tot;
   for (const [k, w] of entries) { r -= w; if (r <= 0) return PIGEON_LAYERS[k]; }
   return 0;
+}
+
+/** batch-2 (#14, #6): the crown, the highest vertex near the head point (within r, default 14% of the model's height),
+ *  as far back as it really is (headPoint leans to the front, so a hat over it floated above the forehead), on the
+ *  head point's centre line. */
+export function crownPoint(b, H = headPoint(b), r = 0.14 * (b.bounds.max.y - b.bounds.min.y)) {
+  const pos = b.geometry.attributes.position;
+  let top = -Infinity, k = -1;
+  for (let i = 0; i < pos.count; i++) {
+    const dx = pos.getX(i) - H.x, dz = pos.getZ(i) - H.z;
+    if (dx * dx + dz * dz < r * r && pos.getY(i) > top) { top = pos.getY(i); k = i; }
+  }
+  return k >= 0 ? new THREE.Vector3(H.x, top, pos.getZ(k)) : H.clone();   // on the head's centre line (a top vertex may be an ear)
+}
+
+/** batch-2 (#14, #6): where a hat of inner radius ri rests on the head under the crown K: the highest vertex in the ring
+ *  ri..1.8 ri round K's vertical (the head is wider than the hat there), never above the crown itself. */
+export function seatY(b, K, ri) {
+  const pos = b.geometry.attributes.position;
+  let top = -Infinity;
+  const r0 = ri * ri, r1 = 3.24 * ri * ri;
+  for (let i = 0; i < pos.count; i++) {
+    const dx = pos.getX(i) - K.x, dz = pos.getZ(i) - K.z, d = dx * dx + dz * dz;
+    if (d >= r0 && d <= r1 && pos.getY(i) > top && pos.getY(i) <= K.y) top = pos.getY(i);
+  }
+  return top > -Infinity ? top : K.y;
 }
 
 /** batch-2 (#22): the species of a crowd model (pigeon-plain → pigeon, night-heron → heron, dog-poodle → dog). */

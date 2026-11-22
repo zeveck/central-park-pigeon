@@ -7,6 +7,8 @@
 // layer: index into the model's morph array (textures/morphs/manifest.json;
 // pigeons 0 blue bar … 8 pure white … 12 mealy; squirrels 0 grey, 1 cinnamon,
 // 2 black, 3 near-white). tint: a multiply colour for one-texture models.
+// neck (batch-2 #6): [dx, dy, dz, ring scale] in head units: moves the neck anchor (collars, tokens, pearls) where a
+// model's neck isn't where entities/characters.js guesses it (62% of the way from the body centre to the head point).
 
 export const PIGEON_LAYERS = {
   'blue-bar': 0, 'blue-checker': 1, 'dark-checker': 2, melanistic: 3, 'mostly-white': 4, 'ash-red': 5, 'red-checker': 6,
@@ -103,14 +105,14 @@ export const LOOKS = {
   ringo: { species: 'raccoon', model: 'raccoon-stand', acc: ['aviator', 'scarf-long:#c4302b'] },
   mamamask: { species: 'raccoon', model: 'raccoon-stand', acc: ['headscarf:#c4302b', 'apron:#d8d0c0', 'spoon'] },
   // Grate Rats
-  sue: { species: 'rat', model: 'rat-stand', acc: ['token'] },
+  sue: { species: 'rat', model: 'rat-stand', neck: [-0.5, -1.4, 0.4, 1.3], acc: ['token'] },
   express: { species: 'rat', model: 'rat-stand', acc: ['cap-conductor', 'waistcoat:#3a3060', 'pocketwatch'] },
   pinstripe: { species: 'rat', model: 'rat-stand', tint: [0.85, 0.85, 0.9], acc: ['tie:#c4302b', 'waistcoat:#3a3a3a'] },
   crumbsy: { species: 'rat', model: 'rat-stand', acc: ['crust'] },
   // Cedar Hill Pack
   biscuit: { species: 'dog', model: 'dog', acc: ['collar:#c4302b'] },
   pretzel: { species: 'dog', model: 'dog-dachshund', acc: ['collar:#2a5ab0'] },
-  fifi: { species: 'dog', model: 'dog-poodle', acc: ['bow:#e87aa8', 'collar:#e87aa8'] },
+  fifi: { species: 'dog', model: 'dog-poodle', neck: [0.1, -1.53, 1.03, 1.65], acc: ['bow:#e87aa8', 'collar:#e87aa8'] },
   moose: { species: 'dog', model: 'dog-mastiff', acc: ['collar:#c4302b'] },
   // Strix's parliament
   strix: { species: 'owl', acc: [] },
