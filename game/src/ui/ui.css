@@ -150,6 +150,8 @@ svg.pad { display: inline-block; width: 1.6em; height: 1.6em; vertical-align: mi
 #flighthints.on { opacity: 1; visibility: visible; transition: opacity 0.6s ease 0.15s, visibility 0s; }
 #flighthints > span { display: inline-flex; align-items: center; gap: 7px; padding: 5px 12px 5px 6px; border-radius: 14px; background: rgba(30, 26, 22, 0.58); color: #fff; font-weight: 600; font-size: 15px; white-space: nowrap; }
 #flighthints > span.t { padding-left: 12px; }
+#flighthints > span.lt { font-size: 13px; opacity: 0.7; padding: 3px 10px 3px 5px; }   /* Batch-2 (#4): learnt rows dim, never go */
+#flighthints > span.lt .key, #flighthints > span.lt .padpill { font-size: 11px; }
 #flighthints .key, #flighthints .padpill { font-size: 13px; }
 body.cine #flighthints { opacity: 0; }
 #tutor::after { content: ''; position: absolute; left: 50%; bottom: -9px; margin-left: -9px; border: 9px solid transparent; border-bottom: 0; border-top-color: var(--paper); }

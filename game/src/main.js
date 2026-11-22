@@ -1641,16 +1641,22 @@ async function boot() {
    *  shows none. On touch the buttons are on screen, so only Land (its button) is named. Shown after 0.5 s of flight, not in
    *  scenes, dialogue, the wheel, a vehicle, an encounter/race panel or while a tutor bubble teaches something. */
   const HINT_LEARNT = { flap: 5, land: 3, boost: 3 };
-  const HINT_ROWS = [['flap', 'flap', 'Flap'], ['land', 'dive', 'Land'], ['boost', 'boost', 'Boost']];
+  // Batch-2 (#4): while flying the flight rows always show ('auto' and 'always'; 'off' hides them); a learnt row only dims
+  // (.lt). Drop joins while carrying, Peck while over water (the swimmers can be talked to from the air).
+  const HINT_ROWS = [['flap', 'flap', 'Flap · hold to climb'], ['land', 'dive', 'Land'], ['boost', 'boost', 'Boost']];
+  let hintWaterT = 0;
   function flightHints(dev, fam, tutor) {
     const mode = G.settings.controlHints || 'auto';
     if (mode === 'off' || gus.mode !== 'fly' || gus.modeT < 0.5 || G.vehicles.driving || G.cutscene.locked || G.dialogue.open || G.wheel.open || G.altView || tutor) return '';
     if (G.mods.some((m) => m.panel?.())) return '';
-    const learnt = G.settings.hintsLearnt || {};
-    const rows = HINT_ROWS.filter(([k]) => (mode === 'always' || (learnt[k] || 0) < HINT_LEARNT[k]) && (dev !== 'touch' || k === 'land'));
-    if (!rows.length) return '';
     if (dev === 'touch') return `<span class="t">Tap${glyph('dive', dev, fam)}to land</span>`;
-    return rows.map(([, a, label]) => `<span>${glyph(a, dev, fam)}${label}</span>`).join('');
+    const learnt = G.settings.hintsLearnt || {};
+    const rows = HINT_ROWS.map(([k, a, label]) => [a, label, mode !== 'always' && (learnt[k] || 0) >= HINT_LEARNT[k]]);
+    if (G.state.carried) rows.push(['drop', 'Drop', false]);
+    // over water (held a moment after the shore, so the strip doesn't flicker along a bank)
+    hintWaterT = collision.surface(gus.position.x, gus.position.z, gus.position.y + 0.1).kind === 'water' ? 1.5 : Math.max(0, hintWaterT - 1 / 60);
+    if (hintWaterT > 0) rows.push(['peck', 'Peck to talk', false]);
+    return rows.map(([a, label, dim]) => `<span${dim ? ' class="lt"' : ''}>${glyph(a, dev, fam)}${label}</span>`).join('');
   }
   /** Flight hint / scarf: count a use toward retiring a hint (saved with the settings; a few writes in all). */
   function learnHint(k) {
