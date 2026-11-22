@@ -206,7 +206,8 @@ export function createInput(target = window, { canvas = null, bindings = DEFAULT
     // Fixes-4 (#8): a direction held on the pad while the report form is open repeats into the form, never the menu under it
     const blocked = !!ignore?.();
     const held = UI_DIRS.find((d) => (blocked ? padDown.has(d) : isHeld(d)));
-    if (!held) { repeat.dir = null; return; }
+    if (!held) { repeat.dir = null; repeat.hold = false; return; }
+    if (repeat.hold) return;   // released by releaseAll (the report form closed): wait for the direction to be let go
     if (repeat.dir !== held) { repeat.dir = held; repeat.t = REPEAT_FIRST; return; }
     repeat.t -= dt;
     if (repeat.t <= 0) { if (blocked) input.onIgnoredPad?.(held); else edges.add(held); repeat.t += REPEAT_NEXT; }
@@ -259,6 +260,10 @@ export function createInput(target = window, { canvas = null, bindings = DEFAULT
     clearAuto() { auto.clear(); autoStick.x = autoStick.y = 0; },
     get autoState() { return { held: [...auto], stick: { ...autoStick } }; },
     inject(a, on) { if (on) press(auto, a); else auto.delete(a); },
+    /** Let go of every key and touch button (the bug report form opening or closing: it keeps its keyups from the
+     *  game). The pad's buttons stay tracked, so the B that closed the form doesn't also act in the menu under it; a
+     *  direction held on the pad stops repeating until it's let go. */
+    releaseAll() { down.clear(); virt.clear(); repeat.dir = null; repeat.hold = true; },
     /** Forget held keys and edges (after a menu closes, so nothing leaks into play). */
     reset() { edges.clear(); look.dx = look.dy = 0; },   // Fixes-1 (#8): and camera turns piled up while a menu was open
     enablePointerLock(on) { wantLock = on; if (!on && document.pointerLockElement === canvas) document.exitPointerLock?.(); },

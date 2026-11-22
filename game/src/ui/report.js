@@ -109,7 +109,9 @@ export function installReport(G) {
       .quick-hint, .pad-send { font-size: 13px; line-height: 1.35; color: #5a4a2e; text-wrap: balance; }
       .quick-hint { margin-top: 6px; color: #9a3d12; font-weight: 700; }
       .pad-send { margin-top: 8px; text-align: center; }
-      .pad-note { margin-top: 10px; font-weight: 700; color: #9a3d12; text-wrap: balance; }
+      .pad-note { margin-top: 10px; font-weight: 700; color: #9a3d12; text-wrap: balance; border-radius: 8px; }
+      .pad-note.flash { animation: padflash 0.9s ease-out 2; }
+      @keyframes padflash { 0% { background: #ffd8a8; } 100% { background: transparent; } }
       :host(.ghf-pad) .link-hint { display: none; }
       :host(:not(.ghf-pad)) .pad-send { display: none; }
       :host(.ghf-pad) .popup :focus { outline: 3px solid #26351f; outline-offset: 2px; }
@@ -151,8 +153,8 @@ export function installReport(G) {
 // Fixes-4 (#8): the one-press choices (added to the form's open shadow root each time it opens, since the form
 // re-renders itself when its attributes change) and controller support while the form is open.
 function installQuickAndPad(G, fb) {
-  const sr = fb.shadowRoot;
-  if (!sr) return;
+  // the shadow root is looked up as it's needed (review: a form without one at install still gets B to close it)
+  const root = () => fb.shadowRoot;
   const fam = () => G.input?.gamepad?.family || 'xbox';
   const pg = (a) => glyph(a, 'gamepad', fam());
   const setPad = (on) => fb.classList.toggle('ghf-pad', on);
@@ -160,6 +162,8 @@ function installQuickAndPad(G, fb) {
   for (const t of ['pointerdown', 'keydown']) fb.addEventListener(t, () => setPad(false), true);
 
   const ensure = () => {
+    const sr = root();
+    if (!sr) return null;
     let q = sr.querySelector('.quick');
     if (!q) {
       q = document.createElement('div');
@@ -180,33 +184,41 @@ function installQuickAndPad(G, fb) {
     }
     // honest about what a controller can do: GitHub's page is where the report is finished
     ps.innerHTML = `Opens GitHub to finish, which needs a mouse, touch or keyboard (and a GitHub account). ${pg('uiBack')} closes this.`;
-    sr.querySelector('.quick-hint').hidden = true;
+    const hint = sr.querySelector('.quick-hint');
+    if (hint) hint.hidden = true;
     sr.querySelectorAll('.quick-pill').forEach((b) => b.classList.remove('active'));
     return q;
   };
   const pick = (b) => {
-    const title = sr.querySelector('#ghf-title');
+    const sr = root();
+    const title = sr?.querySelector('#ghf-title');
     if (!title) return;
     title.value = b.textContent;
     title.dispatchEvent(new Event('input', { bubbles: true }));   // the form clears its "title needed" error
     sr.querySelectorAll('.quick-pill').forEach((p) => p.classList.toggle('active', p === b));
-    sr.querySelector('.quick-hint').hidden = true;
+    const hint = sr.querySelector('.quick-hint');
+    if (hint) hint.hidden = true;
     const send = sr.querySelector('.submit-btn');
     send?.focus();
     (fb.classList.contains('ghf-pad') ? sr.querySelector('.pad-send') : send)?.scrollIntoView?.({ block: 'nearest' });
   };
 
+  // nothing held as the form opens stays held after it closes (the form keeps its keyups from the game)
   fb.addEventListener('gh-feedback:open', () => {
+    G.input?.releaseAll?.();
     ensure();
-    setPad(!G.reportByKeys && G.input?.device === 'gamepad');
+    const pad = !G.reportByKeys && G.input?.device === 'gamepad';
+    setPad(pad);
     G.reportByKeys = false;
-    // focus starts on the first choice (the form would otherwise focus the title box after 50 ms)
-    sr.querySelector('.quick-pill')?.focus();
+    // with a controller, focus starts on the first choice; otherwise the form focuses the title box itself (50 ms
+    // later), so a keyboard player can type at once
+    if (pad) root()?.querySelector('.quick-pill')?.focus();
   });
+  fb.addEventListener('gh-feedback:close', () => G.input?.releaseAll?.());
   // a send that couldn't open the tab: say what finishing takes, and wait for that click
   fb.addEventListener('gh-feedback:opened', (e) => {
     if (e.detail?.opened || !fb.classList.contains('ghf-pad')) return;
-    const note = sr.querySelector('.link-note');
+    const note = root()?.querySelector('.link-note');
     if (!note || note.querySelector('.pad-note')) return;
     const p = document.createElement('p');
     p.className = 'pad-note';
@@ -214,24 +226,31 @@ function installQuickAndPad(G, fb) {
     note.querySelector('.done-btn')?.before(p);
   });
 
-  const focusables = () => [...sr.querySelectorAll('.popup a[href], .popup button:not([disabled]), .popup input:not([disabled]), .popup textarea:not([disabled])')]
+  const focusables = () => [...(root()?.querySelectorAll('.popup a[href], .popup button:not([disabled]), .popup input:not([disabled]), .popup textarea:not([disabled])') || [])]
     .filter((e) => e.getClientRects().length > 0);
   const move = (dir) => {
     const f = focusables();
     if (!f.length) return;
-    const cur = sr.activeElement;
+    const cur = root()?.activeElement;
     if (!f.includes(cur)) { f[0].focus(); return; }
     const a = cur.getBoundingClientRect();
     const ax = a.left + a.width / 2, ay = a.top + a.height / 2;
-    let best = null, bs = Infinity;
+    // up/down go to the nearest row first (the choices wrap in rows of uneven pills), then the closest in it
+    const cands = [];
     for (const e of f) {
       if (e === cur) continue;
       const b = e.getBoundingClientRect();
       const dx = b.left + b.width / 2 - ax, dy = b.top + b.height / 2 - ay;
       const [along, across] = dir === 'uiUp' ? [-dy, Math.abs(dx)] : dir === 'uiDown' ? [dy, Math.abs(dx)] : dir === 'uiLeft' ? [-dx, Math.abs(dy)] : [dx, Math.abs(dy)];
-      if (along <= 2) continue;
-      const score = along + across * 2.2;
-      if (score < bs) { bs = score; best = e; }
+      if (along > 2) cands.push({ e, along, across });
+    }
+    let best = null, bs = Infinity;
+    const vertical = dir === 'uiUp' || dir === 'uiDown';
+    const near = Math.min(...cands.map((c) => c.along));
+    for (const c of cands) {
+      if (vertical && c.along > near + 8) continue;
+      const score = vertical ? c.across : c.along + c.across * 2.2;
+      if (score < bs) { bs = score; best = c.e; }
     }
     if (!best && (dir === 'uiUp' || dir === 'uiDown')) {
       const i = f.indexOf(cur);
@@ -240,9 +259,12 @@ function installQuickAndPad(G, fb) {
     if (best) { best.focus(); best.scrollIntoView?.({ block: 'nearest', inline: 'nearest' }); G.audio?.synth('uiMove'); }
   };
   const padPress = (a) => {
-    if (!fb.isOpen) return;
+    if (!G.reportOpen()) return;
+    // B / ○ always closes, whatever state the form's markup is in
+    if (a === 'uiBack') { G.audio?.synth('uiBack'); try { fb.close(); } catch { fb._close?.(); } return; }
+    const sr = root();
+    if (!sr) return;
     setPad(true);
-    if (a === 'uiBack') { G.audio?.synth('uiBack'); fb.close(); return; }
     if (a === 'uiUp' || a === 'uiDown' || a === 'uiLeft' || a === 'uiRight') { move(a); return; }
     if (a !== 'uiOk') return;
     const cur = sr.activeElement;
@@ -253,6 +275,13 @@ function installQuickAndPad(G, fb) {
       if (hint) { hint.hidden = false; hint.textContent = 'Typing needs a keyboard. With a controller, pick one of these instead.'; }
       sr.querySelector('.quick-pill')?.focus();
       sr.querySelector('.quick')?.scrollIntoView?.({ block: 'nearest' });
+      return;
+    }
+    if (cur.matches('a[target="_blank"]')) {
+      // the browser blocks a new tab from a controller press too: point at the note instead of silently doing nothing
+      const n = sr.querySelector('.pad-note');
+      if (n) { n.classList.remove('flash'); void n.offsetWidth; n.classList.add('flash'); n.scrollIntoView?.({ block: 'nearest' }); }
+      G.audio?.synth('uiBack');
       return;
     }
     G.audio?.synth('uiSelect');
