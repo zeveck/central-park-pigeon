@@ -626,6 +626,7 @@ import { SCHEME, NAP_CLEARS } from './data/schemes.js';
 import { PHASE_LABEL, CHARACTERS } from './data/crews.js';
 import { patchMorphArray, loadMorphArray } from './gfx/morphs.js';
 import { installReport } from './ui/report.js';
+import { installPhoto } from './ui/photo.js';   // photo mode (#9)
 import { installOffline } from './ui/offline.js';
 
 const DT = 1 / 60;
@@ -912,6 +913,8 @@ async function boot() {
     far.followers.position.copy(dataCam.position);
   };
   G.syncCameras = syncCameras;
+  // photo mode (#9): the camera-following world updates, for a camera that moves while the park is paused
+  G.followCamWorld = () => { terrain.updateLod(dataCam.position); treeSys.update(dataCam); props.userData.update(dataCam); streamer.update(gus.position, dataCam.position); };
 
   const streamer = new Streamer(registry, dynamic, ctx.streams, { shadows: preset.casters.static, lodDist: { high: 80, medium: 55, low: 35 }[preset.id] });   // perf pass: landmark LODs
   G.streamer = streamer;
@@ -955,6 +958,7 @@ async function boot() {
   G.menus = new Menus(G);
   for (const f of [titleScreen, pauseScreen, settingsScreen, controlsScreen, creditsScreen, confirmScreen, slotsScreen, napScreen, nestScreen, scarfScreen, grateScreen, boardScreen, mapScreen, rosterScreen]) G.menus.add(f(G));
   installReport(G);
+  installPhoto(G);   // photo mode (#9): the 'photo', 'album' and 'photoview' screens, G.photo
   new TouchControls(input, { onPause: () => G.pause(), blocked: () => G.menus.open || G.screen !== 'play' });
 
   await stage('Waking the park', 0.48);
@@ -1004,6 +1008,7 @@ async function boot() {
       if (input.pressed('map')) { input.endUpdate(); G.openMenu('map'); return; }
       if (input.pressed('board')) { input.endUpdate(); G.openMenu('board'); return; }
       if (input.pressed('where')) G.guide.request();   // guidance: "Where to?" (G / R3 / a tap on the compass)
+      if (input.pressed('photo') && G.photo?.unlocked()) { input.endUpdate(); G.photo.request(); return; }   // photo mode (#9): V / D-pad right
     }
     if (G.hitStop > 0) { G.hitStop--; input.endUpdate(); return; }   // 3b juice: a hit pause holds the whole park for a few updates
     if (G.shakeT > 0) G.shakeT -= dt;
@@ -1774,7 +1779,8 @@ async function boot() {
     G.lastStats = { triangles: renderer.info.render.triangles, calls: renderer.info.render.calls };
     // keep the preset's triangle cap: the crowds, people and named characters give way first
     const cap = preset.caps.triangles, t = G.lastStats.triangles;   // (info isn't reset between the passes: this counts both)
-    if (t > cap * 0.96) G.budgetScale = Math.max(0.2, (G.budgetScale ?? 1) * 0.8);
+    if (G.photoHold) { /* photo mode (#9): the governor holds still while the shot is framed */ }
+    else if (t > cap * 0.96) G.budgetScale = Math.max(0.2, (G.budgetScale ?? 1) * 0.8);
     else if (t < cap * 0.85) G.budgetScale = Math.min(1, (G.budgetScale ?? 1) * 1.05);
     return G.lastStats;
   }

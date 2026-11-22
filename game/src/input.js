@@ -34,6 +34,8 @@ const DEFAULT_BINDINGS = {
   map: ['Tab'],
   board: ['KeyJ'],
   where: ['KeyG'],   // guidance: "Where to?"
+  photo: ['KeyV'],   // photo mode (#9): open it (ui/photo.js); inside it, P pose, L look, +/- zoom
+  photoPose: ['KeyP'], photoLook: ['KeyL'], zoomIn: ['Equal', 'NumpadAdd'], zoomOut: ['Minus', 'NumpadSubtract'],
   mute: ['KeyM'],
   pause: ['Escape', 'KeyP'],
   debugPhase: ['KeyT'],
@@ -50,7 +52,7 @@ const DEFAULT_BINDINGS = {
 // standard-mapping button → actions (each pad button does one thing in play; menus read the ui* twins)
 const PAD_BUTTONS = {
   0: ['flap', 'uiOk'], 1: ['dive', 'uiBack'], 2: ['peck'], 3: ['coo'], 4: ['drop'], 5: ['wheel'],
-  8: ['map'], 9: ['pause'], 10: ['sprint'], 11: ['where'], 12: ['board', 'uiUp'], 13: ['map', 'uiDown'], 14: ['uiLeft'], 15: ['uiRight'],
+  8: ['map'], 9: ['pause'], 10: ['sprint'], 11: ['where'], 12: ['board', 'uiUp'], 13: ['map', 'uiDown'], 14: ['uiLeft'], 15: ['photo', 'uiRight'],   // photo mode (#9): D-pad right opens it (Map keeps View and D-pad down)
 };
 const DEAD = 0.25;
 const UI_DIRS = ['uiUp', 'uiDown', 'uiLeft', 'uiRight'];

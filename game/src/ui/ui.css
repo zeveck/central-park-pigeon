@@ -499,3 +499,73 @@ body.cine #whereto, body.cine #hud .suggest, body.wheel-open #hud .suggest { opa
   #hud .chip[data-tip] { pointer-events: auto; cursor: help; }
   #hud .chip[data-tip]:hover::after { opacity: 1; visibility: visible; }
 }
+
+/* ------------------------------------------------------------------ photo mode (#9): ui/photo.js */
+body.photo > *:not(#game):not(#photo):not(.overlay):not(#fpsbox) { visibility: hidden !important; }
+#photo { position: fixed; inset: 0; z-index: 30; display: none; font-family: 'Fredoka', sans-serif; color: #fffaf0; pointer-events: none; }
+#photo.on { display: block; }
+#photo .catch { position: absolute; inset: 0; pointer-events: auto; touch-action: none; cursor: grab; }
+#photo .catch:active { cursor: grabbing; }
+#photo .vig, #photo .frame, #photo .grid3, #photo .flash { position: absolute; inset: 0; pointer-events: none; }
+#photo .vig { display: none; background: radial-gradient(ellipse at center, transparent 55%, rgba(30, 20, 10, 0.45) 100%); }
+#photo[data-look="film"] .vig { display: block; }
+#photo .frame { display: none; border: solid #f6efe0; border-width: 3.5vw 3.5vw 6vw; box-shadow: inset 0 0 0 1px rgba(90, 70, 50, 0.35); }
+#photo .frame span { position: absolute; left: 0; bottom: -4.6vw; color: #c4302b; font-weight: 600; font-size: 3vw; line-height: 1; white-space: nowrap; }
+#photo[data-look="postcard"] .frame { display: block; }
+#photo .grid3 { display: none; }
+#photo.g .grid3 { display: block; }
+#photo .grid3 i { position: absolute; background: rgba(255, 255, 255, 0.45); box-shadow: 0 0 2px rgba(0, 0, 0, 0.4); }
+#photo .grid3 i:nth-child(1) { left: 33.33%; top: 0; bottom: 0; width: 1px; }
+#photo .grid3 i:nth-child(2) { left: 66.66%; top: 0; bottom: 0; width: 1px; }
+#photo .grid3 i:nth-child(3) { top: 33.33%; left: 0; right: 0; height: 1px; }
+#photo .grid3 i:nth-child(4) { top: 66.66%; left: 0; right: 0; height: 1px; }
+#photo .flash { background: #fff; opacity: 0; }
+#photo button { pointer-events: auto; font-family: inherit; }
+#photo .x { position: absolute; left: calc(14px + var(--safe-l)); top: calc(12px + var(--safe-t)); width: 48px; height: 48px; border-radius: 50%; border: 0; background: rgba(20, 24, 34, 0.6); color: #fffaf0; display: grid; place-items: center; cursor: pointer; outline: none; }
+#photo .x svg { width: 26px; height: 26px; }
+#photo .title { position: absolute; left: 50%; top: calc(14px + var(--safe-t)); transform: translateX(-50%); background: rgba(20, 24, 34, 0.55); padding: 6px 16px; border-radius: 999px; font-weight: 600; font-size: 17px; white-space: nowrap; }
+#photo .panel { position: absolute; left: calc(14px + var(--safe-l)); bottom: calc(14px + var(--safe-b)); right: calc(130px + var(--safe-r)); display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; }
+#photo .chip { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 999px; border: 2px solid rgba(255, 250, 240, 0.25); background: rgba(20, 24, 34, 0.62); color: #fffaf0; font-size: 16px; font-weight: 500; cursor: pointer; white-space: nowrap; outline: none; }
+#photo .chip svg { width: 20px; height: 20px; flex: none; }
+#photo .chip b { font-weight: 700; color: var(--gold); }
+#photo .chip.tog::before { content: ''; width: 14px; height: 14px; border-radius: 4px; border: 2px solid rgba(255, 250, 240, 0.7); box-sizing: border-box; flex: none; }
+#photo .chip.tog.on::before { background: var(--gold); border-color: var(--gold); }
+#photo .chip.on { border-color: var(--gold); }
+#photo .chip:focus, #photo .x:focus { outline: 4px solid var(--gold); outline-offset: 2px; }
+#photo .shutter { position: absolute; right: calc(22px + var(--safe-r)); bottom: calc(22px + var(--safe-b)); width: 92px; height: 92px; border-radius: 50%; border: 5px solid #fffaf0; background: rgba(255, 255, 255, 0.18); cursor: pointer; display: grid; place-items: center; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35); outline: none; }
+#photo .shutter i { width: 68px; height: 68px; border-radius: 50%; background: #fffaf0; transition: transform 0.08s; }
+#photo .shutter:active i { transform: scale(0.88); }
+#photo .shutter:focus { box-shadow: 0 0 0 5px var(--gold), 0 4px 14px rgba(0, 0, 0, 0.35); }
+#photo .phints { position: absolute; right: calc(14px + var(--safe-r)); top: calc(12px + var(--safe-t)); display: flex; flex-direction: column; align-items: flex-end; gap: 4px; font-size: 14px; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7); }
+#photo .phints > span { display: inline-flex; align-items: center; gap: 6px; background: rgba(20, 24, 34, 0.45); padding: 2px 10px 2px 4px; border-radius: 999px; white-space: nowrap; }
+#photo .phints .key { min-width: 0; }
+#photo .note { position: absolute; left: 50%; top: calc(62px + var(--safe-t)); transform: translateX(-50%); max-width: min(560px, 80vw); text-align: center; background: rgba(20, 24, 34, 0.72); padding: 8px 16px; border-radius: 14px; font-size: 16px; opacity: 0; transition: opacity 0.25s; text-wrap: balance; }
+#photo .note.on { opacity: 1; }
+@media (pointer: coarse) { #photo .phints { display: none; } }
+@media (max-height: 480px) {
+  #photo .chip { padding: 6px 11px; font-size: 14px; }
+  #photo .shutter { width: 78px; height: 78px; right: calc(16px + var(--safe-r)); bottom: calc(14px + var(--safe-b)); }
+  #photo .shutter i { width: 56px; height: 56px; }
+  #photo .panel { right: calc(108px + var(--safe-r)); bottom: calc(10px + var(--safe-b)); gap: 6px; }
+}
+#album .card, #photoview .card { width: min(860px, 94vw); max-width: none; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px; }
+#album h2 small { font-size: 15px; font-weight: 500; color: #6a6058; margin-left: 8px; }
+#album .thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; overflow: auto; min-height: 90px; max-height: calc(100vh - 230px); padding: 6px; }
+#album .thumb { border: 0; padding: 0; border-radius: 10px; overflow: hidden; background: #d8cfc0; cursor: pointer; aspect-ratio: 16 / 9; outline: none; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); }
+#album .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+#album .thumb:focus { outline: 4px solid var(--gold); outline-offset: 2px; }
+#album .row, #photoview .row { display: flex; flex-wrap: wrap; gap: 10px; }
+#photoview .big { width: 100%; max-height: calc(100vh - 200px); object-fit: contain; border-radius: 10px; }
+#pause .split { display: flex; gap: 8px; }
+#pause .split .btn { flex: 1; }
+#hud .hb.cam { display: none; }
+#hud .hb.cam.on { display: grid; }
+@media (max-height: 480px) { #album .thumbs { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); max-height: calc(100vh - 170px); } #photoview .big { max-height: calc(100vh - 150px); } }
+/* photo mode (#9): the Photo / Album row makes Pause one row taller; on screens under 820 px tall the rows tighten so the
+   whole list and its hints still fit without scrolling (at 460 px and under it is two columns, above) */
+@media (max-height: 820px) and (min-height: 461px) {
+  #pause .card { padding-top: 16px; padding-bottom: 12px; }
+  #pause .card .list { gap: 6px; }
+  #pause .btn { padding-top: 7px; padding-bottom: 7px; font-size: 18px; }
+  #pause h2 { margin-bottom: 8px; }
+}

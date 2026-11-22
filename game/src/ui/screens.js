@@ -163,6 +163,8 @@ export function pauseScreen(G) {
       list.innerHTML = btn('resume', 'Resume', 'play', 'primary')
         + `<button type="button" class="btn${napWhy ? ' dis' : ''}" data-act="nap">${icon('zzz')}<span>Nap until…</span>${napWhy ? `<span class="right">${esc(napWhy)}</span>` : ''}</button>`
         + btn('board', 'Scheme Board', 'board') + btn('map', 'Map', 'map') + btn('roster', 'Crews & Workshop', 'roster')
+        // photo mode (#9): one row, Photo and Album side by side, once Gus has the camera
+        + (G.photo?.unlocked() ? `<div class="split">${(() => { const why = G.photo.blockedReason(); return `<button type="button" class="btn${why ? ' dis' : ''}" data-act="photo" ${why ? `title="${esc(why)}"` : ''}>${icon('camera')}<span>Photo</span></button>`; })()}${btn('album', 'Album', 'album')}</div>` : G.photo?.hasPhotos() ? `<div class="split">${btn('album', 'Album', 'album')}</div>` : '')
         + btn('controls', 'Controls', 'controls') + btn('settings', 'Settings', 'settings')
         + btn('mute', G.settings.muted ? 'Sound: off' : 'Sound: on', G.settings.muted ? 'muted' : 'speaker')
         + btn('save', 'Save', 'save')
@@ -178,6 +180,8 @@ export function pauseScreen(G) {
     board: () => G.menus.push('board'),
     map: () => G.menus.push('map'),
     roster: () => G.menus.push('roster'),
+    photo: () => { G.menus.closeAll(); G.photo.request(); },   // photo mode (#9)
+    album: () => G.menus.push('album'),
     controls: () => G.menus.push('controls'),
     settings: () => G.menus.push('settings'),
     mute: () => { G.toggleMute(); s.render(); s.el.querySelector('[data-act="mute"]').focus(); },

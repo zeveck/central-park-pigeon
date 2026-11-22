@@ -7,14 +7,15 @@ const KEYS = {
   flap: 'Space', dive: 'C', peck: 'E', coo: 'F', drop: 'Q', sprint: 'Shift', boost: 'Shift', wheel: 'R', map: 'Tab', board: 'J', where: 'G',
   mute: 'M', pause: 'Esc', uiOk: 'Enter', uiBack: 'Esc', move: 'WASD', look: 'Mouse', nap: 'E',
   uiLeft: '←', uiRight: '→', uiUp: '↑', uiDown: '↓',   // polish (P19): arrow key caps
+  photo: 'V', photoPose: 'P', photoLook: 'L', zoomIn: '+', zoomOut: '−',   // photo mode (#9)
 };
-const TOUCH = { uiLeft: 'Tap', uiRight: 'Tap', flap: 'Flap', dive: 'Land', peck: 'Peck', coo: 'Coo', drop: 'Hold Peck', sprint: 'Stick edge', boost: 'Double-tap Flap', wheel: 'Portrait', map: 'Map', board: 'Board', where: 'Compass', pause: 'Pause', uiOk: 'Tap', uiBack: 'Back', move: 'Stick', look: 'Drag', nap: 'Peck' };
+const TOUCH = { uiLeft: 'Tap', uiRight: 'Tap', flap: 'Flap', dive: 'Land', peck: 'Peck', coo: 'Coo', drop: 'Hold Peck', sprint: 'Stick edge', boost: 'Double-tap Flap', wheel: 'Portrait', map: 'Map', board: 'Board', where: 'Compass', pause: 'Pause', uiOk: 'Tap', uiBack: 'Back', move: 'Stick', look: 'Drag', nap: 'Peck', photo: 'Camera', photoPose: 'Pose', photoLook: 'Look', zoomIn: 'Pinch', zoomOut: 'Pinch' };
 // position: bottom right left top (standard mapping 0 1 2 3)
-const PAD_POS = { flap: 'bottom', uiOk: 'bottom', dive: 'right', uiBack: 'right', peck: 'left', nap: 'left', coo: 'top' };
+const PAD_POS = { flap: 'bottom', uiOk: 'bottom', dive: 'right', uiBack: 'right', peck: 'left', nap: 'left', coo: 'top', photoPose: 'left', photoLook: 'top' };
 const PAD_OTHER = {
-  playstation: { uiLeft: 'D-pad left', uiRight: 'D-pad right', drop: 'L1', wheel: 'R1', sprint: 'L3', boost: 'L3', map: 'Create', board: 'D-pad up', where: 'R3', pause: 'Options', move: 'L stick', look: 'R stick' },
-  xbox: { uiLeft: 'D-pad left', uiRight: 'D-pad right', drop: 'LB', wheel: 'RB', sprint: 'LS', boost: 'LS', map: 'View', board: 'D-pad up', where: 'RS', pause: 'Menu', move: 'L stick', look: 'R stick' },
-  nintendo: { uiLeft: 'D-pad left', uiRight: 'D-pad right', drop: 'L', wheel: 'R', sprint: 'LS', boost: 'LS', map: '−', board: 'D-pad up', where: 'RS', pause: '+', move: 'L stick', look: 'R stick' },
+  playstation: { uiLeft: 'D-pad left', uiRight: 'D-pad right', drop: 'L1', wheel: 'R1', sprint: 'L3', boost: 'L3', map: 'Create', zoomOut: 'L1', zoomIn: 'R1', board: 'D-pad up', where: 'R3', pause: 'Options', move: 'L stick', look: 'R stick' },
+  xbox: { uiLeft: 'D-pad left', uiRight: 'D-pad right', drop: 'LB', wheel: 'RB', sprint: 'LS', boost: 'LS', map: 'View', zoomOut: 'LB', zoomIn: 'RB', board: 'D-pad up', where: 'RS', pause: 'Menu', move: 'L stick', look: 'R stick' },
+  nintendo: { uiLeft: 'D-pad left', uiRight: 'D-pad right', drop: 'L', wheel: 'R', sprint: 'LS', boost: 'LS', map: '−', zoomOut: 'L', zoomIn: 'R', board: 'D-pad up', where: 'RS', pause: '+', move: 'L stick', look: 'R stick' },
 };
 const LETTERS = {
   xbox: { bottom: ['A', '#3c9a3c'], right: ['B', '#c8352e'], left: ['X', '#2f6fc0'], top: ['Y', '#d8a91f'] },
@@ -33,7 +34,7 @@ export function psShape(pos) {
   return `<svg class="pad" viewBox="0 0 24 24" aria-hidden="true">${ring}${s}</svg>`;
 }
 
-const DPAD = { uiLeft: 'left', uiRight: 'right', uiUp: 'up', uiDown: 'down', board: 'up' };
+const DPAD = { uiLeft: 'left', uiRight: 'right', uiUp: 'up', uiDown: 'down', board: 'up', photo: 'right' };
 /** A d-pad with one arm lit. */
 function dpad(dir) {
   const arms = { up: 'M9.2 2.5h5.6v6.7H9.2z', down: 'M9.2 14.8h5.6v6.7H9.2z', left: 'M2.5 9.2h6.7v5.6H2.5z', right: 'M14.8 9.2h6.7v5.6h-6.7z' };

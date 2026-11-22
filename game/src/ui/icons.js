@@ -14,6 +14,9 @@ const P = {
   board: '<path d="M3 4h18v14H3z" opacity=".35"/><path d="M3 3h18a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-8l1.5 3h-2l-1.5-3-1.5 3h-2L9 19H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm2 3v5h5V6zm7 0v3h7V6zm0 5v5h7v-5zm-7 2v3h5v-3z"/>',
   speaker: '<path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
   muted: '<path d="M4 9h4l5-4v14l-5-4H4z"/><path d="m16 9 5 6m0-6-5 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>',
+  // photo mode (#9): a little film camera (currentColor), its album (stacked prints) and the shutter
+  camera: '<path d="M8.6 5.2h6.8l1.4 2.3H20a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9.5a2 2 0 0 1 2-2h3.2zM12 9.4a4.1 4.1 0 1 0 0 8.2 4.1 4.1 0 0 0 0-8.2zm0 2a2.1 2.1 0 1 1 0 4.2 2.1 2.1 0 0 1 0-4.2z"/><rect x="3.6" y="5.6" width="3" height="1.4" rx=".5"/>',
+  album: '<path d="M6 3.5h13a1.5 1.5 0 0 1 1.5 1.5v11a1.5 1.5 0 0 1-1.5 1.5H6A1.5 1.5 0 0 1 4.5 16V5A1.5 1.5 0 0 1 6 3.5zm1 2v8l3.3-3.4 2.4 2.4 1.8-1.8 3 2.8V5.5zm8.5 1.4a1.4 1.4 0 1 0 0 2.8 1.4 1.4 0 0 0 0-2.8z"/><path d="M2.5 7v11A2.5 2.5 0 0 0 5 20.5h12.5v-1.8H5a.7.7 0 0 1-.7-.7V7z"/>',
   pause: '<rect x="6" y="4.5" width="4" height="15" rx="1.3"/><rect x="14" y="4.5" width="4" height="15" rx="1.3"/>',
   sun: '<circle cx="12" cy="12" r="5"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></g>',
   morning: '<path d="M3 17h18v2H3z"/><path d="M6.5 17a5.5 5.5 0 0 1 11 0z" fill="#f2c230"/><g stroke="#f2c230" stroke-width="2" stroke-linecap="round"><path d="M12 6.5V9M5.2 10.2l1.6 1.4M18.8 10.2l-1.6 1.4"/></g>',
@@ -65,5 +68,5 @@ export const phaseIcon = (phase) => icon(phase, 'ic tod');
 export function itemIcon(id) {
   if (!id) return '';
   if (id.startsWith('slice')) return icon('slice');
-  return icon({ box: 'box', shiny: 'shiny', key: 'key', 'gate-key': 'key', peas: 'peas', ball: 'ball' }[id] || 'item');
+  return icon({ box: 'box', shiny: 'shiny', key: 'key', 'gate-key': 'key', peas: 'peas', ball: 'ball', camera: 'camera' }[id] || 'item');
 }

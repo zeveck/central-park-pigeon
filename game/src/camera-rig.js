@@ -38,6 +38,7 @@ export class CameraRig {
     this.fov = 60;
     this.view = null;              // null = follow; or { yawOffset, dist, height, look }
     this.free = null;              // { pos: Vector3, look: Vector3, fov, up }
+    this.photo = null;             // photo mode (#9): { yaw, elev, dist, fov, look } (ui/photo.js)
     this.autoFollow = true;
     this.target = new THREE.Vector3();
     this.pushIn = 1;
@@ -74,6 +75,7 @@ export class CameraRig {
       return;
     }
     cam.up.copy(_up);
+    if (this.photo) { this.#photoCam(gus, collision); return; }   // photo mode (#9): ui/photo.js
     const flying = gus.mode === 'fly';
     const perched = gus.mode === 'perch';
     const driving = gus.mode === 'drive' && gus.driveCam;
@@ -148,9 +150,29 @@ export class CameraRig {
     }
     if (Math.abs(cam.fov - this.fov) > 0.01) { cam.fov = this.fov; cam.updateProjectionMatrix(); }
   }
+
+  /** Photo mode (#9): an orbit round Gus, { yaw, elev, dist (≤ 12), fov, look }, with the follow camera's push-in against
+   *  solids and its ground clamp. The rig's own yaw / dist / pitch are left alone, so play resumes where it was. */
+  #photoCam(gus, collision) {
+    const cam = this.camera, ph = this.photo, p = gus.position;
+    const R = Math.min(12, Math.max(0.3, ph.dist)), e = ph.elev;
+    this.target.set(p.x, p.y + (ph.look ?? 0.18), p.z);
+    _pt.set(p.x - Math.sin(ph.yaw) * Math.cos(e) * R, this.target.y + Math.sin(e) * R, p.z - Math.cos(ph.yaw) * Math.cos(e) * R);
+    if (collision) {
+      const f = collision.raySolid(this.target, _pt, 20, { camera: true });
+      if (f < 1) _pt.lerpVectors(this.target, _pt, Math.max(0.06, f - 0.05));
+    }
+    const ground = collision ? collision.heightAt(_pt.x, _pt.z) : -1e9;
+    if (_pt.y < ground + 0.08) _pt.y = ground + 0.08;
+    cam.position.copy(_pt);
+    cam.lookAt(this.target);
+    const fov = ph.fov || 60;
+    if (Math.abs(cam.fov - fov) > 0.01) { cam.fov = fov; cam.updateProjectionMatrix(); }
+  }
 }
 
 const _look = new THREE.Vector3();
+const _pt = new THREE.Vector3();
 
 const _want = new THREE.Vector3();
 const _up = new THREE.Vector3(0, 1, 0);

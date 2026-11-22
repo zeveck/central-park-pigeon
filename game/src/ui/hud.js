@@ -39,6 +39,7 @@ export class Hud {
       <div id="toasts"></div>
       <div class="tr">
         <div class="btns">
+          <button type="button" class="hb cam" data-act="photo" aria-label="Photo mode">${icon('camera')}</button>
           <button type="button" class="hb" data-act="map" aria-label="Map">${icon('map')}</button>
           <button type="button" class="hb" data-act="board" aria-label="Scheme Board">${icon('board')}</button>
           <button type="button" class="hb" data-act="mute" aria-label="Sound">${icon('speaker')}</button>
@@ -64,7 +65,8 @@ export class Hud {
       const b = e.target.closest('[data-act]');
       if (!b) return;
       const a = b.dataset.act;
-      if (a === 'map') G.openMenu('map');
+      if (a === 'photo') G.photo?.request();   // photo mode (#9)
+      else if (a === 'map') G.openMenu('map');
       else if (a === 'board') G.openMenu('board');
       else if (a === 'pause') G.pause();
       else if (a === 'mute') G.toggleMute();
@@ -91,6 +93,8 @@ export class Hud {
     $.portrait.classList.toggle('low', s < 0.2);
     $.portrait.classList.toggle('boost', v.boosting);
     if (L.portrait !== v.portrait) { $.pimg.src = `assets/portraits/${v.portrait}.webp`; L.portrait = v.portrait; }
+    const camOn = !!this.G.photo?.unlocked();   // photo mode (#9): the camera button once Gus has the camera
+    if (L.camOn !== camOn) { this.el.querySelector('.hb.cam').classList.toggle('on', camOn); L.camOn = camOn; }
     const dev = v.device + v.family;
     if (L.dev !== dev) { $.rkey.innerHTML = glyph('wheel', v.device, v.family); L.dev = dev; }
     // feathers
