@@ -118,18 +118,31 @@ export function createInput(target = window, { canvas = null, bindings = DEFAULT
 
   // mouse look (pointer lock, or drag with a button held)
   let dragging = false;
+  // Batch-2 (#18): with a controller in use, a resting hand's mouse jitter (a pixel or two) no longer flips the prompts to
+  // key caps and back (the strip changed its glyphs and width every few frames): it takes a real move (MOUSE_SWITCH px
+  // within half a second) to switch to the keyboard. The look itself is unchanged.
+  const MOUSE_SWITCH = 24;
+  let mouseAcc = 0, mouseAt = 0;
+  const mouseDevice = (e) => {
+    if (device !== 'gamepad') { setDevice('keyboard'); return; }
+    const now = performance.now();
+    if (now - mouseAt > 500) mouseAcc = 0;
+    mouseAt = now;
+    mouseAcc += Math.abs(e.movementX || 0) + Math.abs(e.movementY || 0);
+    if (mouseAcc >= MOUSE_SWITCH) { mouseAcc = 0; setDevice('keyboard'); }
+  };
   const onMouseMove = (e) => {
     const locked = document.pointerLockElement === canvas;
     if (captureCursor && (locked || dragging || true)) {
       cursor.dx += e.movementX; cursor.dy += e.movementY;
-      if (locked) setDevice('keyboard');
+      if (locked) mouseDevice(e);
       return;
     }
     if (!locked && !dragging) return;
     look.dx += e.movementX * sensitivity;
     look.dy += e.movementY * sensitivity * (invertY ? -1 : 1);
     lastLookManual = clock;
-    setDevice('keyboard');
+    mouseDevice(e);
   };
   const onMouseDown = (e) => {
     if (ignore?.(e)) return;

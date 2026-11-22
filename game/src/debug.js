@@ -155,9 +155,9 @@ export function installDebug(G) {
       n = Math.max(0, Math.round(n));
       for (let i = 0; i < n; i++) {
         G.update(G.DT);
-        if (typeof render === 'number' && render > 0 && (i + 1) % render === 0) { G.frameUi(G.DT); G.render(); }
+        if (typeof render === 'number' && render > 0 && (i + 1) % render === 0) { G.syncCameras(); G.frameUi(G.DT); G.render(); }   // Batch-2 (#18): the live loop's order
       }
-      if (render === 'last' || (typeof render === 'number' && n % render !== 0)) { G.frameUi(G.DT * Math.max(1, n)); if (G.screen === 'play') G.render(); }
+      if (render === 'last' || (typeof render === 'number' && n % render !== 0)) { G.syncCameras(); G.frameUi(G.DT * Math.max(1, n)); if (G.screen === 'play') G.render(); }
       return api.state({ measure: false });
     },
 

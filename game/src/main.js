@@ -1798,6 +1798,7 @@ async function boot() {
       if (n === 8) acc = 0;
     }
     const t1 = performance.now();
+    syncCameras();   // Batch-2 (#18): bubbles, prompts and the marker are placed with THIS frame's camera (was last frame's: jitter)
     frameUi(elapsed);
     // Land/perf: a frame with no update since the last one would draw the very same picture (everything moves on the
     // fixed clock), so on a 120/144 Hz screen it isn't drawn again: the canvas keeps showing the last frame. A resize
