@@ -210,7 +210,7 @@ export class Items {
     // fix-23: dropped over water it would lie where Gus can't stand to peck it (a dead end for one-time items): a slice
     // sinks (there are always more; den-cats puts the next anchovy out on the sill), anything else floats back to its
     // source (systems/schemes.js keeper), or where it was found, or the nearest dry ground
-    if (this.G.collision.waterAt(x, z) && this.def(c.id).cls !== 'huge') {
+    if (this.G.wetAt(x, z, g.position.y) && this.def(c.id).cls !== 'huge') {   // (the surface it would land on: a bridge deck is dry)
       const d = this.def(c.id), name = d.name.toLowerCase();
       this.G.audio.play('duck-dive-bloop', { vol: 0.6, at: g.position });
       this.G.particles.splash?.(x, g.position.y, z, 8);
@@ -374,7 +374,7 @@ export class Items {
     this.take();
     if (d.slice) return `The ${d.name.toLowerCase()} is gone. There are always more.`;
     // fix-23: never onto the water (a heavy item dropped in the Rhoda fight over the Meer was out of reach for good)
-    if (d.cls === 'heavy' && !this.G.collision.waterAt(this.G.gus.position.x, this.G.gus.position.z)) { const g = this.G.gus.position; this.spawn(c.id, g.x, g.z, { origin: c.origin }); return `You dropped the ${d.name.toLowerCase()}. It's marked on the compass.`; }
+    if (d.cls === 'heavy' && !this.G.wetAt(this.G.gus.position.x, this.G.gus.position.z, this.G.gus.position.y)) { const g = this.G.gus.position; this.spawn(c.id, g.x, g.z, { origin: c.origin }); return `You dropped the ${d.name.toLowerCase()}. It's marked on the compass.`; }
     const to = this.homeFor(c);
     this.spawn(c.id, to.x, to.z, { origin: c.origin });
     return `The ${d.name.toLowerCase()} floated back to ${to.label}.`;

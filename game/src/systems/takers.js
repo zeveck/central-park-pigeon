@@ -59,8 +59,22 @@ export class Takers {
     const G = this.G, c = G.state.carried;
     if (!c || !isSlice(c.id) || !EATER_CREWS.includes(CHARACTERS[charId]?.crew)) return false;
     if (G.chars?.find(charId)?.here) return false;   // a Called ally keeps its Ask
+    // review: never the anchovy while den-cats is open (Express sits on the 72nd W grate mid-relay); never someone a step
+    // wants to talk to, or who gives a step's nudge (Biscuit on den-biscuit step 1, Pretzel, Crumbsy, Mama Mask…): they talk
+    if (c.id === 'slice-anchovy' && G.schemes.isOpen('den-cats')) return false;
+    if (this.#wantsTalk(charId)) return false;
     if (this.entryFor(charId) || this.#stepWants(charId, c.id)) return false;
     return !this.#byQueenie();
+  }
+  #wantsTalk(charId) {
+    const E = this.G.schemes;
+    for (const id of E.openList()) {
+      const st = E.step(id);
+      if (!st) continue;
+      if ([st, ...(st.alts || [])].some((o) => o.on?.type === 'talk' && o.on.who === charId)) return true;
+      if (st.nudge?.by === charId) return true;   // (shown or still to come: a player goes back to them for the hint)
+    }
+    return false;
   }
   #byQueenie() {
     const G = this.G, q = G.chars?.find('queenie'), p = G.gus.position;

@@ -684,6 +684,9 @@ async function boot() {
   G.surfaceY = (x, z, yRef = 400) => collision.surface(x, z, yRef).y;
   // fix-23: the nearest dry ground to a point (items never come back onto the water, where Gus can't stand to peck them):
   // rings out 1 m at a time, 24 bearings; the first dry spot, then 1.2 m further from the water
+  // fix-23 review: is a point ON the water (a lying item, a drop from height y)? collision.waterAt is 2D and counts a bridge
+  // deck over the Lake as water; the landing surface's kind does not
+  G.wetAt = (x, z, y = 400) => collision.surface(x, z, y + 0.1).kind === 'water';
   G.dryNear = (x, z) => {
     if (!collision.waterAt(x, z)) return { x, z };
     for (let r = 1; r <= 60; r += 1) for (let k = 0; k < 24; k++) {

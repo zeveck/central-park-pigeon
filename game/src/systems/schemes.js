@@ -373,8 +373,9 @@ export class SchemeEngine {
       if (notes) continue;
       const at = this.keeperSpot(r);
       if (Math.hypot(it.x - at.x, it.z - at.z) < 3) { this.keepAway[k] = 0; continue; }
-      const wet = !!G.collision.waterAt(it.x, it.z) && G.items.def(r.item).cls !== 'huge';
-      const far = Math.hypot(g.x - it.x, g.z - it.z) > KEEP.awayR;
+      const wet = G.wetAt(it.x, it.z, it.y) && G.items.def(r.item).cls !== 'huge';   // (by its height: a bridge deck is dry)
+      // (review: no far timer while it lies where the step needs it: the step's place, or by whoever it's for)
+      const far = Math.hypot(g.x - it.x, g.z - it.z) > KEEP.awayR && !this.#parked(r.scheme, it);
       this.keepAway[k] = far ? (this.keepAway[k] || 0) + dt : 0;
       if (wet || this.keepAway[k] > KEEP.awaySecs) {
         this.keepAway[k] = 0;
@@ -383,6 +384,17 @@ export class SchemeEngine {
         G.toast(`The ${name} floated back to ${r.label}.`, { seconds: 4.5 });
       }
     }
+  }
+
+  /** fix-23 review: is this item lying where its scheme's current step uses it (needs/on place, or within 8 m of a give's taker)? */
+  #parked(id, it) {
+    const step = this.step(id);
+    if (!step) return false;
+    for (const o of [step, ...(step.alts || [])]) {
+      for (const pl of [o.needs?.place, o.on?.place]) if (pl && PLACES[pl] && this.atPlace(pl, it)) return true;
+      if (o.on?.type === 'give' && o.on.to) { const c = this.G.chars?.find(o.on.to); if (c && Math.hypot(c.x - it.x, c.z - it.z) < 8) return true; }
+    }
+    return false;
   }
 
   /** Is Gus within 5 m of this taker (a character id, or a human role)? */
@@ -456,7 +468,8 @@ export class SchemeEngine {
   coldSlice(step) {
     const G = this.G, c = this.st.carried;
     if (!step || !c?.id?.startsWith('slice') || G.items.isHot(c)) return null;
-    if (![step.needs, ...(step.alts || []).map((a) => a.needs)].some((n) => n?.hot && n.item?.startsWith('slice'))) return null;
+    // (review: only for the slice the step wants: a plain slice is no use where Queenie wants anchovy)
+    if (![step.needs, ...(step.alts || []).map((a) => a.needs)].some((n) => n?.hot && (n.item === c.id || (n.item === 'slice' && c.id.startsWith('slice'))))) return null;
     const gr = SLICE.griddle[this.st.phase];
     const at = { afternoon: 'at Grand Army Plaza', dusk: 'at 110th & Fifth' }[this.st.phase];
     return { griddle: gr || null, text: gr ? `Cold. The halal cart's griddle ${at} will warm\u00a0it.` : 'Cold. The halal cart\'s griddle will warm it: Grand Army Plaza in the Afternoon, 110th & Fifth at\u00a0Dusk.' };

@@ -111,3 +111,13 @@ part-beak 2517.27, part-beak.alt 2337.23, sab-middle 1791.23, part-wings 1292.98
 truce-dogs-squirrels 3637, den-cats 622.88, den-cats.alt 684.78. No solution was re-recorded for #23: the intended play
 didn't change. The rest weren't replayed: no other scheme's needed item, vehicle or step goes through the new code, and
 outside water / loss / the keeper's own items, drop(), give() and Ruffled behave exactly as before.
+
+## Review follow-up (same day)
+
+- Water is tested by the surface an item lands or lies on (G.wetAt: collision.surface(...).kind === 'water'), not the 2D
+  water outline: on Bow Bridge's deck (waterAt true) the peas stay put when dropped, and stay put with Gus 80 m away for 95 s.
+- No 90 s float-back while the item lies where its step uses it (the step's place, or within 8 m of the give target): the
+  tennis-ball sack left on Cedar Hill with Gus 120 m off for 95 s stays.
+- Give (#19) never takes the anchovy while den-cats is open, and never offers to a character a step wants to talk to or who
+  gives a step's nudge (Biscuit on den-biscuit step 1: no Give; Express with the anchovy: no Give).
+- The cold-slice goal hint only shows for the slice the step wants (a cold plain slice on den-cats step 3: none).
