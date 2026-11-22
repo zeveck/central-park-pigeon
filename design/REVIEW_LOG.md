@@ -109,3 +109,52 @@ The design was restructured from the person's feedback (requests #2–#13: crews
 | A9 Gus in the flock | nice | Fixed: rim light; no blue-bar near Gus |
 
 Converged: no must-fix remains. Open for the person: reserve size, Meshy top-up vs Dec 1 reset, rim light vs scarf.
+
+## Change review: fix #8 #16 #19 #23 (2026-11-22, one round)
+Player + Builder on design/changes/fix-8-16-19-23.md. Must-fix:
+- #8 the controller can't complete a link-mode send (no user gesture): be honest on the controller path.
+- Give must not eat scheme hand-ins.
+- Drop must not delete the slice (the griddle route).
+- Give on any item creates dead ends: slices only.
+- #8 the softlock is input.js:162, and vendor/gh-feedback.js must be re-copied unchanged.
+Should-fix:
+- Any-cart rewarming flattens the puzzle: narrowed to hover-warm at the halal griddles.
+- Vinnie's cart excluded.
+- Label wording plus the suffix bug.
+- #16: the guard's reason as a toast at Gus.
+- Quest items float back.
+- Non-blocking cues only.
+- Anchovy as a second texture.
+- Refill timer on every way of losing the slice.
+- New check-schemes rule.
+- repairSpent extension.
+Nice-to-have, kept: Pickles gives way quickly on a retry; extra report choices. All adopted (see the plan's decisions).
+
+## Change review: batch 2 (2026-11-22, one round)
+Player + Builder on design/changes/batch-2.md. Must-fix:
+- Hop must not delay or swallow takeoffs, and only from ordinary ground.
+- Hop can't be replay-safe with a release threshold (every recorded takeoff is a 3–4 frame tap) → legacy takeoff for old recordings.
+Should-fix:
+- Touch double-tap = Boost.
+- Landing abruptness is a 0.9 m snap → render-side ease.
+- Jitter is the stale camera in frameUi, not rounding.
+- Accessories share a cause: per-species unit and guessed anchors.
+- #22 is a crowd horse next to Dapple.
+- Open sky must be telegraphed and cancellable, cool a hot slice, use a fixed distance, and stay out of scenes and races.
+- Flight hint rows and wording.
+All adopted (see the decisions in batch-2.md).
+
+## Change review: batch 3 (2026-11-22, one round)
+Player + Builder on design/changes/batch-3.md. Must-fix:
+- The water-surface rule (collision.js:139) and heightAt seeding put people and Gus on the lake bed.
+- Data: people, birds, benches and three named characters in water.
+- Crowd animals keep a fixed height; humans have no wall collision.
+- Gus floating as a flag on walk mode, keeping the skim-bounce and the edge-as-wall.
+- Replays: all 40 at the end.
+Should-fix:
+- Bridge deck steps at the ends.
+- Fences are flat planes tiled twice.
+- Dogs are unrigged, so a vertex-shader gait.
+- Water talk reach.
+Nice-to-have: a visible flock arrival.
+All adopted (see the decisions in batch-3.md).

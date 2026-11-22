@@ -25,6 +25,31 @@
 
 21. `--saves --publish --no-confirm`
 
+22. `--fix #8 #23 #19 #16`
+    - #8: Trying to bug report with a controller appears to have multiple problems (https://github.com/zeveck/central-park-pigeon/issues/8)
+    - #23: Missions should always remain solvable (https://github.com/zeveck/central-park-pigeon/issues/23)
+    - #19: Anchovy slice (https://github.com/zeveck/central-park-pigeon/issues/19)
+    - #16: Feedback on pea mission elements (https://github.com/zeveck/central-park-pigeon/issues/16)
+23. (decision) anchovy texture for the slice, about $0.20, or have Queenie ask for pepperoni: `yes` (make the texture)
+24. (answers on the triage questions, 2026-11-22)
+    - #2: `Landing seems abrupt. Probably coming down a little too fast?`
+    - #4: `Let's use your recommendation.` (flight controls always shown while flying; other hints retire once learnt)
+    - #5: `You can just land it and I'll try it deployed and we'll adjust if needed.`
+    - #11: `Sure, try coded on the dogs so I can see. Though the bigger problem is them passing into hills, buildings, etc.`
+    - #9: `Adding a question where you get the camera is good, but it should be on the board/available from the beginning and not too hard? Maybe it's just on a balcony of a building outside the park as a way to get  you out there for a minute? And you need to get film from a crow maybe? Just ideas.`
+    - #13: `next batch`
+25. (batch 2, per the person's go-ahead "proceed on next fixes as you advise") fixing:
+    - #6: Fifi looks weird (https://github.com/zeveck/central-park-pigeon/issues/6)
+    - #14: Top hat pigeons (https://github.com/zeveck/central-park-pigeon/issues/14)
+    - #22: Dapple (https://github.com/zeveck/central-park-pigeon/issues/22)
+    - #15: Bird seed (https://github.com/zeveck/central-park-pigeon/issues/15)
+    - #20: A rat got it (https://github.com/zeveck/central-park-pigeon/issues/20)
+    - #21: Mind the gap (https://github.com/zeveck/central-park-pigeon/issues/21)
+    - #18: Jittery controller hint (https://github.com/zeveck/central-park-pigeon/issues/18)
+    - #4: Showing controls (https://github.com/zeveck/central-park-pigeon/issues/4)
+    - #2: Landing (https://github.com/zeveck/central-park-pigeon/issues/2)
+    - #5: Hop flight (https://github.com/zeveck/central-park-pigeon/issues/5)
+    - #13: Outside the city (https://github.com/zeveck/central-park-pigeon/issues/13)
 ## Settings
 
 - 3D: yes
@@ -109,3 +134,12 @@ Current design (round 3): 17 crews, ~700 animals, 17 bosses + 50 regulars, 5 thr
 - 2026-11-21: CHANGE `--saves --publish --no-confirm`: three save slots (src/saves.js from gamegen templates; save.js slot API; title Continue/Load/New Game; Load screen #slots in ui/screens.js; old cpp-save-v1 moves into slot 1). Dev tools whole-game.mjs + midscene-sweep.mjs read/write cpp-slot-N. Play-test: scratchpad slots-test.mjs → design/screenshots/saves/. Then publish.
 - 2026-11-22: SAVES DONE. Slot test (design/screenshots/saves/): old save → slot 1 with settings kept, Continue = last played, New Game takes a free slot, full → pick + "Replace Save 1?", Delete asks + redraws (fixed), unreadable slot shown with Delete, phone 844×390 fits, controller works, 0 console errors. Replays: 10 of 40 run, all completed with 0 errors (fixture load + per-step autosave = the paths the change touches). The person agreed to stop there and skip the whole-game run ("I think we've proven it enough"). Published 2026-11-22 to https://centralparkpigeon.synapticnoise.com after the person re-authed gh; live check at 1280×720 and 844×390: an old save shows in slot 1, Load/Credits open, 0 console errors, clean text scan. 11 of 40 replays ran in the end, all passing. Plans card unchanged (links the repo's design/).
 - 2026-11-22: ISSUE TRIAGE of the 22 open game issues (all the person's own) → design/reviews/issue-triage-2026-11-22.md: groupings, sizes, batch order. Batch 1 next: `/gamegen --fix #8 #23 #19 #16`, then sync up with the person before batch 2. Proof for batch 1: replay only the schemes each fix touches (gamegen#52), not all 40, unless shared play code changes.
+- 2026-11-22: FIX RUN #8 #23 #19 #16 started. Plan + review: design/changes/fix-8-16-19-23.md. Budget for this change: $20 default; planned spend ≈ $0.20 (anchovy slice texture).
+- 2026-11-22 ~08:40: the person: "Once these land proceed on next fixes as you advise and I'll check back in some hours." PLAN: after #19 + #23 commit → batch 2 (`--fix #6 #14 #22 #15 #20 #21 #18`: accessories, HUD/words, jitter; code-only, no art spend unless asked) → batch 3 (`--fix #1 #17 #7 #12 #10`: ground/water/bridges, fences, flock take-off; world changes → wider replays). Hold for the person: #11, #5, #2, #4, #9 (decisions), #13 (feature). Do NOT publish (not asked); commits stay local until `/gamegen --publish`. Triage: design/reviews/issue-triage-2026-11-22.md.
+- 2026-11-22 ~08:50: PLAN UPDATED from the person's answers (request 24). After #19 + #23 land:
+  - Batch 2: #6 #14 #22 #15 #20 #21 #18 (quick wins) + #4 (flight controls always shown in flight) + #2 (gentler landing: slower descent and flare) + #5 (hop flight: tap = hop, hold/second press = fly; ship it, the person tries it live) + #13 (outside the city: speed boost far out, then a shimmer back to the park centre).
+  - Batch 3, the world: #1 #17 #7 #12 #10 + #11 (a coded walk on the dogs; first, characters passing into hills and buildings, which the person calls the bigger problem).
+  - Batch 4: #9 photo mode as a short, easy scheme on the Board from the start (a camera on a balcony just outside the park, film from a crow; the person's loose ideas), with a design review round. Art within the $20 per-change default.
+  - No publishing until asked.
+- 2026-11-22: #16 (6fecdb0), #19 (30402ab), #23 (191de3e) and #8 (5d6d480 + 0434ba9) COMMITTED; 31 targeted replays exact, check-schemes passes; anchovy texture ≈ $0.10 (ledger ≈ $103.01). A fresh code review of #16/#19/#23 is running. BATCH 2 started: plan + review decisions in design/changes/batch-2.md; builders: (A) flight and HUD: #5 #2 #13 #4 #18; (B) looks and words: #6 #14 #22 #21 #15 #20.
+- 2026-11-22: review follow-up for #19/#23 committed (2d0571a): no Give to characters a step or nudge needs, bridges no longer count as water (G.wetAt), no 90 s float-back at the step's place; replays den-ducks/den-biscuit/truce-dogs-squirrels/den-cats exact. #8, #16, #19, #23 DONE (local commits).
