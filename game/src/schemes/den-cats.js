@@ -51,11 +51,11 @@ export function installDenCats(G) {
   let saidCold = false, refusals = 0, knocking = false;
 
   // the guard: not with Pickles RIGHT there
-  G.items.guards.push((it) => {
-    if (!it.sill) return false;
-    bubbleOver(G, 'pickles', ['Pickles: *snore*… mmm… anchovy… *snore*', 'Pickles: *one ear twitches*'][refusals++ % 2], 2.6);
-    G.toast('Not with Pickles RIGHT there. He\'s asleep… for now.', { seconds: 3.5 });
-    return true;
+  // (fix-16: the guard returns its reason; items.js shows it as the toast, every time; peek = the prompt asking)
+  G.items.guards.push((it, peek) => {
+    if (!it.sill) return null;
+    if (!peek) bubbleOver(G, 'pickles', ['Pickles: *snore*… mmm… anchovy… *snore*', 'Pickles: *one ear twitches*'][refusals++ % 2], 2.6);
+    return 'Not with Pickles RIGHT there. He\'s asleep… for now.';
   });
   // the fan on the bench: the red herring
   G.humans.clings.push((a) => (a.role === 'sliceeater' && a.holds === 'slice-anchovy' && onStep(G, 'den-cats', 2) ? 'Mob me all you like, pigeon. This one\'s MINE. Go bother the CAT.' : null));

@@ -159,7 +159,7 @@ export class HumanCheck {
       if (!s.stage) s.stage = 'go';
       if (s.stage === 'go') { if (tub) s.stage = 'peck'; else return false; }
       if (s.stage === 'peck') {
-        if (sc.prompt?.startsWith('Pick up the peas') && G.gus.grounded) { s.pk = (s.pk || 0) + 1; if (s.pk % 40 === 1) { out.held.add('peck'); this.note(`tries to take the tub: presses Peck at "${sc.prompt}"`); } if (s.pk > 90) s.stage = 'swarm'; return true; }
+        if (/^(Pick up|Guarded:) the peas/.test(sc.prompt || '') && G.gus.grounded) { s.pk = (s.pk || 0) + 1; if (s.pk % 40 === 1) { out.held.add('peck'); this.note(`tries to take the tub: presses Peck at "${sc.prompt}"`); } if (s.pk > 90) s.stage = 'swarm'; return true; }
         this.goTo({ x: tub.x + 0.3, z: tub.z - 0.3 }, out, { r: 0.25 }); return true;   // (up onto the table if need be: a hop)
       }
       if (s.stage === 'swarm') { const a = this.nearHumans(8).find((q) => q.role === 'picnicker'); if (!a || this.swarmAt(a, out)) { s.stage = 'wait'; s.waitT = 0; this.note('nothing works: waits around the picnic'); } return true; }
@@ -196,7 +196,7 @@ export class HumanCheck {
     if (!t) return;
     const d = this.goTo(t, out, { r: s.override ? 0.3 : 1.0 });   // (right up to a thing on the ground)
     const chat = /^Talk to/.test(sc.prompt || '') && !(t.label && sc.prompt.includes(t.label.split(' ').pop()));   // (small talk with whoever's there isn't the goal)
-    if (sc.prompt && !chat && d < 6 && /^(Peck the sign|Talk to|Pick up|Give|Offer|Peck the|Unlock)/.test(sc.prompt) && G.gus.grounded) {
+    if (sc.prompt && !chat && d < 6 && /^(Peck the sign|Talk to|Pick up|Guarded:|Give|Offer|Peck the|Unlock)/.test(sc.prompt) && G.gus.grounded) {
       s.pk = (s.pk || 0) + 1;
       if (s.pk % 30 === 1) { out.held.add('peck'); this.note(`presses Peck at "${sc.prompt}"`); }
     }

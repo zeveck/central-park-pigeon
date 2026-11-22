@@ -51,7 +51,7 @@ export class Items {
     this.models = {};       // id → baked
     this.seq = 1;
     this.steamT = 0;
-    this.guards = [];       // fun pass: (it) => true when a scheme stops this pick-up (it says why itself)
+    this.guards = [];       // fun pass: (it, peek) => a reason (string) or true when a scheme stops this pick-up; fix-16: peek = only asking (the prompt), no side effects
     this.mats = {
       gold: ruleMaterial({ color: 0xd4a02a, roughness: 0.4, metalness: 0.4 }),
       shiny: ruleMaterial({ color: 0xcfe7ff, roughness: 0.25, metalness: 0.6, emissive: 0x334455 }),
@@ -124,7 +124,8 @@ export class Items {
     this.world.push(it);
     this.G.interact.register({
       id: 'item:' + it.uid, kind: 'item', get x() { return it.x; }, get y() { return it.y; }, get z() { return it.z; }, r: 0.9,
-      label: () => (this.def(it.id).cls === 'huge' || (it.id === 'box' && it.placed) ? null : `Pick up the ${this.def(it.id).name.toLowerCase()}`),
+      // fix-16: a guarded item says so in the prompt ("Guarded: the peas"), so a refused Peck is never a mystery
+      label: () => (this.def(it.id).cls === 'huge' || (it.id === 'box' && it.placed) ? null : this.guardReason(it, true) ? `Guarded: the ${this.def(it.id).name.toLowerCase()}` : `Pick up the ${this.def(it.id).name.toLowerCase()}`),
       enabled: () => this.world.includes(it),
       priority: it.low ? 2 : 5,   // fun pass: a guarded item (the anchovy on Pickles' sill) gives way to the character beside it
       act: () => this.pickUp(it),
@@ -162,7 +163,10 @@ export class Items {
     const d = this.def(it.id);
     const G = this.G;
     if (d.cls === 'huge') { G.toast('Too big. That needs a hauler.'); return false; }
-    if (this.guards.some((g) => g(it))) { G.bus.emit('fail', { kind: 'guard', item: it.id }); return false; }   // fun pass: the picnic's tub, Pickles' sill
+    // fun pass: the picnic's tub, Pickles' sill. fix-16: the reason is a toast at Gus every time (it was a bubble over
+    // a picnicker, then only a blip: the owner pressed Peck by the table and could not tell what had happened)
+    const why = this.guardReason(it);
+    if (why) { G.toast(typeof why === 'string' ? why : `Something's stopping you taking the ${d.name.toLowerCase()}.`, { seconds: 3.5 }); G.bus.emit('fail', { kind: 'guard', item: it.id }); return false; }
     if (this.state.carried) {
       // swap: drop what we hold first
       this.drop();
@@ -174,6 +178,12 @@ export class Items {
     if (d.gear && !this.state.gear.includes(d.gear)) { this.state.gear.push(d.gear); this.take(); G.toast(`New gear: ${d.name}`, { kind: 'stamp' }); }
     G.bus.emit('pickup', { item: it.id, uid: it.uid });
     return true;
+  }
+
+  /** fix-16: the first guard's reason for refusing this pick-up (a string, or true), or null. peek: the prompt asking. */
+  guardReason(it, peek = false) {
+    for (const g of this.guards) { const r = g(it, peek); if (r) return r; }
+    return null;
   }
 
   /** Q: drop what Gus carries in front of him. */

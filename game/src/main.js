@@ -443,6 +443,13 @@
 //     floor 0.3 → 0.15, the re-plant distance kept at 0.132 m (DRAG; it was REACH * 2.4), and a planted foot keeps its
 //     heading (f.wyaw / f.yawOff: its toes no longer swivel round the ankle in a turn). Planted toes drift 0 mm walking,
 //     sprinting and turning (shots design/screenshots/flight-scarf/headbob-*). Footstep sounds are timed from speed.
+// Fix-16 notes (the owner: peas gave no feedback; shots design/screenshots/fix-16-19-23/16-*). UI only: no rule changed.
+//   - systems/items.js guards are (it, peek) => reason | null; guardReason(it, peek). A refused Peck shows the reason as a toast
+//     at Gus EVERY time (it was a bubble over a picnicker, often off screen, then only a blip) and the prompt reads "Guarded: …".
+//   - den-ducks.js: "They won't leave the peas while they're sat there…"; outside the Afternoon a Peck at the empty picnic spot
+//     says when the picnic is out; "Got peas!" (stamp toast); the ducks bubble and quack when Gus arrives carrying peas.
+//     All toasts/bubbles, never G.say, so recorded Peck presses are not spent on dialogue.
+//   - debug only: sf-run.mjs serve takes `code <js>` (runs with Playwright's page: real key presses between steps).
 import * as THREE from 'three';
 import { choosePreset, PRESETS, AutoProbe, savePreset } from './presets.js';
 import { Progress, TextureStore } from './gfx/textures.js';

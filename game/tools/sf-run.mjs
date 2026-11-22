@@ -101,6 +101,7 @@ async function main() {
       try {
         if (line === 'exit') { fs.writeFileSync(jf.replace(/\.job$/, '.out'), 'bye\nEXIT 0\n'); fs.unlinkSync(jf + '.running'); await browser.close(); process.exit(0); }   // Fixes-1: stop cleanly (closes the browser)
         if (line === 'reload') { await page.reload({ timeout: 900000 }); await page.waitForFunction(() => window.__game && window.__game.state().screen !== 'loading', null, { timeout: 900000 }); await page.evaluate(() => window.__game.ready()); console.log('reloaded'); }
+        else if (line.startsWith('code ')) { console.log(JSON.stringify(await new Function('page', 'return (async () => {' + line.slice(5) + '})()')(page))); }   // fix-16-19-23: real key presses (page.keyboard) between steps
         else if (line.startsWith('eval ')) { console.log(JSON.stringify(await page.evaluate(new Function('return (async () => {' + line.slice(5) + '})()')))); }
         else if (line === 'scan') { await page.addScriptTag({ path: (process.env.GAMEGEN_SCAN_TEXT || 'scan-text.js') }); console.log(JSON.stringify(await page.evaluate(() => window.__scanText()))); }
         else if (line.startsWith('size ')) { const [w, h] = line.slice(5).trim().split(/\s+/).map(Number); await page.setViewportSize({ width: w, height: h }); console.log('size', w, h); }   // Fixes-2: phone-sized shots

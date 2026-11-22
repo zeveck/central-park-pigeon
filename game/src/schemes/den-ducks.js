@@ -52,13 +52,21 @@ export function installDenDucks(G) {
   // the swarm fails here, out loud (humans.js clings): the "almost" line points away from mobbing
   G.humans.clings.push((a) => (a.spec.group === 'boathouse' && onPeasStep() && tubItem() && !a.busy ? 'We\'ve been mobbed by better pigeons. The peas STAY.' : null));
   let guardSaid = null;
-  // the tub can't be taken while somebody's sat by it (items.js guards)
-  G.items.guards.push((it) => {
-    if (!it.tub || !onPeasStep()) return false;
+  // the tub can't be taken while somebody's sat by it (items.js guards). fix-16: the guard returns its reason, which
+  // items.js shows as a toast at Gus on every refused Peck (the owner pressed Peck here, heard a blip and saw nothing);
+  // peek (the prompt asking, "Guarded: the peas") has no side effects
+  G.items.guards.push((it, peek) => {
+    if (!it.tub || !onPeasStep()) return null;
     const a = near(it, GUARD_R)[0];
-    if (!a) return false;
-    if (G.state.time - (guardSaid || -99) > 2.8) { guardSaid = G.state.time; sayOver(a, ['Hands OFF, pigeon! Those are OUR peas.', 'Nice try. The peas stay with US.', 'Shoo! Go and get your own lunch!'][Math.floor(G.state.time / 7) % 3]); G.audio.synth('uiBack'); }   // (one at a time)
-    return true;
+    if (!a) return null;
+    if (!peek && G.state.time - (guardSaid || -99) > 2.8) { guardSaid = G.state.time; sayOver(a, ['Hands OFF, pigeon! Those are OUR peas.', 'Nice try. The peas stay with US.', 'Shoo! Go and get your own lunch!'][Math.floor(G.state.time / 7) % 3]); G.audio.synth('uiBack'); }   // (one at a time)
+    return 'They won\'t leave the peas while they\'re sat there. Something has to get them up.';
+  });
+  // fix-16: outside the Afternoon the picnic spot is empty; a Peck there says when it's out (a toast, never dialogue)
+  G.interact.register({
+    id: 'picnic-spot', kind: 'spot', x: PICNIC.x, y: ground() + 0.1, z: PICNIC.z, r: 2.4, dy: 2, priority: 0,
+    label: () => (onStep(G, 'den-ducks', 2) && G.state.phase !== 'afternoon' ? 'Look for the picnic' : null),
+    act: () => { G.toast('The picnic\'s here in the afternoons. Nap at a Nest to skip ahead.', { seconds: 4 }); G.audio.synth('uiBack'); },
   });
 
   // a FEED sign up the path: the whole picnic gets up to feed the birds (summonFeeders brings the group)
@@ -68,17 +76,33 @@ export function installDenDucks(G) {
     if (a) sayOver(a, 'Ooh, a FEED sign! Crumbs for the birdies!', 3.2);
   });
   G.bus.on('pickup', (t, e) => {
-    if (e.item !== 'peas' || !onStep(G, 'den-ducks', 2)) return;
+    if (e.item !== 'peas' || !(onStep(G, 'den-ducks', 2) || onStep(G, 'den-ducks', 3))) return;
+    G.toast('Got peas! Commodore Puddles is waiting on the Lake.', { kind: 'stamp', seconds: 3.5 });   // fix-16: a clear pickup
     const g = G.gus.position;
     const a = picnic().sort((p, q) => Math.hypot(p.x - g.x, p.z - g.z) - Math.hypot(q.x - g.x, q.z - g.z))[0];
     if (a) G.later(0.3, () => sayOver(a, 'Hey! HEY! The PEAS!', 2.6));
   });
+
+  // fix-16: the ducks notice Gus arriving with the peas (a bubble and a quack: never dialogue, so no replay's Peck is spent)
+  let peasSeen = false;
+  const watchPeas = () => {
+    const c = G.state.carried, d = G.chars.find('puddles');
+    if (!d || c?.id !== 'peas' || !onStep(G, 'den-ducks', 3)) { if (c?.id !== 'peas') peasSeen = false; return; }
+    const g = G.gus.position, dist = Math.hypot(g.x - d.x, g.z - d.z);
+    if (!peasSeen && dist < 18) {
+      peasSeen = true;
+      bubbleOver(G, 'puddles', 'PEAS? Are those PEAS? Bring them here, Gus! Peck me!', 4);
+      G.later(0.7, () => bubbleOver(G, 'mrspuddles', 'Oh, PEAS, dear!', 3));
+      G.audio.play('duck-quack-mallard', { at: d });
+    } else if (peasSeen && dist > 40) peasSeen = false;
+  };
 
   let lastRound = -99;
   G.bus.on('flip', (t, e) => { if (e.sign === 'M7') lastRound = G.state.time; });
   G.mods.push({
     update() {
       const st = G.state;
+      watchPeas();
       table.visible = st.phase === 'afternoon';
       const tub = tubItem();
       // the tub is on the table while the step wants it (Afternoons only: out of hours it isn't lying about for free)
