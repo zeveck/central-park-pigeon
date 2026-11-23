@@ -163,7 +163,7 @@ export const SSF = {
       { landNear: { x: j.bench.x + 2, z: j.bench.z }, alt: 12, r: 2 }, { walkTo: { x: j.bench.x + 1.3, z: j.bench.z }, r: 0.4 }, { faceTo: j.bench }, { holdCoo: 1.2 },
       { waitFor: (G) => G.items.world.some((q) => q.id.startsWith('slice') && Math.hypot(q.x - j.bench.x, q.z - j.bench.z) < 4), timeout: 15 },
       { pickItem: 'slice-anchovy', near: j.bench, timeout: 20 },
-      { landNear: { x: -44, z: 429 }, alt: 10, r: 2.5 }, { nearHuman: 'guard', d: 1.2, timeout: 30 }, { peck: 'taker:guard' }, { waitFor: 'delacorte.backstage', timeout: 10 }, settle,
+      { landNear: { x: -44, z: 429 }, alt: 10, r: 2.5 }, { nearHuman: 'guard', d: 1.6, timeout: 30 },   // batch-3: the guard stands 0.75 m out of the stage-door wall now (he was inside it); 1.6 m is within his Peck reach { peck: 'taker:guard' }, { waitFor: 'delacorte.backstage', timeout: 10 }, settle,
       { pickItem: 'wrench', timeout: 40 }, { waitFor: 'den-raccoons.s2', timeout: 10 }, settle,
       goTalk(G, 'rigby', 12), { waitFor: 'den-raccoons', timeout: 60 }, settle,
     ];

@@ -239,3 +239,34 @@ An earlier note in the progress file said truce-dogs-squirrels failed identicall
 Draws are flat or down. The extra triangles are in rows this batch-3c work doesn't add to: the static `coded` batch
 (+16k at Bethesda: batch-3d's iron fences), a people shadow row (23k) and +10k people triangles. Batch-3c adds no meshes
 (it drops the trees standing on bridge approaches); the governor holds Bethesda and Bow Bridge by day at 0.2.
+
+## Follow-up (owner direction, 2026-11-23): world first, closed-loop proof
+
+The world is not reshaped to keep recordings valid. Since b7b13c9: the 79th St bridge by Belvedere keeps its deck at the
+higher end (the halfway deck dug under the castle), approaches never lower ground inside a FLAT or within 12 m of a
+landmark, no tree trunk stands on an approach's walkway (9 of 2491 trees), Bow Bridge's collision is 48 boxes (14 stepped
+0.34 m: nobody could walk onto it), and Huddlestone's north end no longer dips 0.38 m (commit 4950019).
+
+**Proof of the world (debug/bridge-checks.js, ground-audit.js):** every deck end within 0.21 m of the ground except the
+79th St north end (deck → a 2 m slope up to the castle court, walkable); Gus on foot and a person walk across 19 of 22
+bridges both ways, and Belvedere both ways onto the court. Not mine, layout as it was: the 65th St bridge at x 95 runs into
+the zoo wall at both ends; the 86th St bridge at x 3.5 meets the Reservoir fence at its north end. No ground lowered inside
+a FLAT or by a landmark (only 3 cells under the Belvedere deck's own end). Grounding audit: no new offenders.
+
+**Proof of the schemes: the closed-loop run is the evidence, the raw file the determinism sample.** For each solution whose
+route crosses ground changed since b7b13c9 (route index, `affected-solutions.mjs --rect … --margin 4`), the scheme's goal
+script was run with the autopilot (`sf-run.mjs record`) and completed; that run is saved as the solution. Its raw file was
+then replayed once and completed (route footprint refreshed in route-index.json):
+
+den-biscuit, den-cats, den-cats.alt, den-crows, den-geese, den-meermob.alt, den-raccoons.alt, den-racers, den-racers.alt,
+den-songbirds, den-squirrels, den-strix, den-turtles, finale, gear-headlamp, gear-pen.alt (16).
+
+Goal-script fixes these needed (debug only): den-racers.alt flies in from the east bank, den-geese approaches the Great
+Lawn signs at 4 m, part-power lands inland and flies back after the wedding scene (b7b13c9), den-raccoons' nearHuman for the
+stage-door guard is 1.6 m (he stood inside the wall; #dryHome moved him 0.75 m out).
+
+**Deferred to the mistake sweep** (it runs every scheme closed-loop on this world): part-beak, part-beak.alt, part-body,
+part-legs, part-wings, part-wings.alt, truce-cats-rats, truce-cats-rats.alt, truce-dogs-squirrels, den-ducks, part-power.
+
+**Open (autopilot gap):** den-raccoons and den-rhoda: the autopilot's Give to a taker (the stage-door guard, Walter) never
+lands, though a direct scripted Give works and both old raw recordings complete on this world. Being fixed next.
