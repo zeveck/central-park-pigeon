@@ -745,7 +745,8 @@ export const CLUES = [
   // den-squirrels: Hazel's three caches on Sheep Meadow (the plumes only show from above 10 m; Gus pecks them)
   ...[[-62, 152], [-38, 177], [-56, 186]].map(([x, z], i) => ({ id: 'hazel-cache-' + (i + 1), type: 'dig', x, z, peck: true, aboveOnly: 10, icon: 'squirrels', active: { scheme: 'den-squirrels', step: 2 }, does: { count: { id: 'hazel', of: 3, flag: 'hazel.caches3' }, toast: 'A cache!' } })),
   // den-crows: three shinies (one on a CPW ledge, one under a plume, one under the Lake)
-  { id: 'shiny-cpw72', type: 'glint', x: -131.6, z: 276, on: 'roof', item: 'shiny', active: { scheme: 'den-crows', step: 2, not: ['shiny.cpw72'] }, does: { flags: ['shiny.cpw72'] } },
+  // (fix-25: moved 1.4 m east onto the open cream rim: at -131.6 it sat inside the corner turret's cone, which collides now)
+  { id: 'shiny-cpw72', type: 'glint', x: -130.2, z: 276, on: 'roof', item: 'shiny', active: { scheme: 'den-crows', step: 2, not: ['shiny.cpw72'] }, does: { flags: ['shiny.cpw72'] } },
   { id: 'shiny-ramble-plume', type: 'dig', x: -4, z: 352, icon: 'squirrels', active: { scheme: 'den-crows', step: 2, not: ['shiny.plume'] }, does: { item: 'shiny', at: 'ally', flags: ['shiny.plume'] } },
   { id: 'shiny-lake', type: 'dive', x: -10, z: 305, on: 'water:lake', icon: 'ducks', active: { scheme: 'den-crows', step: 2, not: ['shiny.lake'] }, does: { item: 'shiny', at: 'ally', flags: ['shiny.lake'], say: [{ who: 'bubbles', text: 'Watch THIS, Gus! Triple tuck!' }] } },
   // den-biscuit: his ball, out in the Lake's east arm
