@@ -10,6 +10,7 @@
 //   node game/tools/sf-run.mjs replay <solution.json> [--fixture id[.sN]] [--until flag]
 //   node game/tools/sf-run.mjs fixture <id> <out-name> --from <fixture> --goal <goal>   (run a goal, save the state as a fixture)
 //   node game/tools/sf-run.mjs check hop | hop-tap | hop-fly | hold-fly | legacy   (Batch-2: the hop checks, src/debug/hop-checks.js)
+//   node game/tools/sf-run.mjs mistake <case> <code> [--cap s] [--fail-dir d]   (#23 mistake sweep: tools/mistake-sweep.mjs; usually a serve job)
 // Batch-2 (#5): record writes version 2; replay passes the file's version to __game.replay (none → G.legacyTakeoff).
 // Options: --port 8141 · --shots dir (a screenshot whenever the cutscene/dialogue changes) · --max secs
 //
@@ -40,6 +41,7 @@ async function boot() {
   // Fixes-3: Network.enable first (without it setCacheDisabled did nothing, and a `reload` job still ran cached modules)
   try { const cdp = await page.context().newCDPSession(page); await cdp.send('Network.enable'); await cdp.send('Network.setCacheDisabled', { cacheDisabled: true }); page.__cdp = cdp; } catch { /* best effort */ }
   const errors = [];
+  page.__errors = errors;   // (the mistake sweep counts them per run)
   page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
   page.on('pageerror', (e) => errors.push(String(e)));
   await page.goto(`http://127.0.0.1:${port}/?preset=${opt('preset', 'low')}`, { waitUntil: 'load' });
@@ -205,8 +207,11 @@ async function runJob(page) {
         console.log(JSON.stringify(r));
         if (!r.ok) process.exitCode = 1;
       }
+    } else if (mode === 'mistake') {
+      // #23 mistake sweep: one (case, mistake) run; prints one `MS {json}` line (tools/mistake-sweep.mjs collects them)
+      await (await import('./mistake-sweep.mjs')).runMistake(page, args, { errors: page.__errors });
     } else {
-      console.log('usage: record <goal> | replay <file> | fixture <id> <out> --from <fx> --goal <goal> | serve --jobs <dir>');
+      console.log('usage: record <goal> | replay <file> | fixture <id> <out> --from <fx> --goal <goal> | mistake <case> <code> | serve --jobs <dir>');
     }
   }
 }
