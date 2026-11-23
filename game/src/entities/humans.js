@@ -48,7 +48,6 @@ const LOOPS = new Set(['idle', 'walk', 'run', 'sit', 'jog', 'balance', 'scan-wal
 // seats (visual): where a seated agent's model is drawn
 const SEAT = { stool: 0.12, bench: 0.08, carriage: 0 };
 const WALK = 1.25, RUN = 3.6, JOG = 2.8;
-const BENCH_DIST = 70;   // perf: sitter benches drawn within this of the camera (people are drawn out to ~60 m)
 const FADE = 0.2;
 
 const _v = new THREE.Vector3();
@@ -266,11 +265,12 @@ export class Humans {
     return !(hit && moved < 0.002);
   }
 
-  /** Perf (render only): the sitter benches within BENCH_DIST of the camera, packed at the front of the instance list. */
+  /** Perf (render only): the sitter benches within the people's draw range of the camera, packed at the front of the instance list. */
   #nearBenches(camera) {
     const B = this.benches, cp = camera?.position;
     if (!B || !cp) return;
-    const near = B.all.filter((b) => (b.x - cp.x) ** 2 + (b.z - cp.z) ** 2 < BENCH_DIST * BENCH_DIST);
+    const R = Math.max(this.range, 75) + 5;   // a little past the people's own draw range (35 / 90 / 120 m by preset): never a sitter on air
+    const near = B.all.filter((b) => (b.x - cp.x) ** 2 + (b.z - cp.z) ** 2 < R * R);
     const key = near.map((b) => B.all.indexOf(b)).join(',');
     if (key === B.key) return;
     B.key = key;
@@ -303,7 +303,7 @@ export class Humans {
       const cg = b.geometry.clone().translate(-(bb.min.x + bb.max.x) / 2, 0, -(bb.min.z + bb.max.z) / 2);   // centred under the sitter
       const m = new THREE.InstancedMesh(cg, b.makeMaterial(), list.length);
       // perf (batch-3 probe): one bounding sphere over the whole park drew all of them, and their shadows, at every spot (~23k
-      // triangles twice on Low). Now only the benches near the camera are in the instance list (#nearBenches), and they cast
+      // triangles twice on Low). Now only the benches within the people's draw range are in the instance list (#nearBenches), and they cast
       // shadows on Medium and High only. Render only: nothing reads a bench.
       m.castShadow = G.preset?.id !== 'low'; m.receiveShadow = true; m.name = 'sitter-benches';
       const mm = new THREE.Matrix4(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0), sc = new THREE.Vector3(-k, k, k), pos = new THREE.Vector3();
@@ -651,14 +651,14 @@ export class Humans {
         a.loopT = (a.loopT + (JOG * dt) / (2 * Math.PI * ((L.rx + L.rz) / 2))) % 1;
         const p = superEllipse(s.at.x, s.at.z, L.rx, L.rz, L.exp, a.loopT);
         const q = superEllipse(s.at.x, s.at.z, L.rx, L.rz, L.exp, a.loopT + 0.002);
-        a.x = p.x; a.z = p.z; a.yaw = Math.atan2(q.x - p.x, q.z - p.z); a.speed = JOG;
+        a.x = p.x; a.z = p.z; a.yaw = Math.atan2(q.x - p.x, q.z - p.z); a.speed = JOG; a.gy = undefined;   // (batch-3: loops keep no sim height: a flee reseeds it)
         break;
       }
       case 'skate': {
         const rx = s.rx ?? 13, rz = s.rz ?? 8, w = s.speed ?? 0.035;   // (Polish-1: the ambient skaters' ovals; the role's are unchanged)
         a.loopT = (a.loopT + dt * w + 1) % 1;
         const ang = a.loopT * Math.PI * 2, dir = Math.sign(w) || 1;
-        a.x = s.at.x + Math.cos(ang) * rx; a.z = s.at.z + Math.sin(ang) * rz;
+        a.x = s.at.x + Math.cos(ang) * rx; a.z = s.at.z + Math.sin(ang) * rz; a.gy = undefined;
         a.yaw = Math.atan2(-Math.sin(ang) * rx * dir, Math.cos(ang) * rz * dir);
         a.speed = 0.9;   // the walk clip, slowed: a glide
         break;
@@ -672,7 +672,7 @@ export class Humans {
         const k = (d - s.cum[i]) / Math.max(1e-6, s.cum[i + 1] - s.cum[i]);
         const nx = pts[i].x + (pts[i + 1].x - pts[i].x) * k, nz = pts[i].z + (pts[i + 1].z - pts[i].z) * k;
         if (Math.hypot(nx - a.x, nz - a.z) > 1e-4) a.yaw = Math.atan2(nx - a.x, nz - a.z);
-        a.speed = s.speed; a.x = nx; a.z = nz;
+        a.speed = s.speed; a.x = nx; a.z = nz; a.gy = undefined;
         break;
       }
       case 'path': {
@@ -683,7 +683,7 @@ export class Humans {
         const nx = pts[i].x + (pts[i + 1].x - pts[i].x) * k, nz = pts[i].z + (pts[i + 1].z - pts[i].z) * k;
         if (Math.hypot(nx - a.x, nz - a.z) > 1e-3) a.yaw = Math.atan2(nx - a.x, nz - a.z);
         a.speed = Math.hypot(nx - a.x, nz - a.z) / dt;
-        a.x = nx; a.z = nz;
+        a.x = nx; a.z = nz; a.gy = undefined;
         break;
       }
       default: a.speed = 0; a.yaw = a.home.yaw ?? a.yaw; break;

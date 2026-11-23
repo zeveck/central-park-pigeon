@@ -362,6 +362,7 @@ B['mosaic'] = (L, ctx) => {
   ctx.dynamic.add(m);
 };
 
+const COARSE_BOW = false;   // batch-3: the old 14-box collision (see below)
 B['bow-bridge'] = (L, ctx) => {
   const W = local(L);
   const endA = W(0, -L.span / 2), endB = W(0, L.span / 2);
@@ -383,7 +384,15 @@ B['bow-bridge'] = (L, ctx) => {
         ctx.batch.box('cream', { x: q.x, y: y - 0.25 - 0.55 * (1 - Math.sin(tm * Math.PI)), z: q.z }, { w: 0.15, h: 0.55 * (1 - Math.sin(tm * Math.PI)) + 0.05, d: seg }, { yaw: L.yaw, pitch });
       }
     }
+    if (!COARSE_BOW) continue;
     ctx.collision.addBox({ x: p.x, z: p.z, y0: y - 0.6, h: 0.6, w: L.width, d: seg, yaw: L.yaw, tag: 'bridge' });
+  }
+  // batch-3 (#17): the walkable deck in finer steps (14 flat boxes rose up to 0.34 m each near the ends, more than a step:
+  // nobody could walk onto Bow Bridge); 48 boxes rise at most ~0.1 m, and the first sits within a step of the ground
+  const nc = 48;
+  for (let i = 0; i < nc; i++) {
+    const tm = (i + 0.5) / nc, p = W(0, -L.span / 2 + L.span * tm);
+    ctx.collision.addBox({ x: p.x, z: p.z, y0: deckY(tm) - 0.6, h: 0.6, w: L.width, d: L.span / nc + 0.05, yaw: L.yaw, tag: 'bridge' });
   }
   // railings (the rail texture, cream) and their perch edges
   for (const s of [-1, 1]) {
@@ -752,12 +761,17 @@ export function buildTransverses(ctx, crossings) {
   }
 }
 
-/** Batch-3 (review): is (x, z) on a bridge approach terrain.js ramped (the path and its side slopes)? main.js drops the trees
- *  placed there after placement (no random draw moves): a tree seated on a raised bank lifted its canopy into flight paths. */
-export function onRamp(ramps, x, z) {
+/** Batch-3 (the owner: no trees on a ramp or a roadway): is (x, z) on a bridge approach's walking surface? Inside an
+ *  approach's footprint (terrain.js deckRamps: out to R from the deck's end, the deck's width plus its side slopes), a point
+ *  is walkway if it is in the path band (the deck's width + 0.5 m) or the painted path / road / paver masks say so. Grass
+ *  on the side slopes is not. Outside every footprint: false (so no tree elsewhere in the park changes). */
+export function onWalkway(ramps, terrain, x, z) {
   for (const e of ramps || []) {
     const ox = x - e.x, oz = z - e.z, u = ox * e.dx + oz * e.dz, v = Math.abs(-ox * e.dz + oz * e.dx);
-    if (u > -1 && u < e.ramp.R && v < e.ramp.hw + e.ramp.side) return true;
+    if (u < -2 || u > e.ramp.R || v > e.ramp.hw + e.ramp.side) continue;
+    if (v < e.ramp.hw + 0.5) return true;
+    const m = terrain.groundKindAt(x, z);
+    if (m.path > 0.5 || m.asphalt > 0.5 || m.pavers > 0.5) return true;
   }
   return false;
 }
