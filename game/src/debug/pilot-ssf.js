@@ -57,7 +57,10 @@ reg((P, g, s, out) => {
     if (s.pressed) { s.n = (s.n || 0) + 1; return s.n > 6 && !G.dialogue.open && !G.cutscene.running; }
     if (gus.mode === 'fly') { out.held.add('dive'); P.stickToward(c.x, c.z, out, 0.5); return false; }
     if (G.interact.current?.t.id === 'char:' + g.talk) { out.held.add('peck'); s.pressed = true; return false; }
+    // batch-3: on foot and no closer for 2 s (the water's edge stops a walk now; it used to splash-launch him): fly over
+    if (s.lift > 0) { s.lift--; out.held.add('flap'); return false; }
     const d = P.stickToward(c.x, c.z, out, 0.6);
+    if (d < (s.best ?? Infinity) - 0.05) { s.best = d; s.stall = 0; } else if ((s.stall = (s.stall || 0) + 1 / 60) > 2) { s.stall = 0; s.best = Infinity; s.lift = 18; }
     if (d > 3) out.held.add('sprint');
     return false;
   }
