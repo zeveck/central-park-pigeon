@@ -347,6 +347,7 @@ HERO['natural-history'] = (ctx, H, masses) => {
   slab(ctx, { x, z, y: H.h, w: w + 0.6, h: 0.7, d: d + 0.6 });   // fix-25: the cream cap is the roof (it hid the spikes and starlings)
   // the starlings' cornice along the park front
   ctx.batch.box('cream', { x: x + w / 2 + 0.4, y: H.h - 6, z }, { w: 0.8, h: 0.5, d: d });
+  ctx.collision.addBox({ x: x + w / 2 + 0.4, z, y0: H.h - 6, h: 0.5, w: 0.8, d, tag: 'ledge' });   // fix-36: the starlings' stage is solid
   ctx.collision.addPerchEdge({ a: { x: x + w / 2 + 0.5, y: H.h - 5.5, z: z - d / 2 + 1 }, b: { x: x + w / 2 + 0.5, y: H.h - 5.5, z: z + d / 2 - 1 }, id: 'museum-cornice', kind: 'cornice', out: Math.PI / 2 });
   // the central portico: columns and a pediment facing the park
   const px = x + w / 2 + 3;

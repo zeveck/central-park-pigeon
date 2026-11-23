@@ -633,13 +633,20 @@ export const RANGER_CARTS = [
 
 // ------------------------------------------------------------------ spike sites (Thread 3)
 // on: 'top' = the roof or cap under (x, z); kind strips | net | bolts.
+// fix-36: the starlings' stage is the stone ledge over the natural history museum's columns (city.js: x -132..-131.2,
+// top 22.5, along the park front); singing from it, the columns throw the sound down the museum steps. Prickett's strips
+// line it, the stretch over the columns too (the ledge shows above the pediment's slopes; only the peak, ±1.5 m, rises
+// over it), half hanging off the lip, with a red line of glue along each run. `ledge` makes the whole run spiked (not only
+// round each strip), and the strips are drawn big (spikes.js).
+export const MUSEUM_LEDGE = { x: -131.3, y: 22.5, runs: [[375, 410.6], [414.4, 450]] };
+const ledgeStrips = (L, n = 8) => L.runs.flatMap(([a, b]) => Array.from({ length: n }, (_, i) => ({ x: L.x, y: L.y, z: +(a + (i * (b - a)) / (n - 1)).toFixed(2) })));
 export const SPIKE_SITES = [
   { id: 'P1', name: 'Grand Army Plaza lampposts', kind: 'strips', when: 'prologue', x: 97, z: -34, r: 9, perches: [{ x: 92, z: -28 }, { x: 102, z: -28 }, { x: 92, z: -46 }, { x: 102, z: -46 }], blocks: 'sign C2 pays nothing' },
   { id: 'P2', name: 'Reservoir south gatehouse roof', kind: 'strips', when: 'prologue', x: 14, z: 566, r: 5, blocks: "the Racers' scheme" },
-  { id: 'P3', name: 'Natural history museum cornice', kind: 'strips', when: 'prologue', x: -150, z: Z(79), r: 14, blocks: "the Racket's scheme; a Summit Perch" },
+  { id: 'P3', name: 'Natural history museum ledge', kind: 'strips', when: 'prologue', x: MUSEUM_LEDGE.x, z: Z(79), r: 20, ledge: MUSEUM_LEDGE, big: true, perches: ledgeStrips(MUSEUM_LEDGE), blocks: "the Racket's scheme" },
   { id: 'P4', name: 'Fifth & 74th ledge', kind: 'bolts', when: 'prologue', x: 150, z: Z(74.5), r: 10, blocks: "Rhoda's scheme", needs: { flags: ['walter.doorOpen'] }, refuse: 'Rigby looks up. "Twelve floors, boss. We need the back stairs. Walter lets raccoons up… for a price."' },   // 3b: only by Walter's stairs (den-rhoda step 3)
   { id: 'P5', name: 'Gapstow Bridge rail', kind: 'strips', when: 'den-horses', x: 60.5, z: 43, r: 8, blocks: 'the selfie postcard' },
-  { id: 'P6', name: 'Plaza Hotel cornice', kind: 'net', when: 'den-horses', x: 65, z: -48, r: 22, blocks: 'a Summit Perch' },
+  { id: 'P6', name: 'Plaza Hotel roof edge', kind: 'net', when: 'den-horses', x: 65, z: -48, r: 22, blocks: 'a Summit Perch' },
   { id: 'P7', name: 'Bow Bridge rail', kind: 'strips', when: 'sab-middle', x: -32, z: 297, r: 13, blocks: "Dove's wedding postcard" },
   { id: 'P8', name: 'Bethesda arcade ledges', kind: 'net', when: 'sab-middle', x: 6.6, z: 270, r: 12, blocks: '3 strays' },
   { id: 'P9', name: "Cleopatra's Needle tip", kind: 'bolts', when: 'sab-north', x: 44, z: 465.6, r: 3, blocks: 'a Summit Perch and postcard' },

@@ -72,7 +72,8 @@ export class Clues {
     // spike sites: strips teeter on the edge (cats Knock them); nets and bolts (raccoons Rig, Rhoda Lifts)
     for (const s of SPIKE_SITES) {
       const pts = s.perches || [{ x: s.x, z: s.z }];
-      this.#add({ id: 'spike-' + s.id, type: s.kind === 'strips' ? 'teeter' : 'net', spikeSite: s.id, x: pts[0].x, z: pts[0].z, on: 'roof', r: s.perches ? Math.max(8, (s.r || 4) + 4) : (s.r || 4) + 12, free: true, points: pts, does: { spike: s.id }, needs: s.needs, refuse: s.refuse });
+      const at = s.ledge ? { x: s.x, z: s.z } : pts[0];   // fix-36: a ledge's spot is its middle (the strips line both runs)
+      this.#add({ id: 'spike-' + s.id, type: s.kind === 'strips' ? 'teeter' : 'net', spikeSite: s.id, x: at.x, z: at.z, on: 'roof', r: s.perches ? Math.max(8, (s.r || 4) + 4) : (s.r || 4) + 12, free: true, points: pts, does: { spike: s.id }, needs: s.needs, refuse: s.refuse });
     }
     for (const d of DOORS) this.#door(d);
     // blockers ("…") and trades ("!") hang their bubbles on the humans themselves (update)
@@ -125,6 +126,9 @@ export class Clues {
       case 'glint': case 'hidden': g.userData.shaft = add(this.geo.shaft, this.mats.shaft, 0); g.userData.shaft.scale.set(1.4, 1.1, 1.4); break;
       case 'teeter': {
         const pts = d.points || [{ x: d.x, z: d.z }];
+        // fix-36: big strips (the museum ledge) are themselves the tell (spikes.js draws them tipped over the lip); no
+        // separate rocking strip (it swung through the real ones)
+        if (SPIKE_SITES.find((q) => q.id === d.spikeSite)?.big) { g.userData.wobblers = []; break; }
         g.userData.wobblers = pts.map((p) => {
           let obj;
           if (d.spikeSite) obj = new THREE.Mesh(this.geo.strip, this.mats.strip);
@@ -348,7 +352,7 @@ export class Clues {
         break;
       case 'teeter':
         for (const w of u.wobblers) { w.rotation.z = Math.sin(T * 5.5) * 0.28; w.rotation.x = Math.sin(T * 3.1) * 0.08; }
-        if (Math.floor(T * 1.2) !== Math.floor((T - dt) * 1.2)) { const w = u.wobblers[0]; G.particles.burst('dust', c.x + w.position.x, c.y + w.position.y - 0.05, c.z + w.position.z, 1, { spread: 0.1 }); }
+        if (u.wobblers.length && Math.floor(T * 1.2) !== Math.floor((T - dt) * 1.2)) { const w = u.wobblers[0]; G.particles.burst('dust', c.x + w.position.x, c.y + w.position.y - 0.05, c.z + w.position.z, 1, { spread: 0.1 }); }
         break;
       default: break;
     }
@@ -497,6 +501,9 @@ export class Clues {
     if (d.type === 'stuck' || d.type === 'rig' || d.type === 'grate') { const a = Math.atan2(c.x - p.x, c.z - p.z); to = { x: p.x + Math.sin(a) * 1.4, z: p.z + Math.cos(a) * 1.4 }; to.y = G.surfaceY(to.x, to.z, s.y + 1); }
     if (d.type === 'net') to.y = G.collision.surface(p.x, p.z, 400).y;
     if (talent === 'nighteyes') to = { x: c.x + (p.x - c.x) * 0.5, z: c.z + (p.z - c.z) * 0.5, y: s.y + 5 };
+    // fix-36: a ledge of strips (the museum): the cat walks the ledge and bats each strip over the edge in turn
+    const site = d.type === 'teeter' && d.spikeSite ? SPIKE_SITES.find((q) => q.id === d.spikeSite) : null;
+    if (site?.ledge) { this.#knockLedge(c, crew, talent, s, site, home); return; }
     const secs = G.chars.moveTo(c, to, { kind: A.move });
     c.yaw = Math.atan2(p.x - c.x, p.z - c.z);
     G.later(secs, () => {
@@ -533,6 +540,31 @@ export class Clues {
     let at = { x: c.x + Math.sin(c.yaw) * 0.5, z: c.z + Math.cos(c.yaw) * 0.5 };
     if (d.does.hand) at = G.collision.clearNear(at.x, at.z, { maxR: 20 }) || G.dryNear(at.x, at.z);
     this.#spawn(d, at, s);
+  }
+
+  /** fix-36: nearest strip first, run by run; each: bound to it, a knock pose facing the lip, the strip falls (spikes.knock).
+   *  The last one runs the clue's effect (spikes.clear, the flag that finishes the step), then the cat comes back. */
+  #knockLedge(c, crew, talent, s, site, home) {
+    const G = this.G, pts = G.spikes.sites.find((q) => q.id === site.id)?.points || [];
+    // (review) one walk down the ledge, from the end nearer the cat to the other (no zigzag)
+    const zs = pts.map((p) => p.z), fromLow = Math.abs(c.z - Math.min(...zs)) <= Math.abs(c.z - Math.max(...zs));
+    const seq = pts.map((p, i) => ({ p, i })).sort((a, b) => (fromLow ? a.p.z - b.p.z : b.p.z - a.p.z));
+    const next = (k) => {
+      if (!c.busyTalent) return;   // (review: a nap sent the cat home mid-ledge; the strips left stay for another Ask)
+      if (k >= seq.length) {
+        this.#effect(s, talent, crew, c, home);
+        const t2 = G.chars.moveTo(c, home, { kind: 'bound' });
+        G.later(t2, () => { c.busyTalent = false; c.script = false; this.#done(s, talent, crew, c); });
+        return;
+      }
+      const { p, i } = seq[k];
+      const secs = G.chars.moveTo(c, { x: p.x - 0.25, y: p.y, z: p.z }, { kind: 'bound' });
+      G.later(secs, () => {
+        c.yaw = Math.PI / 2;   // facing the lip (the park)
+        G.chars.animate(c, 'knock', 0.45, () => { G.spikes.knock(site.id, i); next(k + 1); });
+      });
+    };
+    next(0);
   }
 
   #spawn(d, at, s) {

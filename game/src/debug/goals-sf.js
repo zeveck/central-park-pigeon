@@ -165,7 +165,7 @@ export const GOALS_SF = {
   // ---------------------------------------------------------------- Spikes
   'den-songbirds': () => [
     ...go({ x: -127, z: 410 }), flag('den-songbirds.s1', 30), idle(),
-    { call: 'cats' }, { wait: 3.6 }, { ask: 'cats' }, flag('den-songbirds.s2', 40), idle(),
+    { call: 'cats' }, { wait: 3.6 }, { ask: 'cats' }, flag('den-songbirds.s2', 70), idle(),   // (fix-36: the cat knocks 12 strips off the ledge, one by one)
     ...napAt('nest-ramble', 'afternoon'), idle(),
     { sfLandNear: { x: 78.6, z: -13 }, from: { x: 62, z: -13 }, alt: 8, r: 2.0, timeout: 200 },
     { peck: 'icecream-chime' }, flag('den-songbirds', 120), idle(),

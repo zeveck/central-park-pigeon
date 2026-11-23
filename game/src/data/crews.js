@@ -231,7 +231,7 @@ export const CROWD_HAUNTS = {
   horses: [{ kind: 'line', a: { x: -70, z: -6.5 }, b: { x: 60, z: -6.5 }, n: 12, yaw: 1.57 }, { kind: 'line', a: { x: -62, z: 40 }, b: { x: -55, z: 120 }, n: 2 }],
   songbirds: [
     { kind: 'lawn', x: -50, z: 165, r: 35, n: 22 }, { kind: 'lawn', x: 6.6, z: 200, r: 30, n: 16 }, { kind: 'trees', x: -18, z: 362, r: 40, n: 30 },
-    { kind: 'pavement', x: -143, z: -18, r: 8, n: 10 }, { kind: 'roof', x: -150, z: 412, r: 18, n: 24 }, { kind: 'lawn', x: -6.6, z: 489, r: 36, n: 18 },
+    { kind: 'pavement', x: -143, z: -18, r: 8, n: 10 }, { kind: 'roof', a: { x: -131.4, z: 376 }, b: { x: -131.4, z: 398 }, n: 12, yaw: Math.PI / 2, unlessSpike: 'P3' }, { kind: 'roof', a: { x: -131.4, z: 427 }, b: { x: -131.4, z: 449 }, n: 12, yaw: Math.PI / 2, unlessSpike: 'P3' }, { kind: 'lawn', x: -6.6, z: 489, r: 36, n: 18 },
     { kind: 'lawn', x: 60, z: 30, r: 40, n: 14 }, { kind: 'pavement', x: -129, z: 257, r: 8, n: 8 }, { kind: 'lawn', x: 0, z: 835, r: 40, n: 8 },
   ],
   geese: [

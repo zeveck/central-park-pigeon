@@ -233,7 +233,7 @@ Coordinates are game metres. +z is north from 59th Street (z = 0) to 110th Stree
 
 - **Central Park South:** hotels with doormen and flagpoles; the **carriage line** (horses, carriages, a water trough at the kerb); pedicabs; the **ice-cream truck** (Afternoon, a tinkly original jingle); the **halal cart** at Grand Army Plaza (Afternoon); a steam stack; the **Columbus Circle slice joint** and Sue's grate on the SW corner.
 - **Fifth Avenue:** mansions and doormen; **Walter's building** at 74th (the hawks' ledge); the **construction site** at 76th with scaffolding and a plywood **sidewalk shed**; the spiral museum at 89th; the Engineers' Gate at 90th; the halal cart at 110th & Fifth (Dusk); yellow cabs all along.
-- **Central Park West:** the gabled apartment house at 72nd with the **CPW & 72nd slice joint** and a **bodega** on the corner; the twin-towered apartments at 74th; the natural history museum at 79th (the starlings' cornice).
+- **Central Park West:** the gabled apartment house at 72nd with the **CPW & 72nd slice joint** and a **bodega** on the corner; the twin-towered apartments at 74th; the natural history museum at 79th (the starlings' stage: the stone ledge over its columns, #36).
 - **110th Street:** brownstones with fire escapes and rooftop **water towers** (perches); the **bodega and slice joint at 110th & Lenox** (Queenie's corner; the 110th grate); Prickett's van parks here at Dusk and Night.
 - The **Empire State Building** stands on the southern skyline, always visible (far layer), and is the finale's goal.
 
@@ -389,7 +389,7 @@ Favour examples: Nutmeg wants the Cherry Hill caches re-counted (fly over, peck 
 | 13 | **The Meer Mob**, tough northern pigeons (bandanas); **Big Sal** | Harlem Meer / the Blockhouse | +14 flock; **Muscle**: the flock hauls huge things | Rhoda's gone quiet; fly a flypast of ≥ 30 through the Blockhouse arch, then a feast (crumbs or slices). | Feuds |
 | 14 | **The Bodega Cats**; **Queenie** | 110th & Lenox, CPW & 72nd, Fifth lobbies | **Knock**: knock anything off a high edge (counters, shelves, hooks, ledges, spike strips) | A hot anchovy slice from the far side of the park. | Slice Run |
 | 15 | **The Carriage Horses**; **Clementine** | CPS carriage line, the drives | **Kick**: kick open anything stuck; **Pull**: haul a huge thing by a road | Get Prickett's van off their water trough. | Spikes |
-| 16 | **The Racket**, songbirds; **Mimi** the starling | Everywhere; starlings on the museum cornice | **Mimic**: lure a human away with a sound (phone ring, car alarm, ranger whistle, ice-cream jingle) | Clear their spiked roost, then teach Mimi the ice-cream jingle. | Spikes |
+| 16 | **The Racket**, songbirds; **Mimi** the starling | Everywhere; starlings on the museum's ledge (their stage: the columns throw their songs down the museum steps; while it's spiked they circle in front of it, cleared they line it) | **Mimic**: lure a human away with a sound (phone ring, car alarm, ranger whistle, ice-cream jingle) | Clear their spiked roost, then teach Mimi the ice-cream jingle. | Spikes |
 | 17 | **The Honk**, geese and herons; **Gertrude** | The Lake, Great Lawn, Reservoir, Meer | **Bully**: geese chase humans off a spot in the park (they drop what they're holding) | Settle the geese-and-ducks feud by giving the geese their own lawn. | Feuds |
 
 **Stray pigeons:** 40 lone pigeons hide around the park and city ring, on ledges, under bridges, on water towers and in the Blockhouse. Talk to one and it joins your flock. Each has its own colour morph and neck sheen (see "Pigeon colour morphs" in Art direction), so the flock grows visibly more motley as it grows. The maximum flock is 82 (6 + 12 + 10 + 14 + 40). Up to 24 fly visibly with you; the rest are a number on the HUD, and every one of them shows up in the finale.
@@ -467,9 +467,9 @@ The **Scheme Board** has five lanes side by side. Each lane has a one-line goal,
 |---|---|---|---|---|
 | P1 | Grand Army Plaza lampposts (the Swells' perch) | strips | Prologue end | sign C2 pays nothing |
 | P2 | Reservoir south gatehouse roof (the Racers' roost) | strips | Prologue end | the Racers' scheme |
-| P3 | Natural history museum cornice, CPW/79th (the starlings' roost) | strips | Prologue end | the Racket's scheme; a Summit Perch |
+| P3 | Natural history museum ledge, CPW/79th: the stone ledge over the columns, the starlings' stage (#36: 12 big strips along both runs, glued in a rush, half off the lip; the whole ledge bounces Gus; the cats bat them over the edge one by one, onto the sidewalk) | strips | Prologue end | the Racket's scheme |
 | P4 | Fifth/74th ledge (the hawks' home) | bolts | Prologue end | Rhoda's scheme (cleared inside it) |
-| P5, P6 | Gapstow Bridge rail; Plaza Hotel cornice | strips; net | after `den-horses` | the selfie postcard; a Summit Perch |
+| P5, P6 | Gapstow Bridge rail; Plaza Hotel roof edge | strips; net | after `den-horses` | the selfie postcard; a Summit Perch |
 | P7, P8 | Bow Bridge rail; Bethesda arcade ledges | strips; net | after `sab-middle` | Dove's wedding postcard; 3 strays |
 | P9, P10 | Cleopatra's Needle tip; Conservatory Garden gate tops | bolts; net | after `sab-north` | a Summit Perch and postcard; sign N6 |
 

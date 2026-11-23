@@ -1,6 +1,9 @@
-// den-songbirds, "A New Sound" (Spikes). Prickett spiked the starlings' roost
-// on the natural history museum's cornice (P3): the starlings circle it. The
-// cats Knock the glued strips off the edge. Then Mimi wants a new sound for
+// den-songbirds, "A New Sound" (Spikes). The starlings' stage is the stone
+// ledge over the natural history museum's columns: sing from it and the columns
+// throw the sound down the museum steps, to the school trips and tourists.
+// Prickett glued spike strips all along it (P3), in a rush, half hanging off
+// the lip: the starlings circle in front of it. The cats Knock the strips over
+// the edge, one by one (fix-36). Then Mimi wants a new sound for
 // her act, one nobody else does: at Afternoon Gus perches on the ice-cream
 // truck by Grand Army Plaza and pecks its chime while she watches. She learns
 // the jingle on the spot, lures every kid on the Plaza with it, and the
@@ -14,8 +17,8 @@ const P3 = SPIKE_SITES.find((s) => s.id === 'P3');
 export async function installDenSongbirds(G) {
   const E = G.schemes;
   const ring = await birds(G, 'songbird', 16, 0.32, { tint: 0x2f2b3a });
-  const top = () => G.surfaceY(P3.x + 6, P3.z, 400);
-  let t = 0;
+  const top = () => P3.ledge.y;   // fix-36: the ledge (the stage), not the roof
+  let t = 0, wasFor = null, wasOn = false, landing = null;
   // the truck gets a roof to perch on (it parks here only at Afternoon)
   let col = null;
   const tr = G.street.icecream;
@@ -27,18 +30,19 @@ export async function installDenSongbirds(G) {
     G.sfTruckTop = y0 + h * 0.94;
     col.off = !tr.visible;
   }
-  // ---------------------------------------------------------------- step 1: the starlings circle their spiked cornice
+  // ---------------------------------------------------------------- step 1: the starlings circle their spiked ledge
   E.registerScript('songbirds.roost', (ctx, done) => {
     const y = top();
     G.cutscene.run('songbirds-roost', [
       { do: () => { G.audio.play('starling-chatter', { at: { x: P3.x, y, z: P3.z } }); } },
-      { cam: { ...G.shot({ x: P3.x + 10, y, z: P3.z }, { dist: 18, height: 7, yaw: -1.25, lookY: 2 }), secs: 1.4 } },
+      { cam: { ...G.shot({ x: P3.x, y, z: P3.z - 24 }, { dist: 16, height: 3, yaw: 1.2, lookY: 0.5 }), secs: 1.4 } },   // (from over the park: the ledge, its strips and the circling birds)
       { wait: 1.6 },
       { say: [
         L('mimi', '*a perfect car alarm* …Ha! Gotcha. Oh, it\'s the pigeon with the scarf.', 'mimi-greeting'),
-        L('mimi', 'Look at my cornice, sweetie. SPIKES. Where is a starling supposed to rehearse? On a BUS?'),
-        L('jay', 'CAW CAW! …Sorry. Doing my crow. It was Prickett. Glued strips, right along the edge.'),
-        L('ruby', '"Something is rotten in the state of… the cornice."'),
+        L('mimi', 'See that stone ledge over the big columns, sweetie? Our STAGE. Sing up there and the columns throw it right down Central Park West.'),
+        L('mimi', 'Every doorman, every dog walker, every bus stop for six blocks. And now? SPIKES. All along the edge.'),
+        L('jay', 'CAW CAW! …Sorry. Doing my crow. Prickett did it. Glued them on in a rush, one dab each. Half of them are hanging off the lip.'),
+        L('ruby', '"Something is rotten in the state of… the ledge."'),
       ] },
       { follow: true },
       { do: () => done() },
@@ -48,8 +52,8 @@ export async function installDenSongbirds(G) {
   E.registerScript('songbirds.cornice', (ctx, done) => {
     G.audio.play('starling-chatter', { at: G.gus.position });
     G.later(0.6, () => G.say([
-      L('mimi', 'Ooh. The acoustics are BACK. Thank you, darling. Thank your terrifying friends.'),
-      L('mimi', 'Now. My act needs a NEW sound. Something nobody in this park can do. Bring me one and the Racket is yours.'),
+      L('mimi', 'Our stage! *ahem* *a perfect car alarm* …Hear that echo? Half of Central Park West just checked their cars. Thank your terrifying friends, darling.'),
+      L('mimi', 'But they have all heard my car alarm a hundred times. My act needs a NEW sound. Something nobody in this park can do. Bring me one and the Racket is yours.'),
       L('chip', 'Psst. Afternoons, the ice-cream truck by the Plaza. That tune? Nobody can do that tune.'),
     ], done));
   });
@@ -104,11 +108,28 @@ export async function installDenSongbirds(G) {
     update(dt) {
       t += dt;
       if (col) col.off = !G.street.icecream.visible;
-      // the starlings circle their spiked cornice while P3 is up and Gus is near
+      // the starlings circle in front of their spiked ledge while P3 is up and Gus is near (fix-36: over the park, by the ledge)
       const g = G.gus.position;
-      const on = G.state.spikes.P3 === 'installed' && Math.hypot(g.x - P3.x, g.z - P3.z) < 160;
-      ring.mesh.visible = on;
-      if (on) { const y = top() + 4; for (let i = 0; i < ring.n; i++) { const a = t * 0.9 + (i / ring.n) * Math.PI * 2, r = 9 + 2.5 * Math.sin(i * 1.7 + t); ring.set(i, P3.x + 6 + Math.cos(a) * r, y + Math.sin(a * 2 + i) * 1.2, P3.z + Math.sin(a) * r, a + Math.PI / 2, t * 14 + i); } ring.commit(); }
+      const installed = G.state.spikes.P3 === 'installed', near = Math.hypot(g.x - P3.x, g.z - P3.z) < 160;
+      // (review) cleared in front of Gus: the circling birds come down onto the ledge before the sitters show
+      if (wasFor !== G.state) { wasFor = G.state; wasOn = installed; landing = null; }
+      if (wasOn && !installed && near) landing = { t: 0 };
+      wasOn = installed;
+      G.holdSitters = landing ? { P3: true } : null;
+      ring.mesh.visible = (installed && near) || !!landing;
+      if (ring.mesh.visible) {
+        const y = top() + 4, k = landing ? Math.min(1, landing.t / 1.6) : 0, e = k * k * (3 - 2 * k);
+        const runs = P3.ledge.runs;
+        for (let i = 0; i < ring.n; i++) {
+          // circling over the park in front of the ledge (centre 12 m out, at most 10.5 m round: clear of the facade)
+          const a = t * 0.9 + (i / ring.n) * Math.PI * 2, r = 8 + 2.5 * Math.sin(i * 1.7 + t);
+          let x = P3.x + 12 + Math.cos(a) * r, yy = y + Math.sin(a * 2 + i) * 1.2, z = P3.z + Math.sin(a) * r;
+          if (landing) { const [ra, rb] = runs[i % 2], u = (Math.floor(i / 2) + 0.5) / Math.ceil(ring.n / 2), tz = ra + (rb - ra) * u; x += (P3.ledge.x - 0.1 - x) * e; yy += (P3.ledge.y + 0.05 - yy) * e; z += (tz - z) * e; }
+          ring.set(i, x, yy, z, a + Math.PI / 2, landing ? t * 14 * (1 - e) + i : t * 14 + i);
+        }
+        ring.commit();
+        if (landing && (landing.t += dt) > 1.9) landing = null;
+      }
       // Mimi waits by the ice-cream truck at Afternoon in step 3
       const mimi = G.chars.find('mimi');
       if (mimi && !mimi.script && !mimi.here) {

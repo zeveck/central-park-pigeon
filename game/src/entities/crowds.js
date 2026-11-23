@@ -216,6 +216,10 @@ export class Crowds {
             let tries = 0;
             do { const a = rnd() * 6.28, r = Math.sqrt(rnd()) * h.r; x = h.x + Math.cos(a) * r; z = h.z + Math.sin(a) * r; tries++; } while (w && !pointInPoly(x, z, w.poly) && tries < 40);
             if (w && pointInPoly(x, z, w.poly)) onWater = w;
+          } else if (h.kind === 'roof' && h.a) {
+            // fix-36: a row along a ledge (the starlings on the museum's ledge, facing the park)
+            const t = h.n > 1 ? i / (h.n - 1) : 0.5;
+            x = h.a.x + (h.b.x - h.a.x) * t + (rnd() - 0.5) * 0.15; z = h.a.z + (h.b.z - h.a.z) * t + (rnd() - 0.5) * 0.6;
           } else {
             const a = rnd() * 6.28, r = Math.sqrt(rnd()) * (h.r || 1);
             x = h.x + Math.cos(a) * r; z = h.z + Math.sin(a) * r;
@@ -247,7 +251,8 @@ export class Crowds {
           else if (onWater) y = onWater.level - (group === 'geese' ? 0.18 : 0.12);   // swimmers sit in the water
           else y = G.collision.walkFloor(x, z) + (h.y || 0);   // batch-3: the same floor every step uses (terrain, kerb, deck)
           const a = {
-            i: idx++, group, crew: gdef.crew, model, lod, x, z, y, home: { x: h.kind === 'line' || h.kind === 'ring' ? x : h.x, z: h.kind === 'line' || h.kind === 'ring' ? z : h.z, r: h.kind === 'line' ? 1.5 : h.kind === 'ring' ? 1.2 : (h.r || 2) }, kind: h.kind, water: onWater,
+            unlessSpike: h.unlessSpike || null,   // fix-36: away while that site is spiked
+            i: idx++, group, crew: gdef.crew, model, lod, x, z, y, home: { x: h.kind === 'line' || h.kind === 'ring' || h.a ? x : h.x, z: h.kind === 'line' || h.kind === 'ring' || h.a ? z : h.z, r: h.kind === 'line' ? 1.5 : h.kind === 'ring' ? 1.2 : h.a ? 0.8 : (h.r || 2) }, kind: h.kind, water: onWater,
             yaw: h.yaw ?? rnd() * 6.28, state: 'idle', t: rnd() * 4, tx: x, tz: z, speed: 0, hopT: 0, phase: rnd() * 6.28, rnd,
             phases: h.night ? ['night', 'dusk'] : gdef.phases || null, scale: 1, layer: null, sheen: [1, 1, 1], tint: [1, 1, 1], yBase: y, air: 0,
             yOff: h.kind === 'roof' || onWater ? 0 : h.y || 0,   // batch-3: perched this far above its ground (the owl)
@@ -284,7 +289,7 @@ export class Crowds {
     // the crowd of that species cheers across the park
     for (const a of this.animals) if (a.crew === crew && a.state !== 'away') { a.state = 'cheer'; a.t = 1.5 + a.rnd() * 1.5; }
   }
-  active(a) { return !a.phases || a.phases.includes(this.G.state.phase); }
+  active(a) { return (!a.phases || a.phases.includes(this.G.state.phase)) && !(a.unlessSpike && (this.G.state.spikes?.[a.unlessSpike] === 'installed' || this.G.holdSitters?.[a.unlessSpike])); }
 
   counts() {
     const out = {};
