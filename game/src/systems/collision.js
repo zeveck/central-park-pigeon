@@ -177,7 +177,7 @@ export class Collision {
       else if (it.t === 'cyl') { if (it.walkable && it.y1 <= lim && (x - it.x) ** 2 + (z - it.z) ** 2 <= it.r * it.r) { top = it.y1; kind = it.tag; } }
       else if (it.t === 'rock') { top = Collision.rockTop(it, x, z); if (top > lim + 1.5) top = -Infinity; kind = 'rock'; }
       else if (it.t === 'water') {
-        if (it.level <= lim && x >= it.b.x0 && x <= it.b.x1 && z >= it.b.z0 && z <= it.b.z1 && pointInPoly(x, z, it.outline)) { top = it.level; kind = 'water'; }
+        if (it.level <= lim && x >= it.b.x0 && x <= it.b.x1 && z >= it.b.z0 && z <= it.b.z1 && pointInPoly(x, z, it.outline) && this.heightAt(x, z) < it.level - 0.02) { top = it.level; kind = 'water'; }   // (fix-27: the same waterline as waterAt)
       }
       if (top > out.y) { out.y = top; out.kind = kind; out.item = it; }
     });

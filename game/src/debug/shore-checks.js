@@ -6,7 +6,8 @@
 // moved  what the wider water now covers that the old outline didn't: named characters' homes, item sources, clues on
 //        land, signs and places (each one is something to look at, not necessarily wrong)
 
-import { pointInPoly } from '../core/geo.js';
+import { pointInPoly, offsetClosed } from '../core/geo.js';
+import { waterMargin } from '../world/water.js';
 import { CHARACTERS } from '../data/crews.js';
 import { ITEM_SOURCES } from '../data/item-sources.js';
 import { CLUES, SIGNS, PLACES } from '../world/layout.js';
@@ -19,6 +20,7 @@ export function runShoreChecks(G, { perBody = 16 } = {}) {
   const res = { walk: [], worst: null, moved: [] };
   for (const wb of G.terrain.shapes.water) {
     const n = wb.poly.length;
+    const drawn = offsetClosed(wb.poly, waterMargin(wb));   // where the water is drawn (only there can he be 'under' it)
     for (let k = 0; k < perBody; k++) {
       const a = wb.poly[Math.floor((k / perBody) * n)], b = wb.poly[(Math.floor((k / perBody) * n) + 1) % n];
       // the outward normal of this edge (the outline's winding decides the side: test which side is inside)
@@ -38,7 +40,7 @@ export function runShoreChecks(G, { perBody = 16 } = {}) {
         const g = G.gus.position;
         if (G.gus.floating) { floated = true; break; }
         if (G.gus.mode !== 'walk' || C.deckAt(g.x, g.z) !== -Infinity) continue;
-        minDy = Math.min(minDy, g.y - wb.level);
+        if (pointInPoly(g.x, g.z, drawn)) minDy = Math.min(minDy, g.y - wb.level);
       }
       ext(G, 1);
       const g = G.gus.position;

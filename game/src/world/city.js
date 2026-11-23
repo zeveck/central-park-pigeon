@@ -174,6 +174,7 @@ function waterTower(ctx, x, y, z, side) {
   ctx.batch.box('iron', { x, y: y + 3, z }, { w: 2.8, h: 0.2, d: 2.8 });
   ctx.batch.mesh('wood', new THREE.CylinderGeometry(1.5, 1.6, 3.6, 12), { x, y: y + 5.0, z });
   ctx.batch.mesh('woodDark', new THREE.ConeGeometry(1.75, 1.3, 12), { x, y: y + 7.45, z });
+  ctx.collision.addPyramid({ x, z, y0: y + 6.8, h: 1.3, half: 1.5, tag: 'water-tower' });   // fix-25 review: its conical lid
   ctx.collision.addCylinder({ x, z, y0: y, h: 6.8, r: 1.6, tag: 'water-tower' });
   const top = { x, y: y + 8.1, z, side };
   ctx.collision.addPerch({ x, y: y + 8.1, z, r: 0.25, id: `water-tower-${Math.round(x)}-${Math.round(z)}`, kind: 'water-tower' });
@@ -267,6 +268,7 @@ HERO['plaza-hotel'] = (ctx, H, masses) => {
     const tx = x + dx * (w / 2 - 3), tz = z + dz * (d / 2 - 3);
     ctx.batch.mesh('copper', new THREE.ConeGeometry(3.2, 7, 8), { x: tx, y: H.h + 6.8 + 3.5, z: tz });
     ctx.collision.addPerch({ x: tx, y: H.h + 14.3, z: tz, r: 0.3, id: `plaza-turret-${dx}-${dz}`, kind: 'finial' });
+    ctx.collision.addPyramid({ x: tx, z: tz, y0: H.h + 6.8, h: 7, half: 2.6, tag: 'roof' });   // fix-25 review: the turret cones
   }
   rimPerches(ctx, { x, z, y: H.h + 6.8, w: w - 2, d: d - 2, tag: 'mansard' });
   ctx.collision.addPerch({ x, y: H.h + 6.8, z, r: 6, id: 'summit-plaza', kind: 'summit' });
@@ -296,7 +298,11 @@ HERO['gabled-apartments'] = (ctx, H, masses) => {
     ctx.collision.addPyramid({ x: x + dx * (w / 2 - 3), z: z + dz * (d / 2 - 3), y0: H.h + 0.5, h: 11, half: 4.2 / Math.SQRT2 });   // fix-25
     ctx.collision.addPerch({ x: x + dx * (w / 2 - 3), y: H.h + 11.5, z: z + dz * (d / 2 - 3), r: 0.25, id: `dakota-peak-${dx}-${dz}`, kind: 'finial' });
   }
-  for (let k = 0; k < 6; k++) ctx.batch.box('cream', { x: x + w / 2 - 0.5, y: H.h + 1, z: z - d / 2 + 3 + k * ((d - 6) / 5) }, { w: 1.6, h: 2.4, d: 1.6 });   // dormers on the park side
+  for (let k = 0; k < 6; k++) {   // dormers on the park side (fix-25 review: solid)
+    const dz2 = z - d / 2 + 3 + k * ((d - 6) / 5);
+    ctx.batch.box('cream', { x: x + w / 2 - 0.5, y: H.h + 1, z: dz2 }, { w: 1.6, h: 2.4, d: 1.6 });
+    ctx.collision.addBox({ x: x + w / 2 - 0.5, z: dz2, y0: H.h + 1, h: 2.4, w: 1.6, d: 1.6, tag: 'roof' });
+  }
   ctx.collision.addBox({ x, z, y0: 0, h: H.h, w, d, tag: 'hero' });
   rimPerches(ctx, { x, z, y: H.h + 0.5, w: w + 0.6, d: d + 0.6, tag: 'cornice' });
   ctx.collision.addPerchEdge({ a: { x: x - w / 2 + 3, y: H.h + roofH + 0.5, z }, b: { x: x + w / 2 - 3, y: H.h + roofH + 0.5, z }, id: 'summit-dakota', kind: 'ridge', out: Math.PI / 2 });
@@ -349,11 +355,12 @@ HERO['natural-history'] = (ctx, H, masses) => {
   const s = new THREE.Shape(); s.moveTo(-11, 0); s.lineTo(11, 0); s.lineTo(0, 5); s.lineTo(-11, 0);
   ctx.batch.mesh('cream', new THREE.ExtrudeGeometry(s, { depth: 6, bevelEnabled: false }).translate(0, 0, -3).rotateY(Math.PI / 2), { x: px - 1, y: 18, z });
   ctx.collision.addBox({ x: px - 1, z, y0: 0, h: 18, w: 6, d: 22, tag: 'portico' });
+  ctx.collision.addPrism({ x: px - 1, z, y0: 18, h: 5, w: 6, d: 22, tag: 'portico' });   // fix-25 review: the pediment (Gus landed inside it at 18)
   ctx.collision.addPerchEdge({ a: { x: px - 1, y: 23, z: z - 0.5 }, b: { x: px - 1, y: 23, z: z + 0.5 }, id: 'museum-pediment', kind: 'finial', out: Math.PI / 2 });
   // corner towers
   for (const s2 of [-1, 1]) {
     const tz = z + s2 * (d / 2 - 5);
-    heroBox(ctx, 'brickPlain', { x: x + w / 2 - 5, z: tz, w: 10, h: 36, d: 10 });
+    heroBox(ctx, 'brickPlain', { x: x + w / 2 - 5, z: tz, w: 10, h: 36, d: 10, perch: false });   // (fix-25 review: its rim is under the cap now)
     ctx.batch.mesh('slate', new THREE.ConeGeometry(7.4, 7, 4), { x: x + w / 2 - 5, y: 39.5, z: tz, yaw: Math.PI / 4 });
     ctx.collision.addPyramid({ x: x + w / 2 - 5, z: tz, y0: 36, h: 7, half: 7.4 / Math.SQRT2 });   // fix-25
   }

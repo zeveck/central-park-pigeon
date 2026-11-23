@@ -210,8 +210,9 @@ B['dairy'] = (L, ctx) => {
   const y = ctx.heightAt(L.x, L.z);
   solid(ctx, 'stone', { x: L.x, z: L.z, y, w: 11, h: 4.5, d: 7 }, { perch: false });
   roofPrism(ctx, 'slate', { x: L.x, z: L.z, y: y + 4.5, w: 11.6, d: 7.6, h: 3.6 });
-  solid(ctx, 'stone', { x: L.x + 4, z: L.z + 2, y, w: 3, h: 9, d: 3 }, { tag: 'dairy-tower' });
+  solid(ctx, 'stone', { x: L.x + 4, z: L.z + 2, y, w: 3, h: 9, d: 3 }, { tag: 'dairy-tower', perch: false });
   ctx.batch.mesh('slate', new THREE.ConeGeometry(2.3, 3.2, 4), { x: L.x + 4, y: y + 10.6, z: L.z + 2, yaw: Math.PI / 4 });
+  ctx.collision.addPyramid({ x: L.x + 4, z: L.z + 2, y0: y + 9, h: 3.2, half: 2.3 / Math.SQRT2 });   // fix-25 review: the spire
   ctx.collision.addPerch({ x: L.x + 4, y: y + 12.2, z: L.z + 2, r: 0.2, id: 'dairy-spire', kind: 'finial' });
   // the open porch with green posts
   for (let k = 0; k < 5; k++) ctx.batch.box('green', { x: L.x - 4.5 + k * 2.2, y, z: L.z - 5 }, { w: 0.25, h: 3.2, d: 0.25 });
@@ -425,7 +426,7 @@ B['boathouse'] = (L, ctx) => {
   ctx.batch.box('wood', { x: tx, y: -1.2, z: L.z }, { w: 5, h: 0.9 + y, d: 16 });   // fix-27: drawn at its collider (it was 0.6 m above it, so Gus walked at the water's level beside the boards)
   ctx.collision.addBox({ x: tx, z: L.z, y0: -1.2, h: 0.3 + y + 0.6, w: 5, d: 16, tag: 'deck' });
   ctx.batch.box('green', { x: tx, y: y + 3, z: L.z }, { w: 5, h: 0.15, d: 16 });
-  for (const dz of [-7.5, -2.5, 2.5, 7.5]) ctx.batch.box('green', { x: tx - 2.3, y, z: L.z + dz }, { w: 0.2, h: 3, d: 0.2 });
+  for (const dz of [-7.5, -2.5, 2.5, 7.5]) ctx.batch.box('green', { x: tx - 2.3, y: y - 0.3, z: L.z + dz }, { w: 0.2, h: 3.3, d: 0.2 });   // (fix-27 review: down to the lowered boards)
   ctx.collision.addBox({ x: tx, z: L.z, y0: y + 3, h: 0.15, w: 5, d: 16, tag: 'awning' });
   rimPerches(ctx, { x: tx, z: L.z, y: y + 3.15, w: 5, d: 16, tag: 'awning' });
   // rowboats moored along the shore
