@@ -323,6 +323,7 @@ export function installPhoto(G) {
     const hit = G.collision.raySolid(cam.position, p, 20, { camera: true });
     return hit > 0.92;
   };
+  const scratch = [];
   const snap = async () => {
     if (P.busy) return;
     P.busy = true;
@@ -331,46 +332,59 @@ export function installPhoto(G) {
       const at = Date.now();
       const r = G.renderer, canvas = r.domElement;
       const pr0 = r.getPixelRatio();
-      const cssW = canvas.clientWidth || innerWidth;
-      const full = Math.min(Math.max(pr0, window.devicePixelRatio || 1), MAX_W / cssW);
+      // review: the LONG side is capped at 1920 px (a portrait phone's height, not only a landscape width), and the
+      // particles' size follows the capture's pixel ratio (their size is in device pixels), then goes back
+      const cssW = canvas.clientWidth || innerWidth, cssH = canvas.clientHeight || innerHeight;
+      const full = Math.min(Math.max(pr0, window.devicePixelRatio || 1), MAX_W / Math.max(cssW, cssH));
       const swap = Math.abs(full - pr0) > 0.01;
-      if (swap) r.setPixelRatio(full);
+      if (swap) { r.setPixelRatio(full); G.particles?.setPixelScale?.(cssH * full); }
       G.render();
       const sw = canvas.width, sh = canvas.height;
-      const k = Math.min(1, MAX_W / sw);
+      const k = Math.min(1, MAX_W / Math.max(sw, sh));
       let out = document.createElement('canvas');
       out.width = Math.round(sw * k); out.height = Math.round(sh * k);
       out.getContext('2d').drawImage(canvas, 0, 0, out.width, out.height);
-      if (swap) { r.setPixelRatio(pr0); G.render(); }
+      if (swap) { r.setPixelRatio(pr0); G.particles?.setPixelScale?.(cssH * pr0); G.render(); }
+      scratch.push(out);
       // Say Cheese step 3: the first photo is of Flicker (set now, before any await, so a replay sees it on this update)
       if (flicker() && G.schemes.isOpen('say-cheese') && G.schemes.stepIndex('say-cheese') === 2) {
         G.state.flags['photo.flicker'] = true;
         P.flickerNote = true;
       }
       // the shutter and the flash, straight away
-      G.audio.play('camera-shutter', { vol: 0.9 });
+      G.audio.play('camera-shutter', { vol: 0.9, ui: true });   // review: ui (the menu pauses the park's sounds)
       P.flashT = 1;
       const c = out.getContext('2d', { willReadFrequently: true });
       applyLook(c, out.width, out.height, look);
-      if (look === 'postcard') out = postcardFrame(out);
+      if (look === 'postcard') { out = postcardFrame(out); scratch.push(out); }
       if (P.mark) watermark(out.getContext('2d'), out.width, out.height, at, look === 'postcard');
       const blob = await new Promise((res) => out.toBlob(res, 'image/jpeg', 0.9));
+      if (!(blob instanceof Blob)) throw new Error('toBlob gave nothing (out of memory?)');   // review: never "Saved" with no picture
       const th = document.createElement('canvas');
+      scratch.push(th);
       th.width = 320; th.height = Math.round(320 * out.height / out.width);
       th.getContext('2d').drawImage(out, 0, 0, th.width, th.height);
       const thumb = await new Promise((res) => th.toBlob(res, 'image/jpeg', 0.8));
+      if (!(thumb instanceof Blob)) throw new Error('toBlob gave no thumbnail');
       P.last = { blob, thumb, at, w: out.width, h: out.height, look };
       await store(P.last);
     } catch (e) {
       console.warn('photo: capture failed', e);
       note('That photo didn\'t come out. Try again?', 3.5);
-    } finally { P.busy = false; }
+    } finally {
+      // review (iOS): give the scratch canvases' memory back at once (a 1920 px canvas is ~8 MB until it's collected)
+      for (const c of scratch) { c.width = 0; c.height = 0; }
+      scratch.length = 0;
+      P.busy = false;
+    }
   };
   /** Save to the album; at 60, ask to delete the oldest first. */
   const store = async (rec) => {
     let n = 0;
     try { n = await album.count(); } catch (e) { note(storageWords(e), 6); P.lastError = e?.name || String(e); return false; }
     if (n >= ALBUM_MAX) {
+      // review: the count is async; if photo mode was closed meanwhile, never open the question over play
+      if (!P.open) { G.toast(`Not saved: the album is full (${ALBUM_MAX} photos). Open it from Pause to make room.`, { seconds: 5 }); return false; }
       G.confirm({
         title: 'The album is full', text: `It holds ${ALBUM_MAX} photos. Delete the oldest one to make room? (Download any you want to keep first.)`,
         yes: 'Delete oldest', no: 'Cancel',
@@ -522,7 +536,9 @@ export function installPhoto(G) {
       try { photos = await album.list(); } catch (e) { photos = []; box.innerHTML = `<p class="muted">${esc(storageWords(e))}</p>`; albumEl.querySelector('.n').textContent = ''; return; }
       P.count = photos.length;
       albumEl.querySelector('.n').textContent = `${photos.length} of ${ALBUM_MAX}`;
-      box.innerHTML = photos.length ? photos.map((p, i) => { const u = URL.createObjectURL(p.thumb || p.blob); urls.push(u); return `<button type="button" class="thumb" data-i="${i}" aria-label="Photo from ${esc(dateWords(p.at))}"><img alt="" src="${u}"></button>`; }).join('')
+      // review: a record whose picture can't be read (no Blob) gets a plain tile that offers to delete it
+      const ok = (p) => p.blob instanceof Blob;
+      box.innerHTML = photos.length ? photos.map((p, i) => { if (!ok(p)) return `<button type="button" class="thumb bad" data-i="${i}"><span>This photo can't be read. Delete it?</span></button>`; const u = URL.createObjectURL(p.thumb instanceof Blob ? p.thumb : p.blob); urls.push(u); return `<button type="button" class="thumb" data-i="${i}" aria-label="Photo from ${esc(dateWords(p.at))}"><img alt="" src="${u}"></button>`; }).join('')
         : `<p class="muted empty">No photos yet. ${unlocked() ? 'Open photo mode and snap one!' : 'Find a camera first.'}</p>`;
       if (G.menus.top === albumScreen) G.menus.focusFirst();
     },
@@ -531,7 +547,16 @@ export function installPhoto(G) {
   };
   albumEl.addEventListener('click', (e) => {
     const t = e.target.closest('.thumb');
-    if (t) { G.menus.push('photoview', photos[+t.dataset.i]); return; }
+    if (t) {
+      const p = photos[+t.dataset.i];
+      if (!(p?.blob instanceof Blob)) {
+        G.confirm({ title: 'Delete this photo?', text: 'Its picture can\'t be read, so it can\'t be shown or downloaded.', yes: 'Delete', no: 'Keep it',
+          onYes: async () => { try { await album.remove(p.id); P.count = Math.max(0, (P.count || 1) - 1); } catch (err) { G.toast(storageWords(err)); } albumScreen.render(); } });
+        return;
+      }
+      G.menus.push('photoview', p);
+      return;
+    }
     if (e.target.closest('[data-act="back"]')) G.menus.pop();
   });
   G.menus.add(albumScreen);
@@ -555,6 +580,7 @@ export function installPhoto(G) {
   const viewScreen = {
     id: 'photoview', el: viewEl,
     open(p) {
+      if (!(p?.blob instanceof Blob)) { G.menus.pop(); return; }   // review: (the album never opens one; a stale call can't throw)
       cur = p;
       if (curUrl) URL.revokeObjectURL(curUrl);
       curUrl = URL.createObjectURL(p.blob);

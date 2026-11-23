@@ -117,7 +117,8 @@ export class OpenSky {
       this.fx.style.opacity = String(kr);
       this.fx.classList.toggle('on', kr > 0);
       const cv = this.G.renderer?.domElement;
-      if (cv) cv.style.filter = kr > 0 ? `hue-rotate(${Math.round(kr * 70)}deg) saturate(${(1 + kr * 0.8).toFixed(2)}) blur(${(kr * 1.6).toFixed(2)}px)` : '';
+      // photo mode (#9) review: while photo mode is open its live look owns the canvas filter
+      if (cv && !this.G.photo?.isOpen) cv.style.filter = kr > 0 ? `hue-rotate(${Math.round(kr * 70)}deg) saturate(${(1 + kr * 0.8).toFixed(2)}) blur(${(kr * 1.6).toFixed(2)}px)` : '';
     }
   }
 }

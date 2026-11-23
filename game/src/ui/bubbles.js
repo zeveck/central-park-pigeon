@@ -41,6 +41,9 @@ export class Bubbles {
   /** project(x, y, z) → { x, y, dist, visible } in CSS pixels. */
   render(project) {
     // Land/perf: style writes only when a value changed (bubbles are positioned every drawn frame)
+    // photo mode review (#9): a bubble that would overlap the toast column is pushed below it (toasts and speech were unreadable together)
+    const te = document.getElementById('toasts');
+    const tr = te && te.childElementCount && te.offsetParent ? te.getBoundingClientRect() : null;
     for (const b of this.list.values()) {
       const p = typeof b.at === 'function' ? b.at() : b.at;
       const s = p ? project(p.x, p.y, p.z) : null;
@@ -48,7 +51,14 @@ export class Bubbles {
       const c = b._c || (b._c = {});
       if (c.show !== show) { b.el.style.display = show ? '' : 'none'; c.show = show; }
       if (!show) continue;
-      const x = `${s.x.toFixed(0)}px`, y = `${s.y.toFixed(0)}px`, far = s.dist > b.range * 0.6;
+      let sy = s.y;
+      if (tr && tr.height > 0) {
+        if (c.y !== `${s.y.toFixed(0)}px`) { b.el.style.top = `${s.y.toFixed(0)}px`; c.y = `${s.y.toFixed(0)}px`; }
+        if (c.x !== `${s.x.toFixed(0)}px`) { b.el.style.left = `${s.x.toFixed(0)}px`; c.x = `${s.x.toFixed(0)}px`; }
+        const r = b.el.getBoundingClientRect();
+        if (r.right > tr.left && r.left < tr.right && r.bottom > tr.top && r.top < tr.bottom) sy += tr.bottom + 6 - r.top;
+      }
+      const x = `${s.x.toFixed(0)}px`, y = `${sy.toFixed(0)}px`, far = s.dist > b.range * 0.6;
       if (c.x !== x) { b.el.style.left = x; c.x = x; }
       if (c.y !== y) { b.el.style.top = y; c.y = y; }
       if (c.far !== far) { b.el.classList.toggle('far', far); c.far = far; }

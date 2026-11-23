@@ -448,7 +448,7 @@ export const SCHEMES = [
         goal: 'Borrow the old film camera from the tourist\'s window ledge over CPW.', where: 'A tourist\'s window ledge on Central Park West, between 71st and 72nd', obstacle: 'He\'s guarding it while he snaps the skyline. Get in his shot, or give him a Coo.',
         nudge: { by: 'cawdry', text: 'Tourist in a window over CPW, past 71st. Old camera on the ledge. Stand in his shot and he forgets everything.' },
         answer: { text: 'Fly to the ledge under the tourist\'s window on Central Park West, between 71st and 72nd. Land on the ledge beside his balcony (or stand in front of his lens) and hold still a moment, or Coo below him. When he turns away, Peck the old camera on the ledge.', icon: null },
-        needs: { phase: 'any', place: 'cpw-71-window' }, on: { type: 'pickup', item: 'camera' }, target: { at: { x: -129.6, z: 261.5, label: 'The tourist\'s camera' } },
+        needs: { phase: 'any', place: 'cpw-71-window' }, on: { type: 'pickup', item: 'camera' }, target: { at: { x: -129.6, z: 262.35, label: 'The tourist\'s camera' } },
       }),
       S(2, {
         goal: 'Take the camera to Flicker, the crow who hoards film.', where: 'Flicker the crow, on the slope below Belvedere Castle, at the Ramble\'s north-east edge', obstacle: 'An empty camera takes no pictures.',

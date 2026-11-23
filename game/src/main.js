@@ -1029,7 +1029,7 @@ async function boot() {
       if (input.pressed('map')) { input.endUpdate(); G.openMenu('map'); return; }
       if (input.pressed('board')) { input.endUpdate(); G.openMenu('board'); return; }
       if (input.pressed('where')) G.guide.request();   // guidance: "Where to?" (G / R3 / a tap on the compass)
-      if (input.pressed('photo') && G.photo?.unlocked()) { input.endUpdate(); G.photo.request(); return; }   // photo mode (#9): V / D-pad right
+      if (input.pressed('photo') && G.photo?.unlocked() && G.photo.request()) { input.endUpdate(); return; }   // photo mode (#9): V / D-pad right (a refusal is a toast; the park's update goes on)
     }
     if (G.hitStop > 0) { G.hitStop--; input.endUpdate(); return; }   // 3b juice: a hit pause holds the whole park for a few updates
     if (G.shakeT > 0) G.shakeT -= dt;
@@ -1420,7 +1420,7 @@ async function boot() {
     G.wheel.close(false);
     G.menus.push(id, arg);
   };
-  G.pause = (reason = '') => { if (G.screen !== 'play' || G.napping) return; if (G.menus.is('pause')) return; G.openMenu('pause', reason); };
+  G.pause = (reason = '') => { if (G.screen !== 'play' || G.napping) return; if (G.menus.is('pause')) return; if (['photo', 'album', 'photoview'].some((id) => G.menus.is(id))) return; G.openMenu('pause', reason); };   // photo mode (#9) review: a blur, a hidden tab, a turned phone or the Share sheet never stacks Pause on photo mode (it is a pause already)
   G.closeMenus = (silent = false) => { G.menus.closeAll(); };
   G.resume = () => { G.menus.closeAll(); };
   G.onMenusChanged = () => {

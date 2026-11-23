@@ -164,7 +164,7 @@ body.cine #opensky { opacity: 0; }
 body.cine #flighthints { opacity: 0; }
 #tutor::after { content: ''; position: absolute; left: 50%; bottom: -9px; margin-left: -9px; border: 9px solid transparent; border-bottom: 0; border-top-color: var(--paper); }
 @keyframes bob { 50% { margin-top: -5px; } }
-#bubbles { position: fixed; inset: 0; pointer-events: none; z-index: 9; }
+#bubbles { position: fixed; inset: 0; pointer-events: none; z-index: 11; }   /* photo mode review (#9): over the HUD (10): speech was hidden under the goal card and chips; bubbles.js also keeps them off the toast column */
 .bubble { position: absolute; transform: translate(-50%, -100%); padding: 6px 12px; border-radius: 14px; background: #fffdf6; color: var(--ink); font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 15px; white-space: nowrap; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25); }
 .bubble::after { content: ''; position: absolute; left: 50%; bottom: -7px; margin-left: -7px; border: 7px solid transparent; border-bottom: 0; border-top-color: #fffdf6; }
 .bubble.thought { border-radius: 20px; font-style: italic; }
@@ -569,3 +569,4 @@ body.photo > *:not(#game):not(#photo):not(.overlay):not(#fpsbox) { visibility: h
   #pause .btn { padding-top: 7px; padding-bottom: 7px; font-size: 18px; }
   #pause h2 { margin-bottom: 8px; }
 }
+#album .thumb.bad { display: grid; place-items: center; padding: 8px; background: #e9dfcf; color: #6a3a2a; font: 600 13px/1.25 'Fredoka', sans-serif; text-align: center; }

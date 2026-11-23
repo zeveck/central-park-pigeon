@@ -21,7 +21,7 @@ export const ITEM_SOURCES = [
   { item: 'key', scheme: 'gear-headlamp', steps: [2], at: { x: -127.2, z: 548.6 }, label: 'the 86th Street W grate' },
   { item: 'sail', scheme: 'part-wings', steps: [1], flag: 'wings.sail1', at: { x: 72, z: 305 }, dry: true, label: 'the Conservatory Water shore' },
   { item: 'sail', scheme: 'part-wings', steps: [3], flag: 'wings.sail2', at: { x: 63.6, z: 302.3 }, label: 'the Conservatory Water shore' },
-  { item: 'camera', scheme: 'say-cheese', steps: [2], at: { x: -129.6, z: 261.5 }, label: 'the tourist\'s window ledge on CPW' },   // photo mode (#9)
+  { item: 'camera', scheme: 'say-cheese', steps: [2], at: { x: -129.6, z: 262.35 }, label: 'the tourist\'s window ledge on CPW' },   // photo mode (#9)
   { item: 'sticker', scheme: 'part-beak', steps: [2], at: { x: 128, z: 377 }, label: 'the 77th Street E grate' },
 ];
 

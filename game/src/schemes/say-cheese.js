@@ -19,7 +19,7 @@ import { L, onStep, bubbleOver } from './_ssf-common.js';
 import { ruleMaterial } from '../gfx/load-model.js';
 
 export const FACE_X = -130;                                   // the CPW building face (city.js FACE.west)
-export const CAMERA_AT = { x: -129.6, y: 3.62, z: 261.5 };    // on the ledge (ledge-west-251: x -129.7, y 3.62, z 251.6–271.8)
+export const CAMERA_AT = { x: -129.6, y: 3.62, z: 262.35 };    // on the ledge (ledge-west-251: x -129.7, y 3.62, z 251.6–271.8)
 export const TOURIST = { x: -129.42, y: 3.66, z: 263.75, yaw: Math.PI / 2 };   // on his balcony, facing the park (+x)
 const BALCONY = { z0: 262.75, z1: 264.75, out: 1.05, y: 3.62 };
 const EYE = 1.55;                     // his eye (and lens) above his feet
@@ -102,6 +102,14 @@ export function installSayCheese(G) {
     const it = G.items.spawn('camera', CAMERA_AT.x, CAMERA_AT.z, { y: CAMERA_AT.y, origin: { x: CAMERA_AT.x, z: CAMERA_AT.z } });
     if (it.mesh) it.mesh.rotation.y = Math.PI / 2 + 0.35;   // its lens looks out over the park too
   };
+  // review: on step 1 the camera answers a Peck from anywhere on the ledge by the balcony (the item's own reach is 0.9 m, so
+  // from beside the balcony the prompt said "Nap")
+  G.interact.register({
+    id: 'saycheese:camera', kind: 'item', x: CAMERA_AT.x, y: CAMERA_AT.y, z: CAMERA_AT.z, r: 3.4, dy: 1.2, priority: 5,
+    enabled: () => onStep(G, 'say-cheese', 1) && !!ledgeCam(),
+    label: () => { const it = ledgeCam(); return it ? (G.items.guardReason(it, true) ? 'Guarded: the old film camera' : 'Pick up the old film camera') : null; },
+    act: () => { const it = ledgeCam(); if (it) G.items.pickUp(it); },
+  });
   // the guard: he's watching it (until he's distracted)
   let refusals = 0;
   G.items.guards.push((it, peek) => {
@@ -132,8 +140,9 @@ export function installSayCheese(G) {
     G.audio.play('camera-shutter', { at: touristAt(), vol: 0.8 });
     play('wave');
     say(how === 'coo' ? 'Huh? Who said that? …Oh! A pigeon! Hold still, little guy!' : 'Ha! A pigeon right in my shot! That\'s a keeper!', 3.2);
-    G.later(3.4, () => say('Wait, wait. I need my good lens for this one. Don\'t move!', 3));
-    G.later(1.6, () => G.toast('He\'s gone in for another lens. Now\'s your chance: Peck the old camera on the ledge.', { seconds: 5 }));
+    // review: the hint is in his own bubble, and the toast waits until both bubbles are gone (toasts drew over them)
+    G.later(3.4, () => say('Wait right there! I need my good lens. Nobody touch my old camera on the ledge!', 3.4));
+    G.later(7.0, () => { if (onStep(G, 'say-cheese', 1)) G.toast('He\'s gone in for his lens. Peck the old camera on the ledge.', { seconds: 5 }); });
     G.bus.emit('photobomb', { scheme: 'say-cheese' });
   };
   G.bus.on('coo', (t, e) => {
@@ -170,6 +179,10 @@ export function installSayCheese(G) {
   G.mods.push({
     update(dt) {
       stock();
+      // review: on step 3 Flicker is always drawn (the Low preset's character cap could otherwise hide her, and a snap
+      // only counts her when she's drawn). Visual only (c.always is what a fight's opponent uses).
+      const fl = G.chars.find('flicker');
+      if (fl) { const want = onStep(G, 'say-cheese', 3); if (!!fl.always !== want) fl.always = want; }
       // the photobomb: Gus in his frame for a moment
       if (onStep(G, 'say-cheese', 1) && !flags()['photo.distracted'] && !G.cutscene.running) {
         if (inShot()) { held += dt; if (held >= SHOT.hold) distract('shot'); } else held = Math.max(0, held - dt * 2);
