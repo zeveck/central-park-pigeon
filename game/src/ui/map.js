@@ -5,6 +5,9 @@
 // slice joints and drops, the griddle, feud spots, crews and the tracked
 // scheme's targets. Click (or move the cursor with the stick and press ✕) to
 // set a waypoint; it shows on the compass.
+// fix-34: on a controller the buttons take no focus (the stick moved the cursor AND hopped focus between them, and ✕
+// pressed the focused button instead of setting the waypoint): L stick / D-pad move the cursor, ✕ sets the waypoint,
+// □ clears it, R1 zooms in, L1 shows the whole park, R stick pans, ○ closes. Setting or clearing says so.
 
 import * as THREE from 'three';
 import { WORLD, NESTS, GRATES, SIGNS, SPIKE_SITES, SLICE, RANGER_CARTS, PLACES, ZONES, LANDMARKS, PARK, WATER } from '../world/layout.js';
@@ -123,7 +126,7 @@ export function mapScreen(G) {
   // Fixes-3 (bughunter-2 B6): opened from Pause, Back goes back to Pause (closeMenus unpaused a controller player)
   const leave = () => { if (G.menus.stack.length > 1) G.menus.pop(); else G.closeMenus(); };
   const el = overlay('map', `
-    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><h2 style="margin:0">Map</h2><span class="muted seen"></span><span style="flex:1"></span>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><h2 style="margin:0">Map</h2><span class="muted seen"></span><span class="wpnote" style="font-weight:700;color:#2fa39a"></span><span style="flex:1"></span>
       <button type="button" class="btn small" data-act="zoom">${icon('map')}<span>Whole park</span></button>
       <button type="button" class="btn small" data-act="clear">${icon('waypoint')}<span>Clear waypoint</span></button>
       <button type="button" class="btn small" data-act="close">${icon('close')}<span>Close</span></button></div>
@@ -135,7 +138,15 @@ export function mapScreen(G) {
   const zoomLabel = () => { const sp = el.querySelector('[data-act="zoom"] span'); if (sp) sp.textContent = zoom > 1 ? 'Whole park' : 'Zoom in'; };
   const canvas = el.querySelector('canvas');
   const g = canvas.getContext('2d');
-  let zoom = 1, cursor = null;
+  let zoom = 1, cursor = null, pan = { x: 0, z: 0 }, noteT = 0;
+  const pad = () => G.input.device === 'gamepad';
+  const HINTS = { pad: [['move', 'Cursor'], ['uiOk', 'Set waypoint'], ['peck', 'Clear'], ['look', 'Pan'], ['zoomIn', 'Zoom'], ['uiBack', 'Close']], other: [['move', 'Cursor'], ['uiOk', 'Waypoint'], ['uiBack', 'Close']] };
+  const note = (t) => { const n = el.querySelector('.wpnote'); if (n) n.textContent = t; clearTimeout(noteT); noteT = setTimeout(() => { if (n) n.textContent = ''; }, 2500); };
+  const setZoom = (z) => { if (z === zoom) return; zoom = z; pan = { x: 0, z: 0 }; zoomLabel(); draw(); G.audio.synth('uiMove'); };
+  const clearWaypoint = () => {
+    if (G.state.waypoint) { G.state.waypoint = null; G.audio.synth('uiBack'); note('Waypoint cleared'); draw(); }
+    else { G.audio.synth('uiMove'); note('No waypoint to clear'); }
+  };
   const view = () => {
     const ww = wrap.clientWidth, wh = wrap.clientHeight;
     const W = WORLD.xMax - WORLD.xMin, H = WORLD.zMax - WORLD.zMin;
@@ -151,8 +162,8 @@ export function mapScreen(G) {
     const s = zoom > 1 ? Math.max(s0 * 1.5, ww / W) : s0;
     const p = G.gus.position;
     const clampC = (v, lo, hi, half) => (hi - lo <= half * 2 ? (lo + hi) / 2 : Math.max(lo + half, Math.min(hi - half, v)));
-    const cx = zoom > 1 ? clampC(p.x, WORLD.xMin, WORLD.xMax, ww / 2 / s) : (WORLD.xMin + WORLD.xMax) / 2;
-    const cz = zoom > 1 ? clampC(p.z, WORLD.zMin, WORLD.zMax, wh / 2 / s) : (WORLD.zMin + WORLD.zMax) / 2;
+    const cx = zoom > 1 ? clampC(p.x + pan.x, WORLD.xMin, WORLD.xMax, ww / 2 / s) : (WORLD.xMin + WORLD.xMax) / 2;   // fix-34: + the stick's pan
+    const cz = zoom > 1 ? clampC(p.z + pan.z, WORLD.zMin, WORLD.zMax, wh / 2 / s) : (WORLD.zMin + WORLD.zMax) / 2;
     return { ww, wh, s, cx, cz, rot: false, toPx: (x, z) => [ww / 2 + (x - cx) * s, wh / 2 - (z - cz) * s], toW: (px, py) => [cx + (px - ww / 2) / s, cz - (py - wh / 2) / s] };
   };
   const draw = () => {
@@ -258,27 +269,62 @@ export function mapScreen(G) {
     const [x, z] = view().toW(px, py);
     G.state.waypoint = { x: +x.toFixed(1), z: +z.toFixed(1) };
     G.audio.synth('uiSelect');
+    note('Waypoint set: follow it on the compass');
     draw();
   };
   const s = {
     id: 'map', el,
     // Fixes-3 (R7): it opens zoomed in round Gus (the whole 4 km park in a landscape window was a thin strip); the
     // button toggles the whole park
-    open() { G.audio.play('paper-rustle', { ui: true }); cursor = null; zoom = OPEN_ZOOM; zoomLabel(); requestAnimationFrame(draw); },
+    open() { G.audio.play('paper-rustle', { ui: true }); cursor = null; pan = { x: 0, z: 0 }; zoom = OPEN_ZOOM; zoomLabel(); s.onDevice(); requestAnimationFrame(draw); },
+    // fix-34: a controller never focuses the buttons (its stick and ✕ belong to the map); mouse, keys and touch keep them
+    focusables() { return pad() ? [] : [...el.querySelectorAll('button')]; },
+    onDevice() {
+      if (pad() && document.activeElement?.closest?.('#map')) document.activeElement.blur();
+      const h = el.querySelector('.hints');
+      if (h) h.dataset.auto = JSON.stringify(pad() ? HINTS.pad : HINTS.other);
+    },
     tick() {
       const inp = G.input;
+      if (!pad()) return;
       const m = inp.move();
-      if (Math.hypot(m.x, m.y) > 0.3 && inp.device === 'gamepad') {
-        if (!cursor) cursor = { x: canvas.width / 2, y: canvas.height / 2 };
+      const startCursor = () => { if (!cursor) { const v = view(), p = G.gus.position, [px, py] = v.toPx(p.x, p.z); cursor = { x: Math.max(0, Math.min(canvas.width, px)), y: Math.max(0, Math.min(canvas.height, py)) }; } };
+      let moved = false;
+      if (Math.hypot(m.x, m.y) > 0.3) {
+        startCursor();
         cursor.x = Math.max(0, Math.min(canvas.width, cursor.x + m.x * 6));
         cursor.y = Math.max(0, Math.min(canvas.height, cursor.y - m.y * 6));
-        draw();
+        moved = true;
       }
+      // the right stick pans the zoomed map (the view stays inside the park's map; the pan is kept within it too)
+      const rs = inp.rightStick;
+      if (zoom > 1 && Math.hypot(rs.x, rs.y) > 0.3) {
+        const v = view(), k = 9 / v.s;
+        pan.x += rs.x * k; pan.z -= rs.y * k;
+        const p = G.gus.position;
+        pan.x = Math.max(WORLD.xMin - p.x, Math.min(WORLD.xMax - p.x, pan.x));
+        pan.z = Math.max(WORLD.zMin - p.z, Math.min(WORLD.zMax - p.z, pan.z));
+        moved = true;
+      }
+      if (moved) draw();
     },
     handleInput(inp) {
       if (inp.pressed('map') && !inp.pressed('uiDown')) { leave(); return true; }
+      if (pad()) {
+        const startCursor = () => { if (!cursor) { const v = view(), p = G.gus.position, [px, py] = v.toPx(p.x, p.z); cursor = { x: px, y: py }; } };
+        if (inp.pressed('uiOk')) { startCursor(); setWaypoint(cursor.x, cursor.y); return true; }
+        if (inp.pressed('peck')) { clearWaypoint(); return true; }
+        if (inp.pressed('wheel') || inp.pressed('zoomIn')) { setZoom(OPEN_ZOOM); return true; }
+        if (inp.pressed('drop') || inp.pressed('zoomOut')) { setZoom(1); return true; }
+        // the D-pad nudges the cursor (the left stick makes the same ui edges as it moves: it already moved the cursor in tick)
+        const d = [['uiUp', 0, -12], ['uiDown', 0, 12], ['uiLeft', -12, 0], ['uiRight', 12, 0]].filter(([a]) => inp.pressed(a));
+        if (d.length && Math.hypot(inp.move().x, inp.move().y) > 0.3) return true;
+        if (d.length) { startCursor(); for (const [, dx, dy] of d) { cursor.x = Math.max(0, Math.min(canvas.width, cursor.x + dx)); cursor.y = Math.max(0, Math.min(canvas.height, cursor.y + dy)); } draw(); return true; }
+        return false;   // (○ closes, through back())
+      }
+      if (inp.pressed('zoomIn')) { setZoom(OPEN_ZOOM); return true; }
+      if (inp.pressed('zoomOut')) { setZoom(1); return true; }
       if (cursor && inp.pressed('uiOk') && document.activeElement?.tagName !== 'BUTTON') { setWaypoint(cursor.x, cursor.y); return true; }
-      if (inp.device === 'gamepad' && (inp.pressed('uiUp') || inp.pressed('uiDown') || inp.pressed('uiLeft') || inp.pressed('uiRight')) && !document.activeElement?.closest('#map button')) return true;
       return false;
     },
     back() { leave(); },
@@ -288,8 +334,8 @@ export function mapScreen(G) {
     const b = e.target.closest('[data-act]');
     if (!b) return;
     if (b.dataset.act === 'close') leave();
-    else if (b.dataset.act === 'zoom') { zoom = zoom > 1 ? 1 : OPEN_ZOOM; zoomLabel(); draw(); }
-    else if (b.dataset.act === 'clear') { G.state.waypoint = null; draw(); }
+    else if (b.dataset.act === 'zoom') setZoom(zoom > 1 ? 1 : OPEN_ZOOM);
+    else if (b.dataset.act === 'clear') clearWaypoint();   // fix-34: it says so (it did nothing you could see)
   });
   el.addEventListener('mouseover', (e) => { const b = e.target.closest('button'); if (b && document.activeElement !== b) b.focus({ preventScroll: true }); });
   return s;
