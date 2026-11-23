@@ -60,6 +60,32 @@ export class Collision {
     return it;
   }
 
+  /** fix-25: a gable roof (a prism): a box whose top slopes from the ridge (y0 + h, along local z when alongZ, else local x)
+   *  down to its eaves (y0). Gus lands, walks and perches on the slopes; nothing is solid above them. */
+  addPrism({ x, z, y0, h, w, d, yaw = 0, alongZ = false, tag = 'roof', id }) {
+    const it = this.addBox({ x, z, y0, h, w, d, yaw, tag, id });
+    it.roof = alongZ ? 'z' : 'x';
+    it.rh = h;
+    return it;
+  }
+
+  /** fix-25: a four-sided pyramid roof (a spire, a corner turret's cap): half = half the base's side, axis-aligned in yaw. */
+  addPyramid({ x, z, y0, h, half, yaw = 0, tag = 'roof', id }) {
+    const it = this.addBox({ x, z, y0, h, w: half * 2, d: half * 2, yaw, tag, id });
+    it.roof = 'pyr';
+    it.rh = h;
+    return it;
+  }
+
+  /** The top of a box at (x, z): its flat top, or a roof's slope there (fix-25). (x, z) inside the box's footprint. */
+  static topAt(it, x, z) {
+    if (!it.roof) return it.y1;
+    const dx = x - it.x, dz = z - it.z;
+    const ax = Math.abs(dx * it.c - dz * it.s) / it.hx, az = Math.abs(dx * it.s + dz * it.c) / it.hz;
+    const across = it.roof === 'z' ? ax : it.roof === 'x' ? az : Math.max(ax, az);
+    return it.y0 + it.rh * Math.max(0, 1 - across);
+  }
+
   addCylinder({ x, z, y0 = 0, h, r, walkable = true, tag = 'solid', id }) {
     this.count.cyl++;
     return this.#insert({ t: 'cyl', x, z, y0, y1: y0 + h, r, walkable, tag, id }, x - r, z - r, x + r, z + r);
@@ -147,7 +173,7 @@ export class Collision {
     const lim = yRef + STEP_UP;
     this.#near(x, z, 0, (it) => {
       let top = -Infinity, kind = null;
-      if (it.t === 'box') { if (it.walkable && it.y1 <= lim && Collision.inBox(it, x, z)) { top = it.y1; kind = it.tag; } }
+      if (it.t === 'box') { if (it.walkable && (it.roof ? it.y0 : it.y1) <= lim && Collision.inBox(it, x, z)) { const t = Collision.topAt(it, x, z); if (t <= lim) { top = t; kind = it.tag; } } }
       else if (it.t === 'cyl') { if (it.walkable && it.y1 <= lim && (x - it.x) ** 2 + (z - it.z) ** 2 <= it.r * it.r) { top = it.y1; kind = it.tag; } }
       else if (it.t === 'rock') { top = Collision.rockTop(it, x, z); if (top > lim + 1.5) top = -Infinity; kind = 'rock'; }
       else if (it.t === 'water') {
@@ -252,7 +278,7 @@ export class Collision {
     else { const w = this.waterAt(x, z); if (w && w.level > y - 0.05) return null; }
     let bad = false;
     this.#near(x, z, r, (it) => {
-      if (it.t === 'box') { if (y + h > it.y0 && y < it.y1 - STEP_UP && Collision.inBox(it, x, z, r)) bad = true; }
+      if (it.t === 'box') { if (y + h > it.y0 && y < (it.roof ? Collision.topAt(it, x, z) : it.y1) - STEP_UP && Collision.inBox(it, x, z, r)) bad = true; }
       else if (it.t === 'cyl') { if (y + h > it.y0 && y < it.y1 - STEP_UP && (x - it.x) ** 2 + (z - it.z) ** 2 < (it.r + r) ** 2) bad = true; }
       else if (it.t === 'rock') { const lim = y + STEP_UP; if (Collision.rockTop(it, x, z) > lim || Collision.rockTop(it, x + r, z) > lim || Collision.rockTop(it, x - r, z) > lim || Collision.rockTop(it, x, z + r) > lim || Collision.rockTop(it, x, z - r) > lim) bad = true; }
       if (bad) return false;
@@ -293,7 +319,7 @@ export class Collision {
     let hit = false;
     this.#near(p.x, p.z, r, (it) => {
       if (it.t === 'box') {
-        if (p.y + h < it.y0 || p.y >= it.y1 - STEP_UP) return;
+        if (p.y + h < it.y0 || p.y >= (it.roof ? Collision.topAt(it, p.x, p.z) : it.y1) - STEP_UP) return;   // (a roof: its slope where Gus is)
         const dx = p.x - it.x, dz = p.z - it.z;
         const lx = dx * it.c - dz * it.s, lz = dx * it.s + dz * it.c;
         const cx = Math.max(-it.hx, Math.min(lx, it.hx)), cz = Math.max(-it.hz, Math.min(lz, it.hz));
@@ -367,7 +393,7 @@ export class Collision {
     if (y < this.heightAt(x, z)) return true;
     let res = false;
     this.#near(x, z, 0, (it) => {
-      if (it.t === 'box' && y > it.y0 && y < it.y1 && Collision.inBox(it, x, z)) res = true;
+      if (it.t === 'box' && y > it.y0 && y < it.y1 && Collision.inBox(it, x, z) && (!it.roof || y < Collision.topAt(it, x, z))) res = true;
       else if (it.t === 'cyl' && y > it.y0 && y < it.y1 && (x - it.x) ** 2 + (z - it.z) ** 2 < it.r * it.r) res = true;
       else if (it.t === 'rock' && y < Collision.rockTop(it, x, z)) res = true;
       if (res) return false;

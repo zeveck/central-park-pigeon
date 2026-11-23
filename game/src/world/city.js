@@ -156,7 +156,9 @@ function building(ctx, { side, a0, a1, depth, h, style, rnd, masses, towers }) {
     const tp = { x: topC.x + (rnd() - 0.5) * topSz.w * 0.4, z: topC.z + (rnd() - 0.5) * topSz.d * 0.4 };
     towers.push(waterTower(ctx, tp.x, top + 0.5, tp.z, side));
   } else {
-    ctx.batch.box('roof', { x: topC.x, y: top + 0.5, z: topC.z }, { w: Math.min(5, topSz.w * 0.3), h: 2.6, d: Math.min(5, topSz.d * 0.3) });
+    const bw = Math.min(5, topSz.w * 0.3), bd = Math.min(5, topSz.d * 0.3);
+    ctx.batch.box('roof', { x: topC.x, y: top + 0.5, z: topC.z }, { w: bw, h: 2.6, d: bd });
+    ctx.collision.addBox({ x: topC.x, z: topC.z, y0: top + 0.5, h: 2.6, w: bw, d: bd, tag: 'roof' });   // fix-25: the stair bulkhead is solid
   }
   if (side === 'north') fireEscape(ctx, side, a0, a1, top);
 }
@@ -241,6 +243,12 @@ function sidewalks(ctx, side, spans) {
 // ------------------------------------------------------------------ hero buildings
 const HERO = {};
 
+/** fix-25: a slab drawn on a roof (a cornice cap, a rim) is the roof: it collides, and the rim perches are on its top. */
+function slab(ctx, { x, z, y, w, h, d, tag = 'roof', perch = 'hero' }) {
+  ctx.collision.addBox({ x, z, y0: y, h, w, d, tag });
+  if (perch) rimPerches(ctx, { x, z, y: y + h, w, d, tag: perch });
+}
+
 function heroBox(ctx, mat, { x, z, y = 0, w, h, d, perch = true, tag = 'hero', v0 }) {
   ctx.batch.box(mat, { x, y, z }, { w, h, d }, { v0 });
   ctx.collision.addBox({ x, z, y0: y, h, w, d, tag });
@@ -249,8 +257,9 @@ function heroBox(ctx, mat, { x, z, y = 0, w, h, d, perch = true, tag = 'hero', v
 
 HERO['plaza-hotel'] = (ctx, H, masses) => {
   const x = (H.x0 + H.x1) / 2, z = (H.z0 + H.z1) / 2, w = H.x1 - H.x0, d = H.z1 - H.z0;
-  heroBox(ctx, 'facadeLimestone', { x, z, w, h: H.h, d });
+  heroBox(ctx, 'facadeLimestone', { x, z, w, h: H.h, d, perch: false });
   ctx.batch.box('cream', { x, y: H.h, z }, { w: w + 0.8, h: 0.8, d: d + 0.8 });
+  slab(ctx, { x, z, y: H.h, w: w + 0.8, h: 0.8, d: d + 0.8 });   // fix-25: the cream rim round the mansard
   // the green mansard roof and corner turrets
   ctx.batch.box('copper', { x, y: H.h + 0.8, z }, { w: w - 2, h: 6, d: d - 2 });
   ctx.collision.addBox({ x, z, y0: H.h, h: 6.8, w: w - 2, d: d - 2, tag: 'roof' });
@@ -284,21 +293,23 @@ HERO['gabled-apartments'] = (ctx, H, masses) => {
   ctx.batch.mesh('slate', g, { x, y: H.h + 0.5, z });
   for (const [dx, dz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) {
     ctx.batch.mesh('slate', new THREE.ConeGeometry(4.2, 11, 4), { x: x + dx * (w / 2 - 3), y: H.h + 6, z: z + dz * (d / 2 - 3), yaw: Math.PI / 4 });
+    ctx.collision.addPyramid({ x: x + dx * (w / 2 - 3), z: z + dz * (d / 2 - 3), y0: H.h + 0.5, h: 11, half: 4.2 / Math.SQRT2 });   // fix-25
     ctx.collision.addPerch({ x: x + dx * (w / 2 - 3), y: H.h + 11.5, z: z + dz * (d / 2 - 3), r: 0.25, id: `dakota-peak-${dx}-${dz}`, kind: 'finial' });
   }
   for (let k = 0; k < 6; k++) ctx.batch.box('cream', { x: x + w / 2 - 0.5, y: H.h + 1, z: z - d / 2 + 3 + k * ((d - 6) / 5) }, { w: 1.6, h: 2.4, d: 1.6 });   // dormers on the park side
   ctx.collision.addBox({ x, z, y0: 0, h: H.h, w, d, tag: 'hero' });
   rimPerches(ctx, { x, z, y: H.h + 0.5, w: w + 0.6, d: d + 0.6, tag: 'cornice' });
   ctx.collision.addPerchEdge({ a: { x: x - w / 2 + 3, y: H.h + roofH + 0.5, z }, b: { x: x + w / 2 - 3, y: H.h + roofH + 0.5, z }, id: 'summit-dakota', kind: 'ridge', out: Math.PI / 2 });
-  ctx.collision.addBox({ x, z, y0: H.h, h: roofH * 0.6, w: w - 6, d: d * 0.45, tag: 'roof', walkable: false });
+  ctx.collision.addPrism({ x, z, y0: H.h + 0.5, h: roofH, w: w - 6, d, tag: 'roof' });   // fix-25: the roof as drawn (a 5.4 m unwalkable box sat inside it)
   ctx.summits['hero:gabled-apartments'] = { x: x + 4, y: H.h + roofH + 0.5, z };
   masses.push({ x, z, w, d, h: H.h + 6, style: 'limestone', side: 'west', hero: true });
 };
 
 HERO['twin-towers'] = (ctx, H, masses) => {
   const w = 46, x = FACE.west - w / 2, z = (H.z0 + H.z1) / 2, d = H.z1 - H.z0;
-  heroBox(ctx, 'facadeDeco', { x, z, w, h: H.h, d });
+  heroBox(ctx, 'facadeDeco', { x, z, w, h: H.h, d, perch: false });
   ctx.batch.box('cream', { x, y: H.h, z }, { w: w + 0.5, h: 0.5, d: d + 0.5 });
+  slab(ctx, { x, z, y: H.h, w: w + 0.5, h: 0.5, d: d + 0.5 });   // fix-25
   heroBox(ctx, 'facadeDeco', { x: x - 6, z, w: w - 16, h: 7, d: d - 8, y: H.h + 0.5, v0: H.h });
   const tw = 10;
   const tops = [];
@@ -325,8 +336,9 @@ HERO['twin-towers'] = (ctx, H, masses) => {
 
 HERO['natural-history'] = (ctx, H, masses) => {
   const w = 40, x = FACE.west - w / 2 - 2, z = (H.z0 + H.z1) / 2, d = H.z1 - H.z0;
-  heroBox(ctx, 'brickPlain', { x, z, w, h: H.h, d });
+  heroBox(ctx, 'brickPlain', { x, z, w, h: H.h, d, perch: false });
   ctx.batch.box('cream', { x, y: H.h, z }, { w: w + 0.6, h: 0.7, d: d + 0.6 });
+  slab(ctx, { x, z, y: H.h, w: w + 0.6, h: 0.7, d: d + 0.6 });   // fix-25: the cream cap is the roof (it hid the spikes and starlings)
   // the starlings' cornice along the park front
   ctx.batch.box('cream', { x: x + w / 2 + 0.4, y: H.h - 6, z }, { w: 0.8, h: 0.5, d: d });
   ctx.collision.addPerchEdge({ a: { x: x + w / 2 + 0.5, y: H.h - 5.5, z: z - d / 2 + 1 }, b: { x: x + w / 2 + 0.5, y: H.h - 5.5, z: z + d / 2 - 1 }, id: 'museum-cornice', kind: 'cornice', out: Math.PI / 2 });
@@ -343,6 +355,7 @@ HERO['natural-history'] = (ctx, H, masses) => {
     const tz = z + s2 * (d / 2 - 5);
     heroBox(ctx, 'brickPlain', { x: x + w / 2 - 5, z: tz, w: 10, h: 36, d: 10 });
     ctx.batch.mesh('slate', new THREE.ConeGeometry(7.4, 7, 4), { x: x + w / 2 - 5, y: 39.5, z: tz, yaw: Math.PI / 4 });
+    ctx.collision.addPyramid({ x: x + w / 2 - 5, z: tz, y0: 36, h: 7, half: 7.4 / Math.SQRT2 });   // fix-25
   }
   ctx.collision.addPerch({ x: x + w / 2 - 5, y: 43.1, z: z - d / 2 + 5, r: 0.3, id: 'summit-museum', kind: 'summit' });
   ctx.summits['hero:natural-history'] = { x: x + w / 2 - 5, y: 43.1, z: z - d / 2 + 5 };
@@ -364,8 +377,9 @@ HERO['spiral-museum'] = (ctx, H, masses) => {
   const r = 9 + 4 * 1.1 + 0.6;
   ctx.batch.mesh('glassDark', new THREE.CylinderGeometry(r - 2, r - 2, 0.6, 32), { x: x - 3, y: y + 0.3, z });
   ctx.collision.addCylinder({ x: x - 3, z, y0: 3.5, h: y - 3.5, r, tag: 'spiral' });
-  ctx.collision.addPerch({ x: x - 3, y, z, r: r - 0.5, id: 'summit-spiral', kind: 'summit' });
-  ctx.summits['hero:spiral-museum'] = { x: x - 3, y, z };
+  ctx.collision.addCylinder({ x: x - 3, z, y0: y, h: 0.6, r: r - 2, tag: 'roof' });   // fix-25: the skylight disc is solid
+  ctx.collision.addPerch({ x: x - 3, y: y + 0.6, z, r: r - 2.3, id: 'summit-spiral', kind: 'summit' });
+  ctx.summits['hero:spiral-museum'] = { x: x - 3, y: y + 0.6, z };
   // the tall annex behind
   heroBox(ctx, 'facadeLimestone', { x: x + 14, z, w: 12, h: 34, d: 22 });
   masses.push({ x: x - 3, z, w: 2 * r, d: 2 * r, h: y, style: 'white', side: 'east', hero: true });

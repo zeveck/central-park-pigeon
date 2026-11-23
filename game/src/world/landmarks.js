@@ -169,8 +169,10 @@ B['zoo'] = (L, ctx) => {
   for (const b of walls) solid(ctx, 'brickPlain', { x: b.x, z: b.z, y, w: b.w, h, d: b.d }, { tag: 'zoo-wall' });
   // pavilions with copper roofs, and the sea lion pool in the middle
   for (const [dx, dz, pw, pd] of [[-6, -10, 10, 7], [8, 9, 9, 8], [9, -11, 7, 6]]) {
-    solid(ctx, 'brickPlain', { x: x + dx, z: z + dz, y, w: pw, h: 4, d: pd }, { tag: 'zoo' });
+    solid(ctx, 'brickPlain', { x: x + dx, z: z + dz, y, w: pw, h: 4, d: pd }, { tag: 'zoo', perch: false });
     ctx.batch.box('copper', { x: x + dx, y: y + 4, z: z + dz }, { w: pw + 0.6, h: 0.5, d: pd + 0.6 });
+    ctx.collision.addBox({ x: x + dx, z: z + dz, y0: y + 4, h: 0.5, w: pw + 0.6, d: pd + 0.6, tag: 'roof' });   // fix-25: the copper roof
+    rimPerches(ctx, { x: x + dx, z: z + dz, y: y + 4.5, w: pw + 0.6, d: pd + 0.6, tag: 'zoo' });
   }
   ctx.batch.mesh('stone', new THREE.CylinderGeometry(6, 6, 0.6, 24), { x: x - 3, y: y + 0.3, z: z + 3 });
   ctx.batch.mesh('glassDark', new THREE.CylinderGeometry(5.5, 5.5, 0.05, 24), { x: x - 3, y: y + 0.6, z: z + 3 });
@@ -433,8 +435,8 @@ B['boathouse'] = (L, ctx) => {
     ctx.batch.mesh('wood', new THREE.CapsuleGeometry(0.55, 2.0, 3, 8).rotateX(Math.PI / 2).scale(1, 0.4, 1), { x: bx, y: water.level + 0.1, z: bz, yaw: 1.4 });
     ctx.collision.addPerch({ x: bx, y: water.level + 0.32, z: bz, r: 0.6, id: `rowboat-${k}`, kind: 'boat' });
   }
-  ctx.collision.addBox({ x: L.x + 2, z: L.z, y0: y + 4.6, h: 1.4, w: 9, d: 18, tag: 'roof' });
-  rimPerches(ctx, { x: L.x + 2, z: L.z, y: y + 6.0, w: 1.0, d: 18, tag: 'ridge', sides: [2] });
+  // fix-25: the roof collides as its prism (roofPrism); the ridge perch is on the ridge (it was 1 m down, inside the roof)
+  rimPerches(ctx, { x: L.x + 2, z: L.z, y: y + 7.0, w: 0.3, d: 18, tag: 'ridge', sides: [2] });
   block(ctx, L.x - 9, L.x + 9, L.z - 11, L.z + 11);
 };
 
@@ -553,11 +555,17 @@ B['obelisk'] = (L, ctx) => {
 
 B['met'] = (L, ctx) => {
   const y = 0.5;
-  solid(ctx, 'facadeLimestone', { x: L.x, z: L.z, y, w: L.w, h: 22, d: L.d });
+  // fix-25: the roof slab and the glass wing's top collide, and their rims are the perches (they were drawn on top of
+  // perches and collision 0.5 m and 2.4 m lower, hiding a stray and a golden pretzel)
+  solid(ctx, 'facadeLimestone', { x: L.x, z: L.z, y, w: L.w, h: 22, d: L.d }, { perch: false });
   ctx.batch.box('roof', { x: L.x, y: y + 22, z: L.z }, { w: L.w + 0.6, h: 0.5, d: L.d + 0.6 }, { skip: ['bottom'] });
+  ctx.collision.addBox({ x: L.x, z: L.z, y0: y + 22, h: 0.5, w: L.w + 0.6, d: L.d + 0.6, tag: 'roof' });
+  rimPerches(ctx, { x: L.x, z: L.z, y: y + 22.5, w: L.w + 0.6, d: L.d + 0.6, tag: 'building' });
   // the glass back wing facing the park (scenery)
-  solid(ctx, 'facadeGlass', { x: L.x - L.w / 2 - 5, z: L.z + 4, y, w: 10, h: 13, d: 52 });
+  solid(ctx, 'facadeGlass', { x: L.x - L.w / 2 - 5, z: L.z + 4, y, w: 10, h: 13, d: 52 }, { perch: false });
   ctx.batch.box('glassDark', { x: L.x - L.w / 2 - 5, y: y + 13, z: L.z + 4 }, { w: 10.4, h: 2.4, d: 52.4 }, { pitch: 0, roll: 0.0 });
+  ctx.collision.addBox({ x: L.x - L.w / 2 - 5, z: L.z + 4, y0: y + 13, h: 2.4, w: 10.4, d: 52.4, tag: 'roof' });
+  rimPerches(ctx, { x: L.x - L.w / 2 - 5, z: L.z + 4, y: y + 15.4, w: 10.4, d: 52.4, tag: 'building' });
   block(ctx, L.x - L.w / 2 - 12, L.x + L.w / 2 + 2, L.z - L.d / 2 - 2, L.z + L.d / 2 + 2);
 };
 
@@ -581,8 +589,7 @@ B['gatehouse'] = (L, ctx) => {
   const y = ctx.heightAt(L.x, L.z);
   solid(ctx, 'schist', { x: L.x, z: L.z, y, w: 7, h: 4.5, d: 5.5, yaw: L.yaw }, { perch: false });
   roofPrism(ctx, 'slate', { x: L.x, z: L.z, y: y + 4.5, w: 7.6, d: 6, h: 2.4, yaw: L.yaw });
-  ctx.collision.addBox({ x: L.x, z: L.z, y0: y + 4.5, h: 1.2, w: 7, d: 3, yaw: L.yaw, tag: 'roof' });
-  rimPerches(ctx, { x: L.x, z: L.z, y: y + 6.9, w: 7.0, d: 0.3, yaw: L.yaw, tag: 'ridge', sides: [0] });
+  rimPerches(ctx, { x: L.x, z: L.z, y: y + 6.9, w: 7.0, d: 0.3, yaw: L.yaw, tag: 'ridge', sides: [0] });   // (fix-25: the roof collides as its prism)
   blockAround(ctx, L.x, L.z, 6);
 };
 
@@ -666,7 +673,8 @@ B['plaza-fountain'] = (L, ctx) => {
 
 // ------------------------------------------------------------------ shared pieces
 function roofPrism(ctx, mat, { x, z, y, w, d, h, alongZ = false, yaw = 0 }) {
-  // a gable roof; the ridge runs along x (or z)
+  // a gable roof; the ridge runs along x (or z). fix-25: it collides as drawn (Gus landed on its eaves' level, inside it)
+  ctx.collision.addPrism({ x, z, y0: y, h, w, d, yaw, alongZ, tag: 'roof' });
   const s = new THREE.Shape();
   const half = (alongZ ? w : d) / 2;
   s.moveTo(-half, 0); s.lineTo(half, 0); s.lineTo(0, h); s.lineTo(-half, 0);
