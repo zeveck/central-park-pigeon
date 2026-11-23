@@ -510,7 +510,7 @@ export class Clues {
         const t2 = d.type === 'teeter' || d.type === 'net' || d.type === 'dive' || d.type === 'dig' ? G.chars.moveTo(c, back, { kind: A.move === 'swim' ? 'swim' : A.move }) : 0.01;
         G.later(t2, () => {
           c.busyTalent = false; c.script = false;
-          if (d.does?.item && d.does.at === 'ally') this.#spawn(d, { x: c.x + Math.sin(c.yaw) * 0.5, z: c.z + Math.cos(c.yaw) * 0.5 }, s);
+          if (d.does?.item && d.does.at === 'ally') this.#bringBack(d, c, s);
           this.#done(s, talent, crew, c);
         });
       });
@@ -518,6 +518,21 @@ export class Clues {
       if (talent === 'dig') { const iv = [0.3, 0.8, 1.3, 1.8]; for (const t of iv) G.later(t, () => G.particles.burst('dust', c.x, c.y + 0.1, c.z, 6, { spread: 0.5 })); }
       if (talent === 'kick') G.later(0.5, () => { G.particles.burst('dust', p.x, s.y + 0.6, p.z, 20, { spread: 1.2 }); G.rumble?.(0.5, 0.3, 120); });
     });
+  }
+
+  /** An ally comes back with what it fetched: handed straight to Gus (`hand`, fix-40) when he's close, else put down beside
+   *  the ally (on standable ground: never on the water or a roof). */
+  #bringBack(d, c, s) {
+    const G = this.G, g = G.gus.position;
+    if (d.does.hand && Math.hypot(g.x - c.x, g.z - c.z) < 8) {
+      G.items.handOver(d.does.item);
+      G.particles.burst('sparkle', g.x, g.y + 0.3, g.z, 10, { spread: 0.4 });
+      G.toast(`You've got ${G.items.def(d.does.item).name}.`, { seconds: 3 });
+      return;
+    }
+    let at = { x: c.x + Math.sin(c.yaw) * 0.5, z: c.z + Math.cos(c.yaw) * 0.5 };
+    if (d.does.hand) at = G.collision.clearNear(at.x, at.z, { maxR: 20 }) || G.dryNear(at.x, at.z);
+    this.#spawn(d, at, s);
   }
 
   #spawn(d, at, s) {

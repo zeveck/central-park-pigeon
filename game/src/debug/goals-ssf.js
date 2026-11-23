@@ -227,7 +227,7 @@ export const SSF = {
 
   'den-biscuit': (G) => { const b = clue('ball-lake'); return [
     goTalk(G, 'biscuit'), { waitFor: 'den-biscuit.s1', timeout: 30 }, settle,
-    ask('ducks', dryNear(G, b.x, b.z), { clue: 'ball-lake' }), { pickItem: 'ball', timeout: 20 }, { waitFor: 'den-biscuit.s2', timeout: 10 }, settle,
+    ask('ducks', dryNear(G, b.x, b.z), { clue: 'ball-lake' }), { waitFor: (G) => G.state.carried?.id === 'ball', timeout: 30 }, { waitFor: 'den-biscuit.s2', timeout: 10 }, settle,   // (fix-40: the duck hands it over)
     { fight: 'biscuit', timeout: 240 }, { waitFor: 'den-biscuit', timeout: 60 }, settle,
   ]; },
   'den-strix': (G) => [

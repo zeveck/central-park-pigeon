@@ -96,7 +96,7 @@ Being the smallest, most ignored creature in the most famous park on Earth, and 
 ### Items: light, heavy, huge (slices are light)
 
 - **Light** (shinies, keys, gate key, cufflink, earring, wrench, sticker, peas, spectacles, remote, **pizza slices**): Gus carries 1 with no flight limit.
-- **Heavy** (Biscuit's ball, a sail, a sack of tennis balls, a **pizza box**): Gus can carry one, but only up to 2 m above the ground, and slower (6 m/s).
+- **Heavy** (Biscuit's tennis ball, a sail, a sack of tennis balls, a **pizza box**): Gus can carry one, but only up to 2 m above the ground, and slower (6 m/s).
 - **Huge** (drainpipes, the cone, the battery, the shopping cart): Gus can't move these. A **hauler** can: Biscuit's **Fetch** (day), Rhoda's **Lift** (day), the Meer Mob's **Muscle** (any), or the horses' **Pull** (day, only if a road is within 15 m). Hauled parts go straight to the Workshop.
   - **One water rule:** an item at the bank (the turtle rock's shopping cart, surfaced against the shore) can be hauled by anyone; an item out in open water (the battery under Bow Bridge) needs a flier: Rhoda or Muscle. ("I'm a DOG, Gus. I don't do deep.")
 - **Grate travel** carries whatever Gus holds.
@@ -379,7 +379,7 @@ Favour examples: Nutmeg wants the Cherry Hill caches re-counted (fly over, peck 
 | 3 | **The Lake Mallards**, ducks; **Commodore Puddles** | The Lake, Turtle Pond, Harlem Meer | **Dive**: fetch what's under bubble rings | They won't eat bread ("Do you KNOW what bread does to us?"). Flip the Boathouse sign at Afternoon; picnickers toss **peas**. | Sign War |
 | 4 | **The Ramble Exchange**, crows; **Vesper** | The Ramble (day) | **Trade**: crows swap items with humans for gear (10 crumbs a trade); they run the Lost & Found market | Entry fee: 3 shinies, one needing the squirrels and one the ducks. Vesper then shows you the sealed cave: your **Workshop**. | Lost & Found |
 | 5 | **The Turtle Elders**, slow and wise | Turtle Pond | **Hints**: the step's answer, from anywhere; truces are sealed on their rock | Their rock is blocked by a sunken shopping cart. Ducks surface the handle, a hauler tugs it out. | Feuds |
-| 6 | **Biscuit**, a huge fluffy off-leash dog (rival → ally), and the Cedar Hill Pack | Cedar Hill, day | **Fetch**: hauls one huge thing | *Fight:* deliver his lost ball (heavy, carried low) while he charges. | Lost & Found |
+| 6 | **Biscuit**, a huge fluffy off-leash dog (rival → ally), and the Cedar Hill Pack | Cedar Hill, day | **Fetch**: hauls one huge thing | *Fight:* deliver his lost tennis ball (heavy, carried low; the ducks dive for it and hand it to Gus, #40) while he charges. | Lost & Found |
 | 7 | **Professor Strix**, the Ramble owl (rival → ally) | The Ramble, Night | **Night Eyes**: at Night, hidden things within 30 m glow | *Stealth encounter* (needs the headlamp). Return her spectacles. | Lost & Found |
 | 8 | **The Night Crew**, raccoons; **Rigby** | North Woods / Ravine, D–N | **Rig**: makes vehicles drivable, unbolts and cuts things; **Sabotage**: ranger carts | Rigby needs a wrench from the Delacorte: trade for it, or bribe the stage-door guard with a hot slice. | Sign War |
 | 9 | **The Bethesda Choir**, artsy pigeons (berets); **Maestro Vibrato** | Bethesda Terrace | +12 flock; the **megaphone** (Voice) | They need an audience that stays (the sax busker keeps stealing it): make the Middle signs permanent, then a feast. | Sign War |

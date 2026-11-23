@@ -29,7 +29,7 @@ const P = {
   key: '<circle cx="7.5" cy="12" r="4" fill="none" stroke="#d4a02a" stroke-width="2.4"/><path d="M11.4 11h9.6v2.2h-1.8v2.6h-2.2v-2.6h-5.6z" fill="#d4a02a"/>',
   peas: '<circle cx="8" cy="11" r="3.3" fill="#7fbf3a"/><circle cx="14" cy="9" r="3" fill="#8ccc44"/><circle cx="13" cy="15.5" r="3.3" fill="#6fae33"/>',
   item: '<circle cx="12" cy="12" r="7" fill="#d9c8a0" stroke="#7a6a5a" stroke-width="1.5"/>',
-  ball: '<circle cx="12" cy="12" r="8" fill="#e8462f"/><path d="M5 9c4 2 10 2 14 0M5 15c4-2 10-2 14 0" fill="none" stroke="#fff" stroke-width="1.6"/>',
+  ball: '<circle cx="12" cy="12" r="8" fill="#c8dc36"/><path d="M5 9c4 2 10 2 14 0M5 15c4-2 10-2 14 0" fill="none" stroke="#fff" stroke-width="1.6"/>',
   sign: '<path d="M11 13h2v9h-2z"/><rect x="3" y="3" width="18" height="11" rx="2" fill="#3e5b3a"/><path d="M6 7h12M6 10h8" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>',
   spike: '<path d="M2 20h20v2H2z"/><path d="M3 20 5.5 9 8 20zM8 20l2.5-13L13 20zM13 20l2.5-11L18 20zM17.5 20l2-8 2 8z" fill="#c4492d"/>',
   truce: '<path d="M2 13c3-1 5-4 7.5-4.5L13 10l-3 2.2c-.7.5-.4 1.6.5 1.6l3.5-.6 5-3 1 4.6-5.8 4.4c-1 .7-2.3.9-3.5.5L5 17z"/><path d="M15 6.5c1.5-1.2 3.8-1.6 6-1.1l-1.1 3.8-3.6.8z" opacity=".7"/>',

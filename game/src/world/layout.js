@@ -749,7 +749,9 @@ export const CLUES = [
   { id: 'shiny-ramble-plume', type: 'dig', x: -4, z: 352, icon: 'squirrels', active: { scheme: 'den-crows', step: 2, not: ['shiny.plume'] }, does: { item: 'shiny', at: 'ally', flags: ['shiny.plume'] } },
   { id: 'shiny-lake', type: 'dive', x: -10, z: 305, on: 'water:lake', icon: 'ducks', active: { scheme: 'den-crows', step: 2, not: ['shiny.lake'] }, does: { item: 'shiny', at: 'ally', flags: ['shiny.lake'], say: [{ who: 'bubbles', text: 'Watch THIS, Gus! Triple tuck!' }] } },
   // den-biscuit: his ball, out in the Lake's east arm
-  { id: 'ball-lake', type: 'dive', x: 23.5, z: 314, on: 'water:lake', active: { scheme: 'den-biscuit', step: 2 }, does: { item: 'ball', at: 'ally' } },
+  // fix-40: the duck swims it back and hands it straight to Gus (it used to be put down beside him: on the water, so the item
+  // keeper moved it, onto the Boathouse roof)
+  { id: 'ball-lake', type: 'dive', x: 23.5, z: 314, on: 'water:lake', active: { scheme: 'den-biscuit', step: 2 }, does: { item: 'ball', at: 'ally', hand: true, say: [{ who: 'bubbles', text: 'Got it! One soggy tennis ball, coming right up!' }] } },
   // den-turtles: something on the Elders' rock
   { id: 'turtle-cart', type: 'dive', x: 11.5, z: 430.5, on: 'water:turtle', active: { scheme: 'den-turtles', step: 2 }, does: { item: 'cart', at: { x: 9.5, z: 425.2 }, haulTo: { x: 6, z: 419.5 }, flags: ['turtle.cartSurfaced'] } },
   // gear-headlamp: the jogger's lost key, down the 86th W grate mid-lap (fun pass P9: the rats' Grate Fetch in Act 1; it was a Turtle Pond dive)

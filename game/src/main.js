@@ -769,7 +769,13 @@ async function boot() {
   // fix-23 review: is a point ON the water (a lying item, a drop from height y)? collision.waterAt is 2D and counts a bridge
   // deck over the Lake as water; the landing surface's kind does not
   G.wetAt = (x, z, y = 400) => collision.surface(x, z, y + 0.1).kind === 'water';
+  // fix-40: the spot found must be ground a walker can stand on (clearNear: not inside or on top of a building); the old
+  // test was only "not water", so the ball's keeper spot by the Lake landed 0.1 m inside the Boathouse, on its roof
   G.dryNear = (x, z) => {
+    const p = dryish(x, z);
+    return collision.clearNear(p.x, p.z, { maxR: 20 }) || p;
+  };
+  const dryish = (x, z) => {
     if (!collision.waterAt(x, z)) return { x, z };
     for (let r = 1; r <= 60; r += 1) for (let k = 0; k < 24; k++) {
       const a = (k / 24) * Math.PI * 2, px = x + Math.cos(a) * r, pz = z + Math.sin(a) * r;

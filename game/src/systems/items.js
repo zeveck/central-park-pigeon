@@ -29,7 +29,7 @@ export const ITEM_DEFS = {
   remote: { name: 'RC remote', cls: 'light', code: 'box-small', gear: 'remote' },
   falafel: { name: 'Falafel ball', cls: 'light', code: 'falafel' },
   sprat: { name: 'Sprat', cls: 'light', code: 'sprat' },
-  ball: { name: "Biscuit's ball", cls: 'heavy', code: 'ball' },
+  ball: { name: "Biscuit's tennis ball", cls: 'heavy', code: 'ball' },   // fix-40: a tennis ball (model, name and icon agree)
   sail: { name: 'Sail', cls: 'heavy', code: 'sail' },
   'tennis-sack': { name: 'Sack of tennis balls', cls: 'heavy', code: 'sack' },
   pipe: { name: 'Drainpipe', cls: 'huge', code: 'pipe' },
@@ -65,6 +65,7 @@ export class Items {
       tan: ruleMaterial({ color: 0xb08a5a }),
       dark: ruleMaterial({ color: 0x333338 }),
       rust: ruleMaterial({ color: 0x7a4a30 }),
+      tennis: ruleMaterial({ map: tennisMap(), roughness: 0.95 }),   // fix-40: Biscuit's ball, optic yellow with its white seam
     };
   }
 
@@ -107,7 +108,7 @@ export class Items {
       case 'peas': for (let k = 0; k < 5; k++) add(new THREE.SphereGeometry(0.014, 8, 6), this.mats.green, (k - 2) * 0.016, 0.014, (k % 2) * 0.012); break;
       case 'specs': add(new THREE.TorusGeometry(0.018, 0.004, 5, 12), this.mats.dark, -0.022, 0.02, 0); add(new THREE.TorusGeometry(0.018, 0.004, 5, 12), this.mats.dark, 0.022, 0.02, 0); break;
       case 'falafel': add(new THREE.IcosahedronGeometry(0.025, 1), this.mats.rust, 0, 0.025); break;
-      case 'ball': add(new THREE.SphereGeometry(0.11, 16, 12), this.mats.red, 0, 0.11); break;
+      case 'ball': add(new THREE.SphereGeometry(0.06, 18, 12), this.mats.tennis, 0, 0.06, 0, 0.5, 0, 0.3); break;
       case 'sail': add(new THREE.PlaneGeometry(0.4, 0.5), this.mats.cream, 0, 0.02, 0, -Math.PI / 2); break;
       case 'sack': add(new THREE.SphereGeometry(0.16, 12, 10), this.mats.tan, 0, 0.14); break;
       case 'pipe': add(new THREE.CylinderGeometry(0.15, 0.15, 3, 10), this.mats.rust, 0, 0.15, 0, 0, 0, Math.PI / 2); break;
@@ -240,6 +241,15 @@ export class Items {
 
   /** Take the carried item away (it was given). */
   take() { const c = this.state.carried; this.state.carried = null; this.#syncCarried(); return c; }
+
+  /** fix-40: an ally hands Gus an item (the ducks with Biscuit's ball): it goes straight to his beak, with the pick-up sound
+   *  and the pickup event a peck would give (the fight and the item keeper listen for it). */
+  handOver(id) {
+    this.give(id);
+    const c = this.state.carried;
+    this.G.audio.play('pick-up', { at: this.G.gus.position });
+    this.G.bus.emit('pickup', { item: id, uid: c.uid, handed: true });
+  }
 
   /** Give Gus an item directly (scheme rewards, dev). */
   give(id, { born = null } = {}) {
@@ -398,3 +408,22 @@ export function grateBlockedReason(state, id) {
   return null;
 }
 export { GRATES };
+
+// fix-40: a tennis ball's look, drawn once: optic yellow felt with the white seam (on the sphere's lat-long map the seam is
+// a wave crossing the equator twice per half-turn)
+function tennisMap() {
+  if (typeof document === 'undefined') return null;
+  const W = 128, H = 64, cv = document.createElement('canvas');
+  cv.width = W; cv.height = H;
+  const x = cv.getContext('2d');
+  x.fillStyle = '#cfe23f'; x.fillRect(0, 0, W, H);
+  for (let k = 0; k < 260; k++) { x.fillStyle = k % 2 ? 'rgba(255,255,220,0.18)' : 'rgba(120,140,20,0.14)'; x.fillRect((k * 37) % W, (k * 23) % H, 2, 2); }
+  x.strokeStyle = '#f6f6ea'; x.lineWidth = 4; x.lineCap = 'round';
+  x.beginPath();
+  for (let i = 0; i <= W; i += 2) { const y = H / 2 + Math.sin((i / W) * Math.PI * 4) * H * 0.28; i ? x.lineTo(i, y) : x.moveTo(i, y); }
+  x.stroke();
+  const t = new THREE.CanvasTexture(cv);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.wrapS = THREE.RepeatWrapping;
+  return t;
+}
