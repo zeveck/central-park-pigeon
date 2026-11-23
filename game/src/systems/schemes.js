@@ -19,6 +19,7 @@ import { PLACES, SIGNS, CLUES, TRADES, SLICE } from '../world/layout.js';
 import { derived } from '../state/gamestate.js';
 import { FEUDS } from '../data/crews.js';
 import { ITEM_SOURCES, KEEP } from '../data/item-sources.js';   // fix-23
+import { theItem } from './items.js';   // fix-40
 
 const NUDGE_AFTER = 180;   // game seconds on one step
 // Fun pass (P7): the nudge clock counts time spent stuck, not time flying about: only within NEAR m of one of the step's
@@ -344,7 +345,10 @@ export class SchemeEngine {
   }
   /** Where a rule's item comes back to (on dry ground for a source out on the water). */
   keeperSpot(r) {
-    const at = r.dry ? this.G.dryNear(r.at.x, r.at.z) : r.at;
+    // fix-40 review: cached (the world doesn't move; the keeper asks every half second, and dryNear now searches standable ground)
+    const memo = this.keeperSpots || (this.keeperSpots = new Map());
+    if (!memo.has(r)) memo.set(r, r.dry ? this.G.dryNear(r.at.x, r.at.z) : r.at);
+    const at = memo.get(r);
     return { x: at.x, z: at.z, label: r.label };
   }
   /** fix-23: a one-time quest item that's nowhere (lost in water, eaten, taken by Ruffled) is put back at its source; one
@@ -358,7 +362,7 @@ export class SchemeEngine {
       const k = r.scheme + ':' + r.item;
       if (st.carried?.id === r.item) { this.keepAway[k] = 0; this.keepMissing[k] = 0; continue; }
       const it = G.items.world.find((w) => w.id === r.item);
-      const name = G.items.def(r.item).name.toLowerCase();
+      const name = theItem(G.items.def(r.item).name, true);
       if (!it) {
         // (a beat's grace: a scene or clue may be about to put it down)
         if (!notes && (this.keepMissing[k] = (this.keepMissing[k] || 0) + dt) < 1.5) continue;
@@ -366,7 +370,7 @@ export class SchemeEngine {
         const at = this.keeperSpot(r);
         G.items.spawn(r.item, at.x, at.z, { origin: { x: at.x, z: at.z } });
         if (notes) notes.push(`${r.scheme}: ${r.item} put back at ${r.label}`);
-        else G.toast(`The ${name} ${['peas', 'spectacles'].includes(r.item) ? 'are' : 'is'} back at ${r.label}.`, { seconds: 4.5 });
+        else G.toast(`${name} ${['peas', 'spectacles'].includes(r.item) ? 'are' : 'is'} back at ${r.label}.`, { seconds: 4.5 });
         continue;
       }
       this.keepMissing[k] = 0;
@@ -381,7 +385,7 @@ export class SchemeEngine {
         this.keepAway[k] = 0;
         G.items.remove(it);
         G.items.spawn(r.item, at.x, at.z, { origin: { x: at.x, z: at.z } });
-        G.toast(`The ${name} floated back to ${r.label}.`, { seconds: 4.5 });
+        G.toast(`${name} floated back to ${r.label}.`, { seconds: 4.5 });
       }
     }
   }

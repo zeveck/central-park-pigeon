@@ -140,7 +140,7 @@ export class Items {
     this.G.interact.register({
       id: 'item:' + it.uid, kind: 'item', get x() { return it.x; }, get y() { return it.y; }, get z() { return it.z; }, r: 0.9,
       // fix-16: a guarded item says so in the prompt ("Guarded: the peas"), so a refused Peck is never a mystery
-      label: () => (this.def(it.id).cls === 'huge' || (it.id === 'box' && it.placed) ? null : this.guardReason(it, true) ? `Guarded: the ${this.def(it.id).name.toLowerCase()}` : `Pick up the ${this.def(it.id).name.toLowerCase()}`),
+      label: () => (this.def(it.id).cls === 'huge' || (it.id === 'box' && it.placed) ? null : this.guardReason(it, true) ? `Guarded: ${theItem(this.def(it.id).name)}` : `Pick up ${theItem(this.def(it.id).name)}`),
       enabled: () => this.world.includes(it),
       priority: it.low ? 2 : 5,   // fun pass: a guarded item (the anchovy on Pickles' sill) gives way to the character beside it
       act: () => this.pickUp(it),
@@ -182,7 +182,7 @@ export class Items {
     // fun pass: the picnic's tub, Pickles' sill. fix-16: the reason is a toast at Gus every time (it was a bubble over
     // a picnicker, then only a blip: the owner pressed Peck by the table and could not tell what had happened)
     const why = this.guardReason(it);
-    if (why) { G.toast(typeof why === 'string' ? why : `Something's stopping you taking the ${d.name.toLowerCase()}.`, { seconds: 3.5 }); G.bus.emit('fail', { kind: 'guard', item: it.id }); return false; }
+    if (why) { G.toast(typeof why === 'string' ? why : `Something's stopping you taking ${theItem(d.name)}.`, { seconds: 3.5 }); G.bus.emit('fail', { kind: 'guard', item: it.id }); return false; }
     if (this.state.carried) {
       // swap: drop what we hold first
       this.drop();
@@ -214,13 +214,13 @@ export class Items {
     // sinks (there are always more; den-cats puts the next anchovy out on the sill), anything else floats back to its
     // source (systems/schemes.js keeper), or where it was found, or the nearest dry ground
     if (this.G.wetAt(x, z, g.position.y) && this.def(c.id).cls !== 'huge') {   // (the surface it would land on: a bridge deck is dry)
-      const d = this.def(c.id), name = d.name.toLowerCase();
+      const d = this.def(c.id), name = theItem(d.name, true);
       this.G.audio.play('duck-dive-bloop', { vol: 0.6, at: g.position });
       this.G.particles.splash?.(x, g.position.y, z, 8);
       this.G.bus.emit('drop', { item: c.id, x, z, water: true });
-      if (d.slice) { this.G.toast(`The ${name} sank. There are always more.`); return null; }
+      if (d.slice) { this.G.toast(`${name} sank. There are always more.`); return null; }
       const to = this.homeFor(c);
-      this.G.toast(`The ${name} floated back to ${to.label}.`, { seconds: 4 });
+      this.G.toast(`${name} floated back to ${to.label}.`, { seconds: 4 });
       return this.spawn(c.id, to.x, to.z, { origin: c.origin, uid: c.uid });
     }
     const y = Math.min(g.position.y, this.G.surfaceY(x, z, g.position.y + 0.1));
@@ -394,10 +394,10 @@ export class Items {
     this.take();
     if (d.slice) return `The ${d.name.toLowerCase()} is gone. There are always more.`;
     // fix-23: never onto the water (a heavy item dropped in the Rhoda fight over the Meer was out of reach for good)
-    if (d.cls === 'heavy' && !this.G.wetAt(this.G.gus.position.x, this.G.gus.position.z, this.G.gus.position.y)) { const g = this.G.gus.position; this.spawn(c.id, g.x, g.z, { origin: c.origin }); return `You dropped the ${d.name.toLowerCase()}. It's marked on the compass.`; }
+    if (d.cls === 'heavy' && !this.G.wetAt(this.G.gus.position.x, this.G.gus.position.z, this.G.gus.position.y)) { const g = this.G.gus.position; this.spawn(c.id, g.x, g.z, { origin: c.origin }); return `You dropped ${theItem(d.name)}. It's marked on the compass.`; }
     const to = this.homeFor(c);
     this.spawn(c.id, to.x, to.z, { origin: c.origin });
-    return `The ${d.name.toLowerCase()} floated back to ${to.label}.`;
+    return `${theItem(d.name, true)} floated back to ${to.label}.`;
   }
 }
 
@@ -408,6 +408,13 @@ export function grateBlockedReason(state, id) {
   return null;
 }
 export { GRATES };
+
+/** fix-40: an item's name in a sentence: "the pizza slice", but a proper name keeps its capital and takes no article
+ *  ("Biscuit's tennis ball"; it read "the biscuit's ball"). cap: at the start of a sentence. */
+export function theItem(name, cap = false) {
+  if (/^[A-Z][\w-]*'s\s/.test(name)) return name;
+  return (cap ? 'The ' : 'the ') + name.toLowerCase();
+}
 
 // fix-40: a tennis ball's look, drawn once: optic yellow felt with the white seam (on the sphere's lat-long map the seam is
 // a wave crossing the equator twice per half-turn)
