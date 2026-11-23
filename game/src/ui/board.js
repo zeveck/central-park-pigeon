@@ -3,7 +3,7 @@
 // Each lane header: the thread's name, one-line goal, icon and meter. Under
 // it, polaroid cards for open and finished schemes: goal and obstacle, the
 // phase it needs ("Nap until Dusk"), the crumb cost and tags for other
-// threads' friends it uses. Red string links cards across lanes. A header
+// threads' friends it uses (fix-39: no red string; the tag says it). A header
 // strip shows the finale gate. Layered hints: card → a regular's nudge after
 // ~3 minutes on a step → "Ask the Elders".
 
@@ -102,32 +102,9 @@ export function boardScreen(G) {
         ${cards.filter((s) => done.includes(s.id)).map((s) => card(s.id, true)).join('')}</div>`);
     }
     if (!html.length) html.push(`<div class="lane"><div class="lh"><div class="t">${icon('board')}<span>Nothing pinned yet</span></div><div class="g">Schemes show up here as Gus gets ideas. Look around the Pond.</div></div></div>`);
-    lanes.innerHTML = html.join('') + '<svg class="strings"></svg>';
+    lanes.innerHTML = html.join('');
     eldersOut.textContent = '';
-    requestAnimationFrame(strings);
     G.menus.refreshHints();
-  };
-
-  // red string between cards that use other threads' friends
-  const strings = () => {
-    const svg = lanes.querySelector('svg.strings');
-    if (!svg) return;
-    const box = lanes.getBoundingClientRect();
-    svg.setAttribute('width', lanes.scrollWidth); svg.setAttribute('height', lanes.scrollHeight);
-    const lines = [];
-    for (const c of lanes.querySelectorAll('.pc:not(.done)')) {
-      const id = c.dataset.card;
-      for (const t of G.schemes.cardInfo(id).tags) {
-        if (!t.other) continue;
-        const lane = lanes.querySelector(`.lane[data-lane="${CREW[t.crew].thread}"] .lh`);
-        if (!lane) continue;
-        const a = c.getBoundingClientRect(), b = lane.getBoundingClientRect();
-        const x1 = a.left + a.width / 2 - box.left + lanes.scrollLeft, y1 = a.top + 6 - box.top;
-        const x2 = b.left + b.width / 2 - box.left + lanes.scrollLeft, y2 = b.bottom - box.top;
-        lines.push(`<path d="M${x1} ${y1} Q ${(x1 + x2) / 2} ${Math.max(y1, y2) + 40} ${x2} ${y2}" stroke="#c4302b" stroke-width="2" fill="none" opacity=".8"/>`);
-      }
-    }
-    svg.innerHTML = lines.join('');
   };
 
   const s = {
