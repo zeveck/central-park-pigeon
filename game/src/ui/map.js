@@ -130,7 +130,7 @@ export function mapScreen(G) {
       <button type="button" class="btn small" data-act="zoom">${icon('map')}<span>Whole park</span></button>
       <button type="button" class="btn small" data-act="clear">${icon('waypoint')}<span>Clear waypoint</span></button>
       <button type="button" class="btn small" data-act="close">${icon('close')}<span>Close</span></button></div>
-    <div class="wrap" style="margin-top:8px"><canvas></canvas></div>
+    <div class="wrap" style="margin-top:8px"><canvas></canvas></div><div class="muted howto" style="font-size:13px;margin-top:4px"></div>
     <div class="legend"><span><i style="background:#e07b39"></i>You</span><span><i style="background:#a07444"></i>Nest</span><span><i style="background:#2f7d46"></i>Grate (subway)</span><span><i style="background:#c4302b"></i>Sign</span><span><i style="background:#6f9a4a"></i>Flipped</span><span><i style="background:#3e5b3a;border-radius:2px"></i>Ranger cart</span><span><i style="background:#f2c230"></i>Slice</span><span><i style="background:#2fa39a"></i>Waypoint</span><span><i style="background:#fff;border:2px solid #e07b39"></i>Scheme target</span><span><i style="background:transparent;border:2px dashed #fff"></i>Other cards</span>
       <span class="hints" data-auto='[["move","Cursor"],["uiOk","Waypoint"],["uiBack","Close"]]' style="margin:0 0 0 auto"></span></div>`);
   const wrap = el.querySelector('.wrap');
@@ -140,9 +140,13 @@ export function mapScreen(G) {
   const g = canvas.getContext('2d');
   let zoom = 1, cursor = null, pan = { x: 0, z: 0 }, noteT = 0;
   const pad = () => G.input.device === 'gamepad';
-  const HINTS = { pad: [['move', 'Cursor'], ['uiOk', 'Set waypoint'], ['peck', 'Clear'], ['look', 'Pan'], ['zoomIn', 'Zoom'], ['uiBack', 'Close']], other: [['move', 'Cursor'], ['uiOk', 'Waypoint'], ['uiBack', 'Close']] };
+  // (keys and mouse: the map is clicked, so the row names only what the keys do; a line above it says to click or tap)
+  const hints = () => (pad() ? [['move', 'Cursor'], ['uiOk', 'Set waypoint'], ['peck', 'Clear'], ...(zoom > 1 ? [['look', 'Pan'], ['zoomOut', 'Whole park']] : [['zoomIn', 'Zoom in']]), ['uiBack', 'Close']] : [['uiBack', 'Close']]);
+  const howTo = () => (pad() ? '' : G.input.device === 'touch' ? 'Tap the map to set a waypoint.' : 'Click the map to set a waypoint.');
+  // fix-34 review: on a pad the reticle shows from the start (on Gus), so ✕ always sets the waypoint where it's drawn
+  const padCursor = () => { if (!cursor && pad() && canvas.width) { const v = view(), p = G.gus.position, [px, py] = v.toPx(p.x, p.z); cursor = { x: Math.max(0, Math.min(canvas.width, px)), y: Math.max(0, Math.min(canvas.height, py)) }; } };
   const note = (t) => { const n = el.querySelector('.wpnote'); if (n) n.textContent = t; clearTimeout(noteT); noteT = setTimeout(() => { if (n) n.textContent = ''; }, 2500); };
-  const setZoom = (z) => { if (z === zoom) return; zoom = z; pan = { x: 0, z: 0 }; zoomLabel(); draw(); G.audio.synth('uiMove'); };
+  const setZoom = (z) => { if (z === zoom) return; zoom = z; pan = { x: 0, z: 0 }; zoomLabel(); s.onDevice(); G.menus.refreshHints(); draw(); G.audio.synth('uiMove'); };
   const clearWaypoint = () => {
     if (G.state.waypoint) { G.state.waypoint = null; G.audio.synth('uiBack'); note('Waypoint cleared'); draw(); }
     else { G.audio.synth('uiMove'); note('No waypoint to clear'); }
@@ -276,19 +280,22 @@ export function mapScreen(G) {
     id: 'map', el,
     // Fixes-3 (R7): it opens zoomed in round Gus (the whole 4 km park in a landscape window was a thin strip); the
     // button toggles the whole park
-    open() { G.audio.play('paper-rustle', { ui: true }); cursor = null; pan = { x: 0, z: 0 }; zoom = OPEN_ZOOM; zoomLabel(); s.onDevice(); requestAnimationFrame(draw); },
+    open() { G.audio.play('paper-rustle', { ui: true }); cursor = null; pan = { x: 0, z: 0 }; zoom = OPEN_ZOOM; zoomLabel(); s.onDevice(); const n = el.querySelector('.wpnote'); if (n) n.textContent = ''; requestAnimationFrame(() => { draw(); padCursor(); draw(); }); },
     // fix-34: a controller never focuses the buttons (its stick and ✕ belong to the map); mouse, keys and touch keep them
     focusables() { return pad() ? [] : [...el.querySelectorAll('button')]; },
     onDevice() {
       if (pad() && document.activeElement?.closest?.('#map')) document.activeElement.blur();
       const h = el.querySelector('.hints');
-      if (h) h.dataset.auto = JSON.stringify(pad() ? HINTS.pad : HINTS.other);
+      if (h) h.dataset.auto = JSON.stringify(hints());
+      const t = el.querySelector('.howto');
+      if (t) t.textContent = howTo();
+      if (!pad()) cursor = null; else padCursor();
     },
     tick() {
       const inp = G.input;
       if (!pad()) return;
       const m = inp.move();
-      const startCursor = () => { if (!cursor) { const v = view(), p = G.gus.position, [px, py] = v.toPx(p.x, p.z); cursor = { x: Math.max(0, Math.min(canvas.width, px)), y: Math.max(0, Math.min(canvas.height, py)) }; } };
+      const startCursor = padCursor;
       let moved = false;
       if (Math.hypot(m.x, m.y) > 0.3) {
         startCursor();
@@ -301,9 +308,11 @@ export function mapScreen(G) {
       if (zoom > 1 && Math.hypot(rs.x, rs.y) > 0.3) {
         const v = view(), k = 9 / v.s;
         pan.x += rs.x * k; pan.z -= rs.y * k;
-        const p = G.gus.position;
-        pan.x = Math.max(WORLD.xMin - p.x, Math.min(WORLD.xMax - p.x, pan.x));
-        pan.z = Math.max(WORLD.zMin - p.z, Math.min(WORLD.zMax - p.z, pan.z));
+        // (kept within the same bounds view() holds the centre to, so pushing past an end builds no slack to undo)
+        const p = G.gus.position, hx = v.ww / 2 / v.s, hz = v.wh / 2 / v.s;
+        const lim = (c, lo, hi, half) => (hi - lo <= half * 2 ? (lo + hi) / 2 : Math.max(lo + half, Math.min(hi - half, c)));
+        pan.x = lim(p.x + pan.x, WORLD.xMin, WORLD.xMax, hx) - p.x;
+        pan.z = lim(p.z + pan.z, WORLD.zMin, WORLD.zMax, hz) - p.z;
         moved = true;
       }
       if (moved) draw();
@@ -311,7 +320,7 @@ export function mapScreen(G) {
     handleInput(inp) {
       if (inp.pressed('map') && !inp.pressed('uiDown')) { leave(); return true; }
       if (pad()) {
-        const startCursor = () => { if (!cursor) { const v = view(), p = G.gus.position, [px, py] = v.toPx(p.x, p.z); cursor = { x: px, y: py }; } };
+        const startCursor = padCursor;
         if (inp.pressed('uiOk')) { startCursor(); setWaypoint(cursor.x, cursor.y); return true; }
         if (inp.pressed('peck')) { clearWaypoint(); return true; }
         if (inp.pressed('wheel') || inp.pressed('zoomIn')) { setZoom(OPEN_ZOOM); return true; }

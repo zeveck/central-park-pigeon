@@ -1031,6 +1031,8 @@ async function boot() {
     if (G.menus.open) { G.menus.tick(dt); input.endUpdate(); return; }
     if (G.napping) { napTick(dt); input.endUpdate(); return; }
     if (G.ruffling) { ruffleTick(dt); input.endUpdate(); return; }
+    // fix-33 review: with the Ally wheel open, Esc / Options closes the wheel (calling no one) instead of pausing
+    if (input.pressed('pause') && G.wheel.open) { G.audio.synth('uiBack'); G.wheel.close(false); input.endUpdate(); return; }
     if (input.pressed('pause')) { input.endUpdate(); G.pause(); return; }
     const free = !G.cutscene.locked && !G.dialogue.open;
     if (free && !G.wheel.open) {

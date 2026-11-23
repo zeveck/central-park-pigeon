@@ -77,6 +77,7 @@ export class Wheel {
 
   #paint() {
     const G = this.G;
+    this.paintDev = G.input.device;
     this.ring.querySelectorAll('.al').forEach((e) => e.classList.toggle('sel', +e.dataset.i === this.sel));
     const it = this.items[this.sel];
     const dev = G.input.device, fam = G.input.gamepad?.family;
@@ -111,6 +112,7 @@ export class Wheel {
       for (const it of G.allies.list()) if (!this._pre.has(it.portrait)) { this._pre.add(it.portrait); new Image().src = `assets/portraits/${it.portrait}.webp`; }
     }
     if (!this.open) return false;
+    if (this.paintDev !== inp.device) this.#paint();   // (the prompts follow a device change while it's open)
     // fix-33: ○ / Esc (or Land) closes it without calling anyone
     if (inp.pressed('uiBack') || inp.pressed('dive')) { inp.consume?.('uiBack'); inp.consume?.('dive'); G.audio.synth('uiBack'); this.close(false); return false; }
     if (!this.tapMode && !inp.held('wheel')) { this.close(true); return false; }
