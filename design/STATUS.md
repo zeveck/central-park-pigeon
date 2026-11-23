@@ -59,6 +59,12 @@
     - #10: When pigeons join your flock they should just take off or something (https://github.com/zeveck/central-park-pigeon/issues/10)
 27. (photo mode, after the person's answers in 24 and "Could we add photo mode before the sweep?") building:
     - #9: Photo mode (https://github.com/zeveck/central-park-pigeon/issues/9)
+28. `--fix #32 #30 #37 #39 #40` (batch A of the 2026-11-23 triage; the person's decisions on #39 "Remove it." and #40 "Red rubber is fine but tennis would be more obvious maybe? Either. Duck should hand it."):
+    - #32: Pizza slice heat ring gone (HUD item slot never reappears) (https://github.com/zeveck/central-park-pigeon/issues/32)
+    - #30: Stale dialog image (https://github.com/zeveck/central-park-pigeon/issues/30)
+    - #37: Dialogue text oddness (https://github.com/zeveck/central-park-pigeon/issues/37)
+    - #39: Remove the red string from the Scheme Board (https://github.com/zeveck/central-park-pigeon/issues/39)
+    - #40: Biscuit's ball lands on the Boathouse roof; the duck should hand it over (https://github.com/zeveck/central-park-pigeon/issues/40)
 ## Settings
 
 - 3D: yes
@@ -172,3 +178,4 @@ Current design (round 3): 17 crews, ~700 animals, 17 bosses + 50 regulars, 5 thr
 - 2026-11-23: DISCOVERED another Claude session on this machine (claude pid 187791, scratchpad 30c6ebad…, worktree .gamegen/wt-fix1) running its own replays and checks. I stopped one of its replays at ~07:30 by mistake, believing it was an orphan of my builder. Now yielding: our browser work is paused (tow: 4 replays left; Rhoda trace; sweep) until the person decides how to share the machine.
 - 2026-11-23: TOW FIX COMMITTED 39db0b6 (vehicles.js TOWS table: Zamboni to the rink ice, RC tug to its landing, cart and pedicab as before; plus a sunk/fallen check for every vehicle). In-game proof passed; part-talons and part-wings replay; 3 replays left (part-wings.alt, part-body, den-racers.alt), paused for the other session. To check in the sweep: Gus exiting a vehicle over water is left standing on the surface at -0.9. fix-23 notes (main.js, fix-23-solvable.md) still describe only the cart and pedicab tow.
 - 2026-11-23: CLEAN STOP for the other session (fix batches, worktree .gamegen/wt-fix1), which has the browser first. Committed the remaining edits (autopilot fixes; takers.js Give-height fix as WIP, untested in a browser). No more main-checkout edits or browsers until that session says it's done; notes go in .gamegen/progress/.
+- 2026-11-23: FIX BATCH A (#32 #30 #37 #39 #40) DONE on branch fix/batch1 (worktree .gamegen/wt-fix1, rebased on 3e25a05): HUD slot toggle fixed (ring + icon show), portrait hidden until loaded + queued faces prefetched, full-line layout while typing (screen-reader copy in .sr), Board string removed, ducks hand Biscuit's tennis ball straight to Gus (G.items.handOver; G.dryNear now standable ground via clearNear; theItem() names; keeper spots cached). Fresh code review: no must-fix; follow-ups done. Proof: den-biscuit re-recorded + replays; part-wings and part-wings.alt replay (dryNear/sail keeper); in-game check at 1280×720 and 844×390 (slot, ring, no stale face, no re-wrap, no string, tennis ball, 0 console errors). Found: the den-biscuit ask spot is on the Boathouse terrace, whose drawn deck is 0.6 m above its collider (items there draw under the deck): that is #27's work. Merge to main waits for the other session's uncommitted goals-ssf.js/STATUS.md edits.
