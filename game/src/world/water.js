@@ -73,13 +73,17 @@ export function createWaterMaterial() {
   return mat;
 }
 
+/** fix-27: how far the drawn water reaches past a body's outline (its shore is drawn by the terrain rising through it).
+ *  Collision uses the same reach (main.js addWater), so the water you see is the water you're in. */
+export const waterMargin = (wb) => (wb.stone ? 0.6 : 2.5);
+
 /** Build every water body mesh; returns { group, bodies: [{id, name, level, poly}] }. */
 export function buildWater(shapes, material) {
   const group = new THREE.Group();
   group.name = 'water';
   const bodies = [];
   for (const wb of shapes.water) {
-    const geo = waterGeometry(wb.poly, wb.level, wb.stone ? 0.6 : 2.5);
+    const geo = waterGeometry(wb.poly, wb.level, waterMargin(wb));
     const m = new THREE.Mesh(geo, material);
     m.name = 'water:' + wb.id;
     m.receiveShadow = true;

@@ -571,7 +571,7 @@ import { gpuIdle, primePrograms, sceneTextures, uploadTextures, compileQuiet } f
 import { Collision } from './systems/collision.js';
 import { TimeOfDay, PHASES, PHASE_ORDER } from './systems/timeofday.js';
 import { buildTerrain } from './world/terrain.js';
-import { buildWater, createWaterMaterial } from './world/water.js';
+import { buildWater, createWaterMaterial, waterMargin } from './world/water.js';
 import { placeTrees, addTreeCollision, TreeSystem } from './world/trees.js';
 import { placeProps, buildProps, buildWall, buildNests, buildGrates } from './world/props.js';
 import { buildLandmarks, buildTransverses, findCrossings, Streamer, onWalkway } from './world/landmarks.js';
@@ -761,7 +761,7 @@ async function boot() {
   await stage('Laying out the park', 0);
   const terrain = await buildTerrain({ textures });   // boot fix: async (world/terrain.js paintMasks yields)
   const collision = new Collision({ heightAt: terrain.heightAt });
-  for (const wb of terrain.shapes.water) collision.addWater({ outline: wb.poly, level: wb.level, id: wb.id, name: wb.name });
+  for (const wb of terrain.shapes.water) collision.addWater({ outline: wb.poly, margin: waterMargin(wb), level: wb.level, id: wb.id, name: wb.name });   // fix-27
   G.terrain = terrain; G.collision = collision;
   G.surfaceY = (x, z, yRef = 400) => collision.surface(x, z, yRef).y;
   // fix-23: the nearest dry ground to a point (items never come back onto the water, where Gus can't stand to peck them):

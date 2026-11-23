@@ -420,7 +420,7 @@ B['boathouse'] = (L, ctx) => {
   roofPrism(ctx, 'copper', { x: L.x + 2, z: L.z, y: y + 4.6, w: 10.2, d: 19.2, h: 2.4, alongZ: true });
   // the lakeside terrace on piles, with a green awning
   const tx = L.x - 4.5;
-  ctx.batch.box('wood', { x: tx, y: -0.6, z: L.z }, { w: 5, h: 0.9 + y, d: 16 });
+  ctx.batch.box('wood', { x: tx, y: -1.2, z: L.z }, { w: 5, h: 0.9 + y, d: 16 });   // fix-27: drawn at its collider (it was 0.6 m above it, so Gus walked at the water's level beside the boards)
   ctx.collision.addBox({ x: tx, z: L.z, y0: -1.2, h: 0.3 + y + 0.6, w: 5, d: 16, tag: 'deck' });
   ctx.batch.box('green', { x: tx, y: y + 3, z: L.z }, { w: 5, h: 0.15, d: 16 });
   for (const dz of [-7.5, -2.5, 2.5, 7.5]) ctx.batch.box('green', { x: tx - 2.3, y, z: L.z + dz }, { w: 0.2, h: 3, d: 0.2 });

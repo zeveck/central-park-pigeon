@@ -12,7 +12,7 @@
 //
 // Every shape is plain data, so the same tables serve the game, the map and tests.
 
-import { pointInPoly, polyBounds } from '../core/geo.js';
+import { pointInPoly, polyBounds, offsetClosed } from '../core/geo.js';
 
 const STEP_UP = 0.3;
 
@@ -78,10 +78,15 @@ export class Collision {
     return this.#insert({ t: 'soft', x, y, z, r, tag, id }, x - r, z - r, x + r, z + r);
   }
 
-  addWater({ outline, level, id, name }) {
+  /** fix-27: `margin` widens the outline to the drawn water's (water.js waterMargin); together with the ground-below-level
+   *  test in waterAt it puts the shore where the terrain rises through the drawn water. (The plain outline left a strip up
+   *  to ~3 m wide outside it where the ground was under the drawn water but counted as dry: Gus walked on the lake bed.) */
+  addWater({ outline, level, id, name, margin = 0 }) {
+    const core = outline;
+    if (margin > 0) outline = offsetClosed(outline, margin);
     const b = polyBounds(outline);
     this.count.water++;
-    return this.#insert({ t: 'water', outline, level, id, name, b }, b.x0, b.z0, b.x1, b.z1);
+    return this.#insert({ t: 'water', outline, core, level, id, name, b }, b.x0, b.z0, b.x1, b.z1);
   }
 
   /** Perch point: Gus snaps to (x, y, z). r: how far he can walk before he steps off. */
@@ -272,7 +277,8 @@ export class Collision {
   waterAt(x, z) {
     let res = null;
     this.#near(x, z, 0, (it) => {
-      if (it.t === 'water' && pointInPoly(x, z, it.outline)) { res = it; return false; }
+      // fix-27: water is where the drawn water is AND the ground is under its surface (the shore is the waterline)
+      if (it.t === 'water' && pointInPoly(x, z, it.outline) && this.heightAt(x, z) < it.level - 0.02) { res = it; return false; }
     });
     return res;
   }
