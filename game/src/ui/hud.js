@@ -106,7 +106,9 @@ export class Hud {
     // only written when the ring changed, so a new item with the same ring value kept a bare or stale label), and a Drop
     // hint under it in the device's glyph (the owner: "stuck on your face with no obvious way to drop it")
     const c = v.carried;
-    if (!!c !== !L.slotOn) { $.slot.classList.toggle('empty', !c); L.slotOn = !!c; }
+    // fix-32: compare like with like (was `!!c !== !L.slotOn`, which never un-hid the slot once it emptied, so the
+    // cooling ring and icon vanished for good after the first drop)
+    if (L.slotOn !== !!c) { $.slot.classList.toggle('empty', !c); L.slotOn = !!c; }
     const ckey = c ? c.id : '';
     if (L.carry !== ckey) { $.slotIco.innerHTML = c ? itemIcon(c.id) : ''; L.carry = ckey; }
     const heat = c && c.heat != null ? c.heat : null;
