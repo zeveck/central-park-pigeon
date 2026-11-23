@@ -35,6 +35,7 @@ export const ITEM_DEFS = {
   pipe: { name: 'Drainpipe', cls: 'huge', code: 'pipe' },
   cone: { name: 'Traffic cone', cls: 'huge', model: 'traffic-cone' },
   battery: { name: 'Battery', cls: 'huge', model: 'battery' },
+  camera: { name: 'Old film camera', cls: 'light', model: 'tourist-camera', code: 'camera' },   // photo mode (#9): Say Cheese
   cart: { name: 'Shopping cart', cls: 'huge', code: 'cart' },
 };
 export const HEAVY_LIMITS = { maxAlt: 2, maxSpeed: 6 };
@@ -68,7 +69,7 @@ export class Items {
   }
 
   async load(registry) {
-    for (const id of ['pizza-slice', 'pizza-box', 'traffic-cone', 'battery']) this.models[id] = await registry.baked(id);
+    for (const id of ['pizza-slice', 'pizza-box', 'traffic-cone', 'battery', 'tourist-camera']) this.models[id] = await registry.baked(id);
     // fix-19: the anchovy slice's own texture (the slice's atlas repainted with anchovies, same UV islands: nanogen)
     const base = this.models['pizza-slice']?.map;
     if (base) {
@@ -112,6 +113,7 @@ export class Items {
       case 'pipe': add(new THREE.CylinderGeometry(0.15, 0.15, 3, 10), this.mats.rust, 0, 0.15, 0, 0, 0, Math.PI / 2); break;
       case 'cart': add(new THREE.BoxGeometry(0.6, 0.5, 0.9), this.mats.steel, 0, 0.5); break;
       case 'box-small': add(new THREE.BoxGeometry(0.08, 0.03, 0.12), this.mats.dark, 0, 0.015); break;
+      case 'camera': add(new THREE.BoxGeometry(0.13, 0.08, 0.06), this.mats.tan, 0, 0.04); add(new THREE.CylinderGeometry(0.025, 0.025, 0.03, 12), this.mats.dark, 0, 0.04, 0.04, Math.PI / 2); break;   // (if the GLB is missing)
       case 'sprat': add(new THREE.ConeGeometry(0.018, 0.11, 6), this.mats.shiny, 0, 0.02, 0, 0, 0, Math.PI / 2); break;
       default: add(new THREE.CylinderGeometry(0.03, 0.03, 0.006, 12), this.mats.gold, 0, 0.003); break;
     }

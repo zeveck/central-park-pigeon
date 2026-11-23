@@ -307,3 +307,14 @@ The snow ramp is code (a vertex-coloured kicker mesh in entities/vehicles.js), s
 Used only by slice-anchovy items and the anchovy fan's prop (systems/items.js, entities/humans.js); other slices stay pepperoni.
 
 **Running total: ≈ $103.01** (working cap $150).
+
+## Photo mode #9 (2026-11-22; this change's budget $20)
+| ID | File | Tool | Prompt (short) | Tries | Est. cost |
+|---|---|---|---|---|---|
+| tourist-camera | game/assets/models/tourist-camera.glb (original and preview in .gamegen/candidates/photo/tourist-camera/) | meshgen (Meshy text-to-3D, ~600 tris, 512 px WebP after tools/optimize-assets.mjs) | a small vintage tourist film camera: silver top plate, tan leatherette, round lens; style line | 3 (take 1: orange body, black top, shards round the lens; take 2: beige top, blob lens, ribbon strap; take 3 accepted: 0.13 × 0.098 × 0.066 m, lens faces +Z, no strap stubs) | 90 credits ≈ $1.80 |
+| flicker | design/mockups/cards/flicker.png → game/assets/portraits/flicker.webp (tools/portrait-crops.json box [120, 18, 632, 530]) | imagegen2 (gpt-image-2.6-flare, high, 1024², edit of cawdry.png) | Flicker, a glossy black crow with a film canister on a red cord, posing; style line | 1 | ≈ $0.05 |
+| **Batch total** | | | | | **≈ $1.85** |
+
+The camera cost more than the ≈ $0.60 forecast (two retakes); the change stays far inside its $20. The film canister (Flicker's accessory), the balcony, the window and the camera / album icons are code. The shutter is the existing camera-shutter.mp3. Meshy balance afterwards: 871 credits.
+
+**Running total: ≈ $104.86** (working cap $150).

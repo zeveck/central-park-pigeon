@@ -95,6 +95,7 @@ export const LOOKS = {
   ledger: { species: 'crow', acc: ['spectacles', 'scarf-plaid', 'book'] },
   glint: { species: 'crow', acc: ['bottlecaps'] },
   cawdry: { species: 'crow', acc: ['spyglass', 'pendant'] },
+  flicker: { species: 'crow', acc: ['canister'] },   // photo mode (#9): the film hoarder
   // Turtle Elders
   eldest: { species: 'turtle', tint: [0.75, 0.82, 0.55], acc: [] },
   moss: { species: 'turtle', tint: [0.55, 0.78, 0.4], acc: ['moss', 'mushroom'] },

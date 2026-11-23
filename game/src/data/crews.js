@@ -119,6 +119,7 @@ export const CHARACTERS = {
   ledger: { name: 'Ledger', crew: 'crows', role: 'regular', bio: 'Keeps the trade book. A snob about knitwear.', at: { x: -7, z: 363 }, out: 'day' },
   glint: { name: 'Glint', crew: 'crows', role: 'regular', bio: 'Collects only blue things.', at: { x: -14, z: 368 }, out: 'day' },
   cawdry: { name: 'Cawdry', crew: 'crows', role: 'regular', bio: 'The lookout.', at: { x: -4, z: 371 }, out: 'day' },
+  flicker: { name: 'Flicker', crew: 'crows', role: 'regular', bio: 'Hoards film canisters. Wants a portrait.', at: { x: 8, z: 392 }, out: 'any' },   // photo mode (#9): Say Cheese; out in every phase, on no recorded route
   // Turtle Elders
   eldest: { name: 'The Eldest', crew: 'turtles', role: 'boss', bio: 'Older than the park. Seals every truce.', at: { x: 8.8, z: 432.6, on: 'roof' }, out: 'any', voice: 'eldest' },
   moss: { name: 'Moss', crew: 'turtles', role: 'regular', bio: 'Mostly asleep.', at: { x: 7.6, z: 433.4, on: 'roof' }, out: 'any' },

@@ -462,6 +462,8 @@ function accessory(name, col, u, H, N, B, bb, K = H, sink = () => 0, fit = null,
     case 'scroll': add(cyl(0.15, 0.15, 1.2, 8), '#f4ead0', at(B, 1.1, 0, 0.4), 0, 0, Math.PI / 2); break;
     case 'crumb': add(sph(0.3), '#d9b07a', at(H, 0, -0.3, 1.0)); break;
     case 'cap-peaked': { const d = sink(0.7); add(cyl(0.7, 0.7, 0.35, 14), '#161616', atTop(0, 0.5 + d, -0.05)); add(box(1.0, 0.06, 0.6), '#161616', atTop(0, 0.35 + d, 0.5)); break; }
+    // photo mode (#9): Flicker's film canister on a red cord (black body, yellow band, grey cap)
+    case 'canister': { const r = ring(N); add(tor(0.9 * r.k, 0.035), '#c4302b', onRing(r, 0, 0, 0.2), Math.PI / 2.3); const c = onRing(r, 0, -0.95, 1.0); add(cyl(0.22, 0.22, 0.55, 10), '#1d1d1f', c); add(cyl(0.225, 0.225, 0.2, 10), '#e8c23d', c); add(cyl(0.16, 0.16, 0.12, 8), '#9a9ea4', new THREE.Vector3(c.x, c.y + 0.32 * u, c.z)); break; }
     case 'head-plume': add(cyl(0.04, 0.1, 2.4, 6), '#ffffff', at(H, 0, 0.3, -1.4), 1.25); break;
     default: break;
   }

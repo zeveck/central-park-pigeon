@@ -539,6 +539,25 @@
 //     tail wag; stride from ground covered; legs straight when still; the lying mastiff gets no legs). Hooks: humans.js
 //     leash dogs (uniforms per dog, no bounce), characters.js named dogs and crowds.js crowd dogs (an instanced aGaitI;
 //     crowd dogs no longer roll).
+// Photo-mode notes (#9, the owner: "a photo mode ... save them somewhere that you can download them later", and a little
+// quest to get a camera; design/changes/photo-mode.md; shots design/screenshots/photo-mode/). Shared-file edits, small:
+//   - Here: installPhoto(G) (ui/photo.js: the 'photo', 'album' and 'photoview' screens, G.photo) after the other screens;
+//     installSayCheese(G) (schemes/say-cheese.js) after the finale; update() opens photo mode on 'photo' (V, D-pad right)
+//     in free play once Gus has the camera; G.followCamWorld() (terrain LOD, trees, props, streaming for a camera that
+//     moves while the park is paused); render() leaves budgetScale alone while G.photoHold (photo mode is open).
+//   - Photo mode is a MENU, so the clock, schemes, keeper and autosave stand still. It opens only in free play
+//     (G.photo.blockedReason(): not mid-scene, dialogue, a fight, race, encounter panel or driving). camera-rig.js
+//     rig.photo: an orbit (dist ≤ 12) with the follow camera's push-in and ground clamp, never rig.free. Poses, looks,
+//     "Call the crew" and Hide Gus are visual only and put back on exit. Capture: G.render() then drawImage (no
+//     preserveDrawingBuffer), full resolution, ≤ 1920 px wide, looks in a pixel loop, watermark, JPEG 0.9. Album:
+//     IndexedDB cpp-album (shared by every slot), 60 photos, Share / Download / Delete.
+//   - Say Cheese (data/schemes.js, last before the finale; opens after the Prologue): the tourist's camera on the CPW
+//     ledge at 71st–72nd (an existing perch edge; the balcony is render-only), the photobomb or a Coo, Flicker (a new
+//     crow, data/crews.js, looks.js 'canister', dialogue.js) loads the film (gear 'camera', flag photo.film), and a snap
+//     with Flicker in it (photo.flicker) finishes it. Item 'camera' (systems/items.js, tourist-camera.glb) with a keeper
+//     rule (data/item-sources.js). input.js: photo (V, pad 15), photoPose (P), photoLook (L), zoomIn/zoomOut (+/-).
+//   - debug only: src/debug/goals-photo.js (sf-run.mjs record finds it); tools/check-schemes.mjs leaves "leaf" schemes
+//     (they open or close nothing) out of the completion-order walk; data/fixtures/say-cheese.json (= sf-base).
 import * as THREE from 'three';
 import { choosePreset, PRESETS, AutoProbe, savePreset } from './presets.js';
 import { Progress, TextureStore } from './gfx/textures.js';
@@ -627,6 +646,7 @@ import { PHASE_LABEL, CHARACTERS } from './data/crews.js';
 import { patchMorphArray, loadMorphArray } from './gfx/morphs.js';
 import { installReport } from './ui/report.js';
 import { installPhoto } from './ui/photo.js';   // photo mode (#9)
+import { installSayCheese } from './schemes/say-cheese.js';   // photo mode (#9): the quest
 import { installOffline } from './ui/offline.js';
 
 const DT = 1 / 60;
@@ -978,6 +998,7 @@ async function boot() {
   installSignsSlicesFound(G);   // 3b: one file per scheme in src/schemes/
   await installSpikesFeuds(G);  // 3b: Spikes + Feuds scheme files, src/setpieces/ (the Rink Job, the Wedding)
   await installFinale(G);       // finale: script 'finale', G.finale (a mod), the climb's own scene via G.altView
+  installSayCheese(G);          // photo mode (#9): Say Cheese (the tourist's camera, Flicker)
   // perf pass: small-detail culling for everything but the big pooled/instanced layers (gfx/detail-cull.js)
   G.detailCull = new DetailCull({ k: { high: 0.0015, medium: 0.002, low: 0.004 }[preset.id] });
   G.detailCull.add(...world.children.filter((o) => !['terrain', 'water', 'static', 'props', 'trees', 'taxis', 'gus', 'flock', 'particles', 'humans', 'crowds', 'characters', 'crumbs'].includes(o.name)));

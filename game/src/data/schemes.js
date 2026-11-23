@@ -435,6 +435,37 @@ export const SCHEMES = [
     ],
   },
 
+  // ================================================================ Photo mode (#9): "Say Cheese" (src/schemes/say-cheese.js)
+  // Opens after the Prologue and sits last before the finale, so openList()[0] and the Prologue's tracking don't change.
+  // The camera: a tourist in a window over CPW (71st–72nd) guards his old film camera on the ledge; get in his shot (or
+  // Coo under him) and he forgets it. Flicker (a crow who hoards film) loads it for a portrait; the first photo, of
+  // Flicker, finishes the card. Photo mode itself is ui/photo.js (open once Gus has the camera: gear 'camera').
+  {
+    id: 'say-cheese', title: 'Say Cheese', thread: 'lost', act: '1', start: 'nest-ramble', gives: {},
+    opensWhen: { flags: ['prologue'] },
+    steps: [
+      S(1, {
+        goal: 'Borrow the old film camera from the tourist\'s window ledge over CPW.', where: 'A tourist\'s window ledge on Central Park West, between 71st and 72nd', obstacle: 'He\'s guarding it while he snaps the skyline. Get in his shot, or give him a Coo.',
+        nudge: { by: 'cawdry', text: 'Tourist in a window over CPW, past 71st. Old camera on the ledge. Stand in his shot and he forgets everything.' },
+        answer: { text: 'Fly to the ledge under the tourist\'s window on Central Park West, between 71st and 72nd. Land on the ledge beside his balcony (or stand in front of his lens) and hold still a moment, or Coo below him. When he turns away, Peck the old camera on the ledge.', icon: null },
+        needs: { phase: 'any', place: 'cpw-71-window' }, on: { type: 'pickup', item: 'camera' }, target: { at: { x: -129.6, z: 261.5, label: 'The tourist\'s camera' } },
+      }),
+      S(2, {
+        goal: 'Take the camera to Flicker, the crow who hoards film.', where: 'Flicker the crow, on the slope below Belvedere Castle, at the Ramble\'s north-east edge', obstacle: 'An empty camera takes no pictures.',
+        nudge: { by: 'glint', text: 'Flicker hoards film. Canisters, rolls, the lot. Bring Flicker a camera and see what happens.' },
+        answer: { text: 'Carry the camera to Flicker (the crow with a film canister on a red cord, on the slope below Belvedere Castle, at the Ramble\'s north-east edge) and Peck Flicker to give it.', icon: null },
+        needs: {}, on: { type: 'give', item: 'camera', to: 'flicker' },
+        does: { take: { item: 'camera' }, give: { gear: 'camera' }, setFlags: ['photo.film'], script: 'photo.film' },
+      }),
+      S(3, {
+        goal: 'Open photo mode and snap Flicker\'s portrait.', where: 'Flicker the crow, on the slope below Belvedere Castle, at the Ramble\'s north-east edge', obstacle: 'Flicker is ready for a close-up.',
+        nudge: { by: 'flicker', text: 'Well? Open photo mode and SNAP me. Both sides are my good side.' },
+        answer: { text: 'Open photo mode (Pause, then Photo), turn the camera until Flicker is in the picture, and snap.', icon: null },
+        needs: {}, on: { type: 'flag', flag: 'photo.flicker' },
+      }),
+    ],
+  },
+
   // ================================================================ finale
   {
     id: 'finale', title: 'Feed the Birds', thread: null, act: 'Finale', start: 'nest-ramble', gives: {},
@@ -446,7 +477,7 @@ export const SCHEMES = [
 export const SCHEME = Object.fromEntries(SCHEMES.map((s) => [s.id, s]));
 export const PARTS = ['body', 'talons', 'legs', 'wings', 'eyes', 'beak', 'voice', 'power'];
 export const PART_NAMES = { body: 'Body', talons: 'Talons', legs: 'Legs', wings: 'Wings', eyes: 'Eyes', beak: 'Beak', voice: 'Voice', power: 'Power core' };
-export const GEAR_NAMES = { sunglasses: 'Sunglasses', pen: 'Paint pen', headlamp: 'Headlamp', remote: 'RC remote' };
+export const GEAR_NAMES = { sunglasses: 'Sunglasses', pen: 'Paint pen', headlamp: 'Headlamp', remote: 'RC remote', camera: 'Film camera' };   // photo mode (#9): camera
 
 /** Flags a nap clears (phase-scoped world effects). Everything else persists. */
 export const NAP_CLEARS = ['walter.doorOpen', 'zamboni.ramps', 'relay.used', 'falafel.got'];

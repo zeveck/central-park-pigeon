@@ -271,7 +271,15 @@ pass('nap rule: no step needs a phase-scoped effect from an earlier step (Walter
 }
 // ---------------------------------------------------------------- 6. never 0 open before the finale (every completion order)
 {
-  const order = ids.filter((i) => i !== 'finale');
+  // photo mode (#9): a "leaf" scheme (nothing's opensWhen reads its id or any flag it sets, and it gives no crew, part or
+  // flock) can't open or close another scheme; while it's open it only adds to the open count. Leaving leaves out of the
+  // walk keeps it exact for the rest (with Say Cheese in, the 2^n walk hit its 400k cap before covering every order).
+  const wFlags = (s) => { const w = s.opensWhen || {}; return [...(w.flags || []), ...(w.anyOf || []).flat(), ...(w.atLeast?.of || [])]; };
+  const readFlags = new Set(SCHEMES.flatMap(wFlags));
+  const setsFlags = (s) => [s.id, ...(s.gives?.setFlags || []), ...s.steps.flatMap((st) => [...(st.does?.setFlags || []), ...(st.alts || []).flatMap((a) => a.does?.setFlags || []), `${s.id}.s${s.steps.indexOf(st) + 1}`])];
+  const leaves = ids.filter((id) => id !== 'finale' && !SCHEME[id].gives?.crew && !SCHEME[id].gives?.part && !SCHEME[id].gives?.flock && !setsFlags(SCHEME[id]).some((f) => readFlags.has(f)));
+  const order = ids.filter((i) => i !== 'finale' && !leaves.includes(i));
+  if (leaves.length) notes.push(`completion orders: leaf schemes left out of the walk (they open or close nothing): ${leaves.join(', ')}`);
   const bit = Object.fromEntries(order.map((id, i) => [id, 1n << BigInt(i)]));
   const all = (1n << BigInt(order.length)) - 1n;
   const seen = new Map();

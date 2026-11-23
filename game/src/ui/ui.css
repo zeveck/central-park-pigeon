@@ -510,7 +510,7 @@ body.photo > *:not(#game):not(#photo):not(.overlay):not(#fpsbox) { visibility: h
 #photo .vig { display: none; background: radial-gradient(ellipse at center, transparent 55%, rgba(30, 20, 10, 0.45) 100%); }
 #photo[data-look="film"] .vig { display: block; }
 #photo .frame { display: none; border: solid #f6efe0; border-width: 3.5vw 3.5vw 6vw; box-shadow: inset 0 0 0 1px rgba(90, 70, 50, 0.35); }
-#photo .frame span { position: absolute; left: 0; bottom: -4.6vw; color: #c4302b; font-weight: 600; font-size: 3vw; line-height: 1; white-space: nowrap; }
+#photo .frame span { display: none; }   /* (the caption is drawn on the saved photo; live, the chips sit over it) */
 #photo[data-look="postcard"] .frame { display: block; }
 #photo .grid3 { display: none; }
 #photo.g .grid3 { display: block; }

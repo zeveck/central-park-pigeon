@@ -36,6 +36,7 @@ export const TALK = {
   ledger: [['Every trade, written down. Every. Single. One.'], ['Ten crumbs a trade. Vesper\'s fee. It\'s in the book, so it\'s true.'], ['The Wanted board changes when you nap. People lose things on a schedule. Fascinating.']],
   glint: [['Blue. Only blue. Bottle caps, buttons, the sky on a good day.'], ['Favour: there\'s a blue bottle cap down a city grate. The rats could get it. I could not. I have standards.'], ['That kid at Conservatory Water would swap his remote for something shiny. Everyone would.']],
   cawdry: [['Ranger cart, two o\'clock. Tourist with a pretzel, nine o\'clock.'], ['Jogger stops once a lap. Water fountain, north gatehouse. Like clockwork.'], ['From up here I see everything. Mostly pretzels.']],
+  flicker: [['Flicker. Film is my business. Canisters, rolls, the lot. All beak-certified.'], ['A camera with no film is just a box that judges you.'], ['Light\'s good today. You\'d photograph well, Gus. From the left.']],   // photo mode (#9)
   moss: [['Zzz... hm? Oh. Zzz.']],
   shelly: [['Did you hear about the hawk? And the dog? And the van? I hear everything, dear.']],
   slowpoke: [['Wait... for... me...']],

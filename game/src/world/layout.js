@@ -682,6 +682,7 @@ export const PLACES = {
   'fifth-76': { name: 'Construction site, Fifth & 76th', x: 128, z: Z(76.5), r: 12 },
   'museum-79': { name: 'Natural history museum, CPW & 79th', x: -130, z: Z(79), r: 16 },
   'grate-86w': { name: '86th Street W grate', x: -128, z: Z(85.6), r: 6 },   // fun pass (P9): the jogger's key
+  'cpw-71-window': { name: 'The tourist\'s window, CPW & 71st', x: -129.6, z: 261.5, r: 6 },   // photo mode (#9): Say Cheese step 1
   'north-gatehouse': { name: 'Reservoir north gatehouse', x: -12, z: 758, r: 8 },
   'south-gatehouse': { name: 'Reservoir south gatehouse', x: 14, z: 566, r: 8 },
   'wollman-rink': { name: 'Wollman Rink', x: 51.7, z: 88.6, r: 22 },
