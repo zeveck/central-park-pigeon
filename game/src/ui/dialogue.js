@@ -75,7 +75,8 @@ export class Dialogue {
     }
     this.panel.classList.toggle('noportrait', !src);
     this.#setText(L.text, 0);
-    this.srEl.textContent = `${L.name || c.name}: ${L.text}`;
+    const who = L.name || c.name;
+    this.srEl.textContent = who ? `${who}: ${L.text}` : L.text;   // (a narrator line has no name)
     this.shown = 0;
     this.age = 0;
     this.blipBase = blipFor(L.who);

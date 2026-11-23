@@ -186,7 +186,7 @@ body.cine #flighthints { opacity: 0; }
 #dialogue .name { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 20px; color: var(--orange-d); margin: 2px 0 4px; }
 #dialogue .text { font-size: 19px; line-height: 1.38; min-height: 3.2em; text-wrap: pretty; }
 #dialogue .text .rest { visibility: hidden; }   /* fix-37: laid out, not yet typed */
-#dialogue .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+#dialogue .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; opacity: 0; }   /* for screen readers only */
 #dialogue .next { position: absolute; right: 18px; bottom: 12px; font-size: 14px; color: #6a6058; display: flex; gap: 6px; align-items: center; }
 
 /* ------------------------------------------------------------ the Scheme Board */

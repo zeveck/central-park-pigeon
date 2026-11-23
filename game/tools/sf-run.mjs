@@ -77,7 +77,7 @@ async function stepUntil(page, doneFn, shots) {
       try { await page.screenshot({ timeout: 45000, path: fn + '.png' }); }
       catch {
         // fallback: the canvas only (no HUD), with what was on screen as a caption file
-        const cap = await page.evaluate(() => { const G = window.__sfG; G.render(); return { url: G.renderer.domElement.toDataURL('image/jpeg', 0.85), text: [document.querySelector('#dialogue.on')?.innerText, document.getElementById('sf-stamp')?.className === 'on' ? document.getElementById('sf-stamp').innerText : '', document.getElementById('sf-freeze')?.innerText].filter(Boolean).join(' | ') }; });
+        const cap = await page.evaluate(() => { const G = window.__sfG; G.render(); return { url: G.renderer.domElement.toDataURL('image/jpeg', 0.85), text: [[...document.querySelectorAll('#dialogue.on .name, #dialogue.on .typed')].map((e) => e.innerText).join(': ') || undefined, document.getElementById('sf-stamp')?.className === 'on' ? document.getElementById('sf-stamp').innerText : '', document.getElementById('sf-freeze')?.innerText].filter(Boolean).join(' | ') }; });
         fs.writeFileSync(fn + '.jpg', Buffer.from(cap.url.split(',')[1], 'base64'));
         if (cap.text) fs.writeFileSync(fn + '.txt', cap.text);
       } }
