@@ -18,13 +18,21 @@ export class Dialogue {
     const el = this.el = document.createElement('div');
     el.id = 'dialogue';
     el.setAttribute('role', 'dialog');
-    el.innerHTML = `<div class="panel"><div class="frame"><img alt=""></div><div><div class="name"></div><div class="text" aria-live="polite"></div></div></div><div class="next"></div>`;
+    el.innerHTML = `<div class="panel"><div class="frame"><img alt=""></div><div><div class="name"></div><div class="text" aria-hidden="true"><span class="typed"></span><span class="rest"></span></div><div class="sr" aria-live="polite"></div></div></div><div class="next"></div>`;
     document.body.appendChild(el);
     this.img = el.querySelector('img');
     this.panel = el.querySelector('.panel');
-    this.img.onerror = () => this.panel.classList.add('noportrait');
+    // fix-30: a new speaker's picture stays hidden until it has loaded, so the last speaker's face never flashes up
+    this.picSrc = '';
+    this.img.onload = () => { if (this.img.getAttribute('src') === this.picSrc) this.img.style.visibility = ''; };
+    this.img.onerror = () => { this.panel.classList.add('noportrait'); this.picSrc = ''; };
     this.nameEl = el.querySelector('.name');
     this.textEl = el.querySelector('.text');
+    // fix-37: the whole line is laid out from the first letter (the untyped part is invisible), so words never jump
+    // between lines as they type in; screen readers get the full line once, from .sr
+    this.typedEl = el.querySelector('.text .typed');
+    this.restEl = el.querySelector('.text .rest');
+    this.srEl = el.querySelector('.sr');
     this.nextEl = el.querySelector('.next');
     this.queue = [];
     this.line = null;
@@ -39,6 +47,7 @@ export class Dialogue {
 
   say(lines, onDone = null) {
     this.queue.push(...lines);
+    for (const L of lines) { const src = this.#picFor(L); if (src) new Image().src = src; }   // fix-30: fetch queued faces early
     if (onDone) {
       const prev = this.onDone;
       this.onDone = prev ? () => { prev(); onDone(); } : onDone;
@@ -57,11 +66,16 @@ export class Dialogue {
     const L = this.line;
     const c = CHARACTERS[L.who] || { name: L.name || L.who, portrait: L.who };
     this.nameEl.textContent = L.name || c.name;
-    // Polish-1: narrators and unnamed humans (who: null, or no portrait on file) get no frame at all
-    const pic = L.who && PORTRAITS.has(c.portrait || L.who) ? (c.portrait || L.who) : null;
-    if (pic) this.img.src = `assets/portraits/${pic === 'gus' && this.G.gusPortrait ? this.G.gusPortrait() : pic}.webp`;   // fun pass: Gus in the scarf he's wearing
-    this.panel.classList.toggle('noportrait', !pic);
-    this.textEl.textContent = '';
+    const src = this.#picFor(L);
+    if (src && src !== this.picSrc) {
+      this.picSrc = src;
+      this.img.style.visibility = 'hidden';
+      this.img.src = src;
+      if (this.img.complete && this.img.naturalWidth) this.img.style.visibility = '';   // already decoded (cached)
+    }
+    this.panel.classList.toggle('noportrait', !src);
+    this.#setText(L.text, 0);
+    this.srEl.textContent = `${L.name || c.name}: ${L.text}`;
     this.shown = 0;
     this.age = 0;
     this.blipBase = blipFor(L.who);
@@ -80,7 +94,7 @@ export class Dialogue {
     this.shown = Math.min(text.length, this.shown + CPS * dt);
     const now = Math.floor(this.shown);
     if (now !== before) {
-      this.textEl.textContent = text.slice(0, now);
+      this.#setText(text, now);
       if (now % 3 === 0 && /\w/.test(text[now - 1] || '')) {
         if (this.blipBase) this.G.audio.blip(this.blipBase, this.blipPitch);
         else this.G.audio.synth('tick');
@@ -92,10 +106,21 @@ export class Dialogue {
     this.clicked = false;
     if (adv && this.age > 0.15) {
       inp.consume('peck'); inp.consume('flap'); inp.consume('uiOk');
-      if (!done) { this.shown = text.length; this.textEl.textContent = text; }
+      if (!done) { this.shown = text.length; this.#setText(text, text.length); }
       else this.#next();
     }
   }
+
+  // Polish-1: narrators and unnamed humans (who: null, or no portrait on file) get no frame at all
+  #picFor(L) {
+    if (!L?.who) return null;
+    const c = CHARACTERS[L.who];
+    const pic = c ? (c.portrait || L.who) : L.who;
+    if (!PORTRAITS.has(pic)) return null;
+    return `assets/portraits/${pic === 'gus' && this.G.gusPortrait ? this.G.gusPortrait() : pic}.webp`;   // fun pass: Gus in the scarf he's wearing
+  }
+
+  #setText(text, n) { this.typedEl.textContent = text.slice(0, n); this.restEl.textContent = text.slice(n); }
 
   clear() { this.queue = []; this.line = null; this.onDone = null; this.el.classList.remove('on'); }
 }
