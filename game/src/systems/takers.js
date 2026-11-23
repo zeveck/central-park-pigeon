@@ -33,7 +33,7 @@ export class Takers {
       const agentOf = () => G.humans.agents.find((a) => a.role === role && a.out);
       G.interact.register({
         id: 'taker:' + role, kind: 'human',
-        get x() { return agentOf()?.x ?? 1e6; }, get y() { const a = agentOf(); return a ? (a.y ?? G.surfaceY(a.x, a.z, 5)) + 0.2 : -1e6; }, get z() { return agentOf()?.z ?? 1e6; },
+        get x() { return agentOf()?.x ?? 1e6; }, get y() { const a = agentOf(); return a ? (a.y ?? a.gy ?? G.collision.floorAt(a.x, a.z)) + 0.2 : -1e6; }   /* batch-3: an undrawn person has no a.y; surfaceY(…, 5) found an awning over Walter's door (3.35 m) and his Give was out of reach */, get z() { return agentOf()?.z ?? 1e6; },
         r: 1.6, dy: 2.2, priority: 6,
         label: () => (agentOf() && this.entryFor(key) ? `Give the ${this.itemName()} to the ${role === 'walter' ? 'doorman' : role === 'guard' ? 'stage-door guard' : 'vendor'}` : null),
         act: () => this.give(key),
@@ -43,7 +43,7 @@ export class Takers {
     let cur = null;
     G.interact.register({
       id: 'eater:human', kind: 'eater',
-      get x() { cur = self.#eaterHuman(); return cur?.x ?? 1e6; }, get y() { return cur ? (cur.y ?? G.surfaceY(cur.x, cur.z, 5)) + 0.2 : -1e6; }, get z() { return cur?.z ?? 1e6; },
+      get x() { cur = self.#eaterHuman(); return cur?.x ?? 1e6; }, get y() { return cur ? (cur.y ?? cur.gy ?? G.collision.floorAt(cur.x, cur.z)) + 0.2 : -1e6; }, get z() { return cur?.z ?? 1e6; },
       r: 1.8, dy: 2.2, priority: 0,
       label: () => (cur && self.#eaterHuman() === cur ? (cur.role === 'dogwalker' ? `Give the ${self.itemName()} to the dog` : `Give the ${self.itemName()} away`) : null),
       act: () => { const a = cur; if (!a) return; self.eat({ kind: a.role === 'dogwalker' ? 'dog' : 'person', id: 'human:' + a.role, at: () => ({ x: a.x, y: (a.y ?? 0) + 2.1, z: a.z }) }); if (a.role === 'dogwalker') G.humans.play?.(a, 'pulled', 1.2); },
