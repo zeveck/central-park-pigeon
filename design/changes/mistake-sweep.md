@@ -143,3 +143,11 @@ If all of these hold, the verdict is **FAIL-SCRIPT**: improve the goal script an
 Save & quit → Continue (repairSpent, schemes.js:283) and check again. Still failing means **FAIL-GAME**, a must-fix
 softlock. Anything unclear is **UNSURE**: check it once by hand with real inputs and screenshots, no pokes.
 NUDGE-WRONG is ranked separately by reach × harm; it is usually polish, because the keeper toast still names the place.
+
+## Decision (2026-11-23): rounds, one browser
+The owner chose option 3 (one browser at a time on this machine):
+- **Round 1:** the single most likely mistake for each of the 26 risky steps, plus save-quit-Continue for every scheme (including say-cheese): about 58 runs.
+- **Round 2:** wherever a step or a kind of mistake fails (a real dead end, or a recovery that needed help), run that step's other mistakes and the same kind of mistake on similar steps.
+- Stop when a round finds nothing new.
+- Results go in design/reviews/mistake-sweep.md. Real dead ends are must-fixes for #23.
+- Autopilot gaps are fixed in the autopilot, never by changing the game.
