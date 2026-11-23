@@ -2,6 +2,8 @@
 // (or R1), choose with the mouse, the right stick or 1–9 / 0, release to Call
 // (or Ask, if they're already here). Touch: tap the portrait to open, tap an
 // ally. Greyed allies say why ("Raccoons sleep until Dusk").
+// fix-33: it opens with nobody chosen, so letting go without choosing calls no one; ○ / Esc (uiBack, or Land) closes it
+// without calling, even after choosing.
 
 import { glyph } from './glyphs.js';
 import { CREW, TALENTS } from '../data/crews.js';
@@ -49,7 +51,7 @@ export class Wheel {
     const G = this.G;
     this.items = G.allies.list();
     this.open = true;
-    this.sel = this.items.length ? 0 : -1;
+    this.sel = -1;   // fix-33: nobody until the stick, the mouse or a number key chooses (it was the first ally, always called)
     this.cur = { x: 0, y: 0 };
     G.input.captureCursor(true);
     this.ring.querySelectorAll('.al').forEach((e) => e.remove());
@@ -77,17 +79,27 @@ export class Wheel {
     const G = this.G;
     this.ring.querySelectorAll('.al').forEach((e) => e.classList.toggle('sel', +e.dataset.i === this.sel));
     const it = this.items[this.sel];
-    if (!it) {
+    const dev = G.input.device, fam = G.input.gamepad?.family;
+    if (!this.items.length) {
       this.nm.textContent = 'No allies yet';
       this.why.textContent = '';
       this.act.textContent = 'Win over a crew and its boss will come when you call.';
       return;
     }
+    if (!it) {
+      // fix-33: nobody chosen yet: how to choose, and that letting go calls no one
+      this.nm.textContent = 'Call an ally';
+      this.why.textContent = '';
+      this.act.innerHTML = dev === 'touch' ? 'Tap an ally<br><small>Tap outside to close</small>'
+        : dev === 'gamepad' ? `${this.tapMode ? 'Choose' : 'Right stick to choose'}<br><small>${this.tapMode ? glyph('uiBack', dev, fam) + ' Close' : 'Let go to cancel'}</small>`
+          : `Move the mouse${this.items.length > 1 ? ' or press 1–' + Math.min(9, this.items.length) : ''}<br><small>${this.tapMode ? 'Click outside to close' : 'Let go to cancel'}</small>`;
+      return;
+    }
     this.nm.textContent = it.name;
     this.why.textContent = it.reason || '';
-    const dev = G.input.device;
     const tal = (CREW[it.crew]?.talents || []).map((t) => TALENTS[t]?.name).filter(Boolean).join(' / ');
-    this.act.innerHTML = it.reason ? '' : `${dev === 'touch' ? 'Tap' : !this.tapMode ? 'Release' : dev === 'gamepad' ? 'Press' : 'Click'} to <b>${it.here ? 'Ask' : 'Call'}</b>${it.here && tal ? `<br><small>${tal} here</small>` : ''}`;
+    const cancel = dev === 'touch' ? '' : `<br><small>${glyph('uiBack', dev, fam)} Cancel</small>`;   // fix-33
+    this.act.innerHTML = (it.reason ? '' : `${dev === 'touch' ? 'Tap' : !this.tapMode ? 'Release' : dev === 'gamepad' ? 'Press' : 'Click'} to <b>${it.here ? 'Ask' : 'Call'}</b>${it.here && tal ? `<br><small>${tal} here</small>` : ''}`) + cancel;
   }
 
   /** Each fixed update while open (held mode): steer the selection. Returns true while open. */
@@ -99,6 +111,8 @@ export class Wheel {
       for (const it of G.allies.list()) if (!this._pre.has(it.portrait)) { this._pre.add(it.portrait); new Image().src = `assets/portraits/${it.portrait}.webp`; }
     }
     if (!this.open) return false;
+    // fix-33: ○ / Esc (or Land) closes it without calling anyone
+    if (inp.pressed('uiBack') || inp.pressed('dive')) { inp.consume?.('uiBack'); inp.consume?.('dive'); G.audio.synth('uiBack'); this.close(false); return false; }
     if (!this.tapMode && !inp.held('wheel')) { this.close(true); return false; }
     const n = this.items.length;
     if (n) {
