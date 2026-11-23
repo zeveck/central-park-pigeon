@@ -158,3 +158,24 @@ Should-fix:
 - Water talk reach.
 Nice-to-have: a visible flock arrival.
 All adopted (see the decisions in batch-3.md).
+
+## Change review: photo mode #9 (2026-11-22, one round)
+Player + Builder on design/changes/photo-mode.md. Must-fix:
+- The proposed keys are taken (C = Dive, View = Map).
+- Photo-mode controls weren't specified.
+- Camera and film can't both be carried: film becomes a flag.
+- "Open from the start" hijacks the Prologue's tracking: open after the Prologue, placed last.
+- The route index is stale: refresh first.
+Should-fix:
+- Give each step a catch (photobomb the tourist; Flicker's portrait).
+- A shiny payment clashes with the crows' fee: no shinies.
+- Flicker is out in every phase.
+- "Call the crew".
+- Phone Share and full-resolution capture.
+- Reuse an existing fire-escape perch (no new collider).
+- Photo mode as a menu, with a collision-safe orbit and world updates while paused.
+- Capture without preserveDrawingBuffer.
+- IndexedDB eviction and quota.
+- Flicker placed away from routes.
+- No Nest step.
+All adopted (see the decisions in photo-mode.md).

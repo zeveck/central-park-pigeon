@@ -66,13 +66,13 @@ thing that matters.
 On a keyboard and mouse:
 
 - **Move:** WASD or the arrow keys. **Camera:** the mouse.
-- **Flap:** Space (hop, take off; hold to climb). **Dive / land:** C.
+- **Flap:** Space: a quick tap hops, hold it to take off and climb. **Dive / land:** C.
 - **Sprint:** Shift (a boost in the air).
 - **Peck:** E (talk, pick up, give, flip a sign, nap on a perch).
 - **Coo:** F (tap to gather your flock, hold to swarm). **Drop:** Q.
 - **Ally wheel:** hold R, pick a friend, release (or 1 to 0 for quick calls).
 - **Scheme Board:** J. **Map:** Tab.
-- **Pause:** Esc or P. **Mute:** M.
+- **Pause:** Esc or P. **Mute:** M. **Photo mode:** V (once you've found the camera).
 - **Driving** (yes, you can drive): steer, Space for gas, C to brake, F for
   the horn (or the Zamboni's dump and spray), E to get out.
 
@@ -82,7 +82,7 @@ With a controller (Xbox, PlayStation or Switch Pro; best in Chrome or Edge):
 - **A / ✕:** Flap (or hold **RT / R2** to climb). **B / ○:** Dive (or **LT / L2**).
 - **X / □:** Peck. **Y / △:** Coo. **LB / L1:** Drop. **RB / R1:** Ally wheel.
 - **Click the left stick:** Sprint. **D-pad up:** Scheme Board.
-  **View / Create:** Map. **Menu / Options:** Pause.
+  **View / Create:** Map. **Menu / Options:** Pause. **D-pad right:** Photo mode.
 - The on-screen prompts switch to your controller's own buttons.
 
 On a phone, hold it sideways and use the on-screen controls: the stick to
@@ -105,8 +105,16 @@ played), so you can keep more than one park going or share the game with
 someone else in your house. After the finale the park is yours to
 roam, with postcards, Summit Perches and golden pretzels to collect.
 
+**Photo mode.** Early on, a tourist on Central Park West leaves his old camera
+on the balcony rail, and Flicker the crow knows where to get film. Once you
+have it (V, D-pad right, or the camera button), the park freezes: orbit and
+zoom around Gus, strike a pose, pick a look (Film, Black & White, a postcard
+frame), call your crew into the shot, and snap. Photos go to an album in your
+browser, where you can download or share them.
+
 Found a bug? **Report a bug** in the pause menu (or Ctrl+Shift+L) sends it
-with a screenshot.
+with a screenshot. With a controller, pick what happened from a short list
+(a controller can't type); the last step on GitHub needs a mouse or touch.
 
 ## How it was made
 
@@ -192,6 +200,36 @@ could be made:
 After it was online, three save slots were added with:
 
 > --saves --publish --no-confirm
+
+Then, after playing it and filing issues on GitHub, the owner had gamegen fix
+them in batches, starting with:
+
+> --fix #8 #23 #19 #16
+
+Asked whether to make an anchovy texture for the slice (about $0.20) or have
+Queenie ask for pepperoni:
+
+> yes
+
+And on the open questions from the issue triage:
+
+> Landing seems abrupt. Probably coming down a little too fast?
+
+> Let's use your recommendation.
+
+> You can just land it and I'll try it deployed and we'll adjust if needed.
+
+> Sure, try coded on the dogs so I can see. Though the bigger problem is them passing into hills, buildings, etc.
+
+> Adding a question where you get the camera is good, but it should be on the board/available from the beginning and not too hard? Maybe it's just on a balcony of a building outside the park as a way to get  you out there for a minute? And you need to get film from a crow maybe? Just ideas.
+
+> next batch
+
+That brought hop flight, gentler landings, flight controls on screen, the
+open-sky warp, accessories that sit right, people and animals that stay out
+of the lake and the hills, bridges you can cross, real fences, trotting dogs,
+pigeons that fly in to join the flock, puzzles that can't be lost for good,
+and photo mode.
 
 gamegen planned the game in a design document, had review agents vet it over
 three rounds (86 findings, every must-fix fixed), and shared the design as a
