@@ -27,6 +27,17 @@ const Z = RINK.zamboni;
 const LANE_ARC = 1.4;          // s, the launch over the boards (slow motion in its middle 0.6 s)
 const HOP_SECS = 0.9, HOP_LEN = 4.5;
 
+// fix-23 (tow): each vehicle a scheme step needs: open (that step is still to do), away (left where the step can't use it:
+// wedged, stranded or driven off), to (where it's put back; home if none) and the wake-up toast naming the place.
+const ZAMBONI_SPOT = { x: RINK.bump.x + 4.8, z: RINK.bump.z + 0.4, yaw: -1.6539 };   // where Ringo's demo leaves it (step 3's start)
+const offHome = (V, v) => Math.hypot(v.x - v.def.home.x, v.z - v.def.home.z) >= 3;
+const TOWS = {
+  'hotdog-cart': { open: (st) => !st.flags['part-body'], away: offHome, line: 'Vinnie\'s cart was towed back to the Mall.' },
+  pedicab: { open: (st) => !st.flags['den-racers'], away: offHome, line: 'The pedicab is back at its stand.' },
+  zamboni: { open: (st) => !!st.flags['zamboni.rigged'] && !st.flags['rink.launched'] && !st.flags['part-talons'], away: (V, v) => !V.onIce(v.x, v.z), to: ZAMBONI_SPOT, line: 'The rink crew put the Zamboni back on the Wollman Rink ice.' },
+  'rc-boat': { open: (st) => st.gear.includes('remote') && !st.flags['wings.sail2'] && !st.flags['part-wings'], away: offHome, line: 'The RC tug is back at its landing on Conservatory Water.' },
+};
+
 /** polish (P14): a pile's shape, unit size (x, z in -1..1, y 0..1), as a heightfield with vertex colours. 'mound': a lumpy
  *  snow heap; 'kicker': a snow ramp that rises toward +z (north) to a lip, then drops steeply, its face glazed with ice. */
 function moundGeometry(kind) {
@@ -182,16 +193,35 @@ export class Vehicles {
   onNap() {
     const notes = [];
     if (this.piles.length) { for (const p of this.piles) p.mesh.removeFromParent(); this.piles = []; this.#savePiles(); notes.push('The rink crew resurfaced.'); }
-    // fix-23: a rigged vehicle left wedged somewhere goes home on a nap while its scheme still needs it (never a dead end)
-    for (const [id, scheme, line] of [['hotdog-cart', 'part-body', 'Vinnie\'s cart was towed back to the Mall.'], ['pedicab', 'den-racers', 'The pedicab is back at its stand.']]) {
-      const v = this.list.find((q) => q.id === id), s = this.st.vehicles?.[id];
-      if (!v || !s || this.st.flags[scheme] || this.cur === v || Math.hypot(s.x - v.def.home.x, s.z - v.def.home.z) < 3) continue;
-      delete this.st.vehicles[id];
-      const h = v.def.home; v.x = h.x; v.z = h.z; v.yaw = v.moveYaw = h.yaw; v.speed = 0; v.hop = null; v.y = null; v.tilt = 0;
-      this.#place(v);
-      notes.push(line);
+    // fix-23: a rigged vehicle left wedged or stranded somewhere goes back on a nap while its scheme still needs it (never a
+    // dead end). tow: Vinnie's cart and the pedicab when off home; the Zamboni when off the ice; the RC tug when off its landing.
+    for (const v of this.list) {
+      const t = TOWS[v.id], s = this.st.vehicles?.[v.id];
+      if (!t || !s || !t.open(this.st) || this.cur === v || !t.away(this, v)) continue;
+      this.#towBack(v);
+      notes.push(t.line);
     }
     return notes;
+  }
+  /** fix-23 (tow): put a vehicle back at its tow spot (home, or the Zamboni's spot on the ice), as if never moved. */
+  #towBack(v) {
+    const t = TOWS[v.id], to = t?.to || v.def.home;
+    if (this.cur === v) this.#exit();
+    v.x = to.x; v.z = to.z; v.yaw = v.moveYaw = to.yaw ?? v.def.home.yaw; v.speed = 0; v.hop = null; v.y = null; v.tilt = 0; v.chug = null;
+    this.#place(v);
+    if (to === v.def.home) delete this.st.vehicles?.[v.id]; else this.#save(v);
+    // the RC tug lets go of the sunk boat: back under the spout, as a load puts it
+    if (v.id === 'rc-boat' && this.tow && !this.tow.done) { this.tow.hooked = false; this.tow.x = RC_TOW.boat.x; this.tow.z = RC_TOW.boat.z; this.tow.yaw = 0.4; this.#placeTow(); }
+  }
+  /** fix-23 (tow): sunk, fallen out of the world, or a boat off its pond: no peck or drive gets it back. */
+  #lost(v) {
+    if (!Number.isFinite(v.x) || !Number.isFinite(v.z) || (v.y != null && !Number.isFinite(v.y))) return true;
+    const C = this.G.collision, w = C.waterAt(v.x, v.z);
+    if (v.def.surface === 'water') return !w || w.id !== v.def.water;
+    if (v.y == null) return false;
+    const ground = this.G.terrain.heightAt(v.x, v.z);
+    if (w && v.y < w.level + 0.1 && ground < w.level - 0.4 && C.deckAt(v.x, v.z, v.y) === -Infinity) return true;   // in (or afloat on) deep water
+    return v.y < ground - 3;                                                                                    // through the ground
   }
   napBlock() { return this.cur ? 'Not while driving' : this.auto ? 'Not now' : null; }
   music() { return this.cur?.id === 'zamboni' ? 'rink' : null; }
@@ -314,6 +344,12 @@ export class Vehicles {
       fr.position.set(ringOn.x, ringOn.y + Z.pileH + 0.8, ringOn.z);
       fr.rotation.set(0, Math.atan2(cam.x - ringOn.x, cam.z - ringOn.z), 0);
       fr.fg.geometry.setDrawRange(0, Math.round(48 * k) * 6);
+    }
+    // fix-23 (tow): a vehicle that sank or fell out of the world is fished out at once (Gus gets out first), no nap needed
+    if (G.updates % 30 === 0) for (const q of this.list) {
+      if (q.hop || q.scripted || (this.auto && this.auto.v === q) || !this.#lost(q)) continue;
+      this.#towBack(q);
+      G.toast(TOWS[q.id]?.line || `${q.def.name} is back where it started.`, { seconds: 4 });
     }
     // the tow follows the tug
     const t = this.tow;
