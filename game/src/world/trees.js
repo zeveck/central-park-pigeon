@@ -16,6 +16,9 @@ import { rngFor, fbm } from '../core/rng.js';
 import { pointInPoly, clamp } from '../core/geo.js';
 import { PARK, TRANSVERSES, FLATS, WORLD, AVENUE, NESTS, SIGNS, CLUES } from './layout.js';
 import { CHARACTERS } from '../data/crews.js';
+
+/** fix-31 (debug): the trees the clear-of-spots rule removed, for working out which routes the change can reach. */
+export const TREES_DROPPED = [];
 import { addShaderPatch } from '../anim/shader-patch.js';
 import { RULE, U } from '../gfx/materials.js';
 import { CELL } from '../gfx/batch.js';
@@ -120,6 +123,8 @@ export function placeTrees(terrain, blockers = []) {
     { x: -12.6, z: 363.4 }, { x: -10, z: 365 },   // Ledger's stall at the Exchange oak (item-sources.js), the oak's spot
   ];
   const clearOf = (t) => !spots.some((p) => Math.hypot(t.x - p.x, t.z - p.z) < 2.5);
+  TREES_DROPPED.length = 0;
+  for (const t of out) if (!clearOf(t)) TREES_DROPPED.push({ x: +t.x.toFixed(1), z: +t.z.toFixed(1) });   // (debug: what fix-31 removed)
   const kept = out.filter((t) => !NESTS.some((n) => Math.hypot(t.x - n.x, t.z - n.z) < 1.8) && !inFirstFlight(t) && clearOf(t));
   kept.forEach((t, i) => { t.id = i; t.y = terrain.heightAt(t.x, t.z) - 0.1; });
   return kept;
