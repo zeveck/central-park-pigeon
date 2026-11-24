@@ -173,8 +173,10 @@ export class Items {
     for (const s of this.state.items) for (const m of MOVED_ITEMS) {
       if (s.id !== m.item || Math.hypot(s.x - m.from.x, s.z - m.from.z) > 0.6) continue;
       const d = CLUES.find((q) => q.id === m.clue);
-      if (d) { s.x = d.x; s.z = d.z; s.y = this.G.collision.surface(d.x, d.z, 400).y + (d.y || 0); }
+      if (d) { s.x = d.x; s.z = d.z; s.y = this.G.collision.surface(d.x, d.z, 400).y + (d.y || 0); s.origin = { x: d.x, z: d.z }; }   // (review: the origin too: the clue finds its item by it, for its light shaft and its flag)
     }
+    const cc = this.state.carried;
+    if (cc?.origin) for (const m of MOVED_ITEMS) { if (cc.id === m.item && Math.hypot(cc.origin.x - m.from.x, cc.origin.z - m.from.z) <= 0.6) { const d = CLUES.find((q) => q.id === m.clue); if (d) cc.origin = { x: d.x, z: d.z }; } }
     for (const s of this.state.items) this.#addRuntime({ ...s });
     const maxSeq = Math.max(0, ...this.state.items.map((s) => +String(s.uid).slice(1) || 0));
     this.seq = maxSeq + 1;
@@ -419,6 +421,7 @@ export { GRATES };
 // fix-25: items that clues used to put somewhere now solid (from: the old spot; clue: the clue whose spot they move to)
 const MOVED_ITEMS = [
   { item: 'shiny', from: { x: 84, z: -26.5 }, clue: 'shiny-flagpole' },   // inside the Plaza's Grand Army Plaza turret
+  { item: 'shiny', from: { x: 79, z: -30 }, clue: 'shiny-flagpole' },     // (an interim spot one re-recorded fixture caught)
   { item: 'shiny', from: { x: -131.6, z: 276 }, clue: 'shiny-cpw72' },     // inside the gabled apartments' corner turret
 ];
 

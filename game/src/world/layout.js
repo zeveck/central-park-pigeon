@@ -764,9 +764,9 @@ export const CLUES = [
   { id: 'turtle-cart', type: 'dive', x: 11.5, z: 430.5, on: 'water:turtle', active: { scheme: 'den-turtles', step: 2 }, does: { item: 'cart', at: { x: 9.5, z: 425.2 }, haulTo: { x: 6, z: 419.5 }, flags: ['turtle.cartSurfaced'] } },
   // gear-headlamp: the jogger's lost key, down the 86th W grate mid-lap (fun pass P9: the rats' Grate Fetch in Act 1; it was a Turtle Pond dive)
   { id: 'key-grate', type: 'grate', x: -128, z: Z(85.6), active: { scheme: 'gear-headlamp', step: 1 }, does: { item: 'key', at: 'ally' } },
-  // gear-sunglasses: the shiny on the Plaza Hotel's flagpole
-  // (fix-25: on the hotel's flat roof at the foot of its flagpole (city.js: the pole on the Grand Army Plaza turret); it lay
-  // inside that turret's cone, which is solid now. Not on the pole's tip: a moving pigeon can't stop on it)
+  // gear-sunglasses: the shiny on the Plaza Hotel's roof, by the flagpole turret
+  // (fix-25: on the hotel's flat roof beside the turret with the flagpole (city.js); it lay inside that turret's cone, which
+  // is solid now)
   { id: 'shiny-flagpole', type: 'glint', x: 78, z: -31.5, on: 'roof', item: 'shiny', active: { scheme: 'gear-sunglasses', step: 1 } },
   // part-wings: the first sunk sailboat (the second is under the spout, where ducks won't dive)
   { id: 'sail-1', type: 'dive', x: 72, z: 305, on: 'water:conservatory', active: { scheme: 'part-wings', step: 1, not: ['wings.sail1'] }, does: { item: 'sail', at: 'ally', flags: ['wings.sail1'] } },
