@@ -55,14 +55,17 @@ export function freshState() {
 
 /** Totals the HUD and the Board show. */
 export function derived(st) {
-  const breadPower = Object.values(st.signs).filter((s) => s.permanent).length;
+  // fix-38 (the person's call): every flipped sign counts toward Bread Power, the moment it's flipped; a ranger flipping
+  // one back takes it off again. permanentSigns is what can't be taken back (the bread-print scarf counts those)
+  const breadPower = Object.values(st.signs).filter((s) => s.flipped || s.permanent).length;
+  const permanentSigns = Object.values(st.signs).filter((s) => s.permanent).length;
   const carts = Object.values(st.carts).filter(Boolean).length;
   const spikesCleared = Object.values(st.spikes).filter((v) => v === 'cleared').length + (st.flags['prickett.quit'] ? Object.values(st.spikes).filter((v) => v === null).length : 0);
   const flock = Object.values(st.flockFrom).reduce((a, b) => a + b, 0);
   let support = flock;
   for (const c of st.crews) support += (CREW[c]?.count || 0) + 1 + (CREW[c]?.regulars.length || 0);
   support += st.favours.length * 2;
-  return { breadPower, carts, spikesCleared, flock, support, crews: st.crews.length, parts: st.parts.length, lines: st.lines.length, truces: st.truces.length, deals: Math.min(6, st.deals) };
+  return { breadPower, permanentSigns, carts, spikesCleared, flock, support, crews: st.crews.length, parts: st.parts.length, lines: st.lines.length, truces: st.truces.length, deals: Math.min(6, st.deals) };
 }
 
 export function cloneState(st) { return JSON.parse(JSON.stringify(st)); }

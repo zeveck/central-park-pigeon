@@ -432,7 +432,7 @@ The **Scheme Board** has five lanes side by side. Each lane has a one-line goal,
 - **Unless the raccoons sabotage the carts.** Once the Night Crew has joined, go to a region's parked cart at Night and call Rigby (each cart has a small obstacle first). Raccoons pull the spark plug and pop off a **hubcap**. (The South cart is the exception: it sleeps in Wollman Rink's locked yard and is only reachable in the Rink Job, where a landing Zamboni does the job.) From then on, every flipped sign in that region is **permanent**, with a "This sign is now PERMANENT" stamp. Any two hubcaps are the Mecha's **Eyes**.
 - **City ring signs** have no rangers: they are permanent as soon as they're flipped. They all need the paint pen.
 - **Permanent signs are crumb engines:** each pays **+3 crumbs per nap**.
-- **Bread Power** (HUD meter, 0 to 30) counts permanent signs. **It gates nothing.** More Bread Power means more feeders, more crumbs and a fatter, happier flock, and the finale's bread rain gets bigger.
+- **Bread Power** (HUD meter, 0 to 30) counts every flipped sign, from the moment it's flipped (#38, the person's call: "You flip a sign. You have one of 30."); a ranger flipping one back takes it off again, and says so ("A ranger flipped a sign back. Bread Power 2/30"). Stopping a region's cart makes its flips stay. **It gates nothing.** More Bread Power means more feeders, more crumbs and a fatter, happier flock, and the finale's bread rain gets bigger.
 
 | Signs | Where | Flip with | Made permanent by |
 |---|---|---|---|
@@ -506,7 +506,7 @@ Ledger, the crows' bookkeeper, wears a plaid scarf himself and is a snob about k
 - **Currency: falafel.** The halal cart man tosses a falafel ball to any pigeon who coos at his cart while he works (Afternoon at Grand Army Plaza, Dusk at 110th & Fifth): one per visit per phase. A falafel ball is a light item. Ledger takes them at the Exchange oak ("Crows can't resist a falafel. It's documented.").
 - **The stash:** 10 scarves, each a few falafel. Most are bought; a few are earned and can't be bought, which turns them into small bonus goals:
   - bought from Ledger: Gus's slice orange (the starting scarf), taxi checker (yellow and black), deep subway blue, autumn maple stripes, a Ramble-green cable knit, a fluffy cream mohair;
-  - earned: the **Choir's rainbow stripe** (Vibrato's gift when the Choir joins), **Ringo's racing red** (after the Rink Job), **Dove's wedding white** (after the Wedding), and the **"FEED THE BIRDS" bread-print** (when Bread Power reaches 30).
+  - earned: the **Choir's rainbow stripe** (Vibrato's gift when the Choir joins), **Ringo's racing red** (after the Rink Job), **Dove's wedding white** (after the Wedding), and the **"FEED THE BIRDS" bread-print** (when all 30 signs are permanent).
 - **Wearing one:** at any Nest, "Scarf" opens a small wardrobe of everything in the stash. Pick one and Gus swaps it with a little twirl. Crews comment now and then ("Ooh, the taxi one!"). The scarf shows on Gus in the world, in his portrait frame on the Board, and in the finale.
 - **It's purely for fun.** Scarves change nothing in play, cost nothing on the main path, and count toward Completionist. Falafel is only for scarves, so the slice economy and crumbs stay simple.
 - **Assets:** one shared code-built scarf mesh (the wrap and two tails Gus already wears) with 10 knit-pattern textures (nanogen seamless tiles, about $0.04 each), a falafel-ball item model (code: a small bumpy sphere with a generated texture), a falafel icon, and Ledger's compliment and trade lines.

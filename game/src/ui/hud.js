@@ -142,11 +142,11 @@ export class Hud {
     const cp = `${v.crews}/${CREW_COUNT}|${v.parts}/8`;
     if (L.cp !== cp) { $.crews.textContent = `${v.crews}/${CREW_COUNT}`; $.parts.textContent = `${v.parts}/8`; L.cp = cp; }
     if (L.phase !== v.phase) { $.tod.innerHTML = phaseIcon(v.phase) + `<b>${v.phaseLabel}</b>`; L.phase = v.phase; }
-    const mk = v.meters.map((m) => m.id + m.value + '+' + (m.flipped || 0)).join('|');
+    const mk = v.meters.map((m) => m.id + m.value).join('|');
     if (L.meters !== mk) {
-      // batch-2 (#15): Bread Power also shows the live flips ("Bread Power 0/30 · 3 flipped"), and says what it counts on
-      // hover/focus and the first time it shows
-      const text = (m) => `${m.label} ${m.value}/${m.max}${m.flipped ? ` · ${m.flipped} flipped` : ''}`;
+      // fix-38: Bread Power counts every flipped sign itself (it was permanent signs only, with a separate "· N flipped"),
+      // and says what it counts on hover/focus and the first time it shows
+      const text = (m) => `${m.label} ${m.value}/${m.max}`;
       const ids = v.meters.map((m) => m.id).join('|');
       if (L.meterIds === ids) v.meters.forEach((m, i) => { $.meters.children[i].querySelector('b').textContent = text(m); });   // in place: an open tip stays open
       else $.meters.innerHTML = v.meters.map((m) => `<span class="chip"${TIP[m.id] ? ` tabindex="0" data-tip="${TIP[m.id]}"` : ` title="${esc(m.label)}"`}>${icon(m.icon)}<b>${esc(text(m))}</b></span>`).join('');
@@ -298,11 +298,11 @@ export class Hud {
 // batch-2 (#15): what the crumbs and Bread Power chips are for (hover/focus tip, and a toast the first time each shows)
 const TIP = {
   crumbs: 'Crumbs: spend 15 at a Nest to Feather Up (get a feather back), or on a shiny at the Exchange.',
-  sign: 'Bread Power: signs made permanent. The rangers fix flipped signs until you stop their cart.',
+  sign: 'Bread Power: every sign you\'ve flipped to FEED. Rangers flip them back, until you stop their cart; then they stay.',
 };
 const TOAST_TIP = {
   crumbs: 'Crumbs! 15 buys a feather at a Nest, or a shiny at the Exchange.',
-  sign: 'Bread Power counts PERMANENT signs: stop a ranger cart.',
+  sign: 'Every flipped sign is Bread Power. Rangers will flip them back: stop their cart to make them stay.',
 };
 
 export function metersFor(state, d) {
@@ -310,8 +310,6 @@ export function metersFor(state, d) {
   for (const t of THREADS) {
     if (!state.lanes.includes(t.id)) continue;
     const m = { id: t.id, label: t.meter.label, value: d[t.meter.of], max: t.meter.max, icon: t.icon };
-    // live flips that aren't permanent yet (they count toward nothing until their region's cart is stopped)
-    if (t.id === 'sign') m.flipped = Object.values(state.signs || {}).filter((s) => s.flipped && !s.permanent).length;
     out.push(m);
   }
   return out;

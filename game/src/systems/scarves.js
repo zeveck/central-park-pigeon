@@ -82,7 +82,7 @@ export class Scarves {
       }
     }
     // the bread-print: Bread Power 30
-    if (!st.scarves.includes('bread-print') && derived(st).breadPower >= 30) { st.scarves.push('bread-print'); G.toast('The bread-print scarf is yours!', { kind: 'stamp' }); }
+    if (!st.scarves.includes('bread-print') && derived(st).permanentSigns >= 30) { st.scarves.push('bread-print'); G.toast('The bread-print scarf is yours!', { kind: 'stamp' }); }
     // crews comment on a new scarf now and then
     const c = this.comment;
     if (c && (c.t += dt) > 1.5) {

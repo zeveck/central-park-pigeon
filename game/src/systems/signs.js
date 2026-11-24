@@ -12,6 +12,7 @@ import * as THREE from 'three';
 import { SIGNS, SIGN_RULES, SPIKE_SITES } from '../world/layout.js';
 import { ruleMaterial } from '../gfx/load-model.js';
 import { rngFor } from '../core/rng.js';
+import { derived } from '../state/gamestate.js';   // fix-38
 
 const POST_H = 0.9, PLATE = { w: 0.62, h: 0.44, y: 0.68 };
 const ZERO = new THREE.Matrix4().makeScale(0, 0, 0);
@@ -168,7 +169,11 @@ export class Signs {
     s.pending = false;
     s.feedAt = null;
     this.refresh();
-    if (!quiet) this.G.audio.play('ranger-tut', { at: s });
+    if (!quiet) {
+      this.G.audio.play('ranger-tut', { at: s });
+      // fix-38: a flip counts as Bread Power, so a ranger's fix says it takes one off
+      this.G.toast(`A ranger flipped a sign back. Bread Power ${derived(this.G.state).breadPower}/30`, { kind: 'bad' });
+    }
     this.G.bus.emit('revert', { sign: id });
     return true;
   }
@@ -251,7 +256,7 @@ export class Signs {
     for (const s of this.list) { if (this.st[s.id].flipped && !this.st[s.id].permanent) { this.revert(s.id, { quiet: true }); fixed++; } s.pending = false; s.feedAt = null; }
     const perm = this.list.filter((s) => this.st[s.id].permanent).length;
     const notes = [];
-    if (fixed) notes.push(`Rangers fixed ${fixed} sign${fixed > 1 ? 's' : ''} while you slept.`);
+    if (fixed) notes.push(`Rangers fixed ${fixed} sign${fixed > 1 ? 's' : ''} while you slept (Bread Power ${derived(this.G.state).breadPower}/30).`);
     if (perm) { this.G.state.crumbs += perm * SIGN_RULES.napIncome; notes.push(`Permanent signs paid ${perm * SIGN_RULES.napIncome} crumbs.`); }
     return notes;
   }
