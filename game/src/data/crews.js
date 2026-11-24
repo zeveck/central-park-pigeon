@@ -101,7 +101,7 @@ export const CHARACTERS = {
   // Plaza Swells
   duchess: { name: 'Duchess Pidgeley', crew: 'swells', role: 'boss', bio: 'Runs the Plaza. Judges every feeding frenzy.', at: { x: 97.0, z: -34.95, on: 'roof' }, out: 'any', voice: 'duchess' },
   monty: { name: 'Monty', crew: 'swells', role: 'regular', bio: 'Monocle, gossip, more gossip.', at: { x: 99.37, z: -35.54, on: 'roof' }, out: 'any' },
-  bunting: { name: 'Lady Bunting', crew: 'swells', role: 'regular', bio: 'Opera gloves. Never eats off the ground.', at: { x: 94.47, z: -35.63, on: 'roof' }, out: 'any' },
+  bunting: { name: 'Lady Bunting', crew: 'swells', role: 'regular', bio: 'Pearls and a pink fascinator. Never eats off the ground.', at: { x: 94.47, z: -35.63, on: 'roof' }, out: 'any' },
   tuppence: { name: 'Tuppence', crew: 'swells', role: 'regular', bio: 'The youngest. Hates hats.', at: { x: 101.14, z: -37.1, on: 'roof' }, out: 'any' },
   dove: { name: 'Dove', crew: 'swells', role: 'regular', bio: 'Pure white. Everyone assumes she is a dove.', at: { x: 92.72, z: -37.32, on: 'roof' }, out: 'any', voice: 'dove' },
   // Acorn Syndicate

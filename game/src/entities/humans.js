@@ -1084,7 +1084,14 @@ export function accList(model, acc, specHolds, holds) {
 /** Hang the accessories in `list` on a clone's holders and choose its holding arms (visual only). opts.holds: what the
  *  agent holds (the slice's kind); opts.items: the game's Items (the real slice model). */
 export function dressClone(c, list, acc, { holds = null, items = null } = {}) {
-  for (const h of Object.values(c.hold)) while (h.children.length) h.remove(h.children[0]);
+  // the old pieces' geometry goes (each dress builds its own); the materials are the table's, shared. A slice from
+  // Items (userData.items) shares its model's geometry: only its own material goes.
+  for (const h of Object.values(c.hold)) while (h.children.length) {
+    const old = h.children[0];
+    h.remove(old);
+    if (old.userData.items) { old.userData.sliceMat?.dispose(); continue; }
+    old.traverse((o) => { if (o.isMesh) o.geometry.dispose(); });
+  }
   // the arms: the first held piece per hand chooses its pose; a two-handed piece brings the other hand in
   const arms = { R: null, L: null };
   for (const name of list) {
@@ -1186,7 +1193,7 @@ export function makeAccessories() {
     remote: { bone: 'RightHand', pose: 'front', make: () => grp(mesh(new THREE.BoxGeometry(0.1, 0.03, 0.14), M(0x3a5ab0), 0, 0.015, 0.03, -0.3), mesh(new THREE.CylinderGeometry(0.003, 0.003, 0.18, 4), dark, 0.035, 0.1, 0.05, 0.3)) },
     bouquet: { bone: 'RightHand', pose: 'both', make: (F, x) => { const mid = x.grips.L ? x.grips.L.grip.clone().sub(x.grips.R.grip).multiplyScalar(0.5) : new THREE.Vector3(); const ps = [mesh(new THREE.ConeGeometry(0.035, 0.18, 8).rotateX(Math.PI), green, mid.x, mid.y - 0.03, mid.z + 0.02)]; const cols = [0xfff4f6, 0xf7b8c8, 0xffffff, 0xf2d06b, 0xf7b8c8, 0xffffff, 0xfff4f6]; for (let k = 0; k < 7; k++) { const a = k * 2.4, r = k ? 0.045 : 0; ps.push(mesh(new THREE.SphereGeometry(0.036, 8, 6), M(cols[k]), mid.x + Math.cos(a) * r, mid.y + 0.08 + (k % 2) * 0.012, mid.z + 0.03 + Math.sin(a) * r)); } return grp(...ps); } },
     // the real slice (the anchovy one in its own texture), held by the crust, tip up to the mouth
-    slice: { bone: 'RightHand', pose: 'eat', make: (F, x) => { if (!x.items?.makeMesh) return mesh(new THREE.ConeGeometry(0.08, 0.22, 3), yellow, 0, 0.1, 0.02); const m = x.items.makeMesh(/^slice/.test(x.holds || '') ? x.holds : 'slice'); m.rotation.set(-1.8, 0, 0); m.updateMatrix(); const crust = new THREE.Vector3(0, 0.03, -0.12).applyMatrix4(m.matrix); m.position.sub(crust).add(new THREE.Vector3(0, 0, 0.02)); return m; } },   // (the slice model: crust at -z, tip at +z)
+    slice: { bone: 'RightHand', pose: 'eat', make: (F, x) => { if (!x.items?.makeMesh) return mesh(new THREE.ConeGeometry(0.08, 0.22, 3), yellow, 0, 0.1, 0.02); const m = x.items.makeMesh(/^slice/.test(x.holds || '') ? x.holds : 'slice'); m.userData.items = true; m.rotation.set(-1.8, 0, 0); m.updateMatrix(); const crust = new THREE.Vector3(0, 0.03, -0.12).applyMatrix4(m.matrix); m.position.sub(crust).add(new THREE.Vector3(0, 0, 0.02)); return m; } },   // (the slice model: crust at -z, tip at +z)
     sax: { bone: 'RightHand', pose: 'both', make: (F, x) => { const mid = x.grips.L ? x.grips.L.grip.clone().sub(x.grips.R.grip).multiplyScalar(0.5) : new THREE.Vector3(); return grp(mesh(new THREE.CylinderGeometry(0.018, 0.03, 0.42, 10), gold, mid.x, mid.y + 0.06, mid.z + 0.04, -0.25), mesh(new THREE.CylinderGeometry(0.06, 0.03, 0.08, 12), gold, mid.x, mid.y - 0.16, mid.z + 0.1, -1.2), mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.12, 6), black, mid.x, mid.y + 0.3, mid.z - 0.02, 0.9)); } },
     wand: { bone: 'RightHand', pose: 'front', make: () => grp(mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.6, 6), M(0x3a3a3a), 0, -0.06, 0.28, Math.PI / 2 + 0.25), mesh(new THREE.ConeGeometry(0.025, 0.06, 8), M(0x3a3a3a), 0, -0.135, 0.57, Math.PI / 2 + 0.25)) },
     clipboard: { bone: 'LeftHand', pose: 'phone', make: () => grp(mesh(new THREE.BoxGeometry(0.22, 0.3, 0.015), M(0x8a5e30), 0.03, 0.08, 0.02, 0.6), mesh(new THREE.BoxGeometry(0.18, 0.24, 0.005), white, 0.03, 0.08, 0.03, 0.6)) },

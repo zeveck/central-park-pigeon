@@ -352,7 +352,8 @@ export function accessoryGeometry(look, baked, ref = baked, model = null) {
   // batch-2 (#6): a character's own neck anchor (data/looks.js `neck`: [dx, dy, dz, ring scale] in head units), for
   // models whose neck isn't where the guess puts it (Fifi's mane, a standing rat)
   // #29: a measured neck (data/looks.js MODEL_FIT: just under the head) replaces the guess; the ring is fitted there
-  const NF = MF.neckY != null ? neckFit(c.baked, MF.neckY, H, u) : null;
+  // (a look's own hand-fitted neck still wins: Sue's token cord sank into her fur at the model's neck)
+  const NF = MF.neckY != null && !c.look.neck ? neckFit(c.baked, MF.neckY, H, u) : null;
   const NK = NF ? null : c.look.neck || null;
   if (NK) N.add(new THREE.Vector3(NK[0], NK[1], NK[2]).multiplyScalar(u));
   if (NF) N.copy(NF.p);

@@ -141,7 +141,7 @@ async function buildAnimals() {
       const grp = new THREE.Group();
       const t = look.tint || [1, 1, 1];
       grp.add(new THREE.Mesh(b.geometry, b.makeMaterial({ color: new THREE.Color(t[0], t[1], t[2]) })));
-      const ag = accessoryGeometry(look, b, ref, look.model || sp.model);
+      const ag = accessoryGeometry(look, b, ref, q.has('nofit') ? null : look.model || sp.model);   // &nofit: without MODEL_FIT (to compare)
       if (ag) grp.add(new THREE.Mesh(ag, ruleMaterial({ vertexColors: true })));
       grp.scale.setScalar(look.scale || 1);
       grp.updateMatrixWorld(true);

@@ -348,7 +348,7 @@ The park is **crowded** with animals. Each crew below is a whole population. You
 
 | Crew | Boss | Regulars |
 |---|---|---|
-| Plaza Swells | Duchess Pidgeley | Monty (monocle, gossip), Lady Bunting (opera gloves), Tuppence (the youngest, hates hats), **Dove** (pure white; everyone assumes she's a dove and she's never corrected anyone: "Forty weddings, darling. Not ONE person checked.") |
+| Plaza Swells | Duchess Pidgeley | Monty (monocle, gossip), Lady Bunting (pearls, a pink fascinator), Tuppence (the youngest, hates hats), **Dove** (pure white; everyone assumes she's a dove and she's never corrected anyone: "Forty weddings, darling. Not ONE person checked.") |
 | Acorn Syndicate | Hazel | Nutmeg (accountant, counts everything), Twitch (too fast to finish sentences), Old Pecan (remembers caches from 1974) |
 | Lake Mallards | Commodore Puddles | Mrs. Puddles (the real boss), Bubbles (dives for fun), Ensign Drake (salutes everything) |
 | Ramble Exchange | Vesper | Ledger (keeps the trade book), Glint (collects only blue things), Cawdry (the lookout) |
@@ -840,7 +840,7 @@ Accessories are small code meshes (palette-matched canvas-noise textures) parent
 |---|---|---|---|
 | Duchess Pidgeley | pigeon-plain | 1 blue bar | small black top hat, pearl choker |
 | Monty | pigeon-plain | 6 ash-red | top hat, monocle, pearl choker |
-| Lady Bunting | pigeon-plain | 10 silver-dun | pink feather fascinator, pearl choker, white opera-glove cuffs on the wing tips |
+| Lady Bunting | pigeon-plain | 10 silver-dun | pink feather fascinator, pearl choker (the opera-glove cuffs were dropped, #29: they read as white balls at her sides) |
 | Tuppence | pigeon-plain | 8 pied | an oversized tilted top hat |
 | Dove | pigeon-plain | 9 pure white | none (she's always drawn in the flock) |
 | Maestro Vibrato | pigeon-plain | 1, brighter blue tint | red beret, black waistcoat, bow tie, baton |
