@@ -344,7 +344,12 @@ export class Crowds {
     const gdef = GROUPS[a.group];
     a.t -= dt;
     if (a.state === 'cheer') { if (a.t <= 0) a.state = 'idle'; return; }
-    if (gdef.speed === 0) { a.state = 'idle'; return; }
+    if (gdef.speed === 0) {
+      a.state = 'idle';
+      // #24 (review): owls and hawks never flee and don't bark: Gus coming low and close is when they let it slip
+      if (!gdef.bark && !friendly && gusLow && d < 6) this.#leadHint(a);
+      return;
+    }
     if (!friendly && gusLow && d < WARY_R && a.state !== 'scatter') {
       a.state = 'scatter';
       const l = d || 1;
@@ -473,25 +478,26 @@ export class Crowds {
   }
 
   /** #24: the line a wary animal of this crew lets slip, or null: its first chance, then every third, at most once every
-   *  25 s of game time per crew; never for a crew already joined. Hearing one marks the crew's region on the map. No
+   *  90 s of game time per crew; never for a crew already joined. Hearing one marks the crew's region on the map. No
    *  random draws (crowd decisions are seeded, and replays must repeat). */
   #leadHintLine(crew) {
     const G = this.G, H = crew && LEAD_HINTS[crew];
-    if (!H || this.friendly(crew) || G.dialogue?.open || G.cutscene?.locked) return null;
+    if (!H || this.friendly(crew) || G.dialogue?.open || G.cutscene?.locked || G.midScene?.()) return null;
     const n = (this.hintN ||= {})[crew] = (this.hintN[crew] || 0) + 1;
     const t = G.state.time, last = (this.hintAt ||= {})[crew];
-    if (n % 3 !== 1 || (last != null && t - last < 25)) return null;
+    if (n % 3 !== 1 || (last != null && t - last < 90)) return null;   // (review: about every 90 s at most: now and then)
     this.hintAt[crew] = t;
     const st = G.state.leadHints || (G.state.leadHints = {});
     if (!st[crew]) {
       st[crew] = 1;
-      const c = CREW[crew], P = c?.haunt;
+      const c = CREW[crew], P = H.place || c?.haunt;
       if (P) G.later(2.6, () => G.toast(`${c.name.replace(/^The /, '')}: marked on your map`, { seconds: 3 }));
     }
     return H.lines[Math.floor(n / 3) % H.lines.length];
   }
 
   #leadHint(a) {
+    if (a.group === 'herons') return;   // (they're the geese's crew, but a heron doesn't speak for Gertrude)
     const line = this.#leadHintLine(a.crew);
     if (line) this.G.bubbles.add(line, { at: () => ({ x: a.x, y: a.yBase + 0.6, z: a.z }), ttl: 3.6, range: 30 });
   }

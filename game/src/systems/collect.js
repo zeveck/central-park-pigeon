@@ -452,7 +452,7 @@ export class Collect {
   /** Completionist: what's collected of what (the Board shows it). */
   completion() {
     const st = this.st, d = derived(st);
-    const meters = THREADS.filter((t) => d[t.meter.of] >= t.meter.max).length;
+    const meters = THREADS.filter((t) => (t.meter.of === 'breadPower' ? d.permanentSigns : d[t.meter.of]) >= t.meter.max).length;   // (fix-38: the Sign War is full when all 30 are permanent)
     const rows = [
       { id: 'pretzels', label: 'Golden pretzels', have: st.collectibles.pretzels.length, of: 20 },
       { id: 'strays', label: 'Strays', have: st.collectibles.strays.length, of: 40 },

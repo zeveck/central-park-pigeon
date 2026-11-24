@@ -224,9 +224,11 @@ export function mapScreen(G) {
     for (const c of CREWS) { const b = G.chars?.find(c.boss); if (b && seenAt(b.x, b.z) && G.state.crews.includes(c.id)) dot(b.x, b.z, '#9fd0f0', 3); }
     // #24: a crew whose lead hint Gus has heard (and hasn't joined): a soft region round its haunt, with when to look; not a
     // pin, and drawn under the fog too (it's what he was told)
+    const usedAt = {};
     for (const c of CREWS) {
-      if (!G.state.leadHints?.[c.id] || G.state.crews.includes(c.id)) continue;
-      const P = PLACES[c.haunt];
+      // (review: hidden once the crew's quest card is open: the card says where to go)
+      if (!G.state.leadHints?.[c.id] || G.state.crews.includes(c.id) || (c.recruit && G.schemes.isOpen(c.recruit))) continue;
+      const pid = LEAD_HINTS[c.id]?.place || c.haunt, P = PLACES[pid];
       if (!P) continue;
       const [px, py] = v.toPx(P.x, P.z), R = Math.max(30, (P.r || 0) + 12) * v.s;
       const grd = g.createRadialGradient(px, py, R * 0.2, px, py, R);
@@ -236,7 +238,9 @@ export function mapScreen(G) {
       const when = LEAD_HINTS[c.id]?.when;
       g.font = '700 12px Fredoka, sans-serif'; g.textAlign = 'center'; g.lineWidth = 3; g.strokeStyle = 'rgba(20, 24, 32, 0.85)';
       const label = `${c.name.replace(/^The /, '')}: ${P.name}${when ? ', ' + when : ''}`;
-      g.strokeText(label, px, py - R * 0.55); g.fillStyle = '#f2c230'; g.fillText(label, px, py - R * 0.55);
+      const ly = py + (usedAt[pid] ? R * 0.55 : -R * 0.55);   // (two crews on one place: the second label below, review)
+      usedAt[pid] = true;
+      g.strokeText(label, px, ly); g.fillStyle = '#f2c230'; g.fillText(label, px, ly);
     }
     // Fixes-2 (P2): every open card's target gets a dim ring; the tracked one keeps its bright marker
     const tracked = G.state.tracked;

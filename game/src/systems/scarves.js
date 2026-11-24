@@ -4,7 +4,7 @@
 //             item; Peck Ledger with it and it goes in your falafel account ("It's documented.").
 //   Ledger    the first time Gus lands near him he admires the slice-orange scarf; from then on, talking
 //             to him opens his stash: six scarves to buy with falafel, four to earn (the Choir's rainbow
-//             stripe, Ringo's racing red, Dove's wedding white, the bread-print at Bread Power 30)
+//             stripe, Ringo's racing red, Dove's wedding white, the bread-print when all 30 signs are permanent)
 //   wearing   any Nest's Scarf wardrobe (screens.js); Gus swaps it with a twirl; crews comment now and then
 // Scarves change nothing in play and count toward Completionist.
 
@@ -81,7 +81,7 @@ export class Scarves {
         G.say([{ who: 'ledger', text: 'Now THAT is a scarf. Hand-knit? Tell me it\'s hand-knit.' }, { who: 'ledger', text: 'I keep a little stash myself. Bring me falafel from the halal cart and we\'ll talk knitwear.' }]);
       }
     }
-    // the bread-print: Bread Power 30
+    // the bread-print: all 30 signs permanent (fix-38: Bread Power now counts live flips too)
     if (!st.scarves.includes('bread-print') && derived(st).permanentSigns >= 30) { st.scarves.push('bread-print'); G.toast('The bread-print scarf is yours!', { kind: 'stamp' }); }
     // crews comment on a new scarf now and then
     const c = this.comment;

@@ -171,8 +171,12 @@ export class Signs {
     this.refresh();
     if (!quiet) {
       this.G.audio.play('ranger-tut', { at: s });
-      // fix-38: a flip counts as Bread Power, so a ranger's fix says it takes one off
-      this.G.toast(`A ranger flipped a sign back. Bread Power ${derived(this.G.state).breadPower}/30`, { kind: 'bad' });
+      // fix-38: a flip counts as Bread Power, so a ranger's fix says it takes one off; fixes close together share one toast
+      // with the count then; the Prologue says its own line about its signs
+      if (this.G.state.flags.prologue) {
+        this.revertN = (this.revertN || 0) + 1;
+        if (this.revertN === 1) this.G.later(1.5, () => { const n = this.revertN; this.revertN = 0; this.G.toast(`${n > 1 ? `Rangers flipped ${n} signs` : 'A ranger flipped a sign'} back. Bread Power ${derived(this.G.state).breadPower}/30`, { kind: 'bad' }); });
+      }
     }
     this.G.bus.emit('revert', { sign: id });
     return true;
