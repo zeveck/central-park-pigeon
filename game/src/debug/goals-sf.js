@@ -26,7 +26,9 @@ const d0 = (f) => 1;
 const SF_EXT = (A, g, s, out) => {
   const G = A.G, gus = G.gus, p = gus.position;
   if (g.sfIdle) {
-    const busy = G.cutscene.running || G.dialogue.open || G.schemes.busy.size > 0 || G.menus.open;
+    // fightOk (the mistake sweep): the running fight's own scheme being busy doesn't count
+    const fightBusy = g.fightOk && G.fights.f && G.schemes.busy.has(G.fights.f.ctx?.scheme ?? '') ? 1 : 0;
+    const busy = G.cutscene.running || G.dialogue.open || G.schemes.busy.size > fightBusy || G.menus.open;
     s.calm = busy ? 0 : (s.calm || 0) + 1;
     return s.calm > (g.frames ?? 20);
   }

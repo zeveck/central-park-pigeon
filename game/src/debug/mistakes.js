@@ -60,7 +60,9 @@ function offPoint(G, d, from = G.gus.position) {
 const nearestNest = (G, p = G.gus.position) => [...NESTS].sort((a, b) => dist(a, p) - dist(b, p))[0];
 /** Nap at the nearest Nest until `phase` (done at once if it already is). Gets out of a vehicle first. */
 const napTo = (G, phase) => [...(G.vehicles.driving ? [{ exit: true, timeout: 20 }] : []), { napNest: nearestNest(G).id, phase, timeout: 220 }, { wait: 0.5 }];
-const idle = (frames = 20) => ({ sfIdle: true, frames, timeout: 120 });
+// fightOk: a running fight is its scheme's script, so that scheme stays busy until the fight ends; it doesn't count here
+// (without it every mistake and recovery that starts mid-fight waited out the 120 s timeout pressing nothing)
+const idle = (frames = 20) => ({ sfIdle: true, frames, timeout: 120, fightOk: true });
 const nextPhase = (p, not = []) => { for (let k = 1; k <= 4; k++) { const q = PH[(PH.indexOf(p) + k) % 4]; if (!not.includes(q)) return q; } return PH[(PH.indexOf(p) + 1) % 4]; };
 
 // ------------------------------------------------------------------ marks (when to inject)
