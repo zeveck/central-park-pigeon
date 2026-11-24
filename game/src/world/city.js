@@ -269,6 +269,15 @@ HERO['plaza-hotel'] = (ctx, H, masses) => {
     ctx.batch.mesh('copper', new THREE.ConeGeometry(3.2, 7, 8), { x: tx, y: H.h + 6.8 + 3.5, z: tz });
     ctx.collision.addPerch({ x: tx, y: H.h + 14.3, z: tz, r: 0.3, id: `plaza-turret-${dx}-${dz}`, kind: 'finial' });
     ctx.collision.addPyramid({ x: tx, z: tz, y0: H.h + 6.8, h: 7, half: 2.6, tag: 'roof' });   // fix-25 review: the turret cones
+    if (dx === 1 && dz === 1) {
+      // fix-25: the hotel's flagpole, on the tip of its Grand Army Plaza turret (gear-sunglasses' shiny is on top of it;
+      // it used to lie on the roof inside this turret's cone, which is solid now)
+      const top = H.h + 13.8;
+      ctx.batch.mesh('iron', new THREE.CylinderGeometry(0.045, 0.06, 2.2, 6), { x: tx, y: top + 1.1, z: tz });
+      ctx.batch.box('red', { x: tx, y: top + 1.55, z: tz + 0.42 }, { w: 0.02, h: 0.5, d: 0.8 });
+      ctx.collision.addCylinder({ x: tx, z: tz, y0: top, h: 2.2, r: 0.06, tag: 'flagpole', walkable: false });
+      ctx.collision.addPerch({ x: tx, y: top + 2.22, z: tz, r: 0.18, id: 'plaza-roof-flagpole', kind: 'flagpole' });
+    }
   }
   rimPerches(ctx, { x, z, y: H.h + 6.8, w: w - 2, d: d - 2, tag: 'mansard' });
   ctx.collision.addPerch({ x, y: H.h + 6.8, z, r: 6, id: 'summit-plaza', kind: 'summit' });

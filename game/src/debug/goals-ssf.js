@@ -27,7 +27,9 @@ function besideChar(G, id, want = 1.0) {
 }
 /** Dry ground near a point (a shore spot for a dive). */
 function dryNear(G, x0, z0, want = 0.5) {
-  for (let r = want; r < 30; r += 0.25) for (let a = 0; a < 6.28; a += 0.2) { const x = x0 + Math.cos(a) * r, z = z0 + Math.sin(a) * r; if (!G.collision.waterAt(x, z)) return { x, z }; }
+  // fix-27: ground a walker can stand on (the waterline itself is now exactly where the water ends: Gus stops short of it)
+  const C = G.collision, ok = (x, z) => !C.waterAt(x, z) && C.standable(x, z, { r: 0.3, h: 0.5 }) != null && C.walkBlocked(x, z) !== 1;
+  for (let r = want; r < 30; r += 0.25) for (let a = 0; a < 6.28; a += 0.2) { const x = x0 + Math.cos(a) * r, z = z0 + Math.sin(a) * r; if (ok(x, z)) return { x, z }; }
   return { x: x0, z: z0 };
 }
 const goTalk = (G, id, alt = 7) => { const b = besideChar(G, id); return [{ landNear: b, alt, r: 5, timeout: 120 }, { talk: id, timeout: 40 }]; };
@@ -110,7 +112,7 @@ export const SSF = {
   'gear-sunglasses': (G) => {
     const f = clue('shiny-flagpole');
     return [
-      { landNear: { x: f.x, z: f.z - 18 }, alt: 8, r: 6, timeout: 150 }, { climbTo: G.collision.surface(f.x, f.z, 400).y + 4, timeout: 60 }, { landNear: { x: f.x, z: f.z - 3 }, alt: G.collision.surface(f.x, f.z, 400).y + 3, r: 3, timeout: 60 }, { pickItem: 'shiny', timeout: 20 }, { waitFor: 'gear-sunglasses.s1', timeout: 10 }, settle,
+      { landNear: { x: f.x, z: f.z - 18 }, alt: 8, r: 6, timeout: 150 }, { climbTo: G.collision.surface(f.x, f.z, 400).y + 5, timeout: 60 }, { landOn: 'plaza-roof-flagpole', timeout: 90 }, { pickItem: 'shiny', timeout: 20 }, { waitFor: 'gear-sunglasses.s1', timeout: 10 }, settle,
       // fun pass (P6): land on the fountain rim right behind him (his phone's view) and hold still
       { landNear: { x: 93.55, z: -36.5 }, alt: 2.5, r: 0.5, timeout: 90 }, { walkTo: { x: 93.6, z: -36.45 }, r: 0.4, timeout: 20 }, { waitFor: 'selfie.attention', timeout: 12 }, settle,
       { nearHuman: 'selfie', d: 2.5, timeout: 30 }, { call: 'crows' }, { wait: 3.6 }, { ask: 'crows' },

@@ -765,7 +765,8 @@ export const CLUES = [
   // gear-headlamp: the jogger's lost key, down the 86th W grate mid-lap (fun pass P9: the rats' Grate Fetch in Act 1; it was a Turtle Pond dive)
   { id: 'key-grate', type: 'grate', x: -128, z: Z(85.6), active: { scheme: 'gear-headlamp', step: 1 }, does: { item: 'key', at: 'ally' } },
   // gear-sunglasses: the shiny on the Plaza Hotel's flagpole
-  { id: 'shiny-flagpole', type: 'glint', x: 84, z: -26.5, on: 'roof', item: 'shiny', active: { scheme: 'gear-sunglasses', step: 1 } },
+  // (fix-25: on top of the hotel's flagpole, on its corner turret's tip (city.js); it lay on the roof inside that turret)
+  { id: 'shiny-flagpole', type: 'glint', x: 83, z: -27, y: 2.22, on: 'roof', item: 'shiny', active: { scheme: 'gear-sunglasses', step: 1 } },
   // part-wings: the first sunk sailboat (the second is under the spout, where ducks won't dive)
   { id: 'sail-1', type: 'dive', x: 72, z: 305, on: 'water:conservatory', active: { scheme: 'part-wings', step: 1, not: ['wings.sail1'] }, does: { item: 'sail', at: 'ally', flags: ['wings.sail1'] } },
   { id: 'sail-spout', type: 'dive', x: 77, z: 319.5, on: 'water:conservatory', fake: true, active: { scheme: 'part-wings', step: 3 }, refuseLine: { ducks: "That's a SHOWER, Gus. We don't do showers." } },
