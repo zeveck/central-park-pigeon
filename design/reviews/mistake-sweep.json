@@ -1,0 +1,7305 @@
+{
+ "runs": {
+  "den-ducks.s3|W": {
+   "case": "den-ducks.s3",
+   "code": "W",
+   "round": 1,
+   "fixture": "den-ducks.s3",
+   "cap": 600,
+   "recorded": 21,
+   "begin": {
+    "key": "den-ducks.s3",
+    "code": "W",
+    "fixtureStep": 3,
+    "phase": "afternoon"
+   },
+   "mark": {
+    "t": 171.9,
+    "phase": "afternoon",
+    "step": 3,
+    "carried": "peas",
+    "at": [
+     45.3,
+     293.3
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "drop the peas over the Lake",
+   "route": "input",
+   "took": true,
+   "mistakeSecs": 7.5,
+   "afterMistake": {
+    "t": 179.4,
+    "phase": "afternoon",
+    "step": 3,
+    "carried": null,
+    "at": [
+     -18.1,
+     305
+    ],
+    "mode": "fly",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "fetch the peas at 46, 293",
+     "result": "done",
+     "at": {
+      "t": 213.6,
+      "phase": "afternoon",
+      "step": 4,
+      "carried": null,
+      "at": [
+       -20.9,
+       297.7
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 34.2,
+   "recovery": {
+    "keeper": 1,
+    "refill": 0,
+    "tow": 0,
+    "naps": 0,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 1,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [
+    "NUDGE-WRONG: the compass points at puddles, the peas lies at 46, 293"
+   ],
+   "leftovers": {},
+   "retries": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "wallSecs": 11,
+   "job": "001-den-ducks.s3-W.out"
+  },
+  "den-rats.s3|C": {
+   "case": "den-rats.s3",
+   "code": "C",
+   "round": 1,
+   "fixture": "den-rats.s3",
+   "cap": 600,
+   "recorded": 20.9,
+   "begin": {
+    "key": "den-rats.s3",
+    "code": "C",
+    "fixtureStep": 3,
+    "phase": "afternoon"
+   },
+   "mark": {
+    "t": 406.9,
+    "phase": "afternoon",
+    "step": 3,
+    "carried": "slice",
+    "at": [
+     -142.5,
+     -17.2
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "wait until the slice is cold",
+   "route": "input",
+   "took": true,
+   "mistakeSecs": 60.2,
+   "afterMistake": {
+    "t": 467.1,
+    "phase": "afternoon",
+    "step": 3,
+    "carried": "slice",
+    "at": [
+     -142.5,
+     -17.2
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "warm it on the afternoon griddle",
+     "result": "done",
+     "at": {
+      "t": 547,
+      "phase": "afternoon",
+      "step": 4,
+      "carried": null,
+      "at": [
+       -100,
+       -17.9
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 79.8,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 0,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 1,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {},
+   "retries": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "wallSecs": 27,
+   "job": "002-den-rats.s3-C.out"
+  },
+  "den-cats.s3|C": {
+   "case": "den-cats.s3",
+   "code": "C",
+   "round": 1,
+   "fixture": "den-cats.s3",
+   "cap": 600,
+   "recorded": 61.6,
+   "begin": {
+    "key": "den-cats.s3",
+    "code": "C",
+    "fixtureStep": 3,
+    "phase": "afternoon"
+   },
+   "mark": {
+    "t": 557.8,
+    "phase": "afternoon",
+    "step": 3,
+    "carried": "slice-anchovy",
+    "at": [
+     -128.9,
+     247.1
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "wait until the slice is cold",
+   "route": "input",
+   "took": true,
+   "mistakeSecs": 57.2,
+   "afterMistake": {
+    "t": 615,
+    "phase": "afternoon",
+    "step": 3,
+    "carried": "slice-anchovy",
+    "at": [
+     -128.9,
+     247.1
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "warm it on the dusk griddle",
+     "result": "done",
+     "at": {
+      "t": 733.5,
+      "phase": "dusk",
+      "step": 4,
+      "carried": null,
+      "at": [
+       62,
+       1065.9
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 118.5,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 1,
+    "fails": 1,
+    "raceLost": 0,
+    "starts": 1,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {},
+   "retries": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "wallSecs": 79,
+   "job": "003-den-cats.s3-C.out"
+  },
+  "den-raccoons.s2|C": {
+   "case": "den-raccoons.s2",
+   "code": "C",
+   "round": 1,
+   "fixture": "den-raccoons.s2",
+   "cap": 600,
+   "recorded": 110.2,
+   "begin": {
+    "key": "den-raccoons.s2",
+    "code": "C",
+    "fixtureStep": 2,
+    "phase": "dusk"
+   },
+   "toMark": [
+    {
+     "pilot": "running",
+     "at": {
+      "t": 1589.1,
+      "phase": "dusk",
+      "step": 2,
+      "carried": "slice-anchovy",
+      "at": [
+       -124.4,
+       262.3
+      ],
+      "mode": "takeoff",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "mark": {
+    "t": 1589.1,
+    "phase": "dusk",
+    "step": 2,
+    "carried": "slice-anchovy",
+    "at": [
+     -124.4,
+     262.3
+    ],
+    "mode": "takeoff",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "wait until the slice is cold",
+   "route": "input",
+   "took": true,
+   "mistakeSecs": 61.3,
+   "afterMistake": {
+    "t": 1650.4,
+    "phase": "dusk",
+    "step": 2,
+    "carried": "slice-anchovy",
+    "at": [
+     -129.8,
+     244.9
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "drop the cold slice, get another",
+     "result": "none",
+     "at": {
+      "t": 1684,
+      "phase": "dusk",
+      "step": 2,
+      "carried": null,
+      "at": [
+       -124.6,
+       262
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "attempt": 1,
+     "how": "",
+     "result": "none",
+     "at": {
+      "t": 1701.6,
+      "phase": "dusk",
+      "step": 2,
+      "carried": null,
+      "at": [
+       -124.6,
+       262
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "attempt": 2,
+     "how": "",
+     "result": "none",
+     "at": {
+      "t": 1719.2,
+      "phase": "dusk",
+      "step": 2,
+      "carried": null,
+      "at": [
+       -124.6,
+       262
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "attempt": 3,
+     "how": "nap round",
+     "result": "done",
+     "at": {
+      "t": 1804.9,
+      "phase": "dusk",
+      "step": 3,
+      "carried": "wrench",
+      "at": [
+       -42.1,
+       430.1
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 154.5,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 2,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 1,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {},
+   "retries": 3,
+   "helped": "nap round",
+   "errors": 0,
+   "verdict": "PASS-HELPED",
+   "wallSecs": 105,
+   "job": "004-den-raccoons.s2-C.out"
+  },
+  "den-raccoons.s3|W": {
+   "case": "den-raccoons.s3",
+   "code": "W",
+   "round": 1,
+   "fixture": "den-raccoons.s3",
+   "cap": 600,
+   "recorded": 66.8,
+   "begin": {
+    "key": "den-raccoons.s3",
+    "code": "W",
+    "fixtureStep": 3,
+    "phase": "dusk"
+   },
+   "mark": {
+    "t": 1626.5,
+    "phase": "dusk",
+    "step": 3,
+    "carried": "wrench",
+    "at": [
+     -42.2,
+     430
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "drop the wrench over Turtle Pond",
+   "route": "input",
+   "took": true,
+   "mistakeSecs": 7.5,
+   "afterMistake": {
+    "t": 1634,
+    "phase": "dusk",
+    "step": 3,
+    "carried": null,
+    "at": [
+     25.7,
+     438.5
+    ],
+    "mode": "fly",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "fetch the wrench at -42, 429",
+     "result": "done",
+     "at": {
+      "t": 1713.9,
+      "phase": "dusk",
+      "step": 4,
+      "carried": null,
+      "at": [
+       -32.6,
+       929.3
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 79.8,
+   "recovery": {
+    "keeper": 1,
+    "refill": 0,
+    "tow": 0,
+    "naps": 0,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 1,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [
+    "NUDGE-WRONG: the compass points at rigby, the wrench lies at -42, 429"
+   ],
+   "leftovers": {},
+   "retries": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "wallSecs": 15,
+   "job": "005-den-raccoons.s3-W.out"
+  },
+  "sab-middle.s1|W": {
+   "case": "sab-middle.s1",
+   "code": "W",
+   "round": 1,
+   "fixture": "sab-middle",
+   "cap": 600,
+   "recorded": 34,
+   "begin": {
+    "key": "sab-middle.s1",
+    "code": "W",
+    "fixtureStep": 1,
+    "phase": "night"
+   },
+   "toMark": [
+    {
+     "pilot": "running",
+     "at": {
+      "t": 1761.3,
+      "phase": "night",
+      "step": 1,
+      "carried": "gate-key",
+      "at": [
+       44.2,
+       309.7
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "mark": {
+    "t": 1761.3,
+    "phase": "night",
+    "step": 1,
+    "carried": "gate-key",
+    "at": [
+     44.2,
+     309.7
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "drop the gate-key over the Lake",
+   "route": "input",
+   "took": true,
+   "mistakeSecs": 5.5,
+   "afterMistake": {
+    "t": 1766.9,
+    "phase": "night",
+    "step": 1,
+    "carried": null,
+    "at": [
+     18.8,
+     305.4
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "fetch the gate-key at 45, 309",
+     "result": "done",
+     "at": {
+      "t": 1781.9,
+      "phase": "night",
+      "step": 2,
+      "carried": null,
+      "at": [
+       43.5,
+       311.7
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 15.1,
+   "recovery": {
+    "keeper": 1,
+    "refill": 0,
+    "tow": 0,
+    "naps": 0,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 1,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {},
+   "retries": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "wallSecs": 8,
+   "job": "006-sab-middle.s1-W.out"
+  },
+  "part-body.s2|F": {
+   "case": "part-body.s2",
+   "code": "F",
+   "round": 1,
+   "fixture": "part-body.s2",
+   "cap": 600,
+   "recorded": 52.5,
+   "begin": {
+    "key": "part-body.s2",
+    "code": "F",
+    "fixtureStep": 2,
+    "phase": "afternoon"
+   },
+   "toMark": [
+    {
+     "pilot": "running",
+     "at": {
+      "t": 1851.3,
+      "phase": "dusk",
+      "step": 2,
+      "carried": null,
+      "at": [
+       5.1,
+       207
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": "vinnie",
+      "race": null
+     }
+    }
+   ],
+   "mark": {
+    "t": 1851.3,
+    "phase": "dusk",
+    "step": 2,
+    "carried": null,
+    "at": [
+     5.1,
+     207
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": "vinnie",
+    "race": null
+   },
+   "mistake": "fly off mid-fight (Vinnie spots Rigby)",
+   "route": "input",
+   "took": true,
+   "mistakeSecs": 7.6,
+   "afterMistake": {
+    "t": 1858.9,
+    "phase": "dusk",
+    "step": 2,
+    "carried": null,
+    "at": [
+     2.8,
+     204.8
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "",
+     "result": "none",
+     "at": {
+      "t": 2161.4,
+      "phase": "dusk",
+      "step": 2,
+      "carried": null,
+      "at": [
+       12.2,
+       207
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "attempt": 1,
+     "how": "",
+     "result": "stopped: cap",
+     "at": {
+      "t": 2462.6,
+      "phase": "dusk",
+      "step": 2,
+      "carried": null,
+      "at": [
+       12.2,
+       207
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 603.7,
+   "oracle": {
+    "checks": {
+     "phase": "ok",
+     "human:vinnie": "out",
+     "trigger": "ask: nothing spent"
+    },
+    "fails": [],
+    "ok": true
+   },
+   "verdict": "FAIL-SCRIPT",
+   "why": "not finished; the oracle says the step is still doable: {\"phase\":\"ok\",\"human:vinnie\":\"out\",\"trigger\":\"ask: nothing spent\"}",
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 1,
+    "fails": 1,
+    "raceLost": 0,
+    "starts": 1,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {},
+   "retries": 1,
+   "errors": 0,
+   "wallSecs": 235,
+   "job": "007-part-body.s2-F.out"
+  },
+  "den-racers.s2|F": {
+   "case": "den-racers.s2",
+   "code": "F",
+   "round": 1,
+   "fixture": "den-racers.s2",
+   "cap": 600,
+   "recorded": 65,
+   "begin": {
+    "key": "den-racers.s2",
+    "code": "F",
+    "fixtureStep": 2,
+    "phase": "morning"
+   },
+   "toMark": [
+    {
+     "pilot": "running",
+     "at": {
+      "t": 2261,
+      "phase": "morning",
+      "step": 2,
+      "carried": null,
+      "at": [
+       23.6,
+       565.5
+      ],
+      "mode": "fly",
+      "driving": null,
+      "fight": null,
+      "race": "wings"
+     }
+    }
+   ],
+   "mark": {
+    "t": 2261,
+    "phase": "morning",
+    "step": 2,
+    "carried": null,
+    "at": [
+     23.6,
+     565.5
+    ],
+    "mode": "fly",
+    "driving": null,
+    "fight": null,
+    "race": "wings"
+   },
+   "mistake": "lose the race",
+   "route": "input",
+   "took": false,
+   "tookWhy": "races lost: 0",
+   "mistakeSecs": 300.3,
+   "afterMistake": {
+    "t": 2561.3,
+    "phase": "morning",
+    "step": 2,
+    "carried": null,
+    "at": [
+     -12.7,
+     545.4
+    ],
+    "mode": "fly",
+    "driving": null,
+    "fight": null,
+    "race": "wings"
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "",
+     "result": "none",
+     "at": {
+      "t": 2611,
+      "phase": "morning",
+      "step": 2,
+      "carried": null,
+      "at": [
+       -48.5,
+       579.1
+      ],
+      "mode": "fly",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "attempt": 1,
+     "how": "",
+     "result": "done",
+     "at": {
+      "t": 2684.8,
+      "phase": "morning",
+      "step": 4,
+      "carried": null,
+      "at": [
+       -46.1,
+       576
+      ],
+      "mode": "perch",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 123.5,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 0,
+    "fails": 0,
+    "raceLost": 1,
+    "starts": 1,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {},
+   "retries": 1,
+   "errors": 0,
+   "verdict": "PASS",
+   "wallSecs": 93,
+   "job": "011-den-racers.s2-F.out"
+  },
+  "den-racers.s2.alt|F": {
+   "case": "den-racers.s2.alt",
+   "code": "F",
+   "round": 1,
+   "fixture": "den-racers.alt",
+   "cap": 600,
+   "recorded": null,
+   "begin": {
+    "key": "den-racers.s2.alt",
+    "code": "F",
+    "fixtureStep": 1,
+    "phase": "morning"
+   },
+   "toMark": [
+    {
+     "pilot": "none",
+     "at": {
+      "t": 4086.8,
+      "phase": "dusk",
+      "step": 2,
+      "carried": null,
+      "at": [
+       31.6,
+       566.5
+      ],
+      "mode": "fly",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "pilot": "running",
+     "at": {
+      "t": 4112.4,
+      "phase": "dusk",
+      "step": 2,
+      "carried": null,
+      "at": [
+       33.5,
+       570.3
+      ],
+      "mode": "drive",
+      "driving": "pedicab",
+      "fight": null,
+      "race": "wheels"
+     }
+    }
+   ],
+   "mark": {
+    "t": 4112.4,
+    "phase": "dusk",
+    "step": 2,
+    "carried": null,
+    "at": [
+     33.5,
+     570.3
+    ],
+    "mode": "drive",
+    "driving": "pedicab",
+    "fight": null,
+    "race": "wheels"
+   },
+   "mistake": "stop mid-race (lose the wheels race)",
+   "route": "input",
+   "took": true,
+   "mistakeSecs": 153.1,
+   "afterMistake": {
+    "t": 4265.6,
+    "phase": "dusk",
+    "step": 2,
+    "carried": null,
+    "at": [
+     49.8,
+     575.7
+    ],
+    "mode": "drive",
+    "driving": "pedicab",
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "in the pedicab",
+     "result": "none",
+     "at": {
+      "t": 4280.1,
+      "phase": "dusk",
+      "step": 2,
+      "carried": null,
+      "at": [
+       44.5,
+       576
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "attempt": 1,
+     "how": "",
+     "result": "done",
+     "at": {
+      "t": 4405.6,
+      "phase": "dusk",
+      "step": 4,
+      "carried": null,
+      "at": [
+       -8.8,
+       566.5
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 140.1,
+   "recovery": {
+    "keeper": 1,
+    "refill": 0,
+    "tow": 1,
+    "naps": 1,
+    "fails": 2,
+    "raceLost": 1,
+    "starts": 2,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {},
+   "retries": 1,
+   "errors": 0,
+   "verdict": "PASS",
+   "wallSecs": 156,
+   "job": "012-den-racers.s2.alt-F.out"
+  },
+  "part-talons.s2|O": {
+   "case": "part-talons.s2",
+   "code": "O",
+   "round": 1,
+   "fixture": "part-talons.s2",
+   "cap": 600,
+   "recorded": 86.4,
+   "begin": {
+    "key": "part-talons.s2",
+    "code": "O",
+    "fixtureStep": 2,
+    "phase": "morning"
+   },
+   "mark": {
+    "t": 5217.5,
+    "phase": "morning",
+    "step": 2,
+    "carried": null,
+    "at": [
+     26.8,
+     46.8
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "pay Rigby before the garage door",
+   "route": "input",
+   "took": true,
+   "mistakeSecs": 30.1,
+   "afterMistake": {
+    "t": 5247.6,
+    "phase": "dusk",
+    "step": 2,
+    "carried": null,
+    "at": [
+     -0.7,
+     71.7
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "",
+     "result": "none",
+     "at": {
+      "t": 5562.9,
+      "phase": "dusk",
+      "step": 2,
+      "carried": null,
+      "at": [
+       30,
+       -7.8
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "attempt": 1,
+     "how": "",
+     "result": "stopped: cap",
+     "at": {
+      "t": 5852.1,
+      "phase": "dusk",
+      "step": 2,
+      "carried": null,
+      "at": [
+       30,
+       -7.8
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 604.5,
+   "oracle": {
+    "checks": {
+     "item": "renews",
+     "phase": "ok",
+     "trigger": "zamboni.rigged not yet (redo the action)"
+    },
+    "fails": [],
+    "ok": true
+   },
+   "verdict": "FAIL-SCRIPT",
+   "why": "not finished; the oracle says the step is still doable: {\"item\":\"renews\",\"phase\":\"ok\",\"trigger\":\"zamboni.rigged not yet (redo the action)\"}",
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 1,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 0,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {},
+   "retries": 1,
+   "errors": 0,
+   "wallSecs": 157,
+   "job": "014-part-talons.s2-O.out"
+  },
+  "part-talons.s3|V": {
+   "case": "part-talons.s3",
+   "code": "V",
+   "round": 1,
+   "fixture": "part-talons.s3",
+   "cap": 600,
+   "recorded": 146.3,
+   "begin": {
+    "key": "part-talons.s3",
+    "code": "V",
+    "fixtureStep": 3,
+    "phase": "dusk"
+   },
+   "toMark": [
+    {
+     "how": "zamboni away (45, 82)",
+     "pilot": "running",
+     "at": {
+      "t": 5322,
+      "phase": "night",
+      "step": 3,
+      "carried": null,
+      "at": [
+       43.7,
+       81.9
+      ],
+      "mode": "drive",
+      "driving": "zamboni",
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "mark": {
+    "t": 5322,
+    "phase": "night",
+    "step": 3,
+    "carried": null,
+    "at": [
+     43.7,
+     81.9
+    ],
+    "mode": "drive",
+    "driving": "zamboni",
+    "fight": null,
+    "race": null
+   },
+   "mistake": "wedge the Zamboni in a rink corner and leave it",
+   "route": "input",
+   "took": false,
+   "tookWhy": "still driving",
+   "mistakeSecs": 45.7,
+   "afterMistake": {
+    "t": 5367.7,
+    "phase": "night",
+    "step": 3,
+    "carried": null,
+    "at": [
+     67.2,
+     99.2
+    ],
+    "mode": "drive",
+    "driving": "zamboni",
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "in the zamboni",
+     "result": "done",
+     "at": {
+      "t": 5456.9,
+      "phase": "night",
+      "step": 4,
+      "carried": null,
+      "at": [
+       54,
+       98.2
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 89.3,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 1,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 1,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {
+    "busy": [
+     "part-eyes"
+    ],
+    "dialogue": true
+   },
+   "retries": 0,
+   "errors": 0,
+   "verdict": "LEFTOVERS",
+   "wallSecs": 128,
+   "job": "015-part-talons.s3-V.out"
+  },
+  "part-wings.s1|W": {
+   "case": "part-wings.s1",
+   "code": "W",
+   "round": 1,
+   "fixture": "part-wings",
+   "cap": 600,
+   "recorded": 74,
+   "begin": {
+    "key": "part-wings.s1",
+    "code": "W",
+    "fixtureStep": 1,
+    "phase": "morning"
+   },
+   "toMark": [
+    {
+     "pilot": "running",
+     "at": {
+      "t": 1092.1,
+      "phase": "morning",
+      "step": 1,
+      "carried": "sail",
+      "at": [
+       64,
+       306
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "mark": {
+    "t": 1092.1,
+    "phase": "morning",
+    "step": 1,
+    "carried": "sail",
+    "at": [
+     64,
+     306
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "drop the sail over Conservatory Water",
+   "route": "input",
+   "took": true,
+   "mistakeSecs": 5,
+   "afterMistake": {
+    "t": 1097.1,
+    "phase": "morning",
+    "step": 1,
+    "carried": null,
+    "at": [
+     76.6,
+     324.7
+    ],
+    "mode": "fly",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "fetch the sail at 63, 307",
+     "result": "done",
+     "at": {
+      "t": 1124.7,
+      "phase": "morning",
+      "step": 2,
+      "carried": null,
+      "at": [
+       -19.9,
+       378.6
+      ],
+      "mode": "fly",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 27.6,
+   "recovery": {
+    "keeper": 2,
+    "refill": 0,
+    "tow": 0,
+    "naps": 0,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 1,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {},
+   "retries": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "wallSecs": 61,
+   "job": "017-part-wings.s1-W.out"
+  },
+  "part-wings.s2|W": {
+   "case": "part-wings.s2",
+   "code": "W",
+   "round": 1,
+   "fixture": "part-wings.s2",
+   "cap": 600,
+   "recorded": 116.5,
+   "begin": {
+    "key": "part-wings.s2",
+    "code": "W",
+    "fixtureStep": 2,
+    "phase": "morning"
+   },
+   "toMark": [
+    {
+     "pilot": "none",
+     "at": {
+      "t": 1211.8,
+      "phase": "afternoon",
+      "step": 2,
+      "carried": null,
+      "at": [
+       67.8,
+       294.8
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "pilot": "none",
+     "at": {
+      "t": 1239.9,
+      "phase": "afternoon",
+      "step": 2,
+      "carried": null,
+      "at": [
+       43.1,
+       305.5
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "pilot": "none",
+     "at": {
+      "t": 1261.5,
+      "phase": "afternoon",
+      "step": 2,
+      "carried": null,
+      "at": [
+       43.1,
+       305.5
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "pilot": "none",
+     "at": {
+      "t": 1283.1,
+      "phase": "afternoon",
+      "step": 2,
+      "carried": null,
+      "at": [
+       43.1,
+       305.5
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "pilot": "none",
+     "at": {
+      "t": 1304.7,
+      "phase": "afternoon",
+      "step": 2,
+      "carried": null,
+      "at": [
+       43.1,
+       305.5
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "pilot": "none",
+     "at": {
+      "t": 1326.3,
+      "phase": "afternoon",
+      "step": 2,
+      "carried": null,
+      "at": [
+       43.1,
+       305.5
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "verdict": "HARNESS",
+   "why": "never reached the mark: none / none / none / none / none / none",
+   "wallSecs": 76,
+   "job": "018-part-wings.s2-W.out"
+  },
+  "part-wings.s3|V": {
+   "case": "part-wings.s3",
+   "code": "V",
+   "round": 1,
+   "fixture": "part-wings.s3",
+   "cap": 600,
+   "recorded": 51,
+   "begin": {
+    "key": "part-wings.s3",
+    "code": "V",
+    "fixtureStep": 3,
+    "phase": "afternoon"
+   },
+   "toMark": [
+    {
+     "how": "fetch the sail at 63, 305",
+     "pilot": "none",
+     "at": {
+      "t": 1309.2,
+      "phase": "afternoon",
+      "step": 3,
+      "carried": "sail",
+      "at": [
+       -25.2,
+       377.3
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "pilot": "none",
+     "at": {
+      "t": 1339.9,
+      "phase": "afternoon",
+      "step": 3,
+      "carried": "sail",
+      "at": [
+       -25.2,
+       377.3
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "pilot": "none",
+     "at": {
+      "t": 1370.5,
+      "phase": "afternoon",
+      "step": 3,
+      "carried": "sail",
+      "at": [
+       -25.2,
+       377.3
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "pilot": "none",
+     "at": {
+      "t": 1401.1,
+      "phase": "afternoon",
+      "step": 3,
+      "carried": "sail",
+      "at": [
+       -25.2,
+       377.3
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "pilot": "none",
+     "at": {
+      "t": 1431.8,
+      "phase": "afternoon",
+      "step": 3,
+      "carried": "sail",
+      "at": [
+       -25.2,
+       377.3
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "pilot": "none",
+     "at": {
+      "t": 1462.4,
+      "phase": "afternoon",
+      "step": 3,
+      "carried": "sail",
+      "at": [
+       -25.2,
+       377.3
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "verdict": "HARNESS",
+   "why": "never reached the mark: none / none / none / none / none / none",
+   "wallSecs": 152,
+   "job": "019-part-wings.s3-V.out"
+  },
+  "gear-pen.s2|A": {
+   "case": "gear-pen.s2",
+   "code": "A",
+   "round": 1,
+   "fixture": "gear-pen.s2",
+   "cap": 600,
+   "recorded": 30,
+   "begin": {
+    "key": "gear-pen.s2",
+    "code": "A",
+    "fixtureStep": 2,
+    "phase": "afternoon"
+   },
+   "mark": {
+    "t": 911.4,
+    "phase": "afternoon",
+    "step": 2,
+    "carried": "cufflink",
+    "at": [
+     -99,
+     149.5
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "wander 120 m off for 2 min",
+   "route": "input",
+   "took": true,
+   "mistakeSecs": 138.6,
+   "afterMistake": {
+    "t": 1050,
+    "phase": "afternoon",
+    "step": 2,
+    "carried": "cufflink",
+    "at": [
+     17.2,
+     204.3
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "",
+     "result": "done",
+     "at": {
+      "t": 1066.5,
+      "phase": "afternoon",
+      "step": 3,
+      "carried": null,
+      "at": [
+       15,
+       226.7
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 16.6,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 0,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 1,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {},
+   "retries": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "wallSecs": 64,
+   "job": "025-gear-pen.s2-A.out"
+  },
+  "gear-headlamp.s2|W": {
+   "case": "gear-headlamp.s2",
+   "code": "W",
+   "round": 1,
+   "fixture": "gear-headlamp.s2",
+   "cap": 600,
+   "recorded": 81.5,
+   "begin": {
+    "key": "gear-headlamp.s2",
+    "code": "W",
+    "fixtureStep": 2,
+    "phase": "afternoon"
+   },
+   "mark": {
+    "t": 970.4,
+    "phase": "afternoon",
+    "step": 2,
+    "carried": "key",
+    "at": [
+     -126.5,
+     547.7
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "drop the key over the Reservoir",
+   "route": "input",
+   "took": true,
+   "mistakeSecs": 13.6,
+   "afterMistake": {
+    "t": 983.9,
+    "phase": "afternoon",
+    "step": 2,
+    "carried": null,
+    "at": [
+     -49.4,
+     653.7
+    ],
+    "mode": "fly",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "fetch the key at -127, 549",
+     "result": "done",
+     "at": {
+      "t": 1083.4,
+      "phase": "morning",
+      "step": 3,
+      "carried": null,
+      "at": [
+       -3.3,
+       757.9
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 99.5,
+   "recovery": {
+    "keeper": 1,
+    "refill": 0,
+    "tow": 0,
+    "naps": 1,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 1,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {},
+   "retries": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "wallSecs": 65,
+   "job": "026-gear-headlamp.s2-W.out"
+  },
+  "part-beak.s2|W": {
+   "case": "part-beak.s2",
+   "code": "W",
+   "round": 1,
+   "fixture": "part-beak.s2",
+   "cap": 600,
+   "recorded": 17,
+   "begin": {
+    "key": "part-beak.s2",
+    "code": "W",
+    "fixtureStep": 2,
+    "phase": "morning"
+   },
+   "mark": {
+    "t": 2289.7,
+    "phase": "morning",
+    "step": 2,
+    "carried": "sticker",
+    "at": [
+     126.1,
+     376.6
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "drop the sticker on the shed roof",
+   "route": "input",
+   "took": false,
+   "tookWhy": "still carrying sticker",
+   "mistakeSecs": 152.6,
+   "afterMistake": {
+    "t": 2442.4,
+    "phase": "morning",
+    "step": 2,
+    "carried": "sticker",
+    "at": [
+     116.2,
+     377.8
+    ],
+    "mode": "fly",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "",
+     "result": "done",
+     "at": {
+      "t": 2461.5,
+      "phase": "morning",
+      "step": 3,
+      "carried": null,
+      "at": [
+       127.8,
+       356.9
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 19.1,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 0,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 1,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {},
+   "retries": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "wallSecs": 25,
+   "job": "027-part-beak.s2-W.out"
+  },
+  "truce-dogs-squirrels.s3|W": {
+   "case": "truce-dogs-squirrels.s3",
+   "code": "W",
+   "round": 1,
+   "fixture": "truce-dogs-squirrels.s3",
+   "cap": 600,
+   "recorded": 77,
+   "begin": {
+    "key": "truce-dogs-squirrels.s3",
+    "code": "W",
+    "fixtureStep": 3,
+    "phase": "morning"
+   },
+   "toMark": [
+    {
+     "how": "fetch the tennis-sack at -41, 280",
+     "pilot": "running",
+     "at": {
+      "t": 3557.5,
+      "phase": "morning",
+      "step": 3,
+      "carried": "tennis-sack",
+      "at": [
+       -40,
+       280.2
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "mark": {
+    "t": 3557.5,
+    "phase": "morning",
+    "step": 3,
+    "carried": "tennis-sack",
+    "at": [
+     -40,
+     280.2
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "drop the tennis-sack over the Lake",
+   "route": "input",
+   "took": true,
+   "mistakeSecs": 7.5,
+   "afterMistake": {
+    "t": 3565.1,
+    "phase": "morning",
+    "step": 3,
+    "carried": null,
+    "at": [
+     -13.1,
+     313
+    ],
+    "mode": "fly",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "fetch the tennis-sack at -42, 283",
+     "result": "none",
+     "at": {
+      "t": 3743.3,
+      "phase": "morning",
+      "step": 3,
+      "carried": null,
+      "at": [
+       70,
+       396.4
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "attempt": 1,
+     "how": "fetch the tennis-sack at 70, 397",
+     "result": "none",
+     "at": {
+      "t": 3804.1,
+      "phase": "morning",
+      "step": 3,
+      "carried": "tennis-sack",
+      "at": [
+       25.7,
+       349
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "attempt": 2,
+     "how": "",
+     "result": "none",
+     "at": {
+      "t": 3864.8,
+      "phase": "morning",
+      "step": 3,
+      "carried": "tennis-sack",
+      "at": [
+       25.7,
+       349
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "attempt": 3,
+     "how": "nap round",
+     "result": "none",
+     "at": {
+      "t": 3942.3,
+      "phase": "morning",
+      "step": 3,
+      "carried": "tennis-sack",
+      "at": [
+       -20.9,
+       327.5
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 377.2,
+   "oracle": {
+    "checks": {
+     "item": "carried",
+     "phase": "ok",
+     "human:dogwalker": "out",
+     "trigger": "drop: nothing spent"
+    },
+    "fails": [],
+    "ok": true
+   },
+   "verdict": "FAIL-SCRIPT",
+   "why": "not finished; the oracle says the step is still doable: {\"item\":\"carried\",\"phase\":\"ok\",\"human:dogwalker\":\"out\",\"trigger\":\"drop: nothing spent\"}",
+   "recovery": {
+    "keeper": 1,
+    "refill": 0,
+    "tow": 0,
+    "naps": 2,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 0,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [
+    "compass not at the tennis-sack (lies at -42, 283)"
+   ],
+   "leftovers": {},
+   "retries": 3,
+   "errors": 0,
+   "wallSecs": 158,
+   "job": "028-truce-dogs-squirrels.s3-W.out"
+  },
+  "truce-cats-rats.s3|W": {
+   "case": "truce-cats-rats.s3",
+   "code": "W",
+   "round": 1,
+   "fixture": "truce-cats-rats.s3",
+   "cap": 600,
+   "recorded": 82.1,
+   "begin": {
+    "key": "truce-cats-rats.s3",
+    "code": "W",
+    "fixtureStep": 3,
+    "phase": "morning"
+   },
+   "toMark": [
+    {
+     "pilot": "running",
+     "at": {
+      "t": 2673.4,
+      "phase": "morning",
+      "step": 3,
+      "carried": "box",
+      "at": [
+       110.7,
+       822
+      ],
+      "mode": "fly",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "mark": {
+    "t": 2673.4,
+    "phase": "morning",
+    "step": 3,
+    "carried": "box",
+    "at": [
+     110.7,
+     822
+    ],
+    "mode": "fly",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "drop the box over Harlem Meer",
+   "route": "input",
+   "took": true,
+   "mistakeSecs": 34.2,
+   "afterMistake": {
+    "t": 2707.5,
+    "phase": "morning",
+    "step": 3,
+    "carried": null,
+    "at": [
+     56,
+     1019.5
+    ],
+    "mode": "fly",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "fetch the box at -129, 255",
+     "result": "none",
+     "at": {
+      "t": 2859.7,
+      "phase": "morning",
+      "step": 3,
+      "carried": null,
+      "at": [
+       -117,
+       257.1
+      ],
+      "mode": "fly",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "attempt": 1,
+     "how": "fetch the box at -129, 255",
+     "result": "none",
+     "at": {
+      "t": 3010.3,
+      "phase": "morning",
+      "step": 3,
+      "carried": null,
+      "at": [
+       -129.2,
+       254.3
+      ],
+      "mode": "fly",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "attempt": 2,
+     "how": "fetch the box at -129, 255",
+     "result": "none",
+     "at": {
+      "t": 3162.9,
+      "phase": "morning",
+      "step": 3,
+      "carried": null,
+      "at": [
+       -129.8,
+       256.5
+      ],
+      "mode": "fly",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "attempt": 3,
+     "how": "nap round, fetch the box at -129, 255",
+     "result": "stopped: cap",
+     "at": {
+      "t": 3308.1,
+      "phase": "afternoon",
+      "step": 3,
+      "carried": null,
+      "at": [
+       -126.8,
+       247.5
+      ],
+      "mode": "fly",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 600.6,
+   "oracle": {
+    "checks": {
+     "item": "renews",
+     "phase": "ok",
+     "trigger": "boxOpened: nothing spent"
+    },
+    "fails": [],
+    "ok": true
+   },
+   "verdict": "FAIL-SCRIPT",
+   "why": "not finished; the oracle says the step is still doable: {\"item\":\"renews\",\"phase\":\"ok\",\"trigger\":\"boxOpened: nothing spent\"}",
+   "recovery": {
+    "keeper": 1,
+    "refill": 0,
+    "tow": 0,
+    "naps": 1,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 0,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [
+    "compass not at the box (lies at -129, 255)"
+   ],
+   "leftovers": {},
+   "retries": 3,
+   "errors": 0,
+   "wallSecs": 258,
+   "job": "029-truce-cats-rats.s3-W.out"
+  },
+  "den-rhoda.s2|F": {
+   "case": "den-rhoda.s2",
+   "code": "F",
+   "round": 1,
+   "fixture": "den-rhoda.s2",
+   "cap": 600,
+   "recorded": 50.5,
+   "begin": {
+    "key": "den-rhoda.s2",
+    "code": "F",
+    "fixtureStep": 2,
+    "phase": "morning"
+   },
+   "toMark": [
+    {
+     "pilot": "running",
+     "at": {
+      "t": 3539.2,
+      "phase": "afternoon",
+      "step": 2,
+      "carried": null,
+      "at": [
+       66.6,
+       988.7
+      ],
+      "mode": "fly",
+      "driving": null,
+      "fight": "rhoda",
+      "race": null
+     }
+    }
+   ],
+   "mark": {
+    "t": 3539.2,
+    "phase": "afternoon",
+    "step": 2,
+    "carried": null,
+    "at": [
+     66.6,
+     988.7
+    ],
+    "mode": "fly",
+    "driving": null,
+    "fight": "rhoda",
+    "race": null
+   },
+   "mistake": "leave the Meer 75 m+ mid-fight",
+   "route": "input",
+   "took": true,
+   "mistakeSecs": 12.6,
+   "afterMistake": {
+    "t": 3551.7,
+    "phase": "afternoon",
+    "step": 2,
+    "carried": null,
+    "at": [
+     -19.7,
+     1041.4
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "",
+     "result": "done",
+     "at": {
+      "t": 3583.9,
+      "phase": "afternoon",
+      "step": 3,
+      "carried": null,
+      "at": [
+       79.6,
+       1012.9
+      ],
+      "mode": "fly",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 32.1,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 1,
+    "fails": 1,
+    "raceLost": 0,
+    "starts": 2,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {
+    "dialogue": true
+   },
+   "retries": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "wallSecs": 70,
+   "job": "031b-den-rhoda.s2-F.out"
+  },
+  "den-biscuit.s3|F": {
+   "case": "den-biscuit.s3",
+   "code": "F",
+   "round": 1,
+   "fixture": "den-biscuit.s3",
+   "cap": 600,
+   "recorded": 56,
+   "begin": {
+    "key": "den-biscuit.s3",
+    "code": "F",
+    "fixtureStep": 3,
+    "phase": "afternoon"
+   },
+   "toMark": [
+    {
+     "pilot": "running",
+     "at": {
+      "t": 1366.6,
+      "phase": "afternoon",
+      "step": 3,
+      "carried": "ball",
+      "at": [
+       39.3,
+       355
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": "biscuit",
+      "race": null
+     }
+    }
+   ],
+   "mark": {
+    "t": 1366.6,
+    "phase": "afternoon",
+    "step": 3,
+    "carried": "ball",
+    "at": [
+     39.3,
+     355
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": "biscuit",
+    "race": null
+   },
+   "mistake": "leave Cedar Hill mid-fight",
+   "route": "input",
+   "took": true,
+   "mistakeSecs": 12,
+   "afterMistake": {
+    "t": 1378.7,
+    "phase": "afternoon",
+    "step": 3,
+    "carried": "ball",
+    "at": [
+     85.9,
+     396.4
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "",
+     "result": "none",
+     "at": {
+      "t": 1443.2,
+      "phase": "afternoon",
+      "step": 3,
+      "carried": null,
+      "at": [
+       53.9,
+       397.7
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "attempt": 1,
+     "how": "fetch the ball at 54, 398",
+     "result": "none",
+     "at": {
+      "t": 1480.9,
+      "phase": "afternoon",
+      "step": 3,
+      "carried": null,
+      "at": [
+       34.7,
+       261.2
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "attempt": 2,
+     "how": "fetch the ball at 54, 398",
+     "result": "none",
+     "at": {
+      "t": 1550.8,
+      "phase": "afternoon",
+      "step": 3,
+      "carried": null,
+      "at": [
+       46.9,
+       397.7
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "attempt": 3,
+     "how": "nap round, fetch the ball at 47, 398",
+     "result": "none",
+     "at": {
+      "t": 1669.3,
+      "phase": "dusk",
+      "step": 3,
+      "carried": null,
+      "at": [
+       43.2,
+       397.7
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 290.7,
+   "oracle": {
+    "checks": {
+     "item": "lying on dry ground",
+     "phase": "ok",
+     "trigger": "reach: nothing spent"
+    },
+    "fails": [],
+    "ok": true
+   },
+   "verdict": "FAIL-SCRIPT",
+   "why": "not finished; the oracle says the step is still doable: {\"item\":\"lying on dry ground\",\"phase\":\"ok\",\"trigger\":\"reach: nothing spent\"}",
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 1,
+    "fails": 4,
+    "raceLost": 0,
+    "starts": 4,
+    "repaired": null
+   },
+   "loops": [
+    "step script started 4 times",
+    "Ruffled 3x after the injection"
+   ],
+   "nudge": [
+    "compass not at the ball (lies at 54, 398)"
+   ],
+   "leftovers": {
+    "overlays": [
+     "fade"
+    ]
+   },
+   "retries": 3,
+   "errors": 0,
+   "wallSecs": 147,
+   "job": "031c-den-biscuit.s3-F.out"
+  },
+  "den-strix.s2|F": {
+   "case": "den-strix.s2",
+   "code": "F",
+   "round": 1,
+   "fixture": "den-strix.s2",
+   "cap": 600,
+   "recorded": 98.4,
+   "begin": {
+    "key": "den-strix.s2",
+    "code": "F",
+    "fixtureStep": 2,
+    "phase": "afternoon"
+   },
+   "toMark": [
+    {
+     "pilot": "running",
+     "at": {
+      "t": 1410,
+      "phase": "night",
+      "step": 2,
+      "carried": "spectacles",
+      "at": [
+       -32.1,
+       322.2
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": "strix",
+      "race": null
+     }
+    }
+   ],
+   "mark": {
+    "t": 1410,
+    "phase": "night",
+    "step": 2,
+    "carried": "spectacles",
+    "at": [
+     -32.1,
+     322.2
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": "strix",
+    "race": null
+   },
+   "mistake": "flap in the stealth until spotted",
+   "route": "input",
+   "took": true,
+   "mistakeSecs": 3.9,
+   "afterMistake": {
+    "t": 1413.9,
+    "phase": "night",
+    "step": 2,
+    "carried": "spectacles",
+    "at": [
+     -29.4,
+     330.6
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": "strix",
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "fight on",
+     "result": "none",
+     "at": {
+      "t": 1814.6,
+      "phase": "night",
+      "step": 2,
+      "carried": "spectacles",
+      "at": [
+       -29.1,
+       331.2
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": "strix",
+      "race": null
+     }
+    },
+    {
+     "attempt": 1,
+     "how": "fight on",
+     "result": "stopped: cap",
+     "at": {
+      "t": 2015.4,
+      "phase": "night",
+      "step": 2,
+      "carried": "spectacles",
+      "at": [
+       -29.1,
+       331.2
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": "strix",
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 601.5,
+   "oracle": {
+    "checks": {
+     "item": "carried",
+     "phase": "ok",
+     "trigger": "reach: nothing spent"
+    },
+    "fails": [],
+    "ok": true
+   },
+   "verdict": "FAIL-SCRIPT",
+   "why": "not finished; the oracle says the step is still doable: {\"item\":\"carried\",\"phase\":\"ok\",\"trigger\":\"reach: nothing spent\"}",
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 1,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 1,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {
+    "scriptedChars": [
+     "strix"
+    ],
+    "busy": [
+     "den-strix"
+    ]
+   },
+   "retries": 1,
+   "errors": 0,
+   "wallSecs": 213,
+   "job": "031d-den-strix.s2-F.out"
+  },
+  "den-rhoda.s3|C": {
+   "case": "den-rhoda.s3",
+   "code": "C",
+   "round": 1,
+   "fixture": "den-rhoda.s3",
+   "cap": 600,
+   "recorded": 143.5,
+   "begin": {
+    "key": "den-rhoda.s3",
+    "code": "C",
+    "fixtureStep": 3,
+    "phase": "afternoon"
+   },
+   "toMark": [
+    {
+     "pilot": "running",
+     "at": {
+      "t": 3647.4,
+      "phase": "dusk",
+      "step": 3,
+      "carried": "slice-anchovy",
+      "at": [
+       -125,
+       261.9
+      ],
+      "mode": "fly",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "mark": {
+    "t": 3647.4,
+    "phase": "dusk",
+    "step": 3,
+    "carried": "slice-anchovy",
+    "at": [
+     -125,
+     261.9
+    ],
+    "mode": "fly",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "wait until the slice is cold",
+   "route": "input",
+   "took": true,
+   "mistakeSecs": 59.8,
+   "afterMistake": {
+    "t": 3707.1,
+    "phase": "dusk",
+    "step": 3,
+    "carried": "slice-anchovy",
+    "at": [
+     -124.7,
+     288.9
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "drop the cold slice, get another",
+     "result": "none",
+     "at": {
+      "t": 3752.8,
+      "phase": "dusk",
+      "step": 3,
+      "carried": null,
+      "at": [
+       -110.4,
+       300
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "attempt": 1,
+     "how": "",
+     "result": "none",
+     "at": {
+      "t": 3794.5,
+      "phase": "dusk",
+      "step": 3,
+      "carried": null,
+      "at": [
+       -110.4,
+       300
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "attempt": 2,
+     "how": "",
+     "result": "none",
+     "at": {
+      "t": 3836.2,
+      "phase": "dusk",
+      "step": 3,
+      "carried": null,
+      "at": [
+       -110.4,
+       300
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "attempt": 3,
+     "how": "nap round",
+     "result": "done",
+     "at": {
+      "t": 3942.5,
+      "phase": "dusk",
+      "step": 4,
+      "carried": null,
+      "at": [
+       128.8,
+       315.5
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 235.4,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 3,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 1,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [
+    "compass not at the slice (lies at -125, 262)"
+   ],
+   "leftovers": {},
+   "retries": 3,
+   "helped": "nap round",
+   "errors": 0,
+   "verdict": "PASS-HELPED",
+   "wallSecs": 225,
+   "job": "032-den-rhoda.s3-C.out"
+  },
+  "part-power.s3|O": {
+   "case": "part-power.s3",
+   "code": "O",
+   "round": 1,
+   "fixture": "part-power.s2",
+   "cap": 600,
+   "recorded": 34.9,
+   "begin": {
+    "key": "part-power.s3",
+    "code": "O",
+    "fixtureStep": 2,
+    "phase": "morning"
+   },
+   "mark": {
+    "t": 5184.5,
+    "phase": "morning",
+    "step": 2,
+    "carried": null,
+    "at": [
+     -27.9,
+     329.8
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "Ask the geese before the dove is out",
+   "route": "input",
+   "took": true,
+   "mistakeSecs": 12.6,
+   "afterMistake": {
+    "t": 5197.1,
+    "phase": "morning",
+    "step": 2,
+    "carried": null,
+    "at": [
+     -32,
+     299.2
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "",
+     "result": "done",
+     "at": {
+      "t": 5243.7,
+      "phase": "morning",
+      "step": 4,
+      "carried": null,
+      "at": [
+       -30.8,
+       300.2
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 46.6,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 0,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 2,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {},
+   "retries": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "wallSecs": 39,
+   "job": "033-part-power.s3-O.out"
+  },
+  "den-meermob.s2.alt|C": {
+   "case": "den-meermob.s2.alt",
+   "code": "C",
+   "round": 1,
+   "fixture": "den-meermob.s2",
+   "cap": 600,
+   "recorded": null,
+   "begin": {
+    "key": "den-meermob.s2.alt",
+    "code": "C",
+    "fixtureStep": 2,
+    "phase": "morning"
+   },
+   "toMark": [
+    {
+     "pilot": "running",
+     "at": {
+      "t": 6086.1,
+      "phase": "morning",
+      "step": 2,
+      "carried": "slice",
+      "at": [
+       49.1,
+       1065.5
+      ],
+      "mode": "takeoff",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "mark": {
+    "t": 6086.1,
+    "phase": "morning",
+    "step": 2,
+    "carried": "slice",
+    "at": [
+     49.1,
+     1065.5
+    ],
+    "mode": "takeoff",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "wait until the slice is cold",
+   "route": "input",
+   "took": true,
+   "mistakeSecs": 59.7,
+   "afterMistake": {
+    "t": 6145.9,
+    "phase": "morning",
+    "step": 2,
+    "carried": "slice",
+    "at": [
+     32.6,
+     1070.4
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "",
+     "result": "none",
+     "at": {
+      "t": 6223.7,
+      "phase": "morning",
+      "step": 2,
+      "carried": null,
+      "at": [
+       -80.4,
+       1027.1
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "attempt": 1,
+     "how": "",
+     "result": "none",
+     "at": {
+      "t": 6254.8,
+      "phase": "morning",
+      "step": 2,
+      "carried": null,
+      "at": [
+       48.7,
+       1063.4
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "attempt": 2,
+     "how": "",
+     "result": "none",
+     "at": {
+      "t": 6266.9,
+      "phase": "morning",
+      "step": 2,
+      "carried": null,
+      "at": [
+       48.7,
+       1063.4
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "attempt": 3,
+     "how": "nap round",
+     "result": "none",
+     "at": {
+      "t": 6377.9,
+      "phase": "afternoon",
+      "step": 2,
+      "carried": "slice",
+      "at": [
+       -79.6,
+       1024.7
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 232,
+   "oracle": {
+    "checks": {
+     "item": "carried",
+     "phase": "ok",
+     "trigger": "coo: nothing spent / slice at hand"
+    },
+    "fails": [],
+    "ok": true
+   },
+   "verdict": "FAIL-SCRIPT",
+   "why": "not finished; the oracle says the step is still doable: {\"item\":\"carried\",\"phase\":\"ok\",\"trigger\":\"coo: nothing spent / slice at hand\"}",
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 1,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 0,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [
+    "NUDGE-WRONG: the compass points at bigsal, the slice lies at 49, 1066"
+   ],
+   "leftovers": {},
+   "retries": 3,
+   "errors": 0,
+   "wallSecs": 125,
+   "job": "034-den-meermob.s2.alt-C.out"
+  },
+  "den-ducks.s3|Q": {
+   "case": "den-ducks.s3",
+   "code": "Q",
+   "round": 1,
+   "fixture": "den-ducks.s3",
+   "cap": 600,
+   "recorded": 21,
+   "begin": {
+    "key": "den-ducks.s3",
+    "code": "Q",
+    "fixtureStep": 3,
+    "phase": "afternoon"
+   },
+   "mark": {
+    "t": 171.9,
+    "phase": "afternoon",
+    "step": 3,
+    "carried": "peas",
+    "at": [
+     45.3,
+     293.3
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "save, quit, Continue",
+   "route": "input",
+   "q": {
+    "quitAt": 171.9,
+    "saved": {
+     "t": 171.9,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 2
+     },
+     "carried": "peas",
+     "saveRev": 3
+    },
+    "continuedAt": 172.5,
+    "lostSecs": -0.6,
+    "repaired": null,
+    "leftoversAfterContinue": {}
+   },
+   "took": true,
+   "mistakeSecs": 0.6,
+   "afterMistake": {
+    "t": 172.5,
+    "phase": "afternoon",
+    "step": 3,
+    "carried": "peas",
+    "at": [
+     45.3,
+     293.3
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "",
+     "result": "done",
+     "at": {
+      "t": 193.1,
+      "phase": "afternoon",
+      "step": 4,
+      "carried": null,
+      "at": [
+       -23.2,
+       300.3
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 20.6,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 0,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 1,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {},
+   "retries": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "wallSecs": 100,
+   "job": "035-den-ducks.s3-Q.out"
+  },
+  "den-rats.s3|Q": {
+   "case": "den-rats.s3",
+   "code": "Q",
+   "round": 1,
+   "fixture": "den-rats.s3",
+   "cap": 600,
+   "recorded": 20.9,
+   "begin": {
+    "key": "den-rats.s3",
+    "code": "Q",
+    "fixtureStep": 3,
+    "phase": "afternoon"
+   },
+   "mark": {
+    "t": 406.9,
+    "phase": "afternoon",
+    "step": 3,
+    "carried": "slice",
+    "at": [
+     -142.8,
+     -17.6
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "save, quit, Continue",
+   "route": "input",
+   "q": {
+    "quitAt": 406.9,
+    "saved": {
+     "t": 406.9,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 2
+     },
+     "carried": "slice",
+     "saveRev": 3
+    },
+    "continuedAt": 407.5,
+    "lostSecs": -0.6,
+    "repaired": null,
+    "leftoversAfterContinue": {}
+   },
+   "took": true,
+   "mistakeSecs": 0.6,
+   "afterMistake": {
+    "t": 407.5,
+    "phase": "afternoon",
+    "step": 3,
+    "carried": "slice",
+    "at": [
+     -142.8,
+     -17.6
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "",
+     "result": "done",
+     "at": {
+      "t": 426.1,
+      "phase": "afternoon",
+      "step": 4,
+      "carried": null,
+      "at": [
+       -97.7,
+       -16.8
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 18.6,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 0,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 1,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {},
+   "retries": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "wallSecs": 55,
+   "job": "036-den-rats.s3-Q.out"
+  },
+  "den-cats.s3|Q": {
+   "case": "den-cats.s3",
+   "code": "Q",
+   "round": 1,
+   "fixture": "den-cats.s3",
+   "cap": 600,
+   "recorded": 61.6,
+   "begin": {
+    "key": "den-cats.s3",
+    "code": "Q",
+    "fixtureStep": 3,
+    "phase": "afternoon"
+   },
+   "mark": {
+    "t": 557.8,
+    "phase": "afternoon",
+    "step": 3,
+    "carried": "slice-anchovy",
+    "at": [
+     -128.9,
+     247.1
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "save, quit, Continue",
+   "route": "input",
+   "q": {
+    "quitAt": 557.8,
+    "saved": {
+     "t": 557.8,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 2
+     },
+     "carried": "slice-anchovy",
+     "saveRev": 3
+    },
+    "continuedAt": 558.4,
+    "lostSecs": -0.6,
+    "repaired": null,
+    "leftoversAfterContinue": {}
+   },
+   "took": true,
+   "mistakeSecs": 0.6,
+   "afterMistake": {
+    "t": 558.4,
+    "phase": "afternoon",
+    "step": 3,
+    "carried": "slice-anchovy",
+    "at": [
+     -128.9,
+     247.1
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "",
+     "result": "done",
+     "at": {
+      "t": 619.2,
+      "phase": "afternoon",
+      "step": 4,
+      "carried": null,
+      "at": [
+       61.2,
+       1066.7
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 60.8,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 0,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 1,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {},
+   "retries": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "wallSecs": 75,
+   "job": "037-den-cats.s3-Q.out"
+  },
+  "den-raccoons.s3|Q": {
+   "case": "den-raccoons.s3",
+   "code": "Q",
+   "round": 1,
+   "fixture": "den-raccoons.s3",
+   "cap": 600,
+   "recorded": 66.8,
+   "begin": {
+    "key": "den-raccoons.s3",
+    "code": "Q",
+    "fixtureStep": 3,
+    "phase": "dusk"
+   },
+   "mark": {
+    "t": 1626.5,
+    "phase": "dusk",
+    "step": 3,
+    "carried": "wrench",
+    "at": [
+     -42.2,
+     430
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "save, quit, Continue",
+   "route": "input",
+   "q": {
+    "quitAt": 1626.5,
+    "saved": {
+     "t": 1626.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 2
+     },
+     "carried": "wrench",
+     "saveRev": 3
+    },
+    "continuedAt": 1627.2,
+    "lostSecs": -0.7,
+    "repaired": null,
+    "leftoversAfterContinue": {}
+   },
+   "took": true,
+   "mistakeSecs": 0.7,
+   "afterMistake": {
+    "t": 1627.2,
+    "phase": "dusk",
+    "step": 3,
+    "carried": "wrench",
+    "at": [
+     -42.2,
+     430
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "",
+     "result": "done",
+     "at": {
+      "t": 1695,
+      "phase": "dusk",
+      "step": 4,
+      "carried": null,
+      "at": [
+       -32.9,
+       931.3
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 67.8,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 0,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 1,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {},
+   "retries": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "wallSecs": 71,
+   "job": "038-den-raccoons.s3-Q.out"
+  },
+  "sab-middle.s1|Q": {
+   "case": "sab-middle.s1",
+   "code": "Q",
+   "round": 1,
+   "fixture": "sab-middle",
+   "cap": 600,
+   "recorded": 34,
+   "begin": {
+    "key": "sab-middle.s1",
+    "code": "Q",
+    "fixtureStep": 1,
+    "phase": "night"
+   },
+   "toMark": [
+    {
+     "pilot": "running",
+     "at": {
+      "t": 1761.3,
+      "phase": "night",
+      "step": 1,
+      "carried": "gate-key",
+      "at": [
+       44.2,
+       309.7
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "mark": {
+    "t": 1761.3,
+    "phase": "night",
+    "step": 1,
+    "carried": "gate-key",
+    "at": [
+     44.2,
+     309.7
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "save, quit, Continue",
+   "route": "input",
+   "q": {
+    "quitAt": 1761.3,
+    "saved": {
+     "t": 1761.3,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2
+     },
+     "carried": "gate-key",
+     "saveRev": 3
+    },
+    "continuedAt": 1761.9,
+    "lostSecs": -0.6,
+    "repaired": null,
+    "leftoversAfterContinue": {}
+   },
+   "took": true,
+   "mistakeSecs": 0.6,
+   "afterMistake": {
+    "t": 1761.9,
+    "phase": "night",
+    "step": 1,
+    "carried": "gate-key",
+    "at": [
+     44.2,
+     309.7
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "",
+     "result": "done",
+     "at": {
+      "t": 1766,
+      "phase": "night",
+      "step": 2,
+      "carried": null,
+      "at": [
+       43.4,
+       311.6
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 4,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 0,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 1,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {},
+   "retries": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "wallSecs": 79,
+   "job": "039-sab-middle.s1-Q.out"
+  },
+  "den-racers.s2|Q": {
+   "case": "den-racers.s2",
+   "code": "Q",
+   "round": 1,
+   "fixture": "den-racers.s2",
+   "cap": 600,
+   "recorded": 65,
+   "begin": {
+    "key": "den-racers.s2",
+    "code": "Q",
+    "fixtureStep": 2,
+    "phase": "morning"
+   },
+   "toMark": [
+    {
+     "pilot": "running",
+     "at": {
+      "t": 2261,
+      "phase": "morning",
+      "step": 2,
+      "carried": null,
+      "at": [
+       23.6,
+       565.5
+      ],
+      "mode": "fly",
+      "driving": null,
+      "fight": null,
+      "race": "wings"
+     }
+    }
+   ],
+   "mark": {
+    "t": 2261,
+    "phase": "morning",
+    "step": 2,
+    "carried": null,
+    "at": [
+     23.6,
+     565.5
+    ],
+    "mode": "fly",
+    "driving": null,
+    "fight": null,
+    "race": "wings"
+   },
+   "mistake": "save, quit, Continue",
+   "route": "input",
+   "q": {
+    "quitAt": 2261,
+    "saved": {
+     "t": 2261,
+     "steps": {
+      "prologue": 3,
+      "den-cats": 3,
+      "den-racers": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "continuedAt": 2261.1,
+    "lostSecs": -0.1,
+    "repaired": null,
+    "leftoversAfterContinue": {}
+   },
+   "took": true,
+   "mistakeSecs": 0.1,
+   "afterMistake": {
+    "t": 2261.1,
+    "phase": "morning",
+    "step": 2,
+    "carried": null,
+    "at": [
+     24,
+     565.8
+    ],
+    "mode": "fly",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "",
+     "result": "done",
+     "at": {
+      "t": 2332.4,
+      "phase": "morning",
+      "step": 4,
+      "carried": null,
+      "at": [
+       -46.1,
+       576
+      ],
+      "mode": "perch",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 71.3,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 0,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 1,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {},
+   "retries": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "wallSecs": 70,
+   "job": "041-den-racers.s2-Q.out"
+  },
+  "part-talons.s3|Q": {
+   "case": "part-talons.s3",
+   "code": "Q",
+   "round": 1,
+   "fixture": "part-talons.s3",
+   "cap": 600,
+   "recorded": 146.3,
+   "begin": {
+    "key": "part-talons.s3",
+    "code": "Q",
+    "fixtureStep": 3,
+    "phase": "dusk"
+   },
+   "toMark": [
+    {
+     "how": "zamboni away (45, 82)",
+     "pilot": "running",
+     "at": {
+      "t": 5322,
+      "phase": "night",
+      "step": 3,
+      "carried": null,
+      "at": [
+       43.7,
+       81.9
+      ],
+      "mode": "drive",
+      "driving": "zamboni",
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "mark": {
+    "t": 5322,
+    "phase": "night",
+    "step": 3,
+    "carried": null,
+    "at": [
+     43.7,
+     81.9
+    ],
+    "mode": "drive",
+    "driving": "zamboni",
+    "fight": null,
+    "race": null
+   },
+   "mistake": "save, quit, Continue",
+   "route": "input",
+   "q": {
+    "quitAt": 5322,
+    "saved": {
+     "t": 5322,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-cats": 3,
+      "den-raccoons": 3,
+      "sab-middle": 2,
+      "den-songbirds": 3,
+      "den-horses": 3,
+      "part-talons": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "continuedAt": 5322,
+    "lostSecs": -0.1,
+    "repaired": null,
+    "leftoversAfterContinue": {}
+   },
+   "took": true,
+   "mistakeSecs": 0.1,
+   "afterMistake": {
+    "t": 5322,
+    "phase": "night",
+    "step": 3,
+    "carried": null,
+    "at": [
+     44.6,
+     80.1
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "zamboni away (45, 82)",
+     "result": "done",
+     "at": {
+      "t": 5420.3,
+      "phase": "night",
+      "step": 4,
+      "carried": null,
+      "at": [
+       54,
+       98.2
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 98.3,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 1,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 1,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {
+    "busy": [
+     "part-eyes"
+    ],
+    "dialogue": true
+   },
+   "retries": 0,
+   "errors": 0,
+   "verdict": "LEFTOVERS",
+   "wallSecs": 125,
+   "job": "042-part-talons.s3-Q.out"
+  },
+  "part-wings.s3|Q": {
+   "case": "part-wings.s3",
+   "code": "Q",
+   "round": 1,
+   "fixture": "part-wings.s3",
+   "cap": 600,
+   "recorded": 51,
+   "begin": {
+    "key": "part-wings.s3",
+    "code": "Q",
+    "fixtureStep": 3,
+    "phase": "afternoon"
+   },
+   "toMark": [
+    {
+     "how": "fetch the sail at 63, 305",
+     "pilot": "none",
+     "at": {
+      "t": 1309.2,
+      "phase": "afternoon",
+      "step": 3,
+      "carried": "sail",
+      "at": [
+       -25.2,
+       377.3
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "pilot": "none",
+     "at": {
+      "t": 1339.9,
+      "phase": "afternoon",
+      "step": 3,
+      "carried": "sail",
+      "at": [
+       -25.2,
+       377.3
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "pilot": "none",
+     "at": {
+      "t": 1370.5,
+      "phase": "afternoon",
+      "step": 3,
+      "carried": "sail",
+      "at": [
+       -25.2,
+       377.3
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "pilot": "none",
+     "at": {
+      "t": 1401.1,
+      "phase": "afternoon",
+      "step": 3,
+      "carried": "sail",
+      "at": [
+       -25.2,
+       377.3
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "pilot": "none",
+     "at": {
+      "t": 1431.8,
+      "phase": "afternoon",
+      "step": 3,
+      "carried": "sail",
+      "at": [
+       -25.2,
+       377.3
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "pilot": "none",
+     "at": {
+      "t": 1462.4,
+      "phase": "afternoon",
+      "step": 3,
+      "carried": "sail",
+      "at": [
+       -25.2,
+       377.3
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "verdict": "HARNESS",
+   "why": "never reached the mark: none / none / none / none / none / none",
+   "wallSecs": 139,
+   "job": "043-part-wings.s3-Q.out"
+  },
+  "den-biscuit.s3|Q": {
+   "case": "den-biscuit.s3",
+   "code": "Q",
+   "round": 1,
+   "fixture": "den-biscuit.s3",
+   "cap": 600,
+   "recorded": 56,
+   "begin": {
+    "key": "den-biscuit.s3",
+    "code": "Q",
+    "fixtureStep": 3,
+    "phase": "afternoon"
+   },
+   "toMark": [
+    {
+     "pilot": "running",
+     "at": {
+      "t": 1366.6,
+      "phase": "afternoon",
+      "step": 3,
+      "carried": "ball",
+      "at": [
+       39.3,
+       355
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": "biscuit",
+      "race": null
+     }
+    }
+   ],
+   "mark": {
+    "t": 1366.6,
+    "phase": "afternoon",
+    "step": 3,
+    "carried": "ball",
+    "at": [
+     39.3,
+     355
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": "biscuit",
+    "race": null
+   },
+   "mistake": "save, quit, Continue",
+   "route": "input",
+   "q": {
+    "quitAt": 1366.6,
+    "saved": {
+     "t": 1332.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 2
+     },
+     "carried": "ball",
+     "saveRev": 3
+    },
+    "continuedAt": 1332.9,
+    "lostSecs": 33.7,
+    "repaired": null,
+    "leftoversAfterContinue": {}
+   },
+   "took": true,
+   "mistakeSecs": -33.7,
+   "afterMistake": {
+    "t": 1332.9,
+    "phase": "afternoon",
+    "step": 3,
+    "carried": "ball",
+    "at": [
+     29.9,
+     313.6
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "",
+     "result": "done",
+     "at": {
+      "t": 1387.2,
+      "phase": "afternoon",
+      "step": 4,
+      "carried": null,
+      "at": [
+       50.4,
+       392.9
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 54.2,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 0,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 2,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {
+    "dialogue": true
+   },
+   "retries": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "wallSecs": 125,
+   "job": "044-den-biscuit.s3-Q.out"
+  },
+  "den-strix.s2|Q": {
+   "case": "den-strix.s2",
+   "code": "Q",
+   "round": 1,
+   "fixture": "den-strix.s2",
+   "cap": 600,
+   "recorded": 98.4,
+   "begin": {
+    "key": "den-strix.s2",
+    "code": "Q",
+    "fixtureStep": 2,
+    "phase": "afternoon"
+   },
+   "toMark": [
+    {
+     "pilot": "running",
+     "at": {
+      "t": 1410,
+      "phase": "night",
+      "step": 2,
+      "carried": "spectacles",
+      "at": [
+       -32.1,
+       322.2
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": "strix",
+      "race": null
+     }
+    }
+   ],
+   "mark": {
+    "t": 1410,
+    "phase": "night",
+    "step": 2,
+    "carried": "spectacles",
+    "at": [
+     -32.1,
+     322.2
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": "strix",
+    "race": null
+   },
+   "mistake": "save, quit, Continue",
+   "route": "input",
+   "q": {
+    "quitAt": 1410,
+    "saved": {
+     "t": 1402.6,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 1
+     },
+     "carried": "spectacles",
+     "saveRev": 3
+    },
+    "continuedAt": 1403.4,
+    "lostSecs": 6.6,
+    "repaired": null,
+    "leftoversAfterContinue": {}
+   },
+   "took": true,
+   "mistakeSecs": -6.6,
+   "afterMistake": {
+    "t": 1403.4,
+    "phase": "night",
+    "step": 2,
+    "carried": "spectacles",
+    "at": [
+     -21.7,
+     369.3
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "",
+     "result": "none",
+     "at": {
+      "t": 1711.1,
+      "phase": "night",
+      "step": 2,
+      "carried": "spectacles",
+      "at": [
+       -29.4,
+       330.6
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": "strix",
+      "race": null
+     }
+    },
+    {
+     "attempt": 1,
+     "how": "fight on",
+     "result": "stopped: cap",
+     "at": {
+      "t": 2008.3,
+      "phase": "night",
+      "step": 2,
+      "carried": "spectacles",
+      "at": [
+       -29.1,
+       331.2
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": "strix",
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 604.9,
+   "oracle": {
+    "checks": {
+     "item": "carried",
+     "phase": "ok",
+     "trigger": "reach: nothing spent"
+    },
+    "fails": [],
+    "ok": true
+   },
+   "verdict": "FAIL-SCRIPT",
+   "why": "not finished; the oracle says the step is still doable: {\"item\":\"carried\",\"phase\":\"ok\",\"trigger\":\"reach: nothing spent\"}",
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 1,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 2,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {
+    "scriptedChars": [
+     "strix"
+    ],
+    "busy": [
+     "den-strix"
+    ]
+   },
+   "retries": 1,
+   "errors": 0,
+   "wallSecs": 243,
+   "job": "045-den-strix.s2-Q.out"
+  },
+  "gear-pen.s2|Q": {
+   "case": "gear-pen.s2",
+   "code": "Q",
+   "round": 1,
+   "fixture": "gear-pen.s2",
+   "cap": 600,
+   "recorded": 30,
+   "begin": {
+    "key": "gear-pen.s2",
+    "code": "Q",
+    "fixtureStep": 2,
+    "phase": "afternoon"
+   },
+   "mark": {
+    "t": 911.4,
+    "phase": "afternoon",
+    "step": 2,
+    "carried": "cufflink",
+    "at": [
+     -99,
+     149.5
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "save, quit, Continue",
+   "route": "input",
+   "q": {
+    "quitAt": 911.4,
+    "saved": {
+     "t": 911.4,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 1
+     },
+     "carried": "cufflink",
+     "saveRev": 3
+    },
+    "continuedAt": 912,
+    "lostSecs": -0.6,
+    "repaired": null,
+    "leftoversAfterContinue": {}
+   },
+   "took": true,
+   "mistakeSecs": 0.6,
+   "afterMistake": {
+    "t": 912,
+    "phase": "afternoon",
+    "step": 2,
+    "carried": "cufflink",
+    "at": [
+     -99,
+     149.5
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "",
+     "result": "done",
+     "at": {
+      "t": 941.1,
+      "phase": "afternoon",
+      "step": 3,
+      "carried": null,
+      "at": [
+       15.2,
+       228.9
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 29.1,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 0,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 1,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {},
+   "retries": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "wallSecs": 161,
+   "job": "046-gear-pen.s2-Q.out"
+  },
+  "gear-headlamp.s2|Q": {
+   "case": "gear-headlamp.s2",
+   "code": "Q",
+   "round": 1,
+   "fixture": "gear-headlamp.s2",
+   "cap": 600,
+   "recorded": 81.5,
+   "begin": {
+    "key": "gear-headlamp.s2",
+    "code": "Q",
+    "fixtureStep": 2,
+    "phase": "afternoon"
+   },
+   "mark": {
+    "t": 970.4,
+    "phase": "afternoon",
+    "step": 2,
+    "carried": "key",
+    "at": [
+     -126.5,
+     547.7
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "save, quit, Continue",
+   "route": "input",
+   "q": {
+    "quitAt": 970.4,
+    "saved": {
+     "t": 970.4,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 1
+     },
+     "carried": "key",
+     "saveRev": 3
+    },
+    "continuedAt": 971,
+    "lostSecs": -0.6,
+    "repaired": null,
+    "leftoversAfterContinue": {}
+   },
+   "took": true,
+   "mistakeSecs": 0.6,
+   "afterMistake": {
+    "t": 971,
+    "phase": "afternoon",
+    "step": 2,
+    "carried": "key",
+    "at": [
+     -126.5,
+     547.7
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "",
+     "result": "done",
+     "at": {
+      "t": 1052.4,
+      "phase": "morning",
+      "step": 3,
+      "carried": null,
+      "at": [
+       -3.3,
+       757.9
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 81.4,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 1,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 1,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {},
+   "retries": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "wallSecs": 87,
+   "job": "047-gear-headlamp.s2-Q.out"
+  },
+  "part-beak.s2|Q": {
+   "case": "part-beak.s2",
+   "code": "Q",
+   "round": 1,
+   "fixture": "part-beak.s2",
+   "cap": 600,
+   "recorded": 17,
+   "begin": {
+    "key": "part-beak.s2",
+    "code": "Q",
+    "fixtureStep": 2,
+    "phase": "morning"
+   },
+   "mark": {
+    "t": 2289.7,
+    "phase": "morning",
+    "step": 2,
+    "carried": "sticker",
+    "at": [
+     126.1,
+     376.6
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "save, quit, Continue",
+   "route": "input",
+   "q": {
+    "quitAt": 2289.7,
+    "saved": {
+     "t": 2289.7,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 2,
+      "part-eyes": 1,
+      "part-body": 3,
+      "den-choir": 3,
+      "part-beak": 1
+     },
+     "carried": "sticker",
+     "saveRev": 3
+    },
+    "continuedAt": 2290.4,
+    "lostSecs": -0.6,
+    "repaired": null,
+    "leftoversAfterContinue": {}
+   },
+   "took": true,
+   "mistakeSecs": 0.6,
+   "afterMistake": {
+    "t": 2290.4,
+    "phase": "morning",
+    "step": 2,
+    "carried": "sticker",
+    "at": [
+     126.1,
+     376.6
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "",
+     "result": "done",
+     "at": {
+      "t": 2307.9,
+      "phase": "morning",
+      "step": 3,
+      "carried": null,
+      "at": [
+       128.6,
+       361.4
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 17.6,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 0,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 1,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {},
+   "retries": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "wallSecs": 56,
+   "job": "048-part-beak.s2-Q.out"
+  },
+  "truce-dogs-squirrels.s3|Q": {
+   "case": "truce-dogs-squirrels.s3",
+   "code": "Q",
+   "round": 1,
+   "fixture": "truce-dogs-squirrels.s3",
+   "cap": 600,
+   "recorded": 77,
+   "begin": {
+    "key": "truce-dogs-squirrels.s3",
+    "code": "Q",
+    "fixtureStep": 3,
+    "phase": "morning"
+   },
+   "toMark": [
+    {
+     "how": "fetch the tennis-sack at -41, 280",
+     "pilot": "running",
+     "at": {
+      "t": 3557.5,
+      "phase": "morning",
+      "step": 3,
+      "carried": "tennis-sack",
+      "at": [
+       -40,
+       280.2
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "mark": {
+    "t": 3557.5,
+    "phase": "morning",
+    "step": 3,
+    "carried": "tennis-sack",
+    "at": [
+     -40,
+     280.2
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "save, quit, Continue",
+   "route": "input",
+   "q": {
+    "quitAt": 3557.5,
+    "saved": {
+     "t": 3557.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "truce-dogs-squirrels": 2
+     },
+     "carried": "tennis-sack",
+     "saveRev": 3
+    },
+    "continuedAt": 3558.1,
+    "lostSecs": -0.6,
+    "repaired": null,
+    "leftoversAfterContinue": {}
+   },
+   "took": true,
+   "mistakeSecs": 0.6,
+   "afterMistake": {
+    "t": 3558.1,
+    "phase": "morning",
+    "step": 3,
+    "carried": "tennis-sack",
+    "at": [
+     -40,
+     280.2
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "",
+     "result": "none",
+     "at": {
+      "t": 3744.9,
+      "phase": "morning",
+      "step": 3,
+      "carried": null,
+      "at": [
+       70.8,
+       396.4
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "attempt": 1,
+     "how": "fetch the tennis-sack at 71, 397",
+     "result": "none",
+     "at": {
+      "t": 3805.7,
+      "phase": "morning",
+      "step": 3,
+      "carried": "tennis-sack",
+      "at": [
+       25.7,
+       348.6
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "attempt": 2,
+     "how": "",
+     "result": "none",
+     "at": {
+      "t": 3866.4,
+      "phase": "morning",
+      "step": 3,
+      "carried": "tennis-sack",
+      "at": [
+       25.7,
+       348.6
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "attempt": 3,
+     "how": "nap round",
+     "result": "none",
+     "at": {
+      "t": 3943.9,
+      "phase": "morning",
+      "step": 3,
+      "carried": "tennis-sack",
+      "at": [
+       -20.9,
+       327.5
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 385.8,
+   "oracle": {
+    "checks": {
+     "item": "carried",
+     "phase": "ok",
+     "human:dogwalker": "out",
+     "trigger": "drop: nothing spent"
+    },
+    "fails": [],
+    "ok": true
+   },
+   "verdict": "FAIL-SCRIPT",
+   "why": "not finished; the oracle says the step is still doable: {\"item\":\"carried\",\"phase\":\"ok\",\"human:dogwalker\":\"out\",\"trigger\":\"drop: nothing spent\"}",
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 2,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 0,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [
+    "compass not at the tennis-sack (lies at 71, 397)"
+   ],
+   "leftovers": {},
+   "retries": 3,
+   "errors": 0,
+   "wallSecs": 195,
+   "job": "049-truce-dogs-squirrels.s3-Q.out"
+  },
+  "truce-cats-rats.s3|Q": {
+   "case": "truce-cats-rats.s3",
+   "code": "Q",
+   "round": 1,
+   "fixture": "truce-cats-rats.s3",
+   "cap": 600,
+   "recorded": 82.1,
+   "begin": {
+    "key": "truce-cats-rats.s3",
+    "code": "Q",
+    "fixtureStep": 3,
+    "phase": "morning"
+   },
+   "toMark": [
+    {
+     "pilot": "running",
+     "at": {
+      "t": 2673.4,
+      "phase": "morning",
+      "step": 3,
+      "carried": "box",
+      "at": [
+       110.7,
+       822
+      ],
+      "mode": "fly",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "mark": {
+    "t": 2673.4,
+    "phase": "morning",
+    "step": 3,
+    "carried": "box",
+    "at": [
+     110.7,
+     822
+    ],
+    "mode": "fly",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "save, quit, Continue",
+   "route": "input",
+   "q": {
+    "quitAt": 2673.4,
+    "saved": {
+     "t": 2673.4,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 2,
+      "part-eyes": 1,
+      "part-body": 3,
+      "den-choir": 3,
+      "part-beak": 4,
+      "den-turtles": 3,
+      "truce-cats-rats": 2
+     },
+     "carried": "box",
+     "saveRev": 3
+    },
+    "continuedAt": 2673.8,
+    "lostSecs": -0.5,
+    "repaired": null,
+    "leftoversAfterContinue": {}
+   },
+   "took": true,
+   "mistakeSecs": 0.5,
+   "afterMistake": {
+    "t": 2673.8,
+    "phase": "morning",
+    "step": 3,
+    "carried": "box",
+    "at": [
+     109.7,
+     824.7
+    ],
+    "mode": "fly",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "",
+     "result": "done",
+     "at": {
+      "t": 2941.5,
+      "phase": "morning",
+      "step": 4,
+      "carried": null,
+      "at": [
+       56.6,
+       1064.4
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 267.7,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 0,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 1,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [
+    "tracked scheme changed to den-songbirds"
+   ],
+   "leftovers": {},
+   "retries": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "wallSecs": 178,
+   "job": "050-truce-cats-rats.s3-Q.out"
+  },
+  "den-rhoda.s2|Q": {
+   "case": "den-rhoda.s2",
+   "code": "Q",
+   "round": 1,
+   "fixture": "den-rhoda.s2",
+   "cap": 600,
+   "recorded": 50.5,
+   "begin": {
+    "key": "den-rhoda.s2",
+    "code": "Q",
+    "fixtureStep": 2,
+    "phase": "morning"
+   },
+   "toMark": [
+    {
+     "pilot": "running",
+     "at": {
+      "t": 3539.2,
+      "phase": "afternoon",
+      "step": 2,
+      "carried": null,
+      "at": [
+       66.6,
+       988.7
+      ],
+      "mode": "fly",
+      "driving": null,
+      "fight": "rhoda",
+      "race": null
+     }
+    }
+   ],
+   "mark": {
+    "t": 3539.2,
+    "phase": "afternoon",
+    "step": 2,
+    "carried": null,
+    "at": [
+     66.6,
+     988.7
+    ],
+    "mode": "fly",
+    "driving": null,
+    "fight": "rhoda",
+    "race": null
+   },
+   "mistake": "save, quit, Continue",
+   "route": "input",
+   "q": {
+    "quitAt": 3539.2,
+    "saved": {
+     "t": 3521.3,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "continuedAt": 3521.8,
+    "lostSecs": 17.4,
+    "repaired": null,
+    "leftoversAfterContinue": {}
+   },
+   "took": true,
+   "mistakeSecs": -17.4,
+   "afterMistake": {
+    "t": 3521.8,
+    "phase": "afternoon",
+    "step": 2,
+    "carried": null,
+    "at": [
+     -35.5,
+     940.1
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "",
+     "result": "done",
+     "at": {
+      "t": 3554.9,
+      "phase": "afternoon",
+      "step": 3,
+      "carried": null,
+      "at": [
+       69.3,
+       995.4
+      ],
+      "mode": "fly",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 33.2,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 1,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 2,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {
+    "dialogue": true
+   },
+   "retries": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "wallSecs": 72,
+   "job": "051-den-rhoda.s2-Q.out"
+  },
+  "part-power.s3|Q": {
+   "case": "part-power.s3",
+   "code": "Q",
+   "round": 1,
+   "fixture": "part-power.s3",
+   "cap": 600,
+   "recorded": 34.9,
+   "begin": {
+    "key": "part-power.s3",
+    "code": "Q",
+    "fixtureStep": 3,
+    "phase": "morning"
+   },
+   "mark": {
+    "t": 5213.5,
+    "phase": "morning",
+    "step": 3,
+    "carried": null,
+    "at": [
+     -26.1,
+     296.9
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "save, quit, Continue",
+   "route": "input",
+   "q": {
+    "quitAt": 5213.5,
+    "saved": {
+     "t": 5213.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-raccoons": 3,
+      "den-rhoda": 3,
+      "part-power": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "continuedAt": 5214.2,
+    "lostSecs": -0.7,
+    "repaired": null,
+    "leftoversAfterContinue": {}
+   },
+   "took": true,
+   "mistakeSecs": 0.7,
+   "afterMistake": {
+    "t": 5214.2,
+    "phase": "morning",
+    "step": 3,
+    "carried": null,
+    "at": [
+     -26.1,
+     296.9
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "",
+     "result": "done",
+     "at": {
+      "t": 5243.8,
+      "phase": "morning",
+      "step": 4,
+      "carried": null,
+      "at": [
+       -30.8,
+       300.2
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 29.5,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 0,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 1,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {},
+   "retries": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "wallSecs": 110,
+   "job": "052-part-power.s3-Q.out"
+  },
+  "den-meermob.s2.alt|Q": {
+   "case": "den-meermob.s2.alt",
+   "code": "Q",
+   "round": 1,
+   "fixture": "den-meermob.s2",
+   "cap": 600,
+   "recorded": null,
+   "begin": {
+    "key": "den-meermob.s2.alt",
+    "code": "Q",
+    "fixtureStep": 2,
+    "phase": "morning"
+   },
+   "toMark": [
+    {
+     "pilot": "none",
+     "at": {
+      "t": 6142.8,
+      "phase": "morning",
+      "step": 2,
+      "carried": "slice",
+      "at": [
+       -79.6,
+       1024.7
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "pilot": "none",
+     "at": {
+      "t": 6183.5,
+      "phase": "morning",
+      "step": 2,
+      "carried": "slice",
+      "at": [
+       -79.6,
+       1024.7
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "pilot": "none",
+     "at": {
+      "t": 6224.2,
+      "phase": "morning",
+      "step": 2,
+      "carried": "slice",
+      "at": [
+       -79.6,
+       1024.7
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "pilot": "none",
+     "at": {
+      "t": 6264.9,
+      "phase": "morning",
+      "step": 2,
+      "carried": "slice",
+      "at": [
+       -79.6,
+       1024.7
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "pilot": "none",
+     "at": {
+      "t": 6305.6,
+      "phase": "morning",
+      "step": 2,
+      "carried": "slice",
+      "at": [
+       -79.6,
+       1024.7
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "pilot": "none",
+     "at": {
+      "t": 6346.3,
+      "phase": "morning",
+      "step": 2,
+      "carried": "slice",
+      "at": [
+       -79.6,
+       1024.7
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "verdict": "HARNESS",
+   "why": "never reached the mark: none / none / none / none / none / none",
+   "wallSecs": 115,
+   "job": "053-den-meermob.s2.alt-Q.out"
+  },
+  "prologue.s2|Q": {
+   "case": "prologue.s2",
+   "code": "Q",
+   "round": 1,
+   "fixture": "prologue.s2",
+   "cap": 600,
+   "recorded": 66,
+   "begin": {
+    "key": "prologue.s2",
+    "code": "Q",
+    "fixtureStep": 2,
+    "phase": "morning"
+   },
+   "toMark": [
+    {
+     "pilot": "running",
+     "at": {
+      "t": 65.6,
+      "phase": "morning",
+      "step": 3,
+      "carried": null,
+      "at": [
+       50,
+       5.3
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "mark": {
+    "t": 65.6,
+    "phase": "morning",
+    "step": 3,
+    "carried": null,
+    "at": [
+     50,
+     5.3
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "save, quit, Continue",
+   "route": "input",
+   "q": {
+    "quitAt": 65.6,
+    "saved": {
+     "t": 60.7,
+     "steps": {
+      "prologue": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "continuedAt": 61.3,
+    "lostSecs": 4.4,
+    "repaired": null,
+    "leftoversAfterContinue": {
+     "cutscene": "prologue-end",
+     "busy": [
+      "prologue"
+     ],
+     "bodyClass": [
+      "cine"
+     ]
+    }
+   },
+   "took": true,
+   "mistakeSecs": -4.4,
+   "afterMistake": {
+    "t": 61.3,
+    "phase": "morning",
+    "step": 3,
+    "carried": null,
+    "at": [
+     50,
+     5.3
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [],
+   "gameSecs": 0,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 0,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 2,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {
+    "cutscene": "prologue-end",
+    "busy": [
+     "prologue"
+    ],
+    "cameraLocked": true,
+    "bodyClass": [
+     "cine"
+    ],
+    "dialogue": true
+   },
+   "retries": -1,
+   "errors": 0,
+   "verdict": "LEFTOVERS",
+   "wallSecs": 137,
+   "job": "054-prologue.s2-Q.out"
+  },
+  "sab-north.s1|Q": {
+   "case": "sab-north.s1",
+   "code": "Q",
+   "round": 1,
+   "fixture": "sab-north",
+   "cap": 600,
+   "recorded": 22.4,
+   "begin": {
+    "key": "sab-north.s1",
+    "code": "Q",
+    "fixtureStep": 1,
+    "phase": "dusk"
+   },
+   "toMark": [
+    {
+     "pilot": "running",
+     "at": {
+      "t": 1704.8,
+      "phase": "night",
+      "step": 1,
+      "carried": null,
+      "at": [
+       19.4,
+       896.6
+      ],
+      "mode": "fly",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "mark": {
+    "t": 1704.8,
+    "phase": "night",
+    "step": 1,
+    "carried": null,
+    "at": [
+     19.4,
+     896.6
+    ],
+    "mode": "fly",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "save, quit, Continue",
+   "route": "input",
+   "q": {
+    "quitAt": 1704.8,
+    "saved": {
+     "t": 1704.8,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "continuedAt": 1704.8,
+    "lostSecs": 0,
+    "repaired": null,
+    "leftoversAfterContinue": {}
+   },
+   "took": true,
+   "mistakeSecs": 0,
+   "afterMistake": {
+    "t": 1704.8,
+    "phase": "night",
+    "step": 1,
+    "carried": null,
+    "at": [
+     19.5,
+     896.5
+    ],
+    "mode": "fly",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "",
+     "result": "done",
+     "at": {
+      "t": 1716.4,
+      "phase": "night",
+      "step": 2,
+      "carried": null,
+      "at": [
+       56,
+       862.2
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 11.5,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 1,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 0,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {},
+   "retries": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "wallSecs": 106,
+   "job": "055-sab-north.s1-Q.out"
+  },
+  "part-eyes.s1|Q": {
+   "case": "part-eyes.s1",
+   "code": "Q",
+   "round": 1,
+   "fixture": "sab-middle.s2",
+   "cap": 600,
+   "recorded": null,
+   "begin": {
+    "key": "part-eyes.s1",
+    "code": "Q",
+    "fixtureStep": 1,
+    "phase": "night"
+   },
+   "toMark": [
+    {
+     "pilot": "none",
+     "at": {
+      "t": 2073.5,
+      "phase": "night",
+      "step": 1,
+      "carried": null,
+      "at": [
+       43.5,
+       310
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "pilot": "none",
+     "at": {
+      "t": 2134.3,
+      "phase": "night",
+      "step": 1,
+      "carried": null,
+      "at": [
+       43.5,
+       310
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "pilot": "none",
+     "at": {
+      "t": 2195.1,
+      "phase": "night",
+      "step": 1,
+      "carried": null,
+      "at": [
+       43.5,
+       310
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "pilot": "none",
+     "at": {
+      "t": 2255.8,
+      "phase": "night",
+      "step": 1,
+      "carried": null,
+      "at": [
+       43.5,
+       310
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "pilot": "none",
+     "at": {
+      "t": 2316.6,
+      "phase": "night",
+      "step": 1,
+      "carried": null,
+      "at": [
+       43.5,
+       310
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "pilot": "none",
+     "at": {
+      "t": 2377.4,
+      "phase": "night",
+      "step": 1,
+      "carried": null,
+      "at": [
+       43.5,
+       310
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "verdict": "HARNESS",
+   "why": "never reached the mark: none / none / none / none / none / none",
+   "wallSecs": 148,
+   "job": "056-part-eyes.s1-Q.out"
+  },
+  "den-choir.s2|Q": {
+   "case": "den-choir.s2",
+   "code": "Q",
+   "round": 1,
+   "fixture": "den-choir.s2",
+   "cap": 600,
+   "recorded": 28,
+   "begin": {
+    "key": "den-choir.s2",
+    "code": "Q",
+    "fixtureStep": 2,
+    "phase": "afternoon"
+   },
+   "toMark": [
+    {
+     "pilot": "running",
+     "at": {
+      "t": 2033.2,
+      "phase": "afternoon",
+      "step": 2,
+      "carried": null,
+      "at": [
+       -0.7,
+       263.6
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "mark": {
+    "t": 2033.2,
+    "phase": "afternoon",
+    "step": 2,
+    "carried": null,
+    "at": [
+     -0.7,
+     263.6
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "save, quit, Continue",
+   "route": "input",
+   "q": {
+    "quitAt": 2033.2,
+    "saved": {
+     "t": 2033.2,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 2,
+      "part-eyes": 1,
+      "part-body": 3,
+      "den-choir": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "continuedAt": 2033.7,
+    "lostSecs": -0.5,
+    "repaired": null,
+    "leftoversAfterContinue": {}
+   },
+   "took": true,
+   "mistakeSecs": 0.5,
+   "afterMistake": {
+    "t": 2033.7,
+    "phase": "afternoon",
+    "step": 2,
+    "carried": null,
+    "at": [
+     -0.7,
+     263.6
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "",
+     "result": "done",
+     "at": {
+      "t": 2045.3,
+      "phase": "afternoon",
+      "step": 3,
+      "carried": null,
+      "at": [
+       -29.1,
+       280.2
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 11.5,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 0,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 1,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {},
+   "retries": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "wallSecs": 106,
+   "job": "057-den-choir.s2-Q.out"
+  },
+  "den-songbirds.s2|Q": {
+   "case": "den-songbirds.s2",
+   "code": "Q",
+   "round": 1,
+   "fixture": "den-songbirds.s2",
+   "cap": 600,
+   "recorded": 63,
+   "begin": {
+    "key": "den-songbirds.s2",
+    "code": "Q",
+    "fixtureStep": 2,
+    "phase": "morning"
+   },
+   "toMark": [
+    {
+     "pilot": "running",
+     "at": {
+      "t": 2285.1,
+      "phase": "morning",
+      "step": 2,
+      "carried": null,
+      "at": [
+       -126.9,
+       367
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "mark": {
+    "t": 2285.1,
+    "phase": "morning",
+    "step": 2,
+    "carried": null,
+    "at": [
+     -126.9,
+     367
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "save, quit, Continue",
+   "route": "input",
+   "q": {
+    "quitAt": 2285.1,
+    "saved": {
+     "t": 2285.1,
+     "steps": {
+      "prologue": 3,
+      "den-cats": 3,
+      "den-songbirds": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "continuedAt": 2285.7,
+    "lostSecs": -0.6,
+    "repaired": null,
+    "leftoversAfterContinue": {}
+   },
+   "took": true,
+   "mistakeSecs": 0.6,
+   "afterMistake": {
+    "t": 2285.7,
+    "phase": "morning",
+    "step": 2,
+    "carried": null,
+    "at": [
+     -126.9,
+     367
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "",
+     "result": "done",
+     "at": {
+      "t": 2328.4,
+      "phase": "morning",
+      "step": 3,
+      "carried": null,
+      "at": [
+       -126.9,
+       367
+      ],
+      "mode": "takeoff",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 42.7,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 0,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 1,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {},
+   "retries": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "wallSecs": 71,
+   "job": "058-den-songbirds.s2-Q.out"
+  },
+  "den-horses.s2|Q": {
+   "case": "den-horses.s2",
+   "code": "Q",
+   "round": 1,
+   "fixture": "den-horses.s2",
+   "cap": 600,
+   "recorded": 69,
+   "begin": {
+    "key": "den-horses.s2",
+    "code": "Q",
+    "fixtureStep": 2,
+    "phase": "morning"
+   },
+   "toMark": [
+    {
+     "pilot": "running",
+     "at": {
+      "t": 4800.1,
+      "phase": "morning",
+      "step": 3,
+      "carried": null,
+      "at": [
+       84.5,
+       -7.9
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "mark": {
+    "t": 4800.1,
+    "phase": "morning",
+    "step": 3,
+    "carried": null,
+    "at": [
+     84.5,
+     -7.9
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "save, quit, Continue",
+   "route": "input",
+   "q": {
+    "quitAt": 4800.1,
+    "saved": {
+     "t": 4795.9,
+     "steps": {
+      "prologue": 3,
+      "den-cats": 3,
+      "den-songbirds": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 3,
+      "den-horses": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "continuedAt": 4796.3,
+    "lostSecs": 3.9,
+    "repaired": null,
+    "leftoversAfterContinue": {
+     "scriptedChars": [
+      "clementine",
+      "dapple",
+      "bigben"
+     ],
+     "cutscene": "horses-drink",
+     "busy": [
+      "den-horses"
+     ],
+     "cameraLocked": true,
+     "bodyClass": [
+      "cine"
+     ]
+    }
+   },
+   "took": true,
+   "mistakeSecs": -3.9,
+   "afterMistake": {
+    "t": 4796.3,
+    "phase": "morning",
+    "step": 3,
+    "carried": null,
+    "at": [
+     84.5,
+     -7.9
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [],
+   "gameSecs": 0,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 0,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 2,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {
+    "scriptedChars": [
+     "clementine",
+     "dapple",
+     "bigben"
+    ],
+    "cutscene": "horses-drink",
+    "busy": [
+     "den-horses"
+    ],
+    "cameraLocked": true,
+    "bodyClass": [
+     "cine"
+    ],
+    "dialogue": true
+   },
+   "retries": -1,
+   "errors": 0,
+   "verdict": "LEFTOVERS",
+   "wallSecs": 90,
+   "job": "059-den-horses.s2-Q.out"
+  },
+  "den-turtles.s2|Q": {
+   "case": "den-turtles.s2",
+   "code": "Q",
+   "round": 1,
+   "fixture": "den-turtles.s2",
+   "cap": 600,
+   "recorded": 14,
+   "begin": {
+    "key": "den-turtles.s2",
+    "code": "Q",
+    "fixtureStep": 2,
+    "phase": "morning"
+   },
+   "toMark": [
+    {
+     "pilot": "running",
+     "at": {
+      "t": 3088.5,
+      "phase": "morning",
+      "step": 2,
+      "carried": null,
+      "at": [
+       8.7,
+       432.4
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "mark": {
+    "t": 3088.5,
+    "phase": "morning",
+    "step": 2,
+    "carried": null,
+    "at": [
+     8.7,
+     432.4
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "save, quit, Continue",
+   "route": "input",
+   "q": {
+    "quitAt": 3088.5,
+    "saved": {
+     "t": 3081.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3,
+      "den-turtles": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "continuedAt": 3082.1,
+    "lostSecs": 6.4,
+    "repaired": null,
+    "leftoversAfterContinue": {}
+   },
+   "took": true,
+   "mistakeSecs": -6.4,
+   "afterMistake": {
+    "t": 3082.1,
+    "phase": "morning",
+    "step": 2,
+    "carried": null,
+    "at": [
+     8.7,
+     432.4
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "",
+     "result": "done",
+     "at": {
+      "t": 3093.2,
+      "phase": "morning",
+      "step": 3,
+      "carried": null,
+      "at": [
+       8.7,
+       432.4
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 11.1,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 0,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 2,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {},
+   "retries": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "wallSecs": 98,
+   "job": "060-den-turtles.s2-Q.out"
+  },
+  "den-geese.s2|Q": {
+   "case": "den-geese.s2",
+   "code": "Q",
+   "round": 1,
+   "fixture": "den-geese.s2",
+   "cap": 600,
+   "recorded": 105.5,
+   "begin": {
+    "key": "den-geese.s2",
+    "code": "Q",
+    "fixtureStep": 2,
+    "phase": "morning"
+   },
+   "toMark": [
+    {
+     "pilot": "running",
+     "at": {
+      "t": 3568.3,
+      "phase": "afternoon",
+      "step": 2,
+      "carried": null,
+      "at": [
+       -9.3,
+       493.9
+      ],
+      "mode": "fly",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "mark": {
+    "t": 3568.3,
+    "phase": "afternoon",
+    "step": 2,
+    "carried": null,
+    "at": [
+     -9.3,
+     493.9
+    ],
+    "mode": "fly",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "save, quit, Continue",
+   "route": "input",
+   "q": {
+    "quitAt": 3568.3,
+    "saved": {
+     "t": 3568.3,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-biscuit": 3,
+      "den-turtles": 3,
+      "den-geese": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "continuedAt": 3568.7,
+    "lostSecs": -0.5,
+    "repaired": null,
+    "leftoversAfterContinue": {}
+   },
+   "took": true,
+   "mistakeSecs": 0.5,
+   "afterMistake": {
+    "t": 3568.7,
+    "phase": "afternoon",
+    "step": 2,
+    "carried": null,
+    "at": [
+     -4.9,
+     493.4
+    ],
+    "mode": "fly",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "",
+     "result": "done",
+     "at": {
+      "t": 3821.8,
+      "phase": "afternoon",
+      "step": 3,
+      "carried": null,
+      "at": [
+       37.8,
+       489
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 253.1,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 1,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 2,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {
+    "scriptedChars": [
+     "puddles",
+     "slowpoke",
+     "gertrude"
+    ],
+    "cutscene": "geese-truce",
+    "busy": [
+     "den-geese"
+    ],
+    "cameraLocked": true,
+    "bodyClass": [
+     "cine"
+    ],
+    "dialogue": true
+   },
+   "retries": 0,
+   "errors": 0,
+   "verdict": "LEFTOVERS",
+   "wallSecs": 164,
+   "job": "061-den-geese.s2-Q.out"
+  },
+  "part-legs.s2|Q": {
+   "case": "part-legs.s2",
+   "code": "Q",
+   "round": 1,
+   "fixture": "part-legs.s2",
+   "cap": 600,
+   "recorded": 85.5,
+   "begin": {
+    "key": "part-legs.s2",
+    "code": "Q",
+    "fixtureStep": 2,
+    "phase": "night"
+   },
+   "toMark": [
+    {
+     "pilot": "running",
+     "at": {
+      "t": 6612.7,
+      "phase": "morning",
+      "step": 3,
+      "carried": null,
+      "at": [
+       6.5,
+       537.9
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "mark": {
+    "t": 6612.7,
+    "phase": "morning",
+    "step": 3,
+    "carried": null,
+    "at": [
+     6.5,
+     537.9
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "save, quit, Continue",
+   "route": "input",
+   "q": {
+    "quitAt": 6612.7,
+    "saved": {
+     "t": 6612.7,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-crows": 3,
+      "den-cats": 3,
+      "den-biscuit": 3,
+      "gear-headlamp": 2,
+      "den-strix": 2,
+      "den-turtles": 3,
+      "truce-dogs-squirrels": 3,
+      "den-songbirds": 3,
+      "den-horses": 3,
+      "part-legs": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "continuedAt": 6613.4,
+    "lostSecs": -0.6,
+    "repaired": null,
+    "leftoversAfterContinue": {}
+   },
+   "took": true,
+   "mistakeSecs": 0.6,
+   "afterMistake": {
+    "t": 6613.4,
+    "phase": "morning",
+    "step": 3,
+    "carried": null,
+    "at": [
+     6.5,
+     537.9
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [],
+   "gameSecs": 0,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 1,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 1,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {},
+   "retries": -1,
+   "errors": 0,
+   "verdict": "PASS",
+   "wallSecs": 112,
+   "job": "062-part-legs.s2-Q.out"
+  },
+  "den-squirrels.s2|Q": {
+   "case": "den-squirrels.s2",
+   "code": "Q",
+   "round": 1,
+   "fixture": "den-squirrels.s2",
+   "cap": 600,
+   "recorded": 50,
+   "begin": {
+    "key": "den-squirrels.s2",
+    "code": "Q",
+    "fixtureStep": 2,
+    "phase": "afternoon"
+   },
+   "toMark": [
+    {
+     "pilot": "running",
+     "at": {
+      "t": 307.9,
+      "phase": "afternoon",
+      "step": 2,
+      "carried": null,
+      "at": [
+       -48.1,
+       166.1
+      ],
+      "mode": "fly",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "mark": {
+    "t": 307.9,
+    "phase": "afternoon",
+    "step": 2,
+    "carried": null,
+    "at": [
+     -48.1,
+     166.1
+    ],
+    "mode": "fly",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "save, quit, Continue",
+   "route": "input",
+   "q": {
+    "quitAt": 307.9,
+    "saved": {
+     "t": 307.9,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 1
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "continuedAt": 308.3,
+    "lostSecs": -0.3,
+    "repaired": null,
+    "leftoversAfterContinue": {}
+   },
+   "took": true,
+   "mistakeSecs": 0.3,
+   "afterMistake": {
+    "t": 308.3,
+    "phase": "afternoon",
+    "step": 2,
+    "carried": null,
+    "at": [
+     -45.6,
+     168.4
+    ],
+    "mode": "fly",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "",
+     "result": "none",
+     "at": {
+      "t": 621,
+      "phase": "afternoon",
+      "step": 2,
+      "carried": null,
+      "at": [
+       -62.2,
+       152
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "attempt": 1,
+     "how": "",
+     "result": "stopped: cap",
+     "at": {
+      "t": 910.2,
+      "phase": "afternoon",
+      "step": 2,
+      "carried": null,
+      "at": [
+       -61.8,
+       152
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 602,
+   "oracle": {
+    "checks": {
+     "phase": "ok",
+     "trigger": "hazel.caches3 not yet (redo the action)"
+    },
+    "fails": [],
+    "ok": true
+   },
+   "verdict": "FAIL-SCRIPT",
+   "why": "not finished; the oracle says the step is still doable: {\"phase\":\"ok\",\"trigger\":\"hazel.caches3 not yet (redo the action)\"}",
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 0,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 0,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {},
+   "retries": 1,
+   "errors": 0,
+   "wallSecs": 238,
+   "job": "063-den-squirrels.s2-Q.out"
+  },
+  "den-crows.s2|Q": {
+   "case": "den-crows.s2",
+   "code": "Q",
+   "round": 1,
+   "fixture": "den-crows.s2",
+   "cap": 600,
+   "recorded": 119,
+   "begin": {
+    "key": "den-crows.s2",
+    "code": "Q",
+    "fixtureStep": 2,
+    "phase": "afternoon"
+   },
+   "toMark": [
+    {
+     "pilot": "running",
+     "at": {
+      "t": 687.1,
+      "phase": "afternoon",
+      "step": 2,
+      "carried": "shiny",
+      "at": [
+       -10.5,
+       357.8
+      ],
+      "mode": "fly",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "mark": {
+    "t": 687.1,
+    "phase": "afternoon",
+    "step": 2,
+    "carried": "shiny",
+    "at": [
+     -10.5,
+     357.8
+    ],
+    "mode": "fly",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "save, quit, Continue",
+   "route": "input",
+   "q": {
+    "quitAt": 687.1,
+    "saved": {
+     "t": 687.1,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 1
+     },
+     "carried": "shiny",
+     "saveRev": 3
+    },
+    "continuedAt": 687.2,
+    "lostSecs": 0,
+    "repaired": null,
+    "leftoversAfterContinue": {}
+   },
+   "took": true,
+   "mistakeSecs": 0,
+   "afterMistake": {
+    "t": 687.2,
+    "phase": "afternoon",
+    "step": 2,
+    "carried": "shiny",
+    "at": [
+     -10.4,
+     358.3
+    ],
+    "mode": "fly",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "",
+     "result": "none",
+     "at": {
+      "t": 725.3,
+      "phase": "afternoon",
+      "step": 2,
+      "carried": "shiny",
+      "at": [
+       -131.2,
+       275.9
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "attempt": 1,
+     "how": "",
+     "result": "none",
+     "at": {
+      "t": 746.9,
+      "phase": "afternoon",
+      "step": 2,
+      "carried": "shiny",
+      "at": [
+       -132.8,
+       276.8
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "attempt": 2,
+     "how": "",
+     "result": "none",
+     "at": {
+      "t": 768.5,
+      "phase": "afternoon",
+      "step": 2,
+      "carried": "shiny",
+      "at": [
+       -131.8,
+       279.2
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    },
+    {
+     "attempt": 3,
+     "how": "nap round",
+     "result": "none",
+     "at": {
+      "t": 828.8,
+      "phase": "dusk",
+      "step": 2,
+      "carried": "shiny",
+      "at": [
+       -131.8,
+       276
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 141.6,
+   "oracle": {
+    "checks": {
+     "phase": "ok",
+     "trigger": "shiny at hand"
+    },
+    "fails": [],
+    "ok": true
+   },
+   "verdict": "FAIL-SCRIPT",
+   "why": "not finished; the oracle says the step is still doable: {\"phase\":\"ok\",\"trigger\":\"shiny at hand\"}",
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 1,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 0,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {},
+   "retries": 3,
+   "errors": 0,
+   "wallSecs": 164,
+   "job": "064-den-crows.s2-Q.out"
+  },
+  "gear-sunglasses.s1|Q": {
+   "case": "gear-sunglasses.s1",
+   "code": "Q",
+   "round": 1,
+   "fixture": "gear-sunglasses",
+   "cap": 600,
+   "recorded": 80,
+   "begin": {
+    "key": "gear-sunglasses.s1",
+    "code": "Q",
+    "fixtureStep": 1,
+    "phase": "afternoon"
+   },
+   "toMark": [
+    {
+     "pilot": "running",
+     "at": {
+      "t": 795.5,
+      "phase": "afternoon",
+      "step": 1,
+      "carried": null,
+      "at": [
+       126.4,
+       -215.7
+      ],
+      "mode": "fly",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "mark": {
+    "t": 795.5,
+    "phase": "afternoon",
+    "step": 1,
+    "carried": null,
+    "at": [
+     126.4,
+     -215.7
+    ],
+    "mode": "fly",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "save, quit, Continue",
+   "route": "input",
+   "q": {
+    "quitAt": 795.5,
+    "saved": {
+     "t": 795.5,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "continuedAt": 796,
+    "lostSecs": -0.4,
+    "repaired": null,
+    "leftoversAfterContinue": {}
+   },
+   "took": true,
+   "mistakeSecs": 0.4,
+   "afterMistake": {
+    "t": 796,
+    "phase": "afternoon",
+    "step": 1,
+    "carried": null,
+    "at": [
+     126.4,
+     -220.1
+    ],
+    "mode": "fly",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "",
+     "result": "done",
+     "at": {
+      "t": 916,
+      "phase": "afternoon",
+      "step": 2,
+      "carried": "shiny",
+      "at": [
+       77.8,
+       -32.3
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 120,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 0,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 0,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {},
+   "retries": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "wallSecs": 108,
+   "job": "065-gear-sunglasses.s1-Q.out"
+  },
+  "say-cheese.s2|Q": {
+   "case": "say-cheese.s2",
+   "code": "Q",
+   "round": 1,
+   "fixture": "say-cheese.s2",
+   "cap": 600,
+   "recorded": 29,
+   "begin": {
+    "key": "say-cheese.s2",
+    "code": "Q",
+    "fixtureStep": 2,
+    "phase": "morning"
+   },
+   "toMark": [
+    {
+     "pilot": "running",
+     "at": {
+      "t": 230.9,
+      "phase": "morning",
+      "step": 2,
+      "carried": "camera",
+      "at": [
+       -29.7,
+       351.8
+      ],
+      "mode": "fly",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "mark": {
+    "t": 230.9,
+    "phase": "morning",
+    "step": 2,
+    "carried": "camera",
+    "at": [
+     -29.7,
+     351.8
+    ],
+    "mode": "fly",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "save, quit, Continue",
+   "route": "input",
+   "q": {
+    "quitAt": 230.9,
+    "saved": {
+     "t": 230.9,
+     "steps": {
+      "prologue": 3,
+      "say-cheese": 1
+     },
+     "carried": "camera",
+     "saveRev": 3
+    },
+    "continuedAt": 231,
+    "lostSecs": -0.1,
+    "repaired": null,
+    "leftoversAfterContinue": {}
+   },
+   "took": true,
+   "mistakeSecs": 0.1,
+   "afterMistake": {
+    "t": 231,
+    "phase": "morning",
+    "step": 2,
+    "carried": "camera",
+    "at": [
+     -29.2,
+     352.3
+    ],
+    "mode": "fly",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "",
+     "result": "done",
+     "at": {
+      "t": 254.6,
+      "phase": "morning",
+      "step": 3,
+      "carried": null,
+      "at": [
+       8.9,
+       391
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 23.6,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 0,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 1,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {},
+   "retries": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "wallSecs": 71,
+   "job": "066-say-cheese.s2-Q.out"
+  },
+  "part-body.s3|V": {
+   "case": "part-body.s3",
+   "code": "V",
+   "round": 1,
+   "fixture": "part-body.s3",
+   "cap": 600,
+   "recorded": 106,
+   "begin": {
+    "key": "part-body.s3",
+    "code": "V",
+    "fixtureStep": 3,
+    "phase": "dusk"
+   },
+   "toMark": [
+    {
+     "pilot": "running",
+     "at": {
+      "t": 1886.7,
+      "phase": "dusk",
+      "step": 3,
+      "carried": null,
+      "at": [
+       8,
+       218.3
+      ],
+      "mode": "drive",
+      "driving": "hotdog-cart",
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "mark": {
+    "t": 1886.7,
+    "phase": "dusk",
+    "step": 3,
+    "carried": null,
+    "at": [
+     8,
+     218.3
+    ],
+    "mode": "drive",
+    "driving": "hotdog-cart",
+    "fight": null,
+    "race": null
+   },
+   "mistake": "wedge the cart off the route and leave it",
+   "route": "input",
+   "took": true,
+   "mistakeSecs": 18.6,
+   "afterMistake": {
+    "t": 1905.3,
+    "phase": "dusk",
+    "step": 3,
+    "carried": null,
+    "at": [
+     71,
+     243.1
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "hotdog-cart away (-21, 227)",
+     "result": "done",
+     "at": {
+      "t": 2007.7,
+      "phase": "dusk",
+      "step": 4,
+      "carried": null,
+      "at": [
+       -32.8,
+       371.4
+      ],
+      "mode": "drive",
+      "driving": "hotdog-cart",
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 102.4,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 0,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 1,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {
+    "driving": "hotdog-cart"
+   },
+   "retries": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "wallSecs": 22,
+   "job": "009-part-body.s3-V.out"
+  },
+  "part-body.s3|Q": {
+   "case": "part-body.s3",
+   "code": "Q",
+   "round": 1,
+   "fixture": "part-body.s3",
+   "cap": 600,
+   "recorded": 106,
+   "begin": {
+    "key": "part-body.s3",
+    "code": "Q",
+    "fixtureStep": 3,
+    "phase": "dusk"
+   },
+   "toMark": [
+    {
+     "pilot": "running",
+     "at": {
+      "t": 1886.7,
+      "phase": "dusk",
+      "step": 3,
+      "carried": null,
+      "at": [
+       8,
+       218.3
+      ],
+      "mode": "drive",
+      "driving": "hotdog-cart",
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "mark": {
+    "t": 1886.7,
+    "phase": "dusk",
+    "step": 3,
+    "carried": null,
+    "at": [
+     8,
+     218.3
+    ],
+    "mode": "drive",
+    "driving": "hotdog-cart",
+    "fight": null,
+    "race": null
+   },
+   "mistake": "save, quit, Continue",
+   "route": "input",
+   "q": {
+    "quitAt": 1886.7,
+    "saved": {
+     "t": 1886.7,
+     "steps": {
+      "prologue": 3,
+      "den-ducks": 3,
+      "den-squirrels": 3,
+      "den-rats": 3,
+      "den-cats": 3,
+      "den-crows": 3,
+      "gear-sunglasses": 2,
+      "gear-pen": 2,
+      "gear-headlamp": 2,
+      "part-wings": 3,
+      "den-biscuit": 3,
+      "den-strix": 2,
+      "den-raccoons": 3,
+      "sab-north": 2,
+      "sab-middle": 2,
+      "part-eyes": 1,
+      "part-body": 2
+     },
+     "carried": null,
+     "saveRev": 3
+    },
+    "continuedAt": 1887.3,
+    "lostSecs": -0.6,
+    "repaired": null,
+    "leftoversAfterContinue": {}
+   },
+   "took": true,
+   "mistakeSecs": 0.6,
+   "afterMistake": {
+    "t": 1887.3,
+    "phase": "dusk",
+    "step": 3,
+    "carried": null,
+    "at": [
+     6.5,
+     218.9
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "hotdog-cart away (8, 219)",
+     "result": "done",
+     "at": {
+      "t": 1984.2,
+      "phase": "dusk",
+      "step": 4,
+      "carried": null,
+      "at": [
+       -32.8,
+       371.4
+      ],
+      "mode": "drive",
+      "driving": "hotdog-cart",
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 96.9,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 0,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 1,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {
+    "driving": "hotdog-cart"
+   },
+   "retries": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "wallSecs": 119,
+   "job": "040-part-body.s3-Q.out"
+  }
+ }
+}
