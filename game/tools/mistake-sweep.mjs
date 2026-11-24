@@ -198,7 +198,8 @@ export async function runMistake(page, args, { errors = [] } = {}) {
       await page.evaluate(() => window.__ms.stop());
       for (let k = 0; k < 15; k++) { const r = await page.evaluate(() => window.__ms.run('idle', 4, false)); if (r.hit) break; }
       // timed overlays (a join's polaroid closes 3.5 s after it opens) get up to 12 s more; one still up after that is stuck
-      for (let k = 0; k < 3; k++) { if (!(await page.evaluate(() => window.__sw.leftovers().overlays))) break; await page.evaluate(() => window.__ms.run('idle', 4, false)); }
+      // (plain game steps: __ms.run('idle') returns at once when the park is already idle)
+      for (let k = 0; k < 3; k++) { if (!(await page.evaluate(() => window.__sw.leftovers().overlays))) break; await page.evaluate(() => window.__game.step(240, { render: 'none' })); }
     }
     const fin = await page.evaluate(() => window.__ms.finish());
     row.recovery = fin.recovery; row.loops = fin.loops; row.nudge = fin.nudge; row.leftovers = fin.leftovers;
