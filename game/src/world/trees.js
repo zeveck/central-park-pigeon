@@ -14,7 +14,8 @@ import { simplifiedGeometry, simplifierReady } from '../gfx/simplify.js';
 import { mergeGeometries, mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
 import { rngFor, fbm } from '../core/rng.js';
 import { pointInPoly, clamp } from '../core/geo.js';
-import { PARK, TRANSVERSES, FLATS, WORLD, AVENUE, NESTS, SIGNS } from './layout.js';
+import { PARK, TRANSVERSES, FLATS, WORLD, AVENUE, NESTS, SIGNS, CLUES } from './layout.js';
+import { CHARACTERS } from '../data/crews.js';
 import { addShaderPatch } from '../anim/shader-patch.js';
 import { RULE, U } from '../gfx/materials.js';
 import { CELL } from '../gfx/batch.js';
@@ -110,7 +111,16 @@ export function placeTrees(terrain, blockers = []) {
     if (u < 0.08 || u > 0.92) return false;
     return Math.hypot(t.x - (LAMP.x + dx * u), t.z - (LAMP.z + dz * u)) < t.crown + 4;
   };
-  const kept = out.filter((t) => !NESTS.some((n) => Math.hypot(t.x - n.x, t.z - n.z) < 1.8) && !inFirstFlight(t));
+  // fix-31: no trunk on or right by where someone stands or something happens: named characters' homes on the ground,
+  // clue spots on the ground and the crows' market (Ledger stood inside a Ramble trunk, the canopy hiding him as the
+  // camera came close)
+  const spots = [
+    ...Object.values(CHARACTERS).filter((c) => c.at && c.at.x != null && !c.at.on).map((c) => c.at),
+    ...CLUES.filter((c) => c.x != null && !c.on).map((c) => ({ x: c.x, z: c.z })),
+    { x: -12.6, z: 363.4 }, { x: -10, z: 365 },   // Ledger's stall at the Exchange oak (item-sources.js), the oak's spot
+  ];
+  const clearOf = (t) => !spots.some((p) => Math.hypot(t.x - p.x, t.z - p.z) < 2.5);
+  const kept = out.filter((t) => !NESTS.some((n) => Math.hypot(t.x - n.x, t.z - n.z) < 1.8) && !inFirstFlight(t) && clearOf(t));
   kept.forEach((t, i) => { t.id = i; t.y = terrain.heightAt(t.x, t.z) - 0.1; });
   return kept;
 }
