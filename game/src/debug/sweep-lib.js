@@ -72,7 +72,8 @@ export async function install() {
       if (g.altView) out.altView = true;
       if (g.rig.free) out.cameraLocked = true;
       if (g.rig.glanceShot) out.cameraGlance = true;
-      const ov = ['sf-flash', 'sf-stamp', 'sf-freeze', 'polaroid', 'fade'].filter((id) => document.getElementById(id)?.className); if (ov.length) out.overlays = ov;
+      // showing = has .on (each is transparent without it; #fade keeps .nap after a nap, which draws nothing)
+      const ov = ['sf-flash', 'sf-stamp', 'sf-freeze', 'polaroid', 'fade'].filter((id) => document.getElementById(id)?.classList.contains('on')); if (ov.length) out.overlays = ov;
       const bc = [...document.body.classList].filter((k) => ['cine', 'finale'].includes(k)); if (bc.length) out.bodyClass = bc;
       if (g.slowT > 0) out.slowmo = true;
       if (g.dialogue.open) out.dialogue = true;
