@@ -44,3 +44,36 @@ Not game issues (autopilot / harness), fixes drafted or done:
 
 Next: the two game fixes (re-record den-strix and truce-dogs-squirrels closed loop), then the harness/autopilot fixes, then
 round 2: re-run every non-PASS case above + the checks 3–6.
+
+## Rounds 2 and 3 (2026-11-24): where things stand
+
+Every round-1 non-PASS was re-run on the fixed world and harness (22 runs), then a short round 3 for the cases its fixes
+touched. Latest result per case (design/reviews/mistake-sweep.md): **PASS 53 · PASS-HELPED 2 · FAIL-SCRIPT 2 · LEFTOVERS 1 ·
+FAIL-GAME 0** (58 cases).
+
+Game bugs fixed (each re-recorded closed loop, new recordings replay to completion):
+1. The Strix crossing's first island was in the Lake → moved to dry ground (30a2b66).
+2. The Cedar Hill dog walker walked through the 79th St cut → her loop stays on the hill (30a2b66).
+3. **New in round 2: two sails from the duck.** The sail-1 dive set its flag at the dive; while the duck swam back the item
+   keeper "put the sail back" at the shore, then the duck handed Gus another, so a stray sail stayed at the shore after
+   delivery. The keeper now waits while an ally is bringing an item back (4100b3c).
+
+Also found: den-biscuit's and den-racers.alt's raw recordings had drifted after fix batch F (not from these fixes: an A/B
+with the dog walker's old loop failed identically); both re-recorded (ec8d2c1). Other recordings may have drifted too
+(batch F's proof covered closed-loop runs of three schemes and one raw sample).
+
+Checks closed: Hazel's caches after a Continue (not a save bug: the autopilot
+re-pecked a found cache), the Zamboni corner (exit works at once; the harness's wedge test never fired), den-geese's nap after a
+Continue (the autopilot re-pecked a flipped sign).
+
+Still open:
+- **Compass after a dropped item** (NUDGE-WRONG ×3, "compass not at" ×2 in round 1): the compass keeps pointing at the
+  character, not at the item the step needs. Every player who drops one; a UX fix, not done here.
+- **prologue.s2 Q LEFTOVERS:** after a save/quit inside the Prologue's last scene, the Continue replays it and the +1 CREW
+  polaroid stays up. Low reach; needs a trace through continueGame.
+- **Continue lands ahead of the quit** on some Q runs (negative "Took", e.g. den-biscuit −33.7 s): not traced.
+- FAIL-SCRIPT, autopilot only: truce-cats-rats.s3 W (it fetches a box from the shelf instead of Asking the cats) and
+  den-meermob.s2.alt C (a cold slice costs a phase on a one-slice-per-phase step; the harness's attempts run out). Both
+  oracles say doable.
+- Stealth design note (review): with island 0 moved, a leaf pile sits 0.23 m outside its rim on the way east, and the first
+  moss pad is now behind the start.
