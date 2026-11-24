@@ -1,6 +1,6 @@
 // Rig data for Gus's two meshgen models, in each model's own space as baked
 // by loadBakedModel (metres, +Y up, +Z front, feet at y = 0). Measured from the
-// accepted GLBs (gus-stand 0.32 m tall; gus-fly 0.32 m tall with wings up).
+// accepted GLBs (gus-stand 0.32 m tall; gus-fly 0.32 m tall with wings up, remade for #28).
 // If a model is remade, re-measure these: slice the GLB's vertices by height
 // for the neck profile and pivots, and check them in game/test/gus.html.
 
@@ -57,47 +57,66 @@ export const GUS_STAND = {
   },
 };
 
-export const GUS_FLY = {
-  url: 'gus-fly.glb',
-  // gus-fly comes out with a smaller body than gus-stand (its wings set the
-  // 0.32 m height); this scale makes the two heads match.
+// The flock (main.js: pigeon-plain-fly, a different model) keeps the numbers it was fitted with when it borrowed
+// Gus's old flight rig; #28 remade gus-fly, so they are frozen here and GUS_FLY is free to follow the new mesh.
+export const FLOCK_FLY = {
   scale: 1.15,
   bodyCenter: { x: 0, y: 0.16, z: 0 },
-  flightPitch: 0.7,                      // the model is upright (as its picture); lean it forward to fly
-  // Gus rig: leg bones only (the wings stay on anim/wingbeat.js). Feet are the pink clumps under the belly.
-  skin: {
-    legs: [
-      { hip: [-0.026, 0.078, -0.016], foot: [-0.026, 0.046, -0.02] },
-      { hip: [0.034, 0.078, -0.012], foot: [0.034, 0.046, -0.01] },
-    ],
-    box: [0.022, 0.036],                   // |x - hip.x| full weight inside, none outside
-    top: [0.062, 0.078],                   // leg weight fades out up into the belly
-    tailZ: [-0.075, -0.06],                // the tail tips (z < -0.07) are never leg
-  },
   wings: {
     shoulder: { x: 0.062, y: 0.175, z: -0.01 },
     rootX: [0.058, 0.1],
     rootY: [0.085, 0.125],
     span: 0.22,
   },
+};
+
+export const GUS_FLY = {
+  url: 'gus-fly.glb',
+  // #28: gus-fly remade symmetric (one pair of eyes, the tail fan on the centre line), 0.32 m tall with the wings up.
+  // Its head is bigger than the old model's (which ×1.15 left ~15% bigger than gus-stand's); at ×1.0 it matches
+  // gus-stand's head in a front render (eyes 0.057 apart, the same width), so the take-off / landing swap doesn't jump.
+  scale: 1.0,
+  bodyCenter: { x: 0, y: 0.17, z: 0 },   // the torso (y 0.1-0.25, z -0.07..0.085); the pitch / bank pivot
+  flightPitch: 0.76,                     // the model is upright (as its picture), leaning back 68.7°; lean it forward to fly
+  // Gus rig: leg bones only (the wings stay on anim/wingbeat.js). Feet are the pink clumps under the belly
+  // (pink texels at x ±0.005-0.035, y 0.06-0.095, z -0.04..0.016); the belly is at y ~0.097 over them.
+  skin: {
+    legs: [
+      { hip: [-0.021, 0.095, -0.008], foot: [-0.021, 0.064, 0] },
+      { hip: [0.021, 0.095, -0.008], foot: [0.021, 0.064, 0] },
+    ],
+    box: [0.016, 0.028],                   // |x - hip.x| full weight inside, none outside
+    top: [0.086, 0.099],                   // leg weight fades out up into the belly
+    tailZ: [-0.056, -0.044],               // the tail fan's root (z < -0.05 at the feet's height) is never leg
+  },
+  // The wings are one sheet in the plane z -0.03..-0.055, out of the flanks (the body is |x| < 0.067 in front of
+  // it, the back bulges behind it to z -0.066); the wing's lower edge is y 0.11-0.12 at the root, the tail fan
+  // below it tops out at y 0.104 (|x| < 0.12). rootX starts outside the body so the body never moves.
+  wings: {
+    shoulder: { x: 0.062, y: 0.175, z: -0.035 },
+    rootX: [0.064, 0.11],
+    rootY: [0.092, 0.114],
+    span: 0.2,
+  },
   scarf: {
-    neck: { x: 0, y: 0.19, z: 0.035 },   // Flight hint / scarf: z 0.04 → 0.035 and the knot -0.008 → -0.017: the knot sat 1 cm inside the nape
-    radius: [0.047, 0.05],
+    neck: { x: 0, y: 0.222, z: 0.018 },  // the neck's narrowest: y 0.22-0.23, z -0.044..0.074, |x| < 0.052
+    radius: [0.049, 0.056],
     tube: 0.012,
     tilt: 0.1,
-    knot: { x: 0.012, y: 0.186, z: -0.017 },
+    knot: { x: 0.012, y: 0.217, z: -0.042 },
     tails: [{ x: -0.35, y: -1, z: -0.5 }, { x: 0.35, y: -1, z: -0.45 }], // down his back: ~25 deg below level in flight
-    body: { x: 0, y: 0.13, z: 0.03, r: 0.07 },
-    // Polish-2: the body, not the wings. Flight hint / scarf: the torso only, the rest by the surface; corridor: the tails' centre lines stay within
-    // |x| 0.03 (edges 0.047); see keep below
+    body: { x: 0, y: 0.16, z: 0.01, r: 0.07 },
+    // the torso only (below the wrap, above the feet), the rest by the surface; corridor: the tails' centre lines stay
+    // within |x| 0.03 (edges 0.047); see keep below
     hull: [
-      { c: [0, 0.11, -0.02], x: 0.06, y: [0.03, 0.17], z: [-0.07, 0.08], margin: 0.006, corridor: 0.03 },   // (the tail by the surface)
+      { c: [0, 0.15, 0], x: 0.065, y: [0.06, 0.2], z: [-0.075, 0.09], margin: 0.006, corridor: 0.03 },
     ],
-    surface: { x: 0.056, y: [0.085, 0.25], z: [-0.22, 0.16], margin: 0.005, near: [0.012, 0.186, -0.017, 0.145] },   // (above the legs: all on the root bone, so it is posed once)   // the body between the wings (never moved by the wingbeat)
-    // Flight hint / scarf: on a deep downstroke the wings' trailing feathers sweep in under the shoulders to |x| 0.015, from
-    // y 0.04 to 0.13 and z -0.08 to +0.04 (measured over every stroke the flight uses); below y 0.14 the tails trail off
-    // the back, clear of all of it, never lower than y 0.1 (the tail fan), and stay within |x| 0.03 above it (wing
-    // vertices there keep |x| > 0.048)
-    keep: { y0: 0.14, z0: -0.035, slope: 1.0, floorY: 0.1 },
+    // the posed surface: the body between the wings (|x| inside rootX, so the wingbeat never moves it), above the legs,
+    // the nape and the back of the head
+    surface: { x: 0.062, y: [0.1, 0.28], z: [-0.22, 0.16], margin: 0.005, near: [0.012, 0.217, -0.042, 0.145] },
+    // on a deep downstroke the wings' roots sweep in under the shoulders to |x| 0.01, from y 0.04 to 0.14 but only
+    // in their own plane (z -0.034..-0.054); below y 0.14 the tails trail off the back behind it (the back itself is
+    // at z -0.066), never lower than y 0.105 (the tail fan)
+    keep: { y0: 0.14, z0: -0.062, slope: 1.0, floorY: 0.105 },
   },
 };

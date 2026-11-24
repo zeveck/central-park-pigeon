@@ -443,6 +443,10 @@
 //     floor 0.3 → 0.15, the re-plant distance kept at 0.132 m (DRAG; it was REACH * 2.4), and a planted foot keeps its
 //     heading (f.wyaw / f.yawOff: its toes no longer swivel round the ankle in a turn). Planted toes drift 0 mm walking,
 //     sprinting and turning (shots design/screenshots/flight-scarf/headbob-*). Footstep sounds are timed from speed.
+// Fix-28 notes (Gus in flight had a second eye and a tail off to his left: gus-fly.glb remade symmetric). Visual only.
+//   - entities/gus-rig.js: GUS_FLY re-fitted to the new mesh (scale 1.15 → 1.0: its head is bigger, and 1.0 matches
+//     gus-stand's; pitch 0.76; wings 3.5 cm back; legs, scarf and its colliders re-measured). New FLOCK_FLY keeps the old
+//     numbers, which the flock below (pigeon-plain-fly, a different model) borrowed from GUS_FLY, so the flock is unchanged.
 // Fix-16 notes (the owner: peas gave no feedback; shots design/screenshots/fix-16-19-23/16-*). UI only: no rule changed.
 //   - systems/items.js guards are (it, peek) => reason | null; guardReason(it, peek). A refused Peck shows the reason as a toast
 //     at Gus EVERY time (it was a bubble over a picnicker, often off screen, then only a blip) and the prompt reads "Guarded: …".
@@ -584,7 +588,7 @@ import { createInput } from './input.js';
 import { CameraRig } from './camera-rig.js';
 import { Gus } from './entities/gus.js';
 import { Scarf, KNIT_TILE_TINT } from './entities/scarf.js';
-import { GUS_FLY } from './entities/gus-rig.js';
+import { FLOCK_FLY } from './entities/gus-rig.js';
 import { Flock, VISIBLE_MAX } from './entities/flock.js';
 import { Wingbeat } from './anim/wingbeat.js';
 import { Particles } from './fx/particles.js';
@@ -904,7 +908,7 @@ async function boot() {
   // the flock: pigeon-plain-fly with its morph array (13 painted layers)
   await stage('Colouring the pigeons', 0.4);
   const flockBase = flockFly || fly;
-  const flockWings = new Wingbeat(GUS_FLY.wings);
+  const flockWings = new Wingbeat(FLOCK_FLY.wings);   // #28: the flock keeps the rig it had (gus-fly was remade)
   flockWings.setStroke(0.8, -0.5);
   const flockMat = flockBase.makeMaterial();
   flockWings.patch(flockMat, { instanced: true });
@@ -912,8 +916,8 @@ async function boot() {
   if (flyMorphs) patchMorphArray(flockMat, flyMorphs.texture, { sheen: true });
   const flock = new Flock({
     geometry: flockBase.geometry, material: flockMat, wingbeat: flockWings, count: preset.id === 'low' ? 14 : VISIBLE_MAX, seed: 11,   // perf pass: Low draws 14
-    scale: GUS_FLY.scale * 0.96, pitch: 0.8, morph: !!flyMorphs,
-    bodyCenter: new THREE.Vector3(GUS_FLY.bodyCenter.x, GUS_FLY.bodyCenter.y, GUS_FLY.bodyCenter.z),
+    scale: FLOCK_FLY.scale * 0.96, pitch: 0.8, morph: !!flyMorphs,
+    bodyCenter: new THREE.Vector3(FLOCK_FLY.bodyCenter.x, FLOCK_FLY.bodyCenter.y, FLOCK_FLY.bodyCenter.z),
   });
   flock.mesh.castShadow = preset.id === 'high';   // perf pass: High only (was High and Medium)
   world.add(flock.mesh);

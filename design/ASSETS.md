@@ -324,7 +324,7 @@ The camera cost more than the ≈ $0.60 forecast (two retakes); the change stays
 | Asset | File | Tool | Notes | Cost |
 |---|---|---|---|---|
 | Gus in flight, front and back references | .gamegen/candidates/fix-art/gus-fly/gus-fly-{front,back}-v1.png | imagegen2 high ×2 | symmetric: level wings, tail fanned straight back, one eye a side (the old turned views put a second eye on his head and swept the tail to his left, #28) | ≈ $0.12 |
-| gus-fly | game/assets/models/gus-fly.glb | meshgen (30 credits; 841 left) | 6,148 tris, 2K texture, same frame and height as before | $0.60 |
+| gus-fly | game/assets/models/gus-fly.glb | meshgen (30 credits; 841 left) | 6,148 tris, 2K texture, same frame and height as before; its head is bigger, so it is scaled ×1.0 in code (was ×1.15) to match gus-stand's head; 3.51 MB → 1.14 MB | $0.60 |
 | Coats: Pickles, Tux, Duke, Big Ben | game/assets/textures/coats/{cat-sit-pickles,cat-sit-tux,horse-duke,horse-bigben}.webp | nanogen pro 2K edit ×4 + Pillow region fixes | each model's own atlas, same UVs, the portrait as colour reference (#35) | ≈ $0.54 |
 | **Total** | | | | **≈ $1.26** |
 
