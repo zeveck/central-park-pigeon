@@ -91,6 +91,7 @@
 - ElevenLabs tier: creator (paid; no credit line needed)
 - Meshy: 3,402 credits (person topped up from 2,402 on 2026-11-14): 1,402 monthly (reset 2026-12-01) + 2,000 permanent
 - Credit: Rich Conlan (from GAMEGEN_CREDIT)
+- GitHub preview image: to upload (none set)
 - Available: imagegen2, nanogen, audiogen, meshgen (all keys ok), node, python3 + Pillow, playwright-cli
 
 ## Progress
