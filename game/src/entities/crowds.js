@@ -273,7 +273,9 @@ export class Crowds {
             const kinds = Object.keys(SONGBIRD_TINTS);
             const sk = h.kind === 'roof' ? 'starling' : h.kind === 'trees' ? ['bluejay', 'cardinal', 'warbler', 'sparrow', 'robin'][Math.floor(rnd() * 5)] : ['sparrow', 'sparrow', 'robin', 'starling'][Math.floor(rnd() * 4)];
             const T = SONGBIRD_TINTS[sk] || SONGBIRD_TINTS[kinds[0]];
-            a.tint = T.back; a.head = T.head; a.breast = T.breast;
+            // fix-35: the instance colour (the back) multiplies the whole bird after the shader paints the head and breast, so
+            // those are given divided by it (a blue jay's white breast came out blue)
+            a.tint = T.back; a.head = T.head.map((v, i) => v / T.back[i]); a.breast = T.breast.map((v, i) => v / T.back[i]);
           }
           if (gdef.scaleRange) a.scale = gdef.scaleRange[0] + rnd() * (gdef.scaleRange[1] - gdef.scaleRange[0]);
           else a.scale = 0.92 + rnd() * 0.16;
