@@ -538,7 +538,9 @@ export class Clues {
       return;
     }
     let at = { x: c.x + Math.sin(c.yaw) * 0.5, z: c.z + Math.cos(c.yaw) * 0.5 };
-    if (d.does.hand) at = G.collision.clearNear(at.x, at.z, { maxR: 20 }) || G.dryNear(at.x, at.z);
+    // (fix-27: a duck comes back on the water, which now reaches the waterline: what it fetched goes on the nearest ground
+    // Gus can stand on, never on the water beside it, out of his reach)
+    if (d.does.hand || G.wetAt(at.x, at.z)) at = G.collision.clearNear(at.x, at.z, { maxR: 20 }) || G.dryNear(at.x, at.z);
     this.#spawn(d, at, s);
   }
 

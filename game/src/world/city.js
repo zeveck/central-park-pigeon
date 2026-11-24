@@ -276,7 +276,7 @@ HERO['plaza-hotel'] = (ctx, H, masses) => {
       ctx.batch.mesh('iron', new THREE.CylinderGeometry(0.045, 0.06, 2.2, 6), { x: tx, y: top + 1.1, z: tz });
       ctx.batch.box('red', { x: tx, y: top + 1.55, z: tz + 0.42 }, { w: 0.02, h: 0.5, d: 0.8 });
       ctx.collision.addCylinder({ x: tx, z: tz, y0: top, h: 2.2, r: 0.06, tag: 'flagpole', walkable: false });
-      ctx.collision.addPerch({ x: tx, y: top + 2.22, z: tz, r: 0.18, id: 'plaza-roof-flagpole', kind: 'flagpole' });
+      ctx.collision.addPerch({ x: tx, y: top + 2.22, z: tz, r: 0.3, id: 'plaza-roof-flagpole', kind: 'flagpole' });
     }
   }
   rimPerches(ctx, { x, z, y: H.h + 6.8, w: w - 2, d: d - 2, tag: 'mansard' });

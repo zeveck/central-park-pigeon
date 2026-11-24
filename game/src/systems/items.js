@@ -10,7 +10,7 @@
 // gone ("A rat took your slice while you napped."). Grate travel takes whatever Gus holds.
 
 import * as THREE from 'three';
-import { SLICE, GRATES } from '../world/layout.js';
+import { SLICE, GRATES, CLUES } from '../world/layout.js';
 import { ruleMaterial } from '../gfx/load-model.js';
 
 export const ITEM_DEFS = {
@@ -168,6 +168,13 @@ export class Items {
     this.carryWarm = 0;   // fix-19
     for (const it of [...this.world]) { it.mesh?.removeFromParent(); this.G.interact.unregister('item:' + it.uid); this.G.interact.unregister('boxopen:' + it.uid); }
     this.world = [];
+    // fix-25: a save made after a glint spawned its item keeps the item where the clue used to put it; two of those spots
+    // are now inside solid turrets (roofs collide as drawn), so the item moves to the clue's new spot
+    for (const s of this.state.items) for (const m of MOVED_ITEMS) {
+      if (s.id !== m.item || Math.hypot(s.x - m.from.x, s.z - m.from.z) > 0.6) continue;
+      const d = CLUES.find((q) => q.id === m.clue);
+      if (d) { s.x = d.x; s.z = d.z; s.y = this.G.collision.surface(d.x, d.z, 400).y + (d.y || 0); }
+    }
     for (const s of this.state.items) this.#addRuntime({ ...s });
     const maxSeq = Math.max(0, ...this.state.items.map((s) => +String(s.uid).slice(1) || 0));
     this.seq = maxSeq + 1;
@@ -408,6 +415,12 @@ export function grateBlockedReason(state, id) {
   return null;
 }
 export { GRATES };
+
+// fix-25: items that clues used to put somewhere now solid (from: the old spot; clue: the clue whose spot they move to)
+const MOVED_ITEMS = [
+  { item: 'shiny', from: { x: 84, z: -26.5 }, clue: 'shiny-flagpole' },   // inside the Plaza's Grand Army Plaza turret
+  { item: 'shiny', from: { x: -131.6, z: 276 }, clue: 'shiny-cpw72' },     // inside the gabled apartments' corner turret
+];
 
 /** fix-40: an item's name in a sentence: "the pizza slice", but a proper name keeps its capital and takes no article
  *  ("Biscuit's tennis ball"; it read "the biscuit's ball"). cap: at the start of a sentence. */
