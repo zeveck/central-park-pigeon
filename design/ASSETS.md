@@ -89,7 +89,7 @@ Gus proof first (see design/screenshots/gus-test/). Originals and preview sheets
 | ID | Source pictures | Options | Tris | Credits | Cost | Verdict | GLB (original → optimized) |
 |---|---|---|---|---|---|---|---|
 | gus-stand | gus-stand + gus-stand-back | `--texture 2k --max-texture 2048 --polycount 6000 --height 0.32` | 6,223 | 30 | $0.60 | accepted, first try | 2.89 MB → 0.84 MB |
-| gus-fly | gus-fly + gus-fly-back | same | 6,174 | 30 | $0.60 | accepted, first try (scaled ×1.15 in code to match gus-stand's head) | 3.11 MB → 0.99 MB |
+| gus-fly | gus-fly + gus-fly-back | same | 6,174 | 30 | $0.60 | accepted, first try (replaced 2026-11-24 for #28 by a symmetric model at scale 1.0, below) | 3.11 MB → 0.99 MB |
 
 Meshy so far: 60 credits ($1.20); 3,342 credits left. **Running total: ≈ $38.70 of $100.**
 

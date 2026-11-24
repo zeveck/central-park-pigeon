@@ -54,7 +54,7 @@ export class Characters {
       if (!baked) continue;
       // fix-35: a character with its own coat (a recoloured copy of its model's atlas, same UVs: Pickles' ginger, Tux's
       // tuxedo, Duke's bay, Big Ben's chestnut; a tint over the shared grey atlas could only darken it)
-      if (look.texture && !this.coats?.[look.texture]) {
+      if (look.texture && !(look.texture in (this.coats || {}))) {
         this.coats ||= {};
         try {
           const t = await new THREE.TextureLoader().loadAsync(`assets/textures/coats/${look.texture}.webp`);
@@ -140,14 +140,14 @@ export class Characters {
         addShaderPatch(mat, {
           key: 'songbird',
           uniforms: { uHeadY: { value: bb.min.y + (bb.max.y - bb.min.y) * 0.68 }, uFrontZ: { value: bb.min.z + (bb.max.z - bb.min.z) * 0.55 } },
-          // fix-35: the back colour is painted here too (it was the instance colour, which multiplied the whole bird: Jay's
-          // white breast came out blue)
-          vertexHeader: 'attribute vec3 aHead; attribute vec3 aBreast; attribute vec3 aBack; varying vec3 vHead; varying vec3 vBreast; varying vec3 vBack; varying vec3 vLocal;',
-          vertex: 'vHead = aHead; vBreast = aBreast; vBack = aBack; vLocal = position;',
-          fragmentHeader: 'uniform float uHeadY; uniform float uFrontZ; varying vec3 vHead; varying vec3 vBreast; varying vec3 vBack; varying vec3 vLocal;',
+          // (the same shader text as crowds.js's songbirds: three.js caches the program by the patch key 'songbird', so the two
+          // must not differ; the colours are fixed in the attributes below, fix-35)
+          vertexHeader: 'attribute vec3 aHead; attribute vec3 aBreast; varying vec3 vHead; varying vec3 vBreast; varying vec3 vLocal;',
+          vertex: 'vHead = aHead; vBreast = aBreast; vLocal = position;',
+          fragmentHeader: 'uniform float uHeadY; uniform float uFrontZ; varying vec3 vHead; varying vec3 vBreast; varying vec3 vLocal;',
           fragmentAfterMap: `float lum = dot(diffuseColor.rgb, vec3(0.3, 0.59, 0.11)); vec3 g = vec3(lum) * 1.25;
             float head = smoothstep(uHeadY - 0.01, uHeadY + 0.005, vLocal.y); float breast = (1.0 - head) * smoothstep(uFrontZ - 0.01, uFrontZ + 0.01, vLocal.z);
-            vec3 tint = mix(vBack, vHead, head); tint = mix(tint, vBreast, breast); diffuseColor.rgb = g * tint;`,
+            vec3 tint = mix(vec3(1.0), vHead, head); tint = mix(tint, vBreast, breast); diffuseColor.rgb = g * tint;`,
         });
       }
       this.mats[key] = mat;
@@ -165,16 +165,17 @@ export class Characters {
     }
     if (sp === 'songbird') {
       const T = SONGBIRD_TINTS[look.bird] || SONGBIRD_TINTS.sparrow;
-      geo.setAttribute('aHead', new THREE.InstancedBufferAttribute(new Float32Array(T.head), 3));
-      geo.setAttribute('aBreast', new THREE.InstancedBufferAttribute(new Float32Array(T.breast), 3));
-      geo.setAttribute('aBack', new THREE.InstancedBufferAttribute(new Float32Array(T.back), 3));
+      // fix-35: the instance colour (the back) multiplies the whole bird after the head and breast are painted, so those are
+      // given divided by it (Jay's white breast came out blue)
+      geo.setAttribute('aHead', new THREE.InstancedBufferAttribute(new Float32Array(T.head.map((v, i) => v / T.back[i])), 3));
+      geo.setAttribute('aBreast', new THREE.InstancedBufferAttribute(new Float32Array(T.breast.map((v, i) => v / T.back[i])), 3));
     }
     if (sp === 'dog') { c.gaitAttr = dogGaitAttr(geo, 1); c.gait = new DogGait((baked.bounds.max.y - baked.bounds.min.y) * (look.scale || 1), c.id.length); }
     const m = new THREE.InstancedMesh(geo, this.mats[key], 1);
     if (sp === 'dog') m.customDepthMaterial = this.mats[key].userData.gaitDepth;   // batch-3 (#11): the shadow trots too
     m.name = 'char:' + c.id;
     m.setMatrixAt(0, new THREE.Matrix4());
-    const t = sp === 'songbird' ? [1, 1, 1] : look.tint || [1, 1, 1];   // (fix-35: a songbird's colours are all in its shader)
+    const t = sp === 'songbird' ? (SONGBIRD_TINTS[look.bird] || SONGBIRD_TINTS.sparrow).back : coat ? [1, 1, 1] : look.tint || [1, 1, 1];   // (fix-35: a coat replaces the tint; the tint stays if the coat is missing)
     m.setColorAt(0, new THREE.Color(t[0], t[1], t[2]));
     m.castShadow = this.shadows; m.receiveShadow = true;
     m.frustumCulled = false;

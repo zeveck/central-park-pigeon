@@ -126,14 +126,14 @@ export const LOOKS = {
   pip: { species: 'hawk', scale: 0.75, tint: [1.15, 1.1, 1.05], acc: [] },
   // Bodega Cats
   queenie: { species: 'cat', model: 'cat-sit', tint: [0.9, 0.88, 0.85], acc: ['collar-bell'] },
-  pickles: { species: 'cat', model: 'cat-sit', texture: 'cat-sit-pickles', acc: ['bread'] },   // fix-35: his own ginger coat (was a tint)
-  tux: { species: 'cat', model: 'cat-sit', texture: 'cat-sit-tux', acc: ['bowtie:#d4a02a'] },   // fix-35: a real tuxedo coat
+  pickles: { species: 'cat', model: 'cat-sit', texture: 'cat-sit-pickles', tint: [1.3, 0.85, 0.5], acc: ['bread'] },   // fix-35: his own ginger coat (was a tint)
+  tux: { species: 'cat', model: 'cat-sit', texture: 'cat-sit-tux', tint: [0.45, 0.45, 0.48], acc: ['bowtie:#d4a02a'] },   // fix-35: a real tuxedo coat
   whiskerton: { species: 'cat', model: 'cat-sit', tint: [0.95, 0.95, 1.0], acc: ['shawl', 'cushion'] },
   // Carriage Horses
   clementine: { species: 'horse', tint: [1.05, 1.05, 1.05], acc: ['plume:#c4302b'] },
-  duke: { species: 'horse', texture: 'horse-duke', acc: ['saddle'] },   // fix-35: bay, black mane and legs
+  duke: { species: 'horse', texture: 'horse-duke', tint: [0.7, 0.5, 0.35], acc: ['saddle'] },   // fix-35: bay, black mane and legs
   dapple: { species: 'horse', tint: [1.0, 1.0, 1.02], acc: ['plume:#e8c23d'] },
-  bigben: { species: 'horse', scale: 1.15, texture: 'horse-bigben', acc: ['plume:#2a5ab0'] },   // fix-35: bright chestnut, flaxen mane, blaze
+  bigben: { species: 'horse', scale: 1.15, texture: 'horse-bigben', tint: [0.95, 0.6, 0.4], acc: ['plume:#2a5ab0'] },   // (fix-35: tints are only the fallback if a coat can't load)   // fix-35: bright chestnut, flaxen mane, blaze
   // The Racket
   mimi: { species: 'songbird', bird: 'starling', acc: [] },
   jay: { species: 'songbird', bird: 'bluejay', acc: ['crest:#3a70d0'] },
