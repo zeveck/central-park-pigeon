@@ -52,6 +52,19 @@ export class Characters {
       const model = look.model || sp.model;
       const baked = await G.registry.baked(model);
       if (!baked) continue;
+      // fix-35: a character with its own coat (a recoloured copy of its model's atlas, same UVs: Pickles' ginger, Tux's
+      // tuxedo, Duke's bay, Big Ben's chestnut; a tint over the shared grey atlas could only darken it)
+      if (look.texture && !this.coats?.[look.texture]) {
+        this.coats ||= {};
+        try {
+          const t = await new THREE.TextureLoader().loadAsync(`assets/textures/coats/${look.texture}.webp`);
+          const base = baked.map;
+          if (base) for (const k of ['flipY', 'colorSpace', 'wrapS', 'wrapT', 'magFilter', 'minFilter', 'anisotropy', 'channel']) t[k] = base[k];
+          else { t.flipY = false; t.colorSpace = THREE.SRGBColorSpace; }
+          t.needsUpdate = true;
+          this.coats[look.texture] = t;
+        } catch { this.coats[look.texture] = null; }   // (then the model's own atlas)
+      }
       const pos = this.#resolve(def.at);
       const c = { id, def, look, model, baked, x: pos.x, y: pos.y, z: pos.z, yaw: def.at.yaw ?? (Math.atan2(-pos.x, 300 - pos.z) % 6.28), home: { ...pos, yaw: def.at.yaw }, here: null, tween: null, bobT: id.length };
       c.mesh = this.#body(c, morphs);
@@ -116,9 +129,10 @@ export class Characters {
     const { look, model, baked } = c;
     const sp = look.species;
     const morph = (sp === 'pigeon' && model === 'pigeon-plain') ? morphs['pigeon-plain'] : sp === 'squirrel' ? morphs.squirrel : null;
-    const key = model + (morph ? ':m' : '') + (sp === 'songbird' ? ':s' : '');
+    const coat = c.look.texture ? this.coats?.[c.look.texture] : null;
+    const key = model + (morph ? ':m' : '') + (sp === 'songbird' ? ':s' : '') + (coat ? ':' + c.look.texture : '');
     if (!this.mats[key]) {
-      const mat = baked.makeMaterial();
+      const mat = baked.makeMaterial(coat ? { map: coat } : {});
       if (sp === 'dog') dogGait(mat, baked.geometry, { instanced: true });   // batch-3 (#11): the trot (before geo copies the attributes)
       if (morph) patchMorphArray(mat, morph.texture, { sheen: sp === 'pigeon' });
       if (sp === 'songbird') {
