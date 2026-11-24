@@ -70,7 +70,9 @@ PILOT_EXT.push((P, g, s, out, dt) => {
 /** Go to a spot, Call an ally, wait for the arrival, Ask, and wait for the talent to land. */
 export function ask(crew, at, { fly = true, r = 0.5, clue = null } = {}) {
   const go = at ? (fly ? [{ flyTo: at, alt: 6, r: 3 }, { walkTo: at, r }] : [{ walkTo: at, r }]) : [];
-  return [...go, { call: crew }, { wait: 3.6 }, { ask: crew }, clue ? { waitEvent: 'talent', match: { clue } } : { wait: 3 }];
+  // fix-27: wait until the ally has arrived (a duck can pop up further out now the water reaches the waterline: an Ask
+  // before it's here was a second Call), then a beat
+  return [...go, { call: crew }, { wait: 2 }, { waitFor: (G) => G.allies.isHere(crew), timeout: 20 }, { wait: 0.6 }, { ask: crew }, clue ? { waitEvent: 'talent', match: { clue } } : { wait: 3 }];
 }
 export function callAndAsk(crew, clue = null) { return ask(crew, null, { clue }); }
 export { flat };

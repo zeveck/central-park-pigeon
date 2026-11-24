@@ -26,9 +26,11 @@ function besideChar(G, id, want = 1.0) {
   return { x: x0, z: z0 };
 }
 /** Dry ground near a point (a shore spot for a dive). */
-function dryNear(G, x0, z0, want = 0.5) {
-  // fix-27: ground a walker can stand on (the waterline itself is now exactly where the water ends: Gus stops short of it)
-  const C = G.collision, ok = (x, z) => !C.waterAt(x, z) && C.standable(x, z, { r: 0.3, h: 0.5 }) != null && C.walkBlocked(x, z) !== 1;
+function dryNear(G, x0, z0, want = 0.5, crew = null) {
+  // fix-27: ground a walker can stand on (the waterline itself is now exactly where the water ends: Gus stops short of it),
+  // and, for an ally about to be called there, not somewhere it refuses (den-crows: the nearest bank by the Lake shiny is
+  // now just inside the geese's Bow Bridge turf, where the ducks won't come: "Geese turf, Gus. GEESE.")
+  const C = G.collision, ok = (x, z) => !C.waterAt(x, z) && C.standable(x, z, { r: 0.3, h: 0.5 }) != null && C.walkBlocked(x, z) !== 1 && !(crew && G.allies.reason(crew, { x, z }));
   for (let r = want; r < 30; r += 0.25) for (let a = 0; a < 6.28; a += 0.2) { const x = x0 + Math.cos(a) * r, z = z0 + Math.sin(a) * r; if (ok(x, z)) return { x, z }; }
   return { x: x0, z: z0 };
 }
@@ -105,14 +107,16 @@ export const SSF = {
       // B: the plume by the Ramble: squirrels dig
       ask('squirrels', { x: plume.x + 1.5, z: plume.z }, { clue: 'shiny-ramble-plume' }), { pickItem: 'shiny', timeout: 20 }, toVesper,
       // C: Lake bubbles: ducks (Bubbles) dive
-      ask('ducks', dryNear(G, lake.x, lake.z), { clue: 'shiny-lake' }), { pickItem: 'shiny', timeout: 20 }, toVesper,
+      ask('ducks', dryNear(G, lake.x, lake.z, 0.5, 'ducks'), { clue: 'shiny-lake' }), { pickItem: 'shiny', timeout: 20 }, toVesper,
       { waitFor: 'den-crows', timeout: 90 }, settle,
     ];
   },
   'gear-sunglasses': (G) => {
     const f = clue('shiny-flagpole');
     return [
-      { landNear: { x: f.x, z: f.z - 18 }, alt: 8, r: 6, timeout: 150 }, { climbTo: G.collision.surface(f.x, f.z, 400).y + 5, timeout: 60 }, { landOn: 'plaza-roof-flagpole', timeout: 90 }, { pickItem: 'shiny', timeout: 20 }, { waitFor: 'gear-sunglasses.s1', timeout: 10 }, settle,
+      // fix-25: the shiny is on the hotel's roof by its flagpole: land on the plaza east of the hotel, climb in the open air,
+      // then come down onto the roof by it (the old first leg aimed inside the hotel, at 8 m)
+      { landNear: { x: 96, z: -27 }, alt: 8, r: 4, timeout: 150 }, { climbTo: G.collision.surface(f.x, f.z, 400).y + 6, timeout: 90 }, { landNear: { x: f.x - 2.5, z: f.z - 2 }, alt: G.collision.surface(f.x, f.z, 400).y + 3, r: 2, timeout: 90 }, { pickItem: 'shiny', timeout: 20 }, { waitFor: 'gear-sunglasses.s1', timeout: 10 }, settle,
       // fun pass (P6): land on the fountain rim right behind him (his phone's view) and hold still
       { landNear: { x: 93.55, z: -36.5 }, alt: 2.5, r: 0.5, timeout: 90 }, { walkTo: { x: 93.6, z: -36.45 }, r: 0.4, timeout: 20 }, { waitFor: 'selfie.attention', timeout: 12 }, settle,
       { nearHuman: 'selfie', d: 2.5, timeout: 30 }, { call: 'crows' }, { wait: 3.6 }, { ask: 'crows' },
@@ -229,7 +233,7 @@ export const SSF = {
 
   'den-biscuit': (G) => { const b = clue('ball-lake'); return [
     goTalk(G, 'biscuit'), { waitFor: 'den-biscuit.s1', timeout: 30 }, settle,
-    ask('ducks', dryNear(G, b.x, b.z), { clue: 'ball-lake' }), { waitFor: (G) => G.state.carried?.id === 'ball', timeout: 30 }, { waitFor: 'den-biscuit.s2', timeout: 10 }, settle,   // (fix-40: the duck hands it over)
+    ask('ducks', dryNear(G, b.x, b.z, 0.5, 'ducks'), { clue: 'ball-lake' }), { waitFor: (G) => G.state.carried?.id === 'ball', timeout: 30 }, { waitFor: 'den-biscuit.s2', timeout: 10 }, settle,   // (fix-40: the duck hands it over)
     { fight: 'biscuit', timeout: 240 }, { waitFor: 'den-biscuit', timeout: 60 }, settle,
   ]; },
   'den-strix': (G) => [
@@ -245,7 +249,7 @@ function wings(G, jingle) {
   const W = PLACES.workshop;
   const shore = { x: 63.2, z: 301 };
   return [
-    ask('ducks', dryNear(G, s1.x, s1.z), { clue: 'sail-1' }), { pickItem: 'sail', timeout: 20 },
+    ask('ducks', dryNear(G, s1.x, s1.z, 0.5, 'ducks'), { clue: 'sail-1' }), { pickItem: 'sail', timeout: 20 },
     { landNear: { x: W.x + 1, z: W.z - 2 }, alt: 1.2, r: 2.5, timeout: 120 }, { walkTo: { x: W.x, z: W.z - 3 }, r: 1.5, timeout: 60 }, { waitFor: 'part-wings.s1', timeout: 20 }, settle,
     napAt('nest-mall', 'afternoon'),
     // crumbs for the stall and Vesper's fee: the Afternoon picnickers at the Boathouse and Conservatory Water
