@@ -162,11 +162,17 @@ B['zoo'] = (L, ctx) => {
   const { x, z, w, d } = L;
   const y = ctx.heightAt(x, z);
   const h = 2.6, t = 0.5;
+  // fix-26: a gate in the north wall where the zoo walk leaves over the 65th St transverse bridge (x ≈ 95.1): the
+  // bridge's south end ran straight into the wall
+  const gx = 95.1, gw = 3.6, nl = gx - gw / 2 - (x - w / 2), nr = (x + w / 2) - (gx + gw / 2);
   const walls = [
-    { x, z: z - d / 2, w, d: t }, { x, z: z + d / 2, w, d: t }, { x: x + w / 2, z, w: t, d },
+    { x, z: z - d / 2, w, d: t },
+    { x: x - w / 2 + nl / 2, z: z + d / 2, w: nl, d: t }, { x: x + w / 2 - nr / 2, z: z + d / 2, w: nr, d: t },
+    { x: x + w / 2, z, w: t, d },
     { x: x - w / 2, z: z - d / 4 - 2.5, w: t, d: d / 2 - 5 }, { x: x - w / 2, z: z + d / 4 + 2.5, w: t, d: d / 2 - 5 },
   ];
   for (const b of walls) solid(ctx, 'brickPlain', { x: b.x, z: b.z, y, w: b.w, h, d: b.d }, { tag: 'zoo-wall' });
+  for (const sx of [-1, 1]) solid(ctx, 'brickPlain', { x: gx + sx * (gw / 2 + 0.3), z: z + d / 2, y, w: 0.6, h: h + 0.6, d: 0.7 }, { tag: 'zoo-wall' });   // the gate's piers
   // pavilions with copper roofs, and the sea lion pool in the middle
   for (const [dx, dz, pw, pd] of [[-6, -10, 10, 7], [8, 9, 9, 8], [9, -11, 7, 6]]) {
     solid(ctx, 'brickPlain', { x: x + dx, z: z + dz, y, w: pw, h: 4, d: pd }, { tag: 'zoo', perch: false });

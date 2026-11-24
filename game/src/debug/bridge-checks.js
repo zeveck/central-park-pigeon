@@ -66,9 +66,9 @@ export async function runBridgeChecks(G, api) {
   // 2. walks
   out.walks = [];
   for (const c of crossings(G)) {
-    // a spot to stand 1.5–6 m out along the axis from each end (not water, not inside the castle wall the 79th St bridge
+    // a spot to stand 0.5–6 m out along the axis from each end (not water, not inside the castle wall the 79th St bridge
     // leads to): the walk's start and goal
-    const spot = (e) => { for (let d = 1; d <= 6; d += 0.5) { const x = e.x + e.dx * d, z = e.z + e.dz * d; if (G.collision.standable(x, z, { r: 0.2, h: 1.5 }) != null && G.collision.walkBlocked(x, z) !== 1) return { x, z, d }; } return null; };
+    const spot = (e) => { for (let d = 0.5; d <= 6; d += 0.25) { const x = e.x + e.dx * d, z = e.z + e.dz * d; const f = G.collision.standable(x, z, { r: 0.4, h: 1.5 }); if (f != null && G.collision.walkBlocked(x, z) !== 1 && !G.collision.pushOut({ x, z, y: f }, 0.4, 1.5, { x: 0, y: 0, z: 0 })) return { x, z, d }; } return null; };   // (r 0.4 and nothing to push it: room for a person, 0.28, this side of a fence: the 86th St north end meets the Reservoir's)
     const A = spot(c.a), B = spot(c.b);
     if (!A || !B) { out.walks.push({ id: c.id, skipped: `no standable ground beyond ${!A ? 'end A' : 'end B'} (within 6 m)` }); continue; }
     out.walks.push({ id: c.id, from: [r2(A.x), r2(A.z)], to: [r2(B.x), r2(B.z)], gusAB: gusWalk(G, A, B), gusBA: gusWalk(G, B, A), personAB: personWalk(G, A, B), personBA: personWalk(G, B, A) });

@@ -182,7 +182,9 @@ export const PATHS = [
   { id: 'conservatory-5th', width: 3.5, kind: 'pavers', points: pts([[0.915, 74.0], [1.0, 74.0]]) },
   { id: 'cedar-walk', width: 3.2, points: pts([[0.80, 74.85], [0.82, 75.8], [0.79, 76.4], [0.74, 76.4], [0.66, 76.5], [0.62, 77.4], [0.63, 78.2], [0.66, 79.6], [0.70, 80.6], [0.72, 81.2]]) },
   // the Ramble's winding paths
-  { id: 'ramble-1', width: 2.6, points: pts([[0.365, 75.05], [0.39, 75.5], [0.45, 75.75], [0.50, 75.6], [0.54, 75.8], [0.545, 76.6], [0.52, 77.3], [0.47, 77.6], [0.43, 78.1], [0.45, 78.5], [0.455, 78.95]]) },
+  // fix-26: the last leg crosses the 79th St transverse at x ≈ 0, onto Belvedere's open court (at x -10.5 the bridge's
+  // north end met the castle wall 0.4 m on: Gus squeezed through, a person couldn't)
+  { id: 'ramble-1', width: 2.6, points: pts([[0.365, 75.05], [0.39, 75.5], [0.45, 75.75], [0.50, 75.6], [0.54, 75.8], [0.545, 76.6], [0.52, 77.3], [0.47, 77.6], [0.45, 78.1], [0.495, 78.5], [0.5, 78.95]]) },
   { id: 'ramble-2', width: 2.4, points: pts([[0.45, 75.75], [0.42, 76.3], [0.36, 76.6], [0.30, 76.8], [0.26, 77.4], [0.30, 78.0], [0.37, 78.2], [0.43, 78.1]]) },
   { id: 'ramble-3', width: 2.4, points: pts([[0.42, 76.3], [0.46, 76.9], [0.52, 77.3]]) },
   { id: 'ramble-4', width: 2.4, points: pts([[0.545, 76.6], [0.59, 77.1], [0.62, 77.4]]) },
@@ -195,7 +197,9 @@ export const PATHS = [
   { id: 'needle-walk', width: 3, points: pts([[0.66, 80.65], [0.69, 81.3], [0.70, 81.6], [0.69, 82.4], [0.67, 83.0]]) },
   { id: 'west-lawn-walk', width: 3, points: pts([[0.255, 82.8], [0.17, 82.6], [0.10, 82.0], [0.03, 81.9], [0.0, 81.9]]) },
   { id: 'great-lawn-south', width: 3, points: pts([[0.47, 80.75], [0.47, 81.0]]) },
-  { id: 'great-lawn-north', width: 3, points: pts([[0.47, 84.95], [0.47, 85.5], [0.55, 86.3], [0.60, 86.6]]) },
+  // fix-26: straight across the 86th St transverse bridge (it ran diagonally into the deck's side walls), then along the
+  // Reservoir track
+  { id: 'great-lawn-north', width: 3, points: pts([[0.47, 84.95], [0.47, 85.35], [0.516, 85.45], [0.516, 86.2], [0.55, 86.3], [0.60, 86.6]]) },
   { id: 'museum-walk', width: 3, points: pts([[0.72, 81.2], [0.80, 80.0], [0.84, 79.7], [0.98, 79.3], [1.0, 79.3]]) },
   { id: 'east-promenade', width: 3, points: pts([[0.94, 66.4], [0.95, 69.0], [0.96, 71.6], [0.96, 76.0], [0.95, 78.6], [0.84, 79.7]]) },
   { id: 'west-promenade', width: 3, points: pts([[0.035, 72.8], [0.04, 76.0], [0.05, 78.5], [0.03, 81.9], [0.025, 85.4], [0.02, 88.0]]) },
