@@ -93,6 +93,7 @@ async function buildHumans() {
     if (home !== 'idle' && home !== 'sit') poses.push(home);
     if (names.includes('sit')) poses.push('sit');
     poses.push('walk');
+    if (q.get('clips')) { poses.length = 0; poses.push(...q.get('clips').split(',').filter((n) => names.includes(n))); }   // &clips=idle,walk,run,cheer
     for (const pose of poses) {
       const label = `${o.model.replace('human-', '')} ${o.label}: ${o.list.join(' ') || '-'} [${pose}]`;
       if (ONLY && !label.includes(ONLY)) continue;

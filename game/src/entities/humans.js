@@ -979,8 +979,96 @@ export function makeHumanClone(g, model, lodGeo = null) {
     lods.push([o, lm]);
   });
   for (const [o, lm] of lods) o.parent.add(lm);
+  // #29: the bride's petticoat (PETTICOATS): skinned to her own skeleton like the skirt round it
+  const pc = PETTICOATS[model] && petticoatGeometry(g, PETTICOATS[model]);
+  if (pc) root.traverse((o) => {
+    if (!o.isSkinnedMesh || o.geometry !== pc.src || o.name.endsWith(':lod')) return;
+    const pm = new THREE.SkinnedMesh(pc.geo, petticoatMat());
+    pm.name = 'petticoat';
+    pm.position.copy(o.position); pm.quaternion.copy(o.quaternion); pm.scale.copy(o.scale);
+    pm.bind(o.skeleton, o.bindMatrix);
+    pm.frustumCulled = false; pm.castShadow = false; pm.receiveShadow = true;
+    o.parent.add(pm);
+  });
   holder.visible = false;
   return { model, holder, root, mats, mixer, actions, hold, bones, fit, arms: { R: null, L: null }, lods, far: false, agent: null, current: null, accKey: '', flav: null, flavT: 3 };
+}
+
+// #29: a petticoat for the short-skirted bride. From Gus's height (looking up) her open skirt showed her bare thighs, and
+// the crease across them read as skin-coloured shorts. An opaque white underskirt inside the skirt, from just under the
+// waist (top) to just above the hem (bottom), closed at the bottom: each ring is fitted inside the skirt there (the
+// slab of her lower body's vertices, shrunk by `inset`), and every vertex takes the skin weights of the nearest skirt
+// vertex, so it moves with the skirt (and the thighs it's weighted to) in every clip and never pokes through. The disc
+// that closes it rides the hips. Metres, the model's space at rest.
+const PETTICOATS = { 'human-wedding': { top: 0.84, bottom: 0.5, inset: 0.82 } };
+let _petMat = null;
+const petticoatMat = () => (_petMat ||= ruleMaterial({ color: 0xf6f3ee, side: THREE.DoubleSide }));
+const PETS = new WeakMap();
+
+function petticoatGeometry(g, P) {
+  if (PETS.has(g)) return PETS.get(g);
+  const scene = g.scene;
+  scene.updateMatrixWorld(true);
+  let src = null;
+  scene.traverse((o) => { if (o.isSkinnedMesh && !src) src = o; });
+  if (!src) { PETS.set(g, null); return null; }
+  src.skeleton.update();
+  const names = src.skeleton.bones.map((b) => b.name), hips = names.indexOf('Hips');
+  // geometry space → the model's space at rest: the rest skinning (any bone's; they agree at rest), then the mesh's place
+  const sk = src.skeleton, rest = new THREE.Matrix4().copy(src.bindMatrixInverse).multiply(sk.bones[hips].matrixWorld).multiply(sk.boneInverses[hips]).multiply(src.bindMatrix);
+  const skinnedToRoot = new THREE.Matrix4().copy(scene.matrixWorld).invert().multiply(src.matrixWorld), toMesh = skinnedToRoot.clone().multiply(rest).invert();
+  const pos = src.geometry.attributes.position, si = src.geometry.attributes.skinIndex, sw = src.geometry.attributes.skinWeight;
+  // the lower body's vertices (hips and thighs: the skirt is weighted to them), in the model's space
+  const pts = [], ids = [], v = new THREE.Vector3();
+  for (let i = 0; i < pos.count; i++) {
+    let bi = 0, bw = -1;
+    for (let k = 0; k < 4; k++) { const w = sw.getComponent(i, k); if (w > bw) { bw = w; bi = si.getComponent(i, k); } }
+    if (!/^(Hips|LeftUpLeg|RightUpLeg)$/.test(names[bi])) continue;
+    v.fromBufferAttribute(pos, i); src.applyBoneTransform(i, v); v.applyMatrix4(skinnedToRoot);
+    if (v.y < P.bottom - 0.03 || v.y > P.top + 0.03) continue;
+    pts.push(v.x, v.y, v.z); ids.push(i);
+  }
+  const ring = (y) => {
+    const xs = [], zs = [];
+    for (let i = 0; i < pts.length; i += 3) if (Math.abs(pts[i + 1] - y) < 0.015) { xs.push(pts[i]); zs.push(pts[i + 2]); }
+    if (xs.length < 8) return null;
+    xs.sort((a, b) => a - b); zs.sort((a, b) => a - b);
+    const q = (a, f) => a[Math.floor((a.length - 1) * f)];
+    const x0 = q(xs, 0.04), x1 = q(xs, 0.96), z0 = q(zs, 0.04), z1 = q(zs, 0.96);
+    return { x: (x0 + x1) / 2, z: (z0 + z1) / 2, rx: (x1 - x0) / 2 * P.inset, rz: (z1 - z0) / 2 * P.inset };
+  };
+  const RINGS = 9, SEG = 24, out = [], skI = [], skW = [], idx = [];
+  // the weights of the nearest lower-body vertex
+  const nearest = (x, y, z) => {
+    let best = 0, bd = Infinity;
+    for (let i = 0; i < pts.length; i += 3) { const d = (pts[i] - x) ** 2 + (pts[i + 1] - y) ** 2 + (pts[i + 2] - z) ** 2; if (d < bd) { bd = d; best = ids[i / 3]; } }
+    return best;
+  };
+  const push = (x, y, z, from) => {
+    v.set(x, y, z).applyMatrix4(toMesh); out.push(v.x, v.y, v.z);
+    for (let k = 0; k < 4; k++) { skI.push(from < 0 ? (k ? 0 : hips) : si.getComponent(from, k)); skW.push(from < 0 ? (k ? 0 : 1) : sw.getComponent(from, k)); }
+  };
+  let last = null;
+  for (let r = 0; r < RINGS; r++) {
+    const y = P.top - (P.top - P.bottom) * (r / (RINGS - 1)), f = ring(y) || last;
+    if (!f) { PETS.set(g, null); return null; }
+    last = f;
+    for (let k = 0; k < SEG; k++) { const a = (k / SEG) * Math.PI * 2, x = f.x + Math.sin(a) * f.rx, z = f.z + Math.cos(a) * f.rz; push(x, y, z, nearest(x, y, z)); }
+  }
+  // the bottom: a disc closing it (its centre on the hips)
+  push(last.x, P.bottom, last.z, -1);
+  const c = RINGS * SEG;
+  for (let r = 0; r < RINGS - 1; r++) for (let k = 0; k < SEG; k++) { const a = r * SEG + k, b = r * SEG + (k + 1) % SEG; idx.push(a, a + SEG, b, b, a + SEG, b + SEG); }
+  for (let k = 0; k < SEG; k++) { const a = (RINGS - 1) * SEG + k, b = (RINGS - 1) * SEG + (k + 1) % SEG; idx.push(a, c, b); }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(out, 3));
+  geo.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(skI, 4));
+  geo.setAttribute('skinWeight', new THREE.Float32BufferAttribute(skW, 4));
+  geo.setIndex(idx);
+  geo.computeVertexNormals();
+  const res = { geo, src: src.geometry };
+  PETS.set(g, res);
+  return res;
 }
 
 function setLocal(obj, m) { m.decompose(obj.position, obj.quaternion, obj.scale); }
