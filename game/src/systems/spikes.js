@@ -50,7 +50,7 @@ export class Spikes {
     // bounces too, and this says so)
     this.glue = [];
     for (const s of this.sites) for (const [a, b] of s.ledge?.runs || []) {
-      const m = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.012, b - a), red);
+      const m = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.015, b - a), red);
       m.position.set(s.ledge.x + 0.05, s.ledge.y + 0.006, (a + b) / 2);
       m.userData.site = s.id;
       this.glue.push(m); this.group.add(m);
@@ -92,11 +92,11 @@ export class Spikes {
     for (const m of this.glue || []) m.visible = this.st[m.userData.site] === 'installed';
   }
 
-  /** fix-36: a big ledge strip's frame: on the ledge at p, running along it (z), scaled ×3, tipped 0.14 rad out over the lip
+  /** fix-36: a big ledge strip's frame: on the ledge at p, running along it (z), scaled ×4, tipped 0.14 rad out over the lip
    *  (the ledge faces +x, the park). */
   #bigFrame(p, out = new THREE.Matrix4()) {
     _q.setFromEuler(_e.set(0.14, Math.PI / 2, 0, 'YXZ'));   // (review: the pitch leans its top out to +x; a roll see-sawed it)
-    return out.compose(_v.set(p.x + 0.15, p.y, p.z), _q, _s.set(3, 3, 3));
+    return out.compose(_v.set(p.x + 0.15, p.y, p.z), _q, _s.set(4, 4, 4));   // (×4: they read from over the park)
   }
 
   /** fix-36: a cat bats strip i of a site over the edge: it tumbles down onto the sidewalk with a clatter and lies there a
