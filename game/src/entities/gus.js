@@ -156,6 +156,7 @@ export class Gus {
     this.root.updateMatrixWorld(true);
     if (standOn) this.scarf.attach(this.standMesh, GUS_STAND.scarf, this.neck);
     else this.scarf.attach(this.flyMesh, GUS_FLY.scarf, null);
+    this.onModelSwap?.();   // #41: the carried item moves to the model now showing (systems/items.js; photo mode swaps while paused)
   }
 
   /** Place Gus (tests, respawn). mode: 'walk' | 'fly' | 'perch'. */

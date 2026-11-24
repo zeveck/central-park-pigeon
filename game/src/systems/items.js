@@ -65,7 +65,7 @@ function beakTips(gus) {
 }
 
 /** The carried item goes into Gus's beak (visual only): its grip point, from its bounding box. */
-export function attachCarried(gus, mesh, def) {
+export function attachCarried(gus, mesh, def, heat = null) {
   const k = def.cls === 'heavy' ? 0.8 : 1;
   const bb = new THREE.Box3().setFromObject(mesh);
   const h = bb.max.y - bb.min.y, d = bb.max.z - bb.min.z;
@@ -76,6 +76,7 @@ export function attachCarried(gus, mesh, def) {
   };
   mesh.matrixAutoUpdate = false;
   gus.standMesh.add(mesh);
+  poseCarried(gus, mesh, def, heat);   // posed now (else it sat at his feet until the next update)
 }
 
 /** Each update (after Gus's): the carried item at his beak tip, on whichever model is showing (visual only). */
@@ -338,9 +339,11 @@ export class Items {
     const G = this.G;
     if (c) {
       this.carriedMesh = this.makeMesh(c.id);
-      attachCarried(G.gus, this.carriedMesh, this.def(c.id));
+      attachCarried(G.gus, this.carriedMesh, this.def(c.id), this.heat());
     }
     G.gus.carryLimits = c && this.def(c.id).cls === 'heavy' ? HEAVY_LIMITS : null;
+    // #41: re-posed at once when Gus swaps models outside the update (photo mode's Flap pose while paused, a place())
+    G.gus.onModelSwap = () => { if (this.carriedMesh && this.state.carried) poseCarried(G.gus, this.carriedMesh, this.def(this.state.carried.id), this.heat()); };
   }
 
   /** 0..1 heat of a slice (1 just out of the oven, 0 cold), or null for other items. */
