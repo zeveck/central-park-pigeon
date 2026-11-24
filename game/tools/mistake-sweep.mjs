@@ -196,7 +196,11 @@ export async function runMistake(page, args, { errors = [] } = {}) {
     if (ok) {
       // let the step's scene play out (up to a minute) before looking for leftovers
       await page.evaluate(() => window.__ms.stop());
+      // with the autopilot on an idle goal: it presses through a dialogue the step's end opens (round 1: the auto part-eyes
+      // scene, the geese truce), as a player would; a stopped autopilot left them open and they read as leftovers
+      await page.evaluate(() => window.__ms.start([{ sfIdle: true, frames: 60, timeout: 60, fightOk: true }], 70));
       for (let k = 0; k < 15; k++) { const r = await page.evaluate(() => window.__ms.run('idle', 4, false)); if (r.hit) break; }
+      await page.evaluate(() => window.__ms.stop());
       // timed overlays (a join's polaroid closes 3.5 s after it opens) get up to 12 s more; one still up after that is stuck
       // (plain game steps: __ms.run('idle') returns at once when the park is already idle)
       for (let k = 0; k < 3; k++) { if (!(await page.evaluate(() => window.__sw.leftovers().overlays))) break; await page.evaluate(() => window.__game.step(240, { render: 'none' })); }

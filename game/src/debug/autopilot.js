@@ -109,9 +109,14 @@ export class Autopilot {
     }
     if (g.walkTo) {
       const r = g.r ?? 0.35;
-      if (gus.mode === 'fly') { out.held.add('dive'); return false; }
+      if (gus.mode === 'fly') { s.lift = 0; out.held.add('dive'); return false; }   // (airborne: the hop is done; don't take off again on landing)
       if (gus.mode === 'perch') { /* walk off the perch edge */ }
+      // mistake sweep: on foot and no closer for 2 s (a bench, a person, a kerb): a short flap over it, then walk on
+      // (g.noHop: a walk that must stay on the ground, e.g. inside the Strix crossing, where a flap is loud)
+      if (s.lift > 0) { s.lift--; out.held.add('flap'); return false; }
       const d = this.stickToward(g.walkTo.x, g.walkTo.z, out, 1);
+      const frozen = G.dialogue.open || G.cutscene.running;   // (no stall while a scene or a dialogue holds him)
+      if (!g.noHop && !frozen) { if (d < (s.best ?? Infinity) - 0.05) { s.best = d; s.stall = 0; } else if ((s.stall = (s.stall || 0) + 1 / 60) > 2) { s.stall = 0; s.best = Infinity; s.lift = 12; } }
       if (d > 3) out.held.add('sprint');
       if (d < r) { out.stick.x = out.stick.y = 0; return true; }
       return false;

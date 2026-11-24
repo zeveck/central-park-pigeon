@@ -219,7 +219,7 @@ add('den-racers.s2.alt', { goal: 'den-racers.alt', fixture: 'den-racers.alt', ma
   V: I.wedge('drive the pedicab 100 m off and leave it', (G) => { const v = G.vehicles.driving; const o = offPoint(G, 100, v); return o; }, 25),
   N: I.nap('night'),
 }, vMark: M.driving('pedicab', 3), nMark: M.flag('den-racers.s1') });
-add('part-talons.s2', { mark: M.start, item: 'slice', m: {
+add('part-talons.s2', { mark: M.start, item: 'slice', itemFor: 'union.paid', m: {   // itemFor: the slice is spent once Rigby is paid
   O: I.order('pay Rigby before the garage door', (G) => [...napTo(G, 'dusk'), { landNear: { x: 30, z: -6.6 }, alt: 6, r: 1.5, timeout: 150 }, { walkTo: { x: 30, z: -6.6 }, r: 0.6 }, { peck: 'line:carriage' }, { waitFor: (G) => G.state.carried?.id?.startsWith('slice'), timeout: 10 },
     { landNear: { x: 0, z: 70 }, alt: 6, r: 3, timeout: 150 }, { call: 'raccoons' }, { wait: 4.2 }, { sfTalk: 'rigby', timeout: 30 }, { waitFor: 'union.paid', timeout: 20 }, idle()], (G) => (G.state.flags['union.paid'] && !G.state.flags['door.rink-garage'] ? true : 'not out of order')),
   C: I.cold(), N: I.nap('night'),
@@ -336,6 +336,8 @@ function fix(goals) {
     }
     if (g.flyTo && !g.alt3) { out.push({ landNear: g.flyTo, alt: g.alt ?? 6, r: g.r ?? 3, timeout: 200 }); continue; }
     if (g.talk) { out.push({ msTalk: g.talk, timeout: g.timeout ?? 90 }); continue; }
+    // a peck that can't land (a spent clue, an empty Slice Line) fails in 30 s instead of the run's 300 (round 1: 4 runs hung)
+    if (g.peck && g.timeout == null) { out.push({ ...g, timeout: 30 }); continue; }
     if (g.fight) { out.push({ msFight: g.fight, timeout: g.timeout ?? 300 }); continue; }
     if (g.stealthCross) { out.push({ msFight: 'strix', timeout: g.timeout ?? 400 }); continue; }
     if (g.flyRings) { out.push(g, { msAssert: (G) => !!G.state.flags['race.won'], why: 'race lost' }); continue; }
@@ -534,6 +536,47 @@ export async function install() {
       this.lastPlan = goals;
       return { goals, how: how.join(', ') };
     },
+    /** Round-1 fix 8: never redo a spent source. A clue already done ('clue.<id>' set: the Peck at it, or the Ask whose talent
+     *  it was) is dropped with the moves, Call, waits and Ask that lead to it; a pickItem straight after a landing, with none of
+     *  its item lying within 12 m of that landing, is dropped with the landing (den-crows' ledge shiny already taken). A pick
+     *  after an Ask is kept: the Ask makes the item. Stops at a step-flag wait. */
+    dropSpent(seg, s, how) {
+      // (review: block-scoped. A block starts after the last pick, talk or step-flag wait; a spent Ask pops back to its Call and
+      // the moves just before it, never into the previous block's settle; the missing-item rule only applies when nothing in the
+      // block (an Ask, a Peck, a Call, a talk, a talent) could still make the item: the shelf box spawns on the cats' Ask)
+      const flags = s.flags, kept = [];
+      const isMove = (g) => ['landNear', 'walkTo', 'climbTo', 'flyTo3', 'sfLandNear'].some((k) => g[k] != null);
+      const makes = (g) => ['ask', 'peck', 'call', 'waitEvent', 'msTalk', 'sfTalk', 'talk'].some((k) => g[k] != null);
+      const target = (g) => g && (g.landNear || g.walkTo || g.flyTo3 || g.sfLandNear);
+      const spentClue = (g) => (typeof g.peck === 'string' && g.peck.startsWith('clue:') && flags['clue.' + g.peck.slice(5)] ? g.peck.slice(5) : null)
+        || (g.waitEvent === 'talent' && g.match?.clue && flags['clue.' + g.match.clue] ? g.match.clue : null);
+      const lying = (item, at) => at && G.items.world.some((w) => fitsItem(item, w.id) && Math.hypot(w.x - at.x, w.z - at.z) < 12);
+      let start = 0;
+      for (let i = 0; i < seg.length; i++) {
+        const g = seg[i];
+        const sc = spentClue(g);
+        if (sc) {
+          let at = null;
+          if (g.waitEvent) {   // an Ask: back to its Call, then the moves right before the Call
+            let k = kept.length - 1; while (k >= start && kept[k].call == null) k--;
+            if (k >= start) { kept.length = k; while (kept.length > start && isMove(kept[kept.length - 1])) at = target(kept.pop()) || at; }
+          } else while (kept.length > start && isMove(kept[kept.length - 1])) at = target(kept.pop()) || at;   // a Peck: its moves
+          how.push(`skip spent ${sc}`);
+          if (g.waitEvent && seg[i + 1]?.pickItem && !fitsItem(seg[i + 1].pickItem, s.carried?.id) && !lying(seg[i + 1].pickItem, at)) i++;   // its item, gone
+          continue;
+        }
+        if (g.pickItem && kept.length > start && isMove(kept[kept.length - 1]) && !kept.slice(start).some(makes) && !fitsItem(g.pickItem, s.carried?.id)) {
+          const at = target(kept[kept.length - 1]);
+          if (at && !lying(g.pickItem, at)) {
+            while (kept.length > start && isMove(kept[kept.length - 1])) kept.pop();
+            how.push(`skip ${g.pickItem} gone from ${at.x.toFixed(0)}, ${at.z.toFixed(0)}`); continue;
+          }
+        }
+        kept.push(g);
+        if (g.pickItem || g.msTalk != null || g.sfTalk != null || g.talk != null || typeof g.waitFor === 'string') start = kept.length;
+      }
+      return kept;
+    },
     phasesNow() {
       const c = this.c, idx = G.schemes.stepIndex(c.id);
       const set = new Set();
@@ -547,6 +590,7 @@ export async function install() {
       const veh = c.vehicle, driving = G.vehicles.driving;
       if (driving && driving.id !== veh) goals.push({ exit: true, timeout: 20 }, idle());
       let seg = fix(sw.slice(c.goal));
+      seg = this.dropSpent(seg, s, how);
       // a fight / a race / the step's vehicle already under way: pick the segment up there
       const F = G.fights.f;
       if (F) { const k = seg.findIndex((g) => g.msFight === F.name); if (k >= 0) { seg = seg.slice(k); how.push('fight on'); } }
@@ -565,7 +609,12 @@ export async function install() {
       const opts = optionsOf(c, idx);
       const o = opts.find((q) => q.needs?.item || q.does?.take?.item) || opts[0] || {};
       const item = o.needs?.item || o.does?.take?.item || (idx === c.n - 1 ? c.item : null);
-      if (item) {
+      if (item && c.itemFor && s.flags[c.itemFor] && !fitsItem(item, s.carried?.id)) {
+        // round-1 fix 2: the item went on an earlier part of the step (part-talons: the slice paid Rigby): skip to after its pick
+        let k = -1; seg.forEach((g, i) => { if (picks(g, item)) k = i; });
+        if (k >= 0) seg = seg.slice(k + 1);
+        how.push(`${item} already spent on ${c.itemFor}`);
+      } else if (item) {
         const hot = !!o.needs?.hot;
         const carried = s.carried, has = carried && fitsItem(item, carried.id);
         let pickK = -1; seg.forEach((g, i) => { if (picks(g, item)) pickK = i; });

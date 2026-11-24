@@ -261,8 +261,9 @@ export const GOALS_SF = {
   ],
   'den-meermob.alt': () => {
     // the slices route: three slices from the tourist on the 110th & Lenox bench (a Coo swarm makes him drop it), one a phase
+    // (Big Sal's north side: z 1024.5 landed on the Blockhouse bluff rock, behind a Blockhouse wall from him; the mistake sweep)
     const slice = () => [{ flyTo: { x: 49, z: 1062.6 }, alt: 8, r: 1.5, timeout: 200 }, { walkTo: { x: 49, z: 1063.2 }, r: 0.4 }, { faceTo: { x: 49, z: 1066 } }, { holdCoo: 0.8 }, { sfPick: 'slice', timeout: 30 },
-      { flyTo: { x: -79, z: 1024.5 }, alt: 8, r: 2.5, timeout: 200 }, { sfTalk: 'bigsal', timeout: 40 }, idle()];
+      { flyTo: { x: -79, z: 1028.6 }, alt: 8, r: 2.5, timeout: 200 }, { sfTalk: 'bigsal', timeout: 40 }, idle()];
     return [
       ...talk('bigsal'), idle(),
       { sfFlyThrough: { x: FLYPAST.x, y: 5.0, z: FLYPAST.z }, from: { x: FLYPAST.x + 24, z: FLYPAST.z + 2 }, high: 5.4, timeout: 120 },

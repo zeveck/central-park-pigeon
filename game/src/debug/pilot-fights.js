@@ -100,11 +100,14 @@ PILOT_EXT.push((pilot, g, s, out) => {
     if (F.name !== 'strix' || G.dialogue.open) return false;
     if (gus.mode === 'fly') return false;
     // after a catch Gus is back on an island: rejoin the route at the nearest point ahead of it
-    if (s.lastCatch !== F.catches) { s.lastCatch = F.catches; let bi = 0, bd = Infinity; s.route.forEach((q, i) => { const d = Math.hypot(q.x - p.x, q.z - p.z); if (d < bd) { bd = d; bi = i; } }); s.i = bi; }
-    if (s.wait || F.meter > 55) { s.wait = F.meter > 6; if (s.wait) return false; }
+    if (s.lastCatch !== F.catches) { s.lastCatch = F.catches; s.qi = -1; let bi = 0, bd = Infinity; s.route.forEach((q, i) => { const d = Math.hypot(q.x - p.x, q.z - p.z); if (d < bd) { bd = d; bi = i; } }); s.i = bi; }
+    if (s.wait || F.meter > 55) { s.wait = F.meter > 6; if (s.wait) { s.qi = -1; return false; } }   // (standing still on purpose: no stall)
     while (s.i < s.route.length - 1 && Math.hypot(s.route[s.i].x - p.x, s.route[s.i].z - p.z) < 0.6) s.i++;
     const q = s.route[s.i];
-    pilot.stickToward(q.x, q.z, out, 1);
+    const dq = pilot.stickToward(q.x, q.z, out, 1);
+    // mistake sweep: no closer to this route point for 2 s (something solid in the way): aim at the next one (never flap: noise)
+    if (s.qi !== s.i) { s.qi = s.i; s.qBest = Infinity; s.qStall = 0; }
+    if (dq < s.qBest - 0.05) { s.qBest = dq; s.qStall = 0; } else if ((s.qStall += 1 / 60) > 2 && s.i < s.route.length - 1) s.i++;
     return false;
   }
   return undefined;
