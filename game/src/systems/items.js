@@ -12,6 +12,7 @@
 import * as THREE from 'three';
 import { SLICE, GRATES, CLUES } from '../world/layout.js';
 import { ruleMaterial } from '../gfx/load-model.js';
+import { GUS_STAND, GUS_FLY } from '../entities/gus-rig.js';
 
 export const ITEM_DEFS = {
   slice: { name: 'Pizza slice', cls: 'light', model: 'pizza-slice', slice: true },
@@ -42,21 +43,66 @@ export const HEAVY_LIMITS = { maxAlt: 2, maxSpeed: 6 };
 
 const HOT = SLICE.hotFor;
 
-/** The carried item goes into Gus's beak (visual only: nothing in the game reads the mesh; drop and give use Gus's position). */
-export function attachCarried(gus, mesh, def) {
-  if (def.cls === 'heavy') mesh.scale.setScalar(0.8);
-  gus.root.add(mesh);
+// #41: the carried item is held in Gus's beak: on the ground it rides his head bone (the walk's head thrust, the peck, the
+// idle look-arounds), in the air the flight model (its pitch, bank and wingbeat lean), at the beak tip either way. Each
+// item is gripped by the near top edge of its bounding box (a slice by its crust, the camera by its top), so it hangs from
+// the beak instead of floating ahead of it. A heavy item is dragged: gripped the same way, its far end down to the ground
+// (walking) or hanging (flying). Visual only: drop, give and pick-up use Gus's position, never this mesh.
+const HOLD_TILT = { light: 0.15, flyLight: 0.35, flyHeavy: 1.25 };
+const _hm = new THREE.Matrix4(), _hm2 = new THREE.Matrix4(), _hx = new THREE.Vector3(1, 0, 0);
+
+/** The beak tips of Gus's two models (model space): the most forward vertex above the shoulders near the centre line. */
+function beakTips(gus) {
+  if (gus.beakTips) return gus.beakTips;
+  const tip = (geo, y0) => {
+    const p = geo.attributes.position, v = new THREE.Vector3(0, y0, 0);
+    let best = -Infinity;
+    for (let i = 0; i < p.count; i++) if (p.getY(i) > y0 && Math.abs(p.getX(i)) < 0.03 && p.getZ(i) > best) { best = p.getZ(i); v.set(p.getX(i), p.getY(i), p.getZ(i)); }
+    return v;
+  };
+  gus.beakTips = { stand: tip(gus.standMesh.geometry, GUS_STAND.skin.neck[1]), fly: tip(gus.flyMesh.geometry, GUS_FLY.bodyCenter.y + 0.03) };
+  return gus.beakTips;
 }
 
-/** Each update: the carried item's pose (visual only). */
+/** The carried item goes into Gus's beak (visual only): its grip point, from its bounding box. */
+export function attachCarried(gus, mesh, def) {
+  const k = def.cls === 'heavy' ? 0.8 : 1;
+  const bb = new THREE.Box3().setFromObject(mesh);
+  const h = bb.max.y - bb.min.y, d = bb.max.z - bb.min.z;
+  mesh.userData.hold = {
+    k, heavy: def.cls === 'heavy',
+    grip: new THREE.Vector3((bb.min.x + bb.max.x) / 2, bb.min.y + 0.75 * h, bb.min.z + Math.min(0.015, 0.25 * d)),
+    depth: d * k,
+  };
+  mesh.matrixAutoUpdate = false;
+  gus.standMesh.add(mesh);
+}
+
+/** Each update (after Gus's): the carried item at his beak tip, on whichever model is showing (visual only). */
 export function poseCarried(gus, mesh, def, heat = null) {
-  const flying = gus.mode === 'fly';
-  if (def.cls === 'heavy') mesh.position.set(0, flying ? -0.08 : 0.02, flying ? 0.05 : 0.2);
-  else mesh.position.set(0, flying ? 0.17 : 0.2, flying ? 0.3 : 0.27);   // held in the beak, sticking out in front
-  mesh.rotation.set(flying ? 0.45 : 0.2, 0, flying ? gus.bank * 0.6 : 0);
+  const H = mesh.userData.hold || (attachCarried(gus, mesh, def), mesh.userData.hold);
+  const tips = beakTips(gus), flying = gus.flyPose.visible;
+  const parent = flying ? gus.flyMesh : gus.standMesh;
+  if (mesh.parent !== parent) parent.add(mesh);
+  let tilt;
+  if (flying) {
+    // the flight model is upright in its own space and pitched forward by flyPose: undo the cruise pitch
+    tilt = (H.heavy ? HOLD_TILT.flyHeavy : HOLD_TILT.flyLight) - GUS_FLY.flightPitch;
+    _hm.makeTranslation(tips.fly.x, tips.fly.y, tips.fly.z - 0.004);
+  } else {
+    // the head bone (model space; its rest is GUS_STAND.skin.head), then the beak tip from there
+    const hb = gus.skin.stand.bones.head, h0 = GUS_STAND.skin.head;
+    _hm.copy(hb.matrixWorld).multiply(_hm2.makeTranslation(tips.stand.x - h0[0], tips.stand.y - h0[1], tips.stand.z - h0[2] - 0.004));
+    // a heavy one is dragged: its far end on the ground (the beak is ~0.24 m up)
+    tilt = H.heavy ? Math.asin(Math.min(0.95, tips.stand.y / Math.max(0.05, H.depth))) : HOLD_TILT.light;
+  }
+  _hm.multiply(_hm2.makeRotationAxis(_hx, tilt)).multiply(_hm2.makeScale(H.k, H.k, H.k)).multiply(_hm2.makeTranslation(-H.grip.x, -H.grip.y, -H.grip.z));
+  mesh.matrix.copy(_hm);
+  mesh.matrixWorldNeedsUpdate = true;
   const sl = mesh.userData.slice;
   if (sl) sl.rotation.x = heat > 0 ? 0 : 0.35;   // a cold slice droops
 }
+
 const COOLING = 0.4;      // fix-19: below this much heat the label says "Cooling, still counts"
 const HOVER_WARM_R = 3;   // fix-19: the griddle warms a carried slice within this many metres
 
@@ -77,7 +123,7 @@ export class Items {
       green: ruleMaterial({ color: 0x7fbf3a }),
       red: ruleMaterial({ color: 0xe8462f }),
       steel: ruleMaterial({ color: 0x8a9098, roughness: 0.5, metalness: 0.5 }),
-      cream: ruleMaterial({ color: 0xf2ead8 }),
+      cream: ruleMaterial({ color: 0xf2ead8, side: THREE.DoubleSide }),   // #41: the sail (a sheet: dragged, its underside shows)
       tan: ruleMaterial({ color: 0xb08a5a }),
       dark: ruleMaterial({ color: 0x333338 }),
       rust: ruleMaterial({ color: 0x7a4a30 }),
