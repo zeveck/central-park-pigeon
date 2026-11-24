@@ -65,7 +65,9 @@ export const PEOPLE = [
   { role: 'stagehand', model: 'human-vendor', n: 1, phases: ['dusk'], act: 'wander', at: P(-40, 438), r: 4, acc: ['headset'] },
   { role: 'picnicker', model: MIX.sitters, mix: 1, n: 4, phases: ['afternoon'], act: 'sit', at: P(-6.6, 489), r: 25, feeder: true },
   { role: 'parkgoer', model: MIX.walkers, mix: 4, n: 2, phases: ['morning', 'dusk'], act: 'wander', at: P(-6.6, 489), r: 35, feeder: true },
-  { role: 'dogwalker', model: 'human-dog-walker', n: 1, phases: ['morning'], act: 'path', path: [P(48, 368), P(52, 395), P(70, 420), P(72, 380)], acc: [], dogs: 2 },
+  // the loop stays on Cedar Hill, south of the 79th St cut (z 397–410): it used to cross the cut in two places, down to the road
+  // and up its walls, and a pigeon following her with the heavy sack was pinned at the rim (the mistake sweep, 2026-11-24)
+  { role: 'dogwalker', model: 'human-dog-walker', n: 1, phases: ['morning'], act: 'path', path: [P(48, 368), P(52, 390), P(66, 391), P(72, 380)], acc: [], dogs: 2 },
   // ---------------------------------------------------------------- the Reservoir and the north
   // the jogger who never stops… except at the north gatehouse's water fountain, once a lap
   { role: 'jogger', model: ['human-park', 'human-jogger'], n: 4, phases: ['morning', 'dusk'], act: 'jog', at: P(0, 662), loop: { rx: 94.5, rz: 97.5, exp: 2.25 }, acc: ['headband'], stop: { x: -4, z: 759.4, secs: 6 } },

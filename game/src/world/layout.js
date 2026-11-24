@@ -406,9 +406,11 @@ export const FIGHTS = {
 // back to the last of the 3 moss islands. Any flap fills it at once (the canopy is too low to glide).
 const SP = (u, st) => P(u, st);
 export const RAMBLE_STEALTH = {
-  path: [SP(0.365, 75.05), SP(0.39, 75.5), SP(0.45, 75.75), SP(0.42, 76.3), SP(0.36, 76.6), SP(0.30, 76.8), SP(0.26, 77.4), SP(0.30, 78.0)],
+  // the start (island 0) was in the Lake under Bow Bridge once collision water matched the drawn water (#27, 5e57455): moved 9 m north
+  // onto the nearest dry, gentle ground (the mistake sweep found it: every Strix catch put Gus back in the water)
+  path: [{ x: -25.5, z: 339 }, SP(0.39, 75.5), SP(0.45, 75.75), SP(0.42, 76.3), SP(0.36, 76.6), SP(0.30, 76.8), SP(0.26, 77.4), SP(0.30, 78.0)],
   width: 2.2,
-  islands: [{ x: -29.4, z: 330.6, r: 1.8 }, { x: -17.6, z: 355.4, r: 1.8 }, { x: -52.6, z: 378.4, r: 1.8 }],
+  islands: [{ x: -25.5, z: 339, r: 1.8 }, { x: -17.6, z: 355.4, r: 1.8 }, { x: -52.6, z: 378.4, r: 1.8 }],
   moss: [{ x: -26.4, z: 336, r: 1.1 }, { x: -18, z: 341.8, r: 1.1 }, { x: -11.8, z: 345.6, r: 1.0 }, { x: -13.6, z: 351.2, r: 1.0 },
     { x: -24.5, z: 359, r: 1.0 }, { x: -36.2, z: 363.2, r: 1.1 }, { x: -46.4, z: 368.4, r: 1.0 }, { x: -50.4, z: 384, r: 1.0 }, { x: -47.6, z: 388.6, r: 1.0 }],
   leaves: [{ x: -22.6, z: 339.4, r: 0.9 }, { x: -14.4, z: 343.4, r: 0.9 }, { x: -15.2, z: 349, r: 0.8 }, { x: -21, z: 357.8, r: 0.9 }, { x: -29.6, z: 361, r: 0.9 },
@@ -704,7 +706,7 @@ export const PLACES = {
   'shed-103': { name: 'The 103rd Street shed', x: 62, z: 862, r: 8 },
   'grate-110': { name: '110th & Lenox grate', x: 43.2, z: 1068.6, r: 5 },
   'east-drive-90': { name: "East Drive by the Engineers' Gate", x: 100, z: 680, r: 60 },
-  'ramble-stealth': { name: 'The edge of the night woods', x: -29.4, z: 330.6, r: 2.5 },
+  'ramble-stealth': { name: 'The edge of the night woods', x: -25.5, z: 339, r: 2.5 },   // with RAMBLE_STEALTH's island 0
   'great-lawn-pipes': { name: 'Great Lawn, north edge', x: -7, z: 541, r: 20 },
 };
 

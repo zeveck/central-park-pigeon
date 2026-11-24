@@ -202,7 +202,7 @@ export const SSF = {
     return [
       napAt('nest-mall', 'night'),
       ask('cats', { x: 43.4, z: 309.6 }, { clue: 'lot-key' }),
-      { pickItem: 'gate-key', timeout: 20 }, { walkTo: { x: 43.2, z: 312 }, r: 0.5 }, { peck: 'door:boathouse-gate' }, { waitFor: 'boathouse.gateOpen', timeout: 10 }, settle,
+      { pickItem: 'gate-key', timeout: 20 }, { walkTo: { x: 43.2, z: 312 }, r: 0.5 }, { peck: 'door:boathouse-gate' }, { waitFor: 'boathouse.gateOpen', timeout: 10 }, { waitFor: 'sab-middle.s1', timeout: 10 }, settle,   // (the step flag: the sweep slices goals by it)
       { walkTo: { x: 45.5, z: 314 }, r: 0.5 }, { call: 'raccoons' }, { wait: 3.6 }, { ask: 'raccoons' }, { waitEvent: 'talent', match: { clue: 'cart-middle' }, timeout: 20 },
       { waitFor: 'sab-middle', timeout: 30 }, settle,
     ];
@@ -239,7 +239,7 @@ export const SSF = {
   'den-strix': (G) => [
     { landNear: { x: -12.6, z: 360.4 }, alt: 8, r: 2 }, { walkTo: { x: -12.6, z: 361 }, r: 0.4 }, { peck: 'stall-spectacles' }, { waitFor: 'den-strix.s1', timeout: 10 }, settle,
     napAt('nest-ramble', 'night'),
-    { landNear: { x: -29.4, z: 328 }, alt: 4, r: 2 }, { walkTo: { x: -29.4, z: 330.6 }, r: 0.5 },
+    { landNear: { x: -25.5, z: 337 }, alt: 4, r: 2 }, { walkTo: { x: -25.5, z: 339 }, r: 0.5, noHop: true },   // the stealth start (RAMBLE_STEALTH island 0); inside the crossing's trigger: never flap
     { stealthCross: true, timeout: 400 }, { waitFor: 'den-strix', timeout: 60 }, settle,
   ],
 };
