@@ -38,6 +38,7 @@ export class Clues {
     this.group = new THREE.Group();
     this.group.name = 'clues';
     this.list = [];          // runtime spots
+    this.fetching = new Map();   // item id → game time an ally set off to bring it back (#perform → #bringBack; the keeper waits)
     this.doors = [];
     this.pollT = 0;
     this.t = 0;
@@ -492,6 +493,9 @@ export class Clues {
     const G = this.G, d = s.def, A = TALENT_ACT[talent] || TALENT_ACT.dig;
     c.busyTalent = true;
     c.script = true;
+    // an item the ally brings back is 'on its way' until #bringBack: the item keeper mustn't put another one out meanwhile (the
+    // sail-1 dive set wings.sail1 at the dive and the duck swam back for seconds: the keeper spawned a second sail at the shore)
+    if (d.does?.item && d.does.at === 'ally') this.fetching.set(d.does.item, G.state.time);
     const home = { x: c.x, y: c.y, z: c.z };
     const p = d.points ? d.points[0] : s;
     // where the ally stands to act: the spot itself (a plume, the water, the ledge), or beside it for doors and vehicles
@@ -531,6 +535,7 @@ export class Clues {
    *  the ally (on standable ground: never on the water or a roof). */
   #bringBack(d, c, s) {
     const G = this.G, g = G.gus.position;
+    this.fetching.delete(d.does.item);
     if (d.does.hand && Math.hypot(g.x - c.x, g.z - c.z) < 8) {
       G.items.handOver(d.does.item);
       G.particles.burst('sparkle', g.x, g.y + 0.3, g.z, 10, { spread: 0.4 });
@@ -875,6 +880,7 @@ export class Clues {
   onNap() { this.st.phaseUsed = {}; return []; }
   restore() {
     this.revealing?.clear();   // Fixes-1: timers were cleared with the load
+    this.fetching.clear();     // (a fetch cut off by a load never brings its item back: the keeper may put it out again)
     this.anims.length = 0;     // Fixes-3: a haul or a fall cut off by a load
     for (const c of this.list) c.busy = false;
     for (const [uid, m] of this.haulRings) { m.removeFromParent(); this.G.interact.unregister('flocklift:' + uid); }   // (rebuilt for the loaded items)

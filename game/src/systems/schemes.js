@@ -364,6 +364,9 @@ export class SchemeEngine {
       const it = G.items.world.find((w) => w.id === r.item);
       const name = theItem(G.items.def(r.item).name, true);
       if (!it) {
+        // an ally is bringing it back (a duck's dive, a squirrel's dig): not missing, for up to 30 s (a fetch cut off is still covered)
+        const f = G.clues?.fetching?.get(r.item);
+        if (f != null && G.state.time - f < 30) { this.keepMissing[k] = 0; continue; }
         // (a beat's grace: a scene or clue may be about to put it down)
         if (!notes && (this.keepMissing[k] = (this.keepMissing[k] || 0) + dt) < 1.5) continue;
         this.keepMissing[k] = 0;
