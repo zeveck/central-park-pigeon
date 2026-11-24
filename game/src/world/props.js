@@ -16,6 +16,17 @@ import { CELL } from '../gfx/batch.js';
 const PROP_CELL = CELL * 2;   // perf pass: 256 m prop cells (lamps and benches are cheap; half the draw calls)
 import { inPark } from './terrain.js';
 
+/** fix-26: distance from (x, z) to a polyline. */
+function nearLine(line, x, z) {
+  let best = Infinity;
+  for (let i = 1; i < line.length; i++) {
+    const a = line[i - 1], b = line[i], dx = b.x - a.x, dz = b.z - a.z, L = dx * dx + dz * dz || 1;
+    const t = Math.max(0, Math.min(1, ((x - a.x) * dx + (z - a.z) * dz) / L));
+    best = Math.min(best, Math.hypot(a.x + dx * t - x, a.z + dz * t - z));
+  }
+  return best;
+}
+
 export const LAMP_H = 3.9;     // the cap Gus perches on
 export const BENCH = { w: 1.8, back: 0.86, seat: 0.45, d: 0.6 };
 
@@ -82,17 +93,21 @@ export function placeProps(terrain, { blockers = [] } = {}) {
   for (const p of S.paths) {
     if (p.kind === 'bridle' || p.bridge) continue;
     const off = p.width / 2 + 0.55;
-    const pts = samplePolyline(p.line, 24, { closed: p.closed, offset: 6 });
+    // fix-26: a re-routed path is sampled along its old line (genLine), so the bench draws below stay where they were for
+    // every later path; only the samples that still lie on the new line place anything
+    const pts = samplePolyline(p.genLine || p.line, 24, { closed: p.closed, offset: 6 });
+    const onLine = (s) => !p.genLine || nearLine(p.line, s.x, s.z) < 0.75;
     pts.forEach((s, i) => {
+      const here = onLine(s);
       const side = i % 2 ? 1 : -1;
       const x = s.x - s.tz * off * side, z = s.z + s.tx * off * side;
-      if (ok(x, z) && clearOfRoad(x, z)) lamps.push({ x, z });
+      if (here && ok(x, z) && clearOfRoad(x, z)) lamps.push({ x, z });
       // a bench across the path, facing it
       if (rnd() < 0.55) {
         const along = 8;
         const bx = s.x + s.tx * along + s.tz * (off + 0.2) * side, bz = s.z + s.tz * along - s.tx * (off + 0.2) * side;
         const yaw = Math.atan2(-s.tz * side, s.tx * side);
-        if (ok(bx, bz) && clearOfRoad(bx, bz)) benches.push({ x: bx, z: bz, yaw });
+        if (here && ok(bx, bz) && clearOfRoad(bx, bz)) benches.push({ x: bx, z: bz, yaw });
       }
     });
   }

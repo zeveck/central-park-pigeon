@@ -80,7 +80,7 @@ function fillRect(g, x0, z0, x1, z1, color, blur = 0.6) {
 // Chromium) into short tasks. The draws and their order are unchanged, so the masks are identical.
 const rasterNow = async (...gs) => { for (const g of gs) g.getImageData(0, 0, 1, 1); await new Promise((r) => setTimeout(r, 0)); };
 
-async function paintMasks(S) {
+async function paintMasks(S, gen = false) {   // gen (fix-26): re-routed paths painted where they were (genLine)
   const m = makeMaskCanvases();
   const A = m.A.g, B = m.B.g;
   // A: r = gravel path, g = hex pavers, b = asphalt.  B: r = leaf litter, g = shore mud, b = bridle dirt.
@@ -95,7 +95,7 @@ async function paintMasks(S) {
   for (const p of S.paths) {
     const kind = p.kind || 'path';
     if (kind === 'bridle') strokeLine(B, p.line, p.width, CH.b, p.closed, 1.2);
-    else strokeLine(A, p.line, p.width, kind === 'pavers' ? CH.g : CH.r, p.closed, 1.0);
+    else strokeLine(A, (gen && p.genLine) || p.line, p.width, kind === 'pavers' ? CH.g : CH.r, p.closed, 1.0);
   }
   await rasterNow(A, B);
   for (const pl of S.plazas) {
@@ -504,6 +504,19 @@ export async function buildTerrain({ textures, onStage = () => {} }) {   // boot
   };
   // fast whole-mask readback for bulk queries (tree placement)
   terrain.maskData = { A: masks.A.g.getImageData(0, 0, masks.w, masks.h).data, w: masks.w, h: masks.h };
+  // fix-26: what tree placement tests paths against: the masks with re-routed paths where they were, so moving a path
+  // doesn't re-roll the forest (trees.js then drops any tree on the new paint, after its last draw). Dropped after use.
+  if (S.paths.some((p) => p.genLine)) {
+    const gm = await paintMasks(S, true);
+    terrain.genMaskData = { A: gm.A.g.getImageData(0, 0, gm.w, gm.h).data, w: gm.w, h: gm.h };
+  }
+  terrain.genKindAt = (x, z) => {
+    const md = terrain.genMaskData || terrain.maskData;
+    const px = clamp(Math.round((x - WORLD.xMin) * MASK_RES), 0, md.w - 1);
+    const pz = clamp(Math.round((z - WORLD.zMin) * MASK_RES), 0, md.h - 1);
+    const o = (pz * md.w + px) * 4;
+    return { path: md.A[o] / 255, pavers: md.A[o + 1] / 255, asphalt: md.A[o + 2] / 255 };
+  };
   terrain.groundKindAt = (x, z) => {
     const md = terrain.maskData;
     const px = clamp(Math.round((x - WORLD.xMin) * MASK_RES), 0, md.w - 1);

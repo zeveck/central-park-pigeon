@@ -44,9 +44,11 @@ export function placeTrees(terrain, blockers = []) {
   const lawnSoft = S.lawns.filter((l) => l.level === null);
   const g = terrain.grid;
   const cellIdx = (x, z) => Math.round((z - g.z0) / g.STEP) * g.NX + Math.round((x - g.x0) / g.STEP);
-  const clearOfPaths = (x, z, r) => {
+  // fix-26: against the paths as they were (terrain.genKindAt: a re-routed path at its old line), so moving a path
+  // doesn't shift the draws below; trees on a re-routed path's new paint go after the last draw (onNewPaint)
+  const clearOfPaths = (x, z, r, kindAt = terrain.genKindAt || terrain.groundKindAt) => {
     for (const [dx, dz] of [[0, 0], [r, 0], [-r, 0], [0, r], [0, -r]]) {
-      const k = terrain.groundKindAt(x + dx, z + dz);
+      const k = kindAt(x + dx, z + dz);
       if (k.path > 0.08 || k.pavers > 0.08 || k.asphalt > 0.08) return false;
     }
     return true;
@@ -124,8 +126,10 @@ export function placeTrees(terrain, blockers = []) {
   ];
   const clearOf = (t) => !spots.some((p) => Math.hypot(t.x - p.x, t.z - p.z) < 2.5);
   TREES_DROPPED.length = 0;
-  for (const t of out) if (!clearOf(t)) TREES_DROPPED.push({ x: +t.x.toFixed(1), z: +t.z.toFixed(1) });   // (debug: what fix-31 removed)
-  const kept = out.filter((t) => !NESTS.some((n) => Math.hypot(t.x - n.x, t.z - n.z) < 1.8) && !inFirstFlight(t) && clearOf(t));
+  const onNewPaint = (t) => terrain.genMaskData && clearOfPaths(t.x, t.z, 2.2) && !clearOfPaths(t.x, t.z, 2.2, terrain.groundKindAt);
+  for (const t of out) if (!clearOf(t) || onNewPaint(t)) TREES_DROPPED.push({ x: +t.x.toFixed(1), z: +t.z.toFixed(1) });   // (debug: what fix-31 removed)
+  const kept = out.filter((t) => !NESTS.some((n) => Math.hypot(t.x - n.x, t.z - n.z) < 1.8) && !inFirstFlight(t) && clearOf(t) && !onNewPaint(t));
+  terrain.genMaskData = null;   // (fix-26: only tree placement reads it)
   kept.forEach((t, i) => { t.id = i; t.y = terrain.heightAt(t.x, t.z) - 0.1; });
   return kept;
 }

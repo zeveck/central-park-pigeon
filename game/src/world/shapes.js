@@ -24,7 +24,8 @@ export function shapes() {
   });
   const lawns = LAWNS.map((l) => ({ ...l, poly: outlineOf(l, 5), b: null })).map((l) => ({ ...l, b: polyBounds(l.poly) }));
   const line = (p) => (p.ellipse ? outlineOf(p) : p.closed ? smoothClosed(p.points, 5) : smoothOpen(p.points, 5));
-  const paths = PATHS.map((p) => ({ ...p, line: line(p), closed: !!(p.closed || p.ellipse) }));
+  // fix-26: genLine (from genPoints): the line a re-routed path had, which tree, lamp and bench placement still use
+  const paths = PATHS.map((p) => ({ ...p, line: line(p), genLine: p.genPoints ? line({ ...p, points: p.genPoints }) : null, closed: !!(p.closed || p.ellipse) }));
   const drives = DRIVES.map((d) => ({ ...d, line: smoothOpen(d.points, 6), closed: false }));
   const plazas = PLAZAS.map((p) => ({ ...p, poly: p.outline.map((q) => ({ ...q })) }));
   const woods = WOODS.map((w) => ({ ...w, poly: smoothClosed(w.outline, 4) })).map((w) => ({ ...w, b: polyBounds(w.poly) }));
