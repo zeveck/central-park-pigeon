@@ -212,7 +212,8 @@ export const GOALS_SF = {
   'den-turtles': () => [
     { sfLandNear: { x: 8.8, z: 432.5 }, from: { x: 8.8, z: 418 }, r: 1.6, alt: 6, timeout: 200 }, { sfTalk: 'eldest', timeout: 30 }, flag('den-turtles.s1', 30), idle(),
     { call: 'ducks' }, { wait: 3.8 }, { ask: 'ducks' }, flag('den-turtles.s2', 40), idle(),
-    ...go({ x: 7.5, z: 423.4 }, 5, 1.5), { call: 'biscuit' }, { wait: 3.8 }, { ask: 'biscuit' }, flag('den-turtles.s3', 60), flag('den-turtles', 60), idle(),
+    // (z 421: z 423.4 is in the pond since the shoreline fix, #27)
+    ...go({ x: 7.5, z: 421 }, 5, 1.5), { call: 'biscuit' }, { wait: 3.8 }, { ask: 'biscuit' }, flag('den-turtles.s3', 60), flag('den-turtles', 60), idle(),
   ],
   'den-geese': () => [
     ...talk('gertrude'), flag('den-geese.s1', 30), idle(),
