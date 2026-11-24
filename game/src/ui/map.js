@@ -12,6 +12,7 @@
 import * as THREE from 'three';
 import { WORLD, NESTS, GRATES, SIGNS, SPIKE_SITES, SLICE, RANGER_CARTS, PLACES, ZONES, LANDMARKS, PARK, WATER } from '../world/layout.js';
 import { CREWS, CHARACTERS, FEUDS } from '../data/crews.js';
+import { LEAD_HINTS } from '../data/lead-hints.js';   // #24
 import { overlay } from './menu.js';
 import { icon } from './icons.js';
 import { gpuIdle, primePrograms, compileQuiet } from '../gfx/warm.js';   // boot fix
@@ -221,6 +222,22 @@ export function mapScreen(G) {
     if (gr && seenAt(gr.x, gr.z)) sq(gr.x, gr.z, '#f2c230', 3);
     for (const f of FEUDS) if (!G.state.flags[f.until] && G.state.crews.includes(f.crew)) for (const pl of f.places) { const P = PLACES[pl]; const [px, py] = v.toPx(P.x, P.z); g.strokeStyle = 'rgba(196,48,43,.8)'; g.setLineDash([4, 3]); g.beginPath(); g.arc(px, py, P.r * v.s, 0, 6.3); g.stroke(); g.setLineDash([]); }
     for (const c of CREWS) { const b = G.chars?.find(c.boss); if (b && seenAt(b.x, b.z) && G.state.crews.includes(c.id)) dot(b.x, b.z, '#9fd0f0', 3); }
+    // #24: a crew whose lead hint Gus has heard (and hasn't joined): a soft region round its haunt, with when to look; not a
+    // pin, and drawn under the fog too (it's what he was told)
+    for (const c of CREWS) {
+      if (!G.state.leadHints?.[c.id] || G.state.crews.includes(c.id)) continue;
+      const P = PLACES[c.haunt];
+      if (!P) continue;
+      const [px, py] = v.toPx(P.x, P.z), R = Math.max(30, (P.r || 0) + 12) * v.s;
+      const grd = g.createRadialGradient(px, py, R * 0.2, px, py, R);
+      grd.addColorStop(0, 'rgba(242, 194, 48, 0.28)'); grd.addColorStop(1, 'rgba(242, 194, 48, 0)');
+      g.fillStyle = grd; g.beginPath(); g.arc(px, py, R, 0, 6.3); g.fill();
+      g.setLineDash([5, 5]); g.strokeStyle = 'rgba(242, 194, 48, 0.7)'; g.lineWidth = 1.5; g.beginPath(); g.arc(px, py, R, 0, 6.3); g.stroke(); g.setLineDash([]);
+      const when = LEAD_HINTS[c.id]?.when;
+      g.font = '700 12px Fredoka, sans-serif'; g.textAlign = 'center'; g.lineWidth = 3; g.strokeStyle = 'rgba(20, 24, 32, 0.85)';
+      const label = `${c.name.replace(/^The /, '')}: ${P.name}${when ? ', ' + when : ''}`;
+      g.strokeText(label, px, py - R * 0.55); g.fillStyle = '#f2c230'; g.fillText(label, px, py - R * 0.55);
+    }
     // Fixes-2 (P2): every open card's target gets a dim ring; the tracked one keeps its bright marker
     const tracked = G.state.tracked;
     for (const id of G.schemes.openList()) if (id !== tracked) for (const t of G.schemes.targets(id)) { const [px, py] = v.toPx(t.x, t.z); g.lineWidth = 2; g.strokeStyle = 'rgba(255,255,255,.55)'; g.setLineDash([3, 3]); g.beginPath(); g.arc(px, py, 6, 0, 6.3); g.stroke(); g.setLineDash([]); }

@@ -24,6 +24,7 @@ export function freshState() {
     steps: {},              // scheme id → index of the current step (0-based); missing = not started
     tracked: 'prologue',
     crews: [],              // crew ids joined
+    leadHints: {},          // #24: crews whose lead hint Gus has heard (their region shows on the map)
     parts: [],
     gear: [],
     talents: [],            // talents taught (first-use icons shown once)

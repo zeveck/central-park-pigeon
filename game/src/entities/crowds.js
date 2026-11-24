@@ -12,6 +12,7 @@
 
 import * as THREE from 'three';
 import { CROWD_HAUNTS, CREW, BARKS, CHARACTERS, GREETS } from '../data/crews.js';
+import { LEAD_HINTS } from '../data/lead-hints.js';   // #24
 import { GANG_MIX, PIGEON_LAYERS, SONGBIRD_TINTS, LOOKS, SPECIES } from '../data/looks.js';
 import { rngFor } from '../core/rng.js';
 import { pointInPoly } from '../core/geo.js';
@@ -350,6 +351,7 @@ export class Crowds {
       const run = 3 + a.rnd() * 3;
       a.tx = a.x + (dx / l) * run; a.tz = a.z + (dz / l) * run;
       this.#keepTarget(a);   // batch-3 (#1, #7): not onto the water, into a wall or off a roof
+      this.#leadHint(a);   // #24: now and then, who runs this crew and where
       a.t = 1.2 + a.rnd() * 1.4;
       if (gdef.fly) a.air = 1;
       this.#sound(a, gdef.sound);
@@ -463,9 +465,35 @@ export class Crowds {
     if (!best) return;
     const pool = (this.friendly(best.crew) ? BARKS.friendly : BARKS.wary)[GROUPS[best.group].bark];
     if (!pool) return;
-    const line = pool[Math.floor(best.rnd() * pool.length)];
+    let line = pool[Math.floor(best.rnd() * pool.length)];
     const a = best;
+    // #24: a wary crew that never flees (horses, owls, hawks) lets its lead hint slip in a bark instead (no extra random draw)
+    if (GROUPS[a.group].speed === 0) { const h = this.#leadHintLine(a.crew); if (h) line = h; }
     this.G.bubbles.add(line, { at: () => ({ x: a.x, y: a.yBase + 0.6 + (a.model === 'horse' ? 2 : 0), z: a.z }), ttl: 2.4, range: 14 });
+  }
+
+  /** #24: the line a wary animal of this crew lets slip, or null: its first chance, then every third, at most once every
+   *  25 s of game time per crew; never for a crew already joined. Hearing one marks the crew's region on the map. No
+   *  random draws (crowd decisions are seeded, and replays must repeat). */
+  #leadHintLine(crew) {
+    const G = this.G, H = crew && LEAD_HINTS[crew];
+    if (!H || this.friendly(crew) || G.dialogue?.open || G.cutscene?.locked) return null;
+    const n = (this.hintN ||= {})[crew] = (this.hintN[crew] || 0) + 1;
+    const t = G.state.time, last = (this.hintAt ||= {})[crew];
+    if (n % 3 !== 1 || (last != null && t - last < 25)) return null;
+    this.hintAt[crew] = t;
+    const st = G.state.leadHints || (G.state.leadHints = {});
+    if (!st[crew]) {
+      st[crew] = 1;
+      const c = CREW[crew], P = c?.haunt;
+      if (P) G.later(2.6, () => G.toast(`${c.name.replace(/^The /, '')}: marked on your map`, { seconds: 3 }));
+    }
+    return H.lines[Math.floor(n / 3) % H.lines.length];
+  }
+
+  #leadHint(a) {
+    const line = this.#leadHintLine(a.crew);
+    if (line) this.G.bubbles.add(line, { at: () => ({ x: a.x, y: a.yBase + 0.6, z: a.z }), ttl: 3.6, range: 30 });
   }
 
   // ------------------------------------------------------------ drawing: nearest-N per model
