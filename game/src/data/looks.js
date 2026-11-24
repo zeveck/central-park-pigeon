@@ -62,7 +62,7 @@ export const LOOKS = {
   // Plaza Swells
   duchess: { species: 'pigeon', layer: 0, sheen: 'teal-magenta', acc: ['tophat-small', 'pearls'] },
   monty: { species: 'pigeon', layer: 5, sheen: 'bronze-pink', acc: ['tophat', 'monocle', 'pearls'] },
-  bunting: { species: 'pigeon', layer: 9, sheen: 'faint', acc: ['fascinator', 'pearls', 'gloves'] },
+  bunting: { species: 'pigeon', layer: 9, sheen: 'faint', acc: ['fascinator', 'pearls'] },   // #29: no gloves (white balls at its sides: a pigeon has no hands)
   tuppence: { species: 'pigeon', layer: 7, sheen: 'teal-magenta', acc: ['tophat-big'] },
   dove: { species: 'pigeon', layer: 8, sheen: 'faint', acc: [] },
   // Bethesda Choir
@@ -103,7 +103,7 @@ export const LOOKS = {
   slowpoke: { species: 'turtle', tint: [0.95, 0.85, 0.75], acc: ['ear-stripe'] },
   // Night Crew
   rigby: { species: 'raccoon', model: 'raccoon-stand', acc: [] },
-  socket: { species: 'raccoon', model: 'raccoon-stand', tint: [0.75, 0.75, 0.75], acc: ['goggles:#5a4a2a', 'apron:#6b4a2a', 'wrench'] },
+  socket: { species: 'raccoon', model: 'raccoon-stand', tint: [0.75, 0.75, 0.75], acc: ['goggles-up:#5a4a2a', 'apron:#6b4a2a', 'wrench'] },
   ringo: { species: 'raccoon', model: 'raccoon-stand', acc: ['aviator', 'scarf-long:#c4302b'] },
   mamamask: { species: 'raccoon', model: 'raccoon-stand', acc: ['headscarf:#c4302b', 'apron:#d8d0c0', 'spoon'] },
   // Grate Rats
@@ -150,6 +150,22 @@ export const LOOKS = {
   vinnie: { species: 'human', model: 'human-vendor', acc: [] },
   dolores: { species: 'human', model: 'human-park', tint: [0.75, 0.6, 0.7], acc: ['shawl', 'felt-hat'] },
   ranger: { species: 'human', model: 'human-ranger', acc: [] },
+};
+
+// #29: measured on each model (game/test/lineup.html?set=measure&model=…: a 1 cm grid front and side, then a ray onto the
+// surface): metres, the model's own space. eyes: each eye's surface point and normal [x, y, z, nx, ny, nz] (the model's right
+// eye first); eyeR: the lens radius; bridge: where a pair of glasses crosses the beak or nose. neckY: where a collar,
+// a necklace or a bow tie goes round (just under the head); the ring's centre and size are fitted to the model there.
+// Glasses, monocles and goggles are built on these; a model without eyes here wears none.
+export const MODEL_FIT = {
+  'pigeon-plain': { eyes: [[-0.071, 0.279, 0.0944, -0.702, 0.232, 0.673], [-0.008, 0.277, 0.0961, 0.687, 0.242, 0.686]], eyeR: 0.014, bridge: [-0.0395, 0.2822, 0.1141], neckY: 0.215 },
+  squirrel: { eyes: [[-0.0154, 0.2046, 0.1006, -0.316, 0.473, 0.822], [0.0346, 0.197, 0.0832, 0.724, 0.168, 0.669]], eyeR: 0.013, bridge: [0.0096, 0.2047, 0.1169] },
+  crow: { eyes: [[-0.067, 0.367, 0.1619, -0.501, -0.009, 0.865], [0.012, 0.367, 0.1661, 0.288, -0.092, 0.953]], eyeR: 0.016, bridge: [-0.0275, 0.3718, 0.1807], neckY: 0.295 },
+  'duck-bufflehead': { eyes: [[-0.0337, 0.293, 0.1037, -0.195, 0.278, 0.941], [0.0385, 0.286, 0.0975, 0.462, 0.111, 0.88]], eyeR: 0.016, bridge: [0.0024, 0.2943, 0.1168] },
+  'raccoon-stand': { eyes: [[-0.106, 0.647, 0.1787, -0.275, 0.108, 0.955], [0.021, 0.651, 0.1817, 0.359, 0.212, 0.909]], eyeR: 0.032, bridge: [-0.0425, 0.6586, 0.1902], neckY: 0.48 },
+  'duck-hen': { neckY: 0.34 },
+  'cat-sit': { neckY: 0.15 },
+  'rat-stand': { neckY: 0.12 },
 };
 
 // What a crowd member of a gang wears (a simpler version).

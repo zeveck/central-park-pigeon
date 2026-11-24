@@ -41,6 +41,22 @@ export const ITEM_DEFS = {
 export const HEAVY_LIMITS = { maxAlt: 2, maxSpeed: 6 };
 
 const HOT = SLICE.hotFor;
+
+/** The carried item goes into Gus's beak (visual only: nothing in the game reads the mesh; drop and give use Gus's position). */
+export function attachCarried(gus, mesh, def) {
+  if (def.cls === 'heavy') mesh.scale.setScalar(0.8);
+  gus.root.add(mesh);
+}
+
+/** Each update: the carried item's pose (visual only). */
+export function poseCarried(gus, mesh, def, heat = null) {
+  const flying = gus.mode === 'fly';
+  if (def.cls === 'heavy') mesh.position.set(0, flying ? -0.08 : 0.02, flying ? 0.05 : 0.2);
+  else mesh.position.set(0, flying ? 0.17 : 0.2, flying ? 0.3 : 0.27);   // held in the beak, sticking out in front
+  mesh.rotation.set(flying ? 0.45 : 0.2, 0, flying ? gus.bank * 0.6 : 0);
+  const sl = mesh.userData.slice;
+  if (sl) sl.rotation.x = heat > 0 ? 0 : 0.35;   // a cold slice droops
+}
 const COOLING = 0.4;      // fix-19: below this much heat the label says "Cooling, still counts"
 const HOVER_WARM_R = 3;   // fix-19: the griddle warms a carried slice within this many metres
 
@@ -276,9 +292,7 @@ export class Items {
     const G = this.G;
     if (c) {
       this.carriedMesh = this.makeMesh(c.id);
-      const d = this.def(c.id);
-      if (d.cls === 'heavy') this.carriedMesh.scale.setScalar(0.8);
-      G.gus.root.add(this.carriedMesh);
+      attachCarried(G.gus, this.carriedMesh, this.def(c.id));
     }
     G.gus.carryLimits = c && this.def(c.id).cls === 'heavy' ? HEAVY_LIMITS : null;
   }
@@ -316,16 +330,7 @@ export class Items {
   update(dt) {
     const G = this.G, t = G.state.time;
     // pose the carried item in Gus's beak (Gus's model space; he faces +Z)
-    if (this.carriedMesh) {
-      const g = G.gus, flying = g.mode === 'fly';
-      const d = this.def(this.state.carried.id);
-      if (d.cls === 'heavy') this.carriedMesh.position.set(0, flying ? -0.08 : 0.02, flying ? 0.05 : 0.2);
-      else this.carriedMesh.position.set(0, flying ? 0.17 : 0.2, flying ? 0.3 : 0.27);   // held in the beak, sticking out in front
-      this.carriedMesh.rotation.set(flying ? 0.45 : 0.2, 0, flying ? g.bank * 0.6 : 0);
-      const h = this.heat();
-      const sl = this.carriedMesh.userData.slice;
-      if (sl) sl.rotation.x = h > 0 ? 0 : 0.35;   // a cold slice droops
-    }
+    if (this.carriedMesh) poseCarried(G.gus, this.carriedMesh, this.def(this.state.carried.id), this.heat());
     // steam over hot slices
     this.steamT += dt;
     if (this.steamT > 0.12) {

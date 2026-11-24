@@ -41,7 +41,7 @@ const MODELS = ['human-park', 'human-ranger', 'human-vendor', 'human-prickett', 
   'human-dolores', 'human-chess-player', 'human-jogger', 'human-tourist', 'human-child', 'human-teen-skater', 'human-birder',
   'human-businessperson', 'human-halal-cart-man', 'human-pizza-counterman', 'human-dog-walker', 'human-carriage-driver'];
 // accessories a model already wears (modelled), so a role's code accessory is skipped on it
-const MODEL_HAS = { 'human-tourist': ['camera'], 'human-birder': ['binoculars'], 'human-businessperson': ['phone'], 'human-halal-cart-man': ['paperhat'], 'human-pizza-counterman': ['paperhat'] };
+export const MODEL_HAS = { 'human-vendor': ['paperhat'], 'human-walter': ['capbraid'], 'human-tourist': ['camera'], 'human-birder': ['binoculars'], 'human-businessperson': ['phone'], 'human-halal-cart-man': ['paperhat'], 'human-pizza-counterman': ['paperhat'] };
 // a missing one-shot clip → the nearest this model has
 const CLIP_ALT = { throw: ['pickup', 'wave', 'call', 'cheer'], pickup: ['throw', 'wave'], cheer: ['wave', 'jump', 'argue', 'call'], scold: ['argue', 'shrug', 'call'], taunt: ['wave', 'gawk', 'call', 'shrug'], wave: ['call', 'cheer', 'bow'], attack: ['scold', 'argue'], stomp: ['scold', 'argue'] };
 const LOOPS = new Set(['idle', 'walk', 'run', 'sit', 'jog', 'balance', 'scan-walk', 'phone-walk', 'phone', 'cook', 'look', 'think', 'catch-breath']);
@@ -138,60 +138,9 @@ export class Humans {
   }
 
   #makeClone(model) {
-    const g = this.gltf[model];
-    const root = SkeletonUtils.clone(g.scene);
-    root.name = model;
-    const holder = new THREE.Group();
-    holder.add(root);
-    holder.scale.x = -1;   // counter-mirror (the world root is mirrored)
-    const mats = [];
-    root.traverse((o) => {
-      if (o.isMesh) {
-        const src = o.material;
-        o.material = ruleMaterial({ map: src.map || null });
-        if (o.material.map) o.material.map.colorSpace = THREE.SRGBColorSpace;
-        o.castShadow = true; o.receiveShadow = true;
-        o.frustumCulled = false;
-        mats.push(o.material);
-      }
-    });
-    const bones = {};
-    root.traverse((o) => { if (o.isBone && ['Head', 'RightHand', 'LeftHand', 'Spine02'].includes(o.name)) bones[o.name] = o; });
-    const mixer = new THREE.AnimationMixer(root);
-    const actions = {};
-    for (const clip of g.animations) {
-      const a = mixer.clipAction(clip);
-      if (LOOPS.has(clip.name)) a.setLoop(THREE.LoopRepeat);
-      else { a.setLoop(THREE.LoopOnce); a.clampWhenFinished = true; }
-      actions[clip.name] = a;
-    }
-    // bone holders that undo the rig's scale, so accessories are in metres
-    root.updateMatrixWorld(true);
-    const hold = {};
-    for (const [n, b] of Object.entries(bones)) {
-      const s = b.getWorldScale(_v).x / Math.abs(root.getWorldScale(new THREE.Vector3()).x || 1);
-      const h = new THREE.Group();
-      h.scale.setScalar(1 / (s || 1));
-      b.add(h);
-      hold[n] = h;
-    }
-    // perf pass: the LOD meshes, bound to the clone's own skeleton and sharing its materials (tints apply to both)
-    const lods = [];
-    root.traverse((o) => {
-      const lg = o.isSkinnedMesh && this.lodGeo?.get(o.geometry);
-      if (!lg) return;
-      const lm = new THREE.SkinnedMesh(lg, o.material);
-      lm.name = o.name + ':lod';
-      lm.position.copy(o.position); lm.quaternion.copy(o.quaternion); lm.scale.copy(o.scale);
-      lm.bind(o.skeleton, o.bindMatrix);
-      lm.frustumCulled = false; lm.castShadow = o.castShadow; lm.receiveShadow = o.receiveShadow;
-      lm.visible = false;
-      lods.push([o, lm]);
-    });
-    for (const [o, lm] of lods) o.parent.add(lm);
-    holder.visible = false;
-    this.group.add(holder);
-    return { model, holder, root, mats, mixer, actions, hold, lods, far: false, agent: null, current: null, accKey: '', flav: null, flavT: 3 };
+    const c = makeHumanClone(this.gltf[model], model, this.lodGeo);
+    this.group.add(c.holder);
+    return c;
   }
 
   // ------------------------------------------------------------ agents
@@ -545,6 +494,7 @@ export class Humans {
         if (c.current == null || (this.poseN + (a.k | 0)) % every === 0 || c.animDt > 0.25) {
           this.#clipFor(a, c, c.animDt);
           c.mixer.update(c.animDt);
+          poseHeld(c);
           c.animDt = 0;
         }
       }
@@ -807,23 +757,11 @@ export class Humans {
   }
 
   #dress(c, a) {
-    const has = MODEL_HAS[a.model] || [];
-    const list = (a.spec.acc || []).filter((q) => !has.includes(q) && !(q === 'slice' && a.spec.holds && !a.holds));   // Fixes-3: a dropped slice leaves his hand
-    if (a.holds && !list.includes('slice')) list.push('slice');
-    const key = list.join(',');
+    const list = accList(a.model, a.spec.acc, a.spec.holds, a.holds);
+    const key = list.join(',') + '|' + (a.holds || '');   // (#41: the anchovy slice and a plain one differ)
     if (c.accKey === key) return;
     c.accKey = key;
-    for (const h of Object.values(c.hold)) while (h.children.length) h.remove(h.children[0]);
-    for (const name of list) {
-      const spec = this.acc[name];
-      if (!spec) continue;
-      const h = c.hold[spec.bone];
-      if (!h) continue;
-      let m = spec.make();
-      // fix-19: the anchovy fan holds the real slice model in its anchovy texture (it was a plain yellow cone)
-      if (name === 'slice' && a.holds === 'slice-anchovy' && this.G.items?.anchovyMap) { m = this.G.items.makeMesh('slice-anchovy'); m.scale.setScalar(ANCHOVY_PROP.scale); m.position.set(...ANCHOVY_PROP.at); m.rotation.set(...ANCHOVY_PROP.rot); }
-      h.add(m);
-    }
+    dressClone(c, list, this.acc, { holds: a.holds, items: this.G.items });
   }
 
   /** Show or hide a held item on an agent (slice eaten, dropped). */
@@ -841,7 +779,6 @@ const DEFAULT_FLAVOUR = {
   'human-birder': ['look'], 'human-businessperson': ['phone'],
 };
 const CARRIAGE_BOX = { fwd: 0.9, up: 1.25 };
-const ANCHOVY_PROP = { scale: 1, at: [0, 0.06, 0.06], rot: [1.2, 0, 0] };   // fix-19: in the right hand's bone space
 const PEOPLE_FLOOR = { high: 4, medium: 3, low: 2 };   // perf pass: was 8 / 6 / 3, set while the world alone was over the caps
 const DOG_TINTS = [{}, { color: 0xd8c8b0 }, { color: 0x8a6a4a }, {}, { color: 0x404048 }];
 
@@ -856,12 +793,279 @@ export function superEllipse(cx, cz, rx, rz, exp, t) {
   return { x: cx + rx * Math.sign(c) * Math.abs(c) ** k, z: cz + rz * Math.sign(s) * Math.abs(s) ** k };
 }
 
-// role accessories: small code meshes on a bone holder (metres; the bone's local axes)
-function makeAccessories() {
+// ------------------------------------------------------------------ accessories (#29, #41)
+// The models are big-headed cartoons, so nothing is hung at a guessed offset any more. Each model's anchors are measured
+// once from its own rig and skin (humanFit): the head's crown, eye line and cross-sections, the chest and waist surfaces,
+// each hand's grip. Accessories ride on holders under the Head, Spine (the chest), Spine02 (the waist) and hand bones;
+// a body holder's frame is the model's own space at rest (metres, +Y up, +Z front), so a piece is built straight from the
+// measurements and then moves with its bone. People holding something (a bouquet, a slice, a phone…) get a holding arm
+// (poseHeld): after the mixer, that arm is aimed from the chest so the hand is in front of them, in every looping clip
+// (idle, walk, sit…); one-shots (throw, wave…) play as made. Visual only: nothing in the game reads a bone or a holder.
+
+const FITS = new WeakMap();
+const HEAD_BONES = new Set(['Head', 'head_end', 'headfront']);
+const TORSO_BONES = new Set(['Hips', 'Spine02', 'Spine01', 'Spine', 'neck', 'LeftShoulder', 'RightShoulder', 'LeftUpLeg', 'RightUpLeg']);   // (the hips' front is on the thighs)
+const HOLD_BONES = ['Head', 'Spine', 'Spine02', 'RightHand', 'LeftHand'];
+const SIDES = { R: 'Right', L: 'Left' };
+
+/** The model's anchors, measured at rest in its own space (metres): see the block comment above. Cached per GLTF. */
+export function humanFit(g) {
+  if (FITS.has(g)) return FITS.get(g);
+  const scene = g.scene;
+  scene.updateMatrixWorld(true);
+  const inv = new THREE.Matrix4().copy(scene.matrixWorld).invert();
+  const bone = {};
+  scene.traverse((o) => { if (o.isBone) bone[o.name] = o; });
+  const rel = (b) => new THREE.Matrix4().multiplyMatrices(inv, b.matrixWorld);
+  const P = (n) => new THREE.Vector3().setFromMatrixPosition(rel(bone[n]));
+  const Q = (n) => { const p = new THREE.Vector3(), q = new THREE.Quaternion(), s = new THREE.Vector3(); rel(bone[n]).decompose(p, q, s); return q; };
+  // every skinned vertex at rest, by its strongest bone: head, torso, each hand
+  const head = [], torso = [], hands = { RightHand: [], LeftHand: [] };
+  const v = new THREE.Vector3(), m = new THREE.Matrix4();
+  scene.traverse((o) => {
+    if (!o.isSkinnedMesh) return;
+    o.skeleton.update();
+    m.multiplyMatrices(inv, o.matrixWorld);
+    const pos = o.geometry.attributes.position, si = o.geometry.attributes.skinIndex, sw = o.geometry.attributes.skinWeight;
+    const names = o.skeleton.bones.map((b) => b.name);
+    for (let i = 0; i < pos.count; i++) {
+      let bi = 0, bw = -1;
+      for (let k = 0; k < 4; k++) { const w = sw.getComponent(i, k); if (w > bw) { bw = w; bi = si.getComponent(i, k); } }
+      const n = names[bi];
+      const list = HEAD_BONES.has(n) ? head : TORSO_BONES.has(n) ? torso : hands[n];
+      if (!list) continue;
+      v.fromBufferAttribute(pos, i);
+      o.applyBoneTransform(i, v);
+      v.applyMatrix4(m);
+      list.push(v.x, v.y, v.z);
+    }
+  });
+  // a horizontal slab of a point list: its x range and front/back z (within |x - cx| < xr when given)
+  const slab = (pts, y, h = 0.012, cx = 0, xr = Infinity) => {
+    let x0 = Infinity, x1 = -Infinity, z0 = Infinity, z1 = -Infinity, n = 0;
+    for (let i = 0; i < pts.length; i += 3) {
+      if (Math.abs(pts[i + 1] - y) > h || Math.abs(pts[i] - cx) > xr) continue;
+      x0 = Math.min(x0, pts[i]); x1 = Math.max(x1, pts[i]); z0 = Math.min(z0, pts[i + 2]); z1 = Math.max(z1, pts[i + 2]); n++;
+    }
+    return n ? { x0, x1, z0, z1, cx: (x0 + x1) / 2, cz: (z0 + z1) / 2, rx: (x1 - x0) / 2, rz: (z1 - z0) / 2 } : null;
+  };
+  // the head: its crown (the top of the head, hat or hair: the centre of the top 4 cm), heights up it from the Head bone
+  // (at the chin on these cartoons) as shares of the way to the crown: the eyes at 0.42, a hat's band at 0.62
+  let hy0 = Infinity, top = -Infinity;
+  for (let i = 0; i < head.length; i += 3) { hy0 = Math.min(hy0, head[i + 1]); top = Math.max(top, head[i + 1]); }
+  let hcx = 0, hcz = 0, hn = 0;
+  for (let i = 0; i < head.length; i += 3) if (head[i + 1] > top - 0.04) { hcx += head[i]; hcz += head[i + 2]; hn++; }
+  hcx /= hn || 1; hcz /= hn || 1;
+  const base = P('Head').y, up = (f) => base + f * (top - base);
+  const H = {
+    top, chin: hy0, cx: hcx, cz: hcz, height: top - hy0, base, up, eyeY: up(0.42), band: up(0.62),
+    ring: (y) => slab(head, y, 0.012) || { x0: hcx - 0.1, x1: hcx + 0.1, z0: hcz - 0.1, z1: hcz + 0.1, cx: hcx, cz: hcz, rx: 0.1, rz: 0.1 },
+  };
+  // the chest (on Spine) and the waist (on Spine02): the body's slab there (a beard counts), its front and back surface at x.
+  // The chest is a little above the Spine bone, but never inside the head (the vendor's chin is below his Spine bone).
+  const body = head.concat(torso);
+  const neckY = P('neck').y, spineY = P('Spine').y, waistY = P('Spine02').y;
+  const chestY = Math.min(spineY + 0.25 * (neckY - spineY), hy0 - 0.06);
+  const shoulderX = Math.abs(P('RightShoulder').x - P('LeftShoulder').x) / 2 + 0.04;
+  const surf = (x, y, front = true) => {
+    let best = front ? -Infinity : Infinity;
+    for (let i = 0; i < body.length; i += 3) {
+      if (Math.abs(body[i] - x) > 0.025 || Math.abs(body[i + 1] - y) > 0.025) continue;
+      best = front ? Math.max(best, body[i + 2]) : Math.min(best, body[i + 2]);
+    }
+    return Number.isFinite(best) ? best : (front ? 0.12 : -0.12);
+  };
+  const chest = { y: chestY, slab: slab(body, chestY, 0.02, 0, shoulderX), neckY: Math.min(neckY, hy0), surf };
+  const waist = { y: waistY, slab: slab(body, waistY, 0.02, 0, shoulderX), surf };
+  // the arms: rest joints and directions (model space), for the holding arm and each hand's grip
+  const arms = {};
+  for (const [k, S] of Object.entries(SIDES)) {
+    const pA = P(S + 'Arm'), pF = P(S + 'ForeArm'), pH = P(S + 'Hand');
+    const hp = hands[S + 'Hand'], cH = new THREE.Vector3();
+    for (let i = 0; i < hp.length; i += 3) cH.x += hp[i], cH.y += hp[i + 1], cH.z += hp[i + 2];
+    if (hp.length) cH.divideScalar(hp.length / 3); else cH.copy(pH);
+    const hs = new THREE.Vector3(); rel(bone[S + 'Hand']).decompose(new THREE.Vector3(), new THREE.Quaternion(), hs);
+    arms[k] = {
+      out: Math.sign(pH.x) || (k === 'R' ? -1 : 1), pA, pF, pH, cH,
+      qA0: Q(S + 'Arm'), qF0: Q(S + 'ForeArm'), qH0: Q(S + 'Hand'), sH: hs,
+      lenA: pF.distanceTo(pA), lenF: pH.distanceTo(pF),
+      dirA: pF.clone().sub(pA).normalize(), dirF: pH.clone().sub(pF).normalize(),
+      handLocal: bone[S + 'Hand'].quaternion.clone(),
+    };
+  }
+  const fit = { head: H, chest, waist, arms, qS0: Q('Spine'), height: top, rest: Object.fromEntries(HOLD_BONES.filter((n) => bone[n]).map((n) => [n, rel(bone[n])])) };
+  FITS.set(g, fit);
+  return fit;
+}
+
+// holding arms, in the model's space (x: out = the arm's own side): the upper arm's and the forearm's directions
+const ARM_POSES = {
+  front: { upper: [0.12, -1, 0.32], fore: [-0.2, 0.08, 1] },        // a hand in front of the belly (a wand, a remote, a broom)
+  both: { upper: [0.1, -1, 0.38], fore: [-0.62, 0.12, 1] },         // both hands together in front (a bouquet, a box, a sax)
+  eat: { upper: [0.16, -1, 0.12], fore: [-0.42, 1, 0.42] },         // up to the chin (a slice)
+  phone: { upper: [0.08, -1, 0.16], fore: [-0.38, 0.62, 1] },       // at the chest, looked at (a phone, a clipboard)
+  selfie: { upper: [0.3, 0.42, 1], fore: [0.22, 0.55, 1] },         // out and up in front (a selfie stick)
+};
+const _q1 = new THREE.Quaternion(), _q2 = new THREE.Quaternion(), _q3 = new THREE.Quaternion(), _q4 = new THREE.Quaternion();
+const _d1 = new THREE.Vector3(), _d2 = new THREE.Vector3();
+const _m1 = new THREE.Matrix4(), _m2 = new THREE.Matrix4();
+
+function poseDirs(pose, out) {
+  const P = ARM_POSES[pose];
+  return [new THREE.Vector3(P.upper[0] * out, P.upper[1], P.upper[2]).normalize(), new THREE.Vector3(P.fore[0] * out, P.fore[1], P.fore[2]).normalize()];
+}
+
+/** Where a hand's grip is with its arm in `pose` (chest at rest), and the hand bone's model matrix there. */
+function holdFrame(A, pose) {
+  if (!pose) return { hand: new THREE.Matrix4().compose(A.pH, A.qH0, A.sH), grip: A.cH.clone() };
+  const [dA, dF] = poseDirs(pose, A.out);
+  const RF = new THREE.Quaternion().setFromUnitVectors(A.dirF, dF);
+  const pF = A.pA.clone().addScaledVector(dA, A.lenA), pH = pF.clone().addScaledVector(dF, A.lenF);
+  const qH = RF.clone().multiply(A.qH0);
+  return { hand: new THREE.Matrix4().compose(pH, qH, A.sH), grip: pH.clone().add(A.cH.clone().sub(A.pH).applyQuaternion(RF)), dF };
+}
+
+/** A pooled person: a SkeletonUtils clone of the model in a counter-mirrored holder, its mixer and clip actions, the
+ *  bone holders accessories hang on, and the LOD meshes. (Exported for the lineup test page, game/test/lineup.html.) */
+export function makeHumanClone(g, model, lodGeo = null) {
+  const fit = humanFit(g);
+  const root = SkeletonUtils.clone(g.scene);
+  root.name = model;
+  const holder = new THREE.Group();
+  holder.add(root);
+  holder.scale.x = -1;   // counter-mirror (the world root is mirrored)
+  const mats = [];
+  root.traverse((o) => {
+    if (o.isMesh) {
+      const src = o.material;
+      o.material = ruleMaterial({ map: src.map || null });
+      if (o.material.map) o.material.map.colorSpace = THREE.SRGBColorSpace;
+      o.castShadow = true; o.receiveShadow = true;
+      o.frustumCulled = false;
+      mats.push(o.material);
+    }
+  });
+  const bones = {};
+  root.traverse((o) => { if (o.isBone) bones[o.name] = o; });
+  const mixer = new THREE.AnimationMixer(root);
+  const actions = {};
+  for (const clip of g.animations) {
+    const a = mixer.clipAction(clip);
+    if (LOOPS.has(clip.name)) a.setLoop(THREE.LoopRepeat);
+    else { a.setLoop(THREE.LoopOnce); a.clampWhenFinished = true; }
+    actions[clip.name] = a;
+  }
+  // #29: bone holders whose frame at rest is the model's own space (metres): the inverse of the bone's rest matrix
+  const hold = {};
+  for (const n of HOLD_BONES) {
+    if (!bones[n]) continue;
+    const h = new THREE.Group();
+    h.name = 'hold:' + n;
+    setLocal(h, _m1.copy(fit.rest[n]).invert());
+    bones[n].add(h);
+    hold[n] = h;
+  }
+  // perf pass: the LOD meshes, bound to the clone's own skeleton and sharing its materials (tints apply to both)
+  const lods = [];
+  root.traverse((o) => {
+    const lg = o.isSkinnedMesh && lodGeo?.get(o.geometry);
+    if (!lg) return;
+    const lm = new THREE.SkinnedMesh(lg, o.material);
+    lm.name = o.name + ':lod';
+    lm.position.copy(o.position); lm.quaternion.copy(o.quaternion); lm.scale.copy(o.scale);
+    lm.bind(o.skeleton, o.bindMatrix);
+    lm.frustumCulled = false; lm.castShadow = o.castShadow; lm.receiveShadow = o.receiveShadow;
+    lm.visible = false;
+    lods.push([o, lm]);
+  });
+  for (const [o, lm] of lods) o.parent.add(lm);
+  holder.visible = false;
+  return { model, holder, root, mats, mixer, actions, hold, bones, fit, arms: { R: null, L: null }, lods, far: false, agent: null, current: null, accKey: '', flav: null, flavT: 3 };
+}
+
+function setLocal(obj, m) { m.decompose(obj.position, obj.quaternion, obj.scale); }
+
+/** The accessories an agent wears: its spec's, less what its model already has; a held slice in hand (gone once dropped). */
+export function accList(model, acc, specHolds, holds) {
+  const has = MODEL_HAS[model] || [];
+  const list = (acc || []).filter((q) => !has.includes(q) && !(q === 'slice' && specHolds && !holds));   // Fixes-3: a dropped slice leaves his hand
+  if (holds && /^slice/.test(holds) && !list.includes('slice')) list.push('slice');   // #29: only a slice (the cyclist's box was getting one too)
+  return list;
+}
+
+/** Hang the accessories in `list` on a clone's holders and choose its holding arms (visual only). opts.holds: what the
+ *  agent holds (the slice's kind); opts.items: the game's Items (the real slice model). */
+export function dressClone(c, list, acc, { holds = null, items = null } = {}) {
+  for (const h of Object.values(c.hold)) while (h.children.length) h.remove(h.children[0]);
+  // the arms: the first held piece per hand chooses its pose; a two-handed piece brings the other hand in
+  const arms = { R: null, L: null };
+  for (const name of list) {
+    const spec = acc[name];
+    if (!spec?.pose) continue;
+    const side = spec.bone === 'LeftHand' ? 'L' : 'R';
+    if (!arms[side]) arms[side] = spec.pose;
+    if (spec.pose === 'both') arms.R = arms.L = 'both';
+  }
+  c.arms = arms;
+  const grips = {};
+  for (const k of ['R', 'L']) {
+    const h = c.hold[SIDES[k] + 'Hand'];
+    if (!h) continue;
+    const f = holdFrame(c.fit.arms[k], arms[k]);
+    grips[k] = f;
+    // the hand holder: its frame is the model's axes at the grip, with the arm in its pose
+    setLocal(h, _m1.copy(f.hand).invert().multiply(_m2.makeTranslation(f.grip.x, f.grip.y, f.grip.z)));
+  }
+  const ctx = { fit: c.fit, grips, holds, items };
+  for (const name of list) {
+    const spec = acc[name];
+    if (!spec) continue;
+    const h = c.hold[spec.bone];
+    if (!h) continue;
+    const m = spec.make(c.fit, ctx);
+    if (m) h.add(m);
+  }
+}
+
+/** After the mixer (visual only): aim each holding arm from the chest, so what it holds is in front, in the hand. Looping
+ *  clips only (idle, walk, sit, look…); a one-shot (a throw, a wave) plays as made. */
+export function poseHeld(c) {
+  if (!c.arms || (!c.arms.R && !c.arms.L) || !LOOPS.has(c.current)) return;
+  const F = c.fit, B = c.bones, root = c.root;
+  // the chest's turn from rest (the idle's hip twist, the walk's sway, the sit's lean): the held pose turns with it
+  const dS = chainQuat(B.Spine, root, _q1).multiply(_q2.copy(F.qS0).invert());
+  for (const k of ['R', 'L']) {
+    const pose = c.arms[k];
+    if (!pose) continue;
+    const A = F.arms[k], S = SIDES[k], arm = B[S + 'Arm'], fore = B[S + 'ForeArm'], hand = B[S + 'Hand'];
+    const P = ARM_POSES[pose];
+    _d1.set(P.upper[0] * A.out, P.upper[1], P.upper[2]).normalize().applyQuaternion(dS);
+    _d2.set(P.fore[0] * A.out, P.fore[1], P.fore[2]).normalize().applyQuaternion(dS);
+    const qA = _q3.setFromUnitVectors(A.dirA, _d1).multiply(A.qA0);                       // the upper arm, model space
+    arm.quaternion.copy(chainQuat(arm.parent, root, _q4).invert().multiply(qA));
+    const qF = _q4.setFromUnitVectors(A.dirF, _d2).multiply(A.qF0);                       // the forearm, model space
+    fore.quaternion.copy(_q2.copy(qA).invert().multiply(qF));
+    hand.quaternion.copy(A.handLocal);
+  }
+}
+
+/** A bone's rotation in the clone root's space (the product of its parents' local rotations). */
+function chainQuat(o, root, out) {
+  out.identity();
+  for (let p = o; p && p !== root; p = p.parent) out.premultiply(p.quaternion);
+  return out;
+}
+
+// role accessories. bone: the holder (Head, Spine = the chest, Spine02 = the waist: the model's space at rest; RightHand /
+// LeftHand: the grip, model axes with the arm in its pose). pose: the holding arm. make(fit, ctx) builds the piece from
+// the model's own measurements (humanFit). Dropped (#29): tophat, felthat, shawl, basket, leashes, tails (no one wore them).
+export function makeAccessories() {
   const M = (c, extra = {}) => ruleMaterial({ color: c, ...extra });
-  const dark = M(0x2a2a30), black = M(0x161616), white = M(0xf4f0e6), red = M(0xc4302b), tan = M(0xc8a070), gold = M(0xd4a02a);
+  const dark = M(0x2a2a30), black = M(0x161616), white = M(0xf4f0e6), red = M(0xc4302b), gold = M(0xd4a02a, { roughness: 0.4, metalness: 0.5 });
+  const navy = M(0x2a3a5a), yellow = M(0xf2c230), blue = M(0x3aa0d8), steel = M(0xd8dde2), green = M(0x4a7a3a), wood = M(0x8a5a2a);
+  const veilMat = M(0xffffff, { transparent: true, opacity: 0.55, side: THREE.DoubleSide, depthWrite: false });
   const mesh = (geo, mat, x = 0, y = 0, z = 0, rx = 0, ry = 0, rz = 0) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.rotation.set(rx, ry, rz); m.castShadow = true; return m; };
-  // perf pass: a two-part accessory is one vertex-coloured mesh (one draw call, not two)
+  // perf pass: a several-part accessory is one vertex-coloured mesh (one draw call)
   const vcol = ruleMaterial({ vertexColors: true });
   const grp = (...ms) => {
     const geos = ms.map((m) => {
@@ -877,39 +1081,50 @@ function makeAccessories() {
     out.castShadow = true;
     return out;
   };
+  // ---- head pieces, from the measured head: its crown, its band (where a hat's band sits) and the cross-section there
+  const band = (F) => { const H = F.head, r = H.ring(H.band); return { H, y: H.band, cx: r.cx, cz: r.cz, rx: r.rx * 1.04, rz: r.rz * 1.04, up: H.top - H.band }; };
+  // a dome over the crown, from the band up (a cap, a helmet, a hard hat); its brim or peak added by the caller
+  const dome = (F, mat, grow = 1.06, lift = 0.012) => { const b = band(F); const g = new THREE.SphereGeometry(1, 18, 9, 0, Math.PI * 2, 0, Math.PI / 2).scale(b.rx * grow, b.up + lift, b.rz * grow); return mesh(g, mat, b.cx, b.y, b.cz); };
+  const ringAt = (y, F, grow, tube, mat, tilt = 0) => { const r = F.head.ring(y); return mesh(new THREE.TorusGeometry(1, tube / Math.max(r.rx, 0.01), 6, 28).rotateX(Math.PI / 2).scale(r.rx * grow, r.rx, r.rz * grow), mat, r.cx, y, r.cz, tilt); };
+  // ---- the chest: a point on its front surface, x (+ = the wearer's left) as a share of its half-width
+  const chestAt = (F, xs, dy = 0, out = 0.01) => { const C = F.chest, x = C.slab ? C.slab.cx + xs * C.slab.rx : xs * 0.15, y = C.y + dy; return new THREE.Vector3(x, y, C.surf(x, y) + out); };
+  const flower = (F, petal, x) => { const p = chestAt(F, x, 0.02); const k = Math.max(0.8, Math.min(1.3, F.head.height / 0.36)); return grp(mesh(new THREE.SphereGeometry(0.024 * k, 8, 6), petal, p.x, p.y, p.z + 0.01), mesh(new THREE.SphereGeometry(0.016 * k, 6, 4), petal, p.x + 0.018 * k * Math.sign(x), p.y - 0.012 * k, p.z + 0.006), mesh(new THREE.BoxGeometry(0.012, 0.045 * k, 0.008), green, p.x - 0.006 * Math.sign(x), p.y - 0.03 * k, p.z, 0, 0, 0.4 * Math.sign(x))); };
+  // a strap from a chest piece up round the back of the neck (two straight runs to the neck's sides)
+  const strap = (F, p, w) => { const C = F.chest, ny = C.neckY, nr = F.head.ring(F.head.chin + 0.01); const parts = []; for (const s of [-1, 1]) { const a = new THREE.Vector3(p.x + s * w, p.y, p.z), b = new THREE.Vector3(nr.cx + s * nr.rx * 0.75, ny, C.surf(nr.cx + s * nr.rx * 0.75, ny) - 0.005); const d = b.clone().sub(a); const m = mesh(new THREE.BoxGeometry(0.012, d.length(), 0.004), black); m.position.copy(a).addScaledVector(d, 0.5); m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); parts.push(m); } return parts; };
   return {
-    phone: { bone: 'RightHand', make: () => mesh(new THREE.BoxGeometry(0.07, 0.14, 0.012), dark, 0, 0.08, 0.03) },
-    selfie: { bone: 'RightHand', make: () => grp(mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.55, 6), dark, 0, 0.3, 0), mesh(new THREE.BoxGeometry(0.07, 0.14, 0.012), dark, 0, 0.6, 0)) },
-    camera: { bone: 'RightHand', make: () => grp(mesh(new THREE.BoxGeometry(0.12, 0.08, 0.06), black, 0, 0.06, 0.04), mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.05, 10), dark, 0, 0.06, 0.09, Math.PI / 2)) },
-    binoculars: { bone: 'Spine02', make: () => grp(mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.1, 8), black, -0.03, 0.05, 0.14, Math.PI / 2), mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.1, 8), black, 0.03, 0.05, 0.14, Math.PI / 2)) },
-    tophat: { bone: 'Head', make: () => grp(mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.16, 14), black, 0, 0.27, 0), mesh(new THREE.CylinderGeometry(0.16, 0.16, 0.012, 16), black, 0, 0.19, 0)) },
-    headband: { bone: 'Head', make: () => mesh(new THREE.TorusGeometry(0.1, 0.018, 6, 16), red, 0, 0.13, 0, Math.PI / 2) },
-    paperhat: { bone: 'Head', make: () => mesh(new THREE.BoxGeometry(0.2, 0.07, 0.12), white, 0, 0.22, 0) },
-    hardhat: { bone: 'Head', make: () => mesh(new THREE.SphereGeometry(0.13, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2), M(0xf2c230), 0, 0.17, 0) },
-    cap: { bone: 'Head', make: () => grp(mesh(new THREE.CylinderGeometry(0.11, 0.11, 0.06, 12), M(0x2a3a5a), 0, 0.2, 0), mesh(new THREE.BoxGeometry(0.14, 0.01, 0.08), M(0x1a2440), 0, 0.18, 0.1)) },
-    helmet: { bone: 'Head', make: () => mesh(new THREE.SphereGeometry(0.13, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2), M(0x3aa0d8), 0, 0.16, 0) },
-    headset: { bone: 'Head', make: () => mesh(new THREE.TorusGeometry(0.11, 0.008, 6, 16, Math.PI), black, 0, 0.12, 0, 0, Math.PI / 2, 0) },
-    beret: { bone: 'Head', make: () => mesh(new THREE.CylinderGeometry(0.12, 0.1, 0.04, 14), M(0x8e1c2c), 0.02, 0.21, 0, 0, 0, 0.2) },
-    felthat: { bone: 'Head', make: () => grp(mesh(new THREE.CylinderGeometry(0.09, 0.1, 0.1, 14), M(0x6a3c5a), 0, 0.22, 0), mesh(new THREE.CylinderGeometry(0.17, 0.17, 0.01, 16), M(0x6a3c5a), 0, 0.17, 0)) },
-    shawl: { bone: 'Spine02', make: () => mesh(new THREE.TorusGeometry(0.16, 0.05, 6, 14), M(0xb07ab0), 0, 0.12, 0, Math.PI / 2) },
-    veil: { bone: 'Head', make: () => mesh(new THREE.ConeGeometry(0.16, 0.42, 12, 1, true), M(0xffffff, { transparent: true, opacity: 0.75, side: THREE.DoubleSide }), 0, 0.02, -0.06, 0.25) },
-    bouquet: { bone: 'RightHand', make: () => grp(mesh(new THREE.SphereGeometry(0.07, 10, 8), M(0xf2a0b8), 0, 0.1, 0.03), mesh(new THREE.CylinderGeometry(0.015, 0.01, 0.12, 6), M(0x4a7a3a), 0, 0.02, 0.03)) },
-    basket: { bone: 'LeftHand', make: () => mesh(new THREE.CylinderGeometry(0.14, 0.11, 0.16, 14), tan, 0, -0.06, 0.06) },
-    sax: { bone: 'RightHand', make: () => mesh(new THREE.CylinderGeometry(0.02, 0.05, 0.4, 10), gold, 0, 0.12, 0.08, 0.3) },
-    guitar: { bone: 'Spine02', make: () => grp(mesh(new THREE.CylinderGeometry(0.17, 0.17, 0.07, 16), M(0x8a5a2a), 0.05, -0.08, 0.16, Math.PI / 2), mesh(new THREE.BoxGeometry(0.05, 0.45, 0.03), M(0x5a3a1a), 0.05, 0.25, 0.16)) },
-    apron: { bone: 'Spine02', make: () => mesh(new THREE.BoxGeometry(0.3, 0.45, 0.02), white, 0, -0.3, 0.13) },
-    remote: { bone: 'RightHand', make: () => mesh(new THREE.BoxGeometry(0.1, 0.03, 0.14), M(0x3a5ab0), 0, 0.05, 0.04) },
-    leashes: { bone: 'RightHand', make: () => mesh(new THREE.CylinderGeometry(0.004, 0.004, 1.4, 4), M(0xc4302b), 0, -0.6, 0.35, 0.6) },
-    box: { bone: 'Spine02', make: () => mesh(new THREE.BoxGeometry(0.42, 0.07, 0.42), M(0xd9b07a), 0, 0.05, 0.3) },
-    slice: { bone: 'RightHand', make: () => mesh(new THREE.ConeGeometry(0.08, 0.22, 3), M(0xf2c230), 0, 0.12, 0.04, 0, 0, 0) },
-    capbraid: { bone: 'Head', make: () => mesh(new THREE.TorusGeometry(0.105, 0.012, 6, 18), gold, 0, 0.19, 0, Math.PI / 2) },
-    clipboard: { bone: 'LeftHand', make: () => grp(mesh(new THREE.BoxGeometry(0.22, 0.3, 0.015), M(0x8a5e30), 0, 0.12, 0.06), mesh(new THREE.BoxGeometry(0.18, 0.24, 0.005), white, 0, 0.12, 0.07)) },
-    spraytank: { bone: 'Spine02', make: () => grp(mesh(new THREE.CylinderGeometry(0.11, 0.11, 0.45, 12), M(0xd8dde2), 0, 0, -0.22), mesh(new THREE.SphereGeometry(0.11, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2), M(0xd8dde2), 0, 0.22, -0.22)) },
-    wand: { bone: 'RightHand', make: () => mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.6, 6), M(0x3a3a3a), 0, 0.1, 0.25, Math.PI / 2) },
-    // Polish-1: the wedding's buttonhole (the groom) and corsages (the guests)
-    buttonhole: { bone: 'Spine02', make: () => grp(mesh(new THREE.SphereGeometry(0.035, 8, 6), white, -0.09, 0.12, 0.14), mesh(new THREE.SphereGeometry(0.02, 6, 4), M(0x4a7a3a), -0.07, 0.1, 0.14)) },
-    tails: { bone: 'Spine02', make: () => mesh(new THREE.BoxGeometry(0.34, 0.5, 0.03), M(0x1c1c22), 0, -0.42, -0.12, 0.12) },
-    corsage: { bone: 'Spine02', make: () => mesh(new THREE.SphereGeometry(0.035, 8, 6), M(0xf2a0b8), 0.09, 0.12, 0.13) },
-    'sunglasses-up': { bone: 'Head', make: () => mesh(new THREE.BoxGeometry(0.16, 0.035, 0.02), black, 0, 0.17, 0.08) },
+    // ---- in the hand (relative to the grip; the holding arm brings it in front)
+    phone: { bone: 'RightHand', pose: 'phone', make: () => mesh(new THREE.BoxGeometry(0.075, 0.15, 0.012), dark, 0, 0.05, 0.01, 0.55, 0, 0) },
+    selfie: { bone: 'RightHand', pose: 'selfie', make: (F, x) => { const d = x.grips.R.dF.clone().add(new THREE.Vector3(0, 1.4, -0.2)).normalize(); const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), d); const s = mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.55, 6), dark); s.quaternion.copy(q); s.position.copy(d).multiplyScalar(0.25); const ph = mesh(new THREE.BoxGeometry(0.075, 0.15, 0.012), dark); ph.position.copy(d).multiplyScalar(0.55); ph.rotation.set(0.35, 0, 0); return grp(s, ph); } },
+    remote: { bone: 'RightHand', pose: 'front', make: () => grp(mesh(new THREE.BoxGeometry(0.1, 0.03, 0.14), M(0x3a5ab0), 0, 0.015, 0.03, -0.3), mesh(new THREE.CylinderGeometry(0.003, 0.003, 0.18, 4), dark, 0.035, 0.1, 0.05, 0.3)) },
+    bouquet: { bone: 'RightHand', pose: 'both', make: (F, x) => { const mid = x.grips.L ? x.grips.L.grip.clone().sub(x.grips.R.grip).multiplyScalar(0.5) : new THREE.Vector3(); const ps = [mesh(new THREE.ConeGeometry(0.035, 0.18, 8).rotateX(Math.PI), green, mid.x, mid.y - 0.03, mid.z + 0.02)]; const cols = [0xfff4f6, 0xf7b8c8, 0xffffff, 0xf2d06b, 0xf7b8c8, 0xffffff, 0xfff4f6]; for (let k = 0; k < 7; k++) { const a = k * 2.4, r = k ? 0.045 : 0; ps.push(mesh(new THREE.SphereGeometry(0.036, 8, 6), M(cols[k]), mid.x + Math.cos(a) * r, mid.y + 0.08 + (k % 2) * 0.012, mid.z + 0.03 + Math.sin(a) * r)); } return grp(...ps); } },
+    // the real slice (the anchovy one in its own texture), held by the crust, tip up to the mouth
+    slice: { bone: 'RightHand', make: (F, x) => { if (x.holds === 'slice-anchovy' && x.items?.anchovyMap) { const m = x.items.makeMesh('slice-anchovy'); m.position.set(0, 0.06, 0.06); m.rotation.set(1.2, 0, 0); return m; } return mesh(new THREE.ConeGeometry(0.08, 0.22, 3), yellow, 0, 0.12, 0.04); } },   // (in hand; #41 makes it held)
+    sax: { bone: 'RightHand', pose: 'both', make: (F, x) => { const mid = x.grips.L ? x.grips.L.grip.clone().sub(x.grips.R.grip).multiplyScalar(0.5) : new THREE.Vector3(); return grp(mesh(new THREE.CylinderGeometry(0.018, 0.03, 0.42, 10), gold, mid.x, mid.y + 0.06, mid.z + 0.04, -0.25), mesh(new THREE.CylinderGeometry(0.06, 0.03, 0.08, 12), gold, mid.x, mid.y - 0.16, mid.z + 0.1, -1.2), mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.12, 6), black, mid.x, mid.y + 0.3, mid.z - 0.02, 0.9)); } },
+    wand: { bone: 'RightHand', pose: 'front', make: () => grp(mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.6, 6), M(0x3a3a3a), 0, -0.06, 0.28, Math.PI / 2 + 0.25), mesh(new THREE.ConeGeometry(0.025, 0.06, 8), M(0x3a3a3a), 0, -0.135, 0.57, Math.PI / 2 + 0.25)) },
+    clipboard: { bone: 'LeftHand', pose: 'phone', make: () => grp(mesh(new THREE.BoxGeometry(0.22, 0.3, 0.015), M(0x8a5e30), 0.03, 0.08, 0.02, 0.6), mesh(new THREE.BoxGeometry(0.18, 0.24, 0.005), white, 0.03, 0.08, 0.03, 0.6)) },
+    broom: { bone: 'RightHand', pose: 'front', make: () => grp(mesh(new THREE.CylinderGeometry(0.014, 0.014, 1.25, 6), wood, 0, -0.18, 0.12, 0.35), mesh(new THREE.BoxGeometry(0.26, 0.14, 0.06), M(0xc8a24a), 0, -0.76, 0.33, 0.35)) },
+    box: { bone: 'RightHand', pose: 'both', make: (F, x) => { const mid = x.grips.L ? x.grips.L.grip.clone().sub(x.grips.R.grip).multiplyScalar(0.5) : new THREE.Vector3(); return mesh(new THREE.BoxGeometry(0.4, 0.07, 0.4), M(0xd9b07a), mid.x, mid.y + 0.045, mid.z + 0.12); } },
+    // ---- on the head (the Head bone: built from the measured crown and band)
+    cap: { bone: 'Head', make: (F) => { const b = band(F); return grp(dome(F, navy), mesh(new THREE.CylinderGeometry(1, 1, 0.012, 16, 1, false, -Math.PI / 2, Math.PI).scale(b.rx * 0.85, 1, 0.1), M(0x1a2440), b.cx, b.y + 0.004, b.cz + b.rz * 0.95)); } },
+    helmet: { bone: 'Head', make: (F) => grp(dome(F, blue, 1.12, 0.03), ringAt(band(F).y, F, 1.1, 0.012, dark)) },
+    hardhat: { bone: 'Head', make: (F) => { const b = band(F); return grp(dome(F, yellow, 1.1, 0.03), mesh(new THREE.CylinderGeometry(1, 1, 0.014, 20).scale(b.rx * 1.3, 1, b.rz * 1.35), yellow, b.cx, b.y, b.cz + b.rz * 0.08), mesh(new THREE.BoxGeometry(0.03, b.up * 0.9, b.rz * 1.6), M(0xe0b020), b.cx, b.y + b.up * 0.55, b.cz)); } },
+    beret: { bone: 'Head', make: (F) => { const b = band(F); return mesh(new THREE.SphereGeometry(1, 16, 8).scale(b.rx * 1.12, b.up * 0.32, b.rz * 1.12), M(0x8e1c2c), b.cx + b.rx * 0.12, F.head.top - b.up * 0.18, b.cz - b.rz * 0.05, 0, 0, -0.18); } },
+    paperhat: { bone: 'Head', make: (F) => { const b = band(F); return mesh(new THREE.BoxGeometry(b.rx * 1.7, b.up * 0.55, b.rz * 1.9), white, b.cx, b.y + b.up * 0.55, b.cz); } },
+    headband: { bone: 'Head', make: (F) => ringAt(F.head.up(0.7), F, 1.03, 0.016, red) },
+    headset: { bone: 'Head', make: (F) => { const H = F.head, ey = H.eyeY - 0.02, r = H.ring(ey), over = H.top - ey + 0.012; const arc = mesh(new THREE.TorusGeometry(1, 0.008 / over, 6, 20, Math.PI).scale(r.rx * 1.06, over, over), black, r.cx, ey, r.cz - r.rz * 0.1); const cup = (s) => mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.03, 12), black, r.cx + s * r.rx * 1.06, ey, r.cz - r.rz * 0.1, 0, 0, Math.PI / 2); const boom = new THREE.Vector3(r.cx + r.rx * 0.5, H.chin + 0.25 * (ey - H.chin), r.z1 + 0.01); const a = new THREE.Vector3(r.cx + r.rx * 1.06, ey, r.cz - r.rz * 0.1); const d = boom.clone().sub(a); const mic = mesh(new THREE.CylinderGeometry(0.005, 0.005, d.length(), 5), black); mic.position.copy(a).addScaledVector(d, 0.5); mic.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); return grp(arc, cup(1), cup(-1), mic, mesh(new THREE.SphereGeometry(0.012, 6, 4), black, boom.x, boom.y, boom.z)); } },
+    capbraid: { bone: 'Head', make: (F) => ringAt(band(F).y, F, 1.02, 0.01, gold) },
+    // sunglasses pushed up on top of the head
+    'sunglasses-up': { bone: 'Head', make: (F) => { const H = F.head, y = H.top - 0.22 * (H.top - H.eyeY), r = H.ring(y), z = r.z1 - 0.012, w = Math.min(0.075, r.rx * 0.5); return grp(mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.01, 14).scale(1.25, 1, 1), black, r.cx - w * 0.55, y, z, Math.PI / 2 - 0.9), mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.01, 14).scale(1.25, 1, 1), black, r.cx + w * 0.55, y, z, Math.PI / 2 - 0.9), mesh(new THREE.BoxGeometry(w * 2.1, 0.008, 0.008), black, r.cx, y + 0.006, z), mesh(new THREE.BoxGeometry(0.006, 0.006, r.rz * 1.5), black, r.cx - r.rx * 0.98, y - 0.01, r.cz + r.rz * 0.15), mesh(new THREE.BoxGeometry(0.006, 0.006, r.rz * 1.5), black, r.cx + r.rx * 0.98, y - 0.01, r.cz + r.rz * 0.15)); } },
+    // the veil: gathered at the back of the crown, falling down the back past the shoulders (an open cone, its back
+    // half and sides only: never over the face), with a pearl comb where it's pinned
+    veil: { bone: 'Head', make: (F) => { const H = F.head, y0 = H.top - 0.12 * (H.top - H.eyeY), r = H.ring(y0), len = H.height * 0.95 + 0.3, rb = Math.max(r.rx, r.rz) * 1.7; const g = new THREE.CylinderGeometry(1, 1, 1, 18, 6, true, Math.PI / 2 + 0.35, Math.PI - 0.7); const p = g.attributes.position; for (let i = 0; i < p.count; i++) { const t = 0.5 - p.getY(i), rr = THREE.MathUtils.lerp(Math.max(r.rx, r.rz) * 0.95, rb, Math.sqrt(t)); p.setXYZ(i, p.getX(i) * rr * (r.rx / Math.max(r.rx, r.rz)), y0 - t * len, r.cz + p.getZ(i) * rr - t * 0.06); } g.computeVertexNormals(); const v = new THREE.Mesh(g, veilMat); v.position.x = r.cx; v.renderOrder = 2; const comb = []; for (let k = -2; k <= 2; k++) comb.push(mesh(new THREE.SphereGeometry(0.014, 6, 4), white, r.cx + k * r.rx * 0.22, y0 + 0.008 - Math.abs(k) * 0.004, r.z0 + 0.01 + Math.abs(k) * 0.01)); const gr = new THREE.Group(); gr.add(v, grp(...comb)); return gr; } },
+    // ---- on the chest (Spine) and the waist (Spine02), on their measured surfaces
+    buttonhole: { bone: 'Spine', make: (F) => flower(F, white, 0.5) },
+    corsage: { bone: 'Spine', make: (F) => flower(F, M(0xf2a0b8), 0.5) },
+    camera: { bone: 'Spine', make: (F) => { const p = chestAt(F, 0, -0.1, 0.035); return grp(mesh(new THREE.BoxGeometry(0.12, 0.08, 0.06), black, p.x, p.y, p.z), mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.05, 10), dark, p.x, p.y, p.z + 0.05, Math.PI / 2), ...strap(F, new THREE.Vector3(p.x, p.y + 0.035, p.z - 0.02), 0.05)); } },
+    binoculars: { bone: 'Spine', make: (F) => { const p = chestAt(F, 0, -0.08, 0.04); return grp(mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.1, 8), black, p.x - 0.03, p.y, p.z, 0), mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.1, 8), black, p.x + 0.03, p.y, p.z, 0), ...strap(F, new THREE.Vector3(p.x, p.y + 0.05, p.z - 0.02), 0.04)); } },
+    guitar: { bone: 'Spine', make: (F) => { const p = chestAt(F, -0.3, -0.2, 0.06); return grp(mesh(new THREE.CylinderGeometry(0.17, 0.17, 0.07, 16), M(0x8a5a2a), p.x, p.y, p.z, Math.PI / 2), mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.072, 12), black, p.x, p.y, p.z + 0.001, Math.PI / 2), mesh(new THREE.BoxGeometry(0.05, 0.5, 0.03), M(0x5a3a1a), p.x + 0.2, p.y + 0.2, p.z, 0, 0, -0.9), ...strap(F, new THREE.Vector3(p.x, p.y + 0.15, p.z - 0.04), 0.1)); } },
+    spraytank: { bone: 'Spine', make: (F) => { const C = F.chest, y = C.y - 0.06, z = C.surf(0, y, false) - 0.12; return grp(mesh(new THREE.CylinderGeometry(0.11, 0.11, 0.45, 12), steel, 0, y, z), mesh(new THREE.SphereGeometry(0.11, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2), steel, 0, y + 0.225, z)); } },
+    apron: { bone: 'Spine02', make: (F) => { const W = F.waist, y = W.y - 0.2, s = W.slab, z = Math.max(W.surf(0, W.y - 0.05), s ? s.z1 - 0.01 : -1) + 0.015; return mesh(new THREE.BoxGeometry(Math.max(0.32, s ? s.rx * 1.5 : 0), 0.5, 0.012), white, 0, y, z, 0.08); } },
   };
 }

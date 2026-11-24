@@ -9,7 +9,7 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { CHARACTERS, CREW, phaseList } from '../data/crews.js';
-import { LOOKS, SPECIES, SONGBIRD_TINTS } from '../data/looks.js';
+import { LOOKS, SPECIES, SONGBIRD_TINTS, MODEL_FIT } from '../data/looks.js';
 import { TALK } from '../data/dialogue.js';
 import { ruleMaterial } from '../gfx/load-model.js';
 import { patchMorphArray } from '../gfx/morphs.js';
@@ -183,39 +183,8 @@ export class Characters {
   }
 
   #accessories(c) {
-    const codes = c.look.acc || [];
-    if (!codes.length) return null;
-    const H = headPoint(c.baked);
-    const B = c.baked.bounds.getCenter(new THREE.Vector3());
-    const N = B.clone().lerp(H, 0.62);
-    const u = headUnit(c);
-    // batch-2 (#6): a character's own neck anchor (data/looks.js `neck`: [dx, dy, dz, ring scale] in head units), for
-    // models whose neck isn't where the guess puts it (Fifi's mane, a standing rat)
-    const NK = c.look.neck || null;
-    if (NK) N.add(new THREE.Vector3(NK[0], NK[1], NK[2]).multiplyScalar(u));
-    const K = crownPoint(c.baked, H);   // batch-2 (#6, #14): hats, bows and caps sit on the crown, not at the head point
-    // a hat of inner radius ri (head units) rests this far under the crown (≤ 0, in head units)
-    const sink = (ri) => (seatY(c.baked, K, ri * u) - K.y) / u;
-    // on a model the sizes weren't drawn for, a waistcoat is fitted to the body (fitRing); neck rings take the look's scale
-    const fit = c.ref && c.ref !== c.baked ? (p, R, half) => fitRing(c.baked, p, R, half) : null;
-    const ringK = NK?.[3] || 1, ringTilt = NK?.[4] ?? Math.PI / 2.3, lift = c.look.lift || 0;
-    const parts = [];
-    for (const code of codes) {
-      const [name, col] = code.split(':');
-      for (const p of accessory(name, col, u, H, N, B, c.baked.bounds, K, sink, fit, ringK, ringTilt, lift)) parts.push(p);
-    }
-    if (!parts.length) return null;
-    const geos = parts.map(({ geo, color }) => {
-      const g = geo.index ? geo.toNonIndexed() : geo;
-      g.deleteAttribute('uv');
-      const n = g.attributes.position.count;
-      const cc = new THREE.Color(color);
-      const arr = new Float32Array(n * 3);
-      for (let i = 0; i < n; i++) { arr[i * 3] = cc.r; arr[i * 3 + 1] = cc.g; arr[i * 3 + 2] = cc.b; }
-      g.setAttribute('color', new THREE.BufferAttribute(arr, 3));
-      return g;
-    });
-    const merged = mergeGeometries(geos, false);
+    const merged = accessoryGeometry(c.look, c.baked, c.ref, c.model);
+    if (!merged) return null;
     if (!this.accMat) this.accMat = ruleMaterial({ vertexColors: true });
     const m = new THREE.Mesh(merged, this.accMat);
     m.castShadow = this.shadows;
@@ -368,6 +337,57 @@ function entranceStart(G, kind, to, c) {
   }
 }
 
+/** A named animal's code accessories (data/looks.js) as one merged, vertex-coloured geometry in its model's space, or
+ *  null. look: its LOOKS entry; baked: its model; ref: its species' own model (the head unit's). (Exported for the lineup
+ *  test page, game/test/lineup.html.) */
+export function accessoryGeometry(look, baked, ref = baked, model = null) {
+  const c = { look, baked, ref };
+  const MF = (model && MODEL_FIT[model]) || {};
+  const codes = look.acc || [];
+  if (!codes.length) return null;
+  const H = headPoint(c.baked);
+  const B = c.baked.bounds.getCenter(new THREE.Vector3());
+  const N = B.clone().lerp(H, 0.62);
+  const u = headUnit(c);
+  // batch-2 (#6): a character's own neck anchor (data/looks.js `neck`: [dx, dy, dz, ring scale] in head units), for
+  // models whose neck isn't where the guess puts it (Fifi's mane, a standing rat)
+  // #29: a measured neck (data/looks.js MODEL_FIT: just under the head) replaces the guess; the ring is fitted there
+  const NF = MF.neckY != null ? neckFit(c.baked, MF.neckY, H, u) : null;
+  const NK = NF ? null : c.look.neck || null;
+  if (NK) N.add(new THREE.Vector3(NK[0], NK[1], NK[2]).multiplyScalar(u));
+  if (NF) N.copy(NF.p);
+  const K = crownPoint(c.baked, H);   // batch-2 (#6, #14): hats, bows and caps sit on the crown, not at the head point
+  // a hat of inner radius ri (head units) rests this far under the crown (≤ 0, in head units)
+  const sink = (ri) => (seatY(c.baked, K, ri * u) - K.y) / u;
+  // on a model the sizes weren't drawn for, a waistcoat is fitted to the body (fitRing); neck rings take the look's scale
+  // #29: a waistcoat (and what's held at the side) is fitted to the body on every model (cartoon bodies are rounder than the
+  // head unit guessed: on the pigeons the waistcoat was a sheet out of the back)
+  const fit = (p, R, half) => { const ctr = NF ? NF.p : p, f = slabFit(c.baked, p.y, half, ctr.x, ctr.z, 3.5 * u); return f ? { p: new THREE.Vector3(f.x, p.y, f.z), k: Math.max(0.6, Math.min(2.5, ((f.rx + f.rz) / 2 * 1.04) / R)) } : fitRing(c.baked, p, R, half); };
+  const ringK = NF ? NF.k : NK?.[3] || 1, ringTilt = NK?.[4] ?? Math.PI / 2.3, lift = c.look.lift || 0;
+  const eyes = MF.eyes ? { at: MF.eyes.map((e) => new THREE.Vector3(e[0], e[1], e[2])), n: MF.eyes.map((e) => new THREE.Vector3(e[3], e[4], e[5]).normalize()), r: MF.eyeR, bridge: new THREE.Vector3(...MF.bridge) } : null;
+  const beak = beakTip(c.baked, B);
+  // the top of the model over (x, z) (within r): where a saddle rests
+  const top = (x, z, r) => { const pp = c.baked.geometry.attributes.position; let y = -Infinity; for (let i = 0; i < pp.count; i++) if (Math.hypot(pp.getX(i) - x, pp.getZ(i) - z) < r) y = Math.max(y, pp.getY(i)); return Number.isFinite(y) ? y : B.y; };
+  const vest = (y1, y0) => wrapVest(c.baked, y0, y1, NF ? NF.p : B, 3.5 * u, u);
+  const parts = [];
+  for (const code of codes) {
+    const [name, col] = code.split(':');
+    for (const p of accessory(name, col, u, H, N, B, c.baked.bounds, K, sink, fit, ringK, ringTilt, lift, eyes, beak, vest, top)) parts.push(p);
+  }
+  if (!parts.length) return null;
+  const geos = parts.map(({ geo, color }) => {
+    const g = geo.index ? geo.toNonIndexed() : geo;
+    g.deleteAttribute('uv');
+    const n = g.attributes.position.count;
+    const cc = new THREE.Color(color);
+    const arr = new Float32Array(n * 3);
+    for (let i = 0; i < n; i++) { arr[i * 3] = cc.r; arr[i * 3 + 1] = cc.g; arr[i * 3 + 2] = cc.b; }
+    g.setAttribute('color', new THREE.BufferAttribute(arr, 3));
+    return g;
+  });
+  return mergeGeometries(geos, false);
+}
+
 /** batch-2 (#6): the head unit for this character's model: the species' unit, scaled by the cube root of the model's
  *  bounding-box volume against the species model's (robust to pose: a sitting cat or a standing raccoon keeps its size). */
 function headUnit(c) {
@@ -375,6 +395,93 @@ function headUnit(c) {
   if (!c.ref || c.ref === c.baked) return u;
   const vol = (b) => { const s = b.bounds.getSize(new THREE.Vector3()); return Math.cbrt(s.x * s.y * s.z); };
   return u * vol(c.baked) / vol(c.ref);
+}
+
+/** #29: a horizontal slab of the model at height y (within maxR of (cx, cz)): its centre and half-sizes, from the 5th to
+ *  95th percentiles of x and z (vertex density and a stray wing tip don't pull it about). null when too few vertices. */
+function slabFit(b, y, half, cx, cz, maxR) {
+  const pos = b.geometry.attributes.position, xs = [], zs = [];
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i), z = pos.getZ(i);
+    if (Math.abs(pos.getY(i) - y) < half && Math.hypot(x - cx, z - cz) < maxR) { xs.push(x); zs.push(z); }
+  }
+  if (xs.length < 12) return null;
+  const pc = (a, f) => a[Math.min(a.length - 1, Math.floor(a.length * f))];
+  xs.sort((p, q) => p - q); zs.sort((p, q) => p - q);
+  const x0 = pc(xs, 0.05), x1 = pc(xs, 0.95), z0 = pc(zs, 0.05), z1 = pc(zs, 0.95);
+  return { x: (x0 + x1) / 2, z: (z0 + z1) / 2, rx: (x1 - x0) / 2, rz: (z1 - z0) / 2 };
+}
+
+/** #29: the neck ring at a measured height (MODEL_FIT neckY), within 3 head units of the head point. Returns { p, k }: k is
+ *  the ring scale for the neck pieces (drawn at ~0.95 head units). */
+function neckFit(b, y, H, u) {
+  const f = slabFit(b, y, Math.max(0.006, 0.12 * u), H.x, H.z, 3 * u);
+  if (!f) return { p: new THREE.Vector3(H.x, y, H.z), k: 1 };
+  return { p: new THREE.Vector3(f.x, y, f.z), k: ((f.rx + f.rz) / 2 * 1.06) / (0.95 * u) };
+}
+
+/** #29: the tip of the beak or the nose: the most forward vertex above the body's centre. */
+function beakTip(b, B) {
+  const pos = b.geometry.attributes.position;
+  let best = null;
+  for (let i = 0; i < pos.count; i++) if (pos.getY(i) > B.y && (!best || pos.getZ(i) > best.z)) best = new THREE.Vector3(pos.getX(i), pos.getY(i), pos.getZ(i));
+  return best || B.clone();
+}
+
+/** #29: glasses, a monocle or goggles on the measured eyes (MODEL_FIT): a rim round each eye, facing out along the eye's
+ *  normal; a bridge over the beak or nose; arms back along the head. kind: round | specs | monocle | goggles | goggles-up. */
+function eyewear(kind, E, color, add) {
+  const r = E.r * (kind.startsWith('goggles') ? 1.2 : 1.12), up = new THREE.Vector3(0, 1, 0);
+  const face = E.n[0].clone().add(E.n[1]).setY(0).normalize();
+  let at = E.at, n = E.n;
+  if (kind === 'goggles-up') {   // pushed up on the forehead, looking up and out
+    at = at.map((p) => p.clone().addScaledVector(up, r * 1.9).addScaledVector(face, -r * 0.35));
+    n = n.map((q) => q.clone().lerp(up, 0.55).normalize());
+  }
+  const tube = kind === 'specs' ? 0.07 : kind.startsWith('goggles') ? 0.2 : 0.1;
+  const rim = (p, q) => { const g = new THREE.TorusGeometry(r, r * tube, 6, 20); g.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), q)); const c = p.clone().addScaledVector(q, r * 0.3); g.translate(c.x, c.y, c.z); add(g, color); return c; };
+  const rod = (a, b, w, col = color) => { const d = b.clone().sub(a), g = new THREE.CylinderGeometry(w, w, d.length(), 5); g.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(up, d.clone().normalize())); const m = a.clone().addScaledVector(d, 0.5); g.translate(m.x, m.y, m.z); add(g, col); };
+  const inPlane = (q, v) => v.clone().addScaledVector(q, -v.dot(q)).normalize();
+  if (kind === 'monocle') {
+    const c = rim(at[0], n[0]);
+    rod(c.clone().addScaledVector(up, -r), c.clone().addScaledVector(up, -r * 4).addScaledVector(face, -r * 0.6), r * 0.05);   // its chain
+    return;
+  }
+  const c0 = rim(at[0], n[0]), c1 = rim(at[1], n[1]);
+  const t0 = inPlane(n[0], c1.clone().sub(c0)), t1 = inPlane(n[1], c0.clone().sub(c1));
+  const w = r * tube * 0.8;
+  const br = kind === 'goggles-up' ? c0.clone().lerp(c1, 0.5).addScaledVector(face, r * 0.2) : E.bridge.clone().addScaledVector(face, r * 0.15);
+  rod(c0.clone().addScaledVector(t0, r), br, w); rod(br, c1.clone().addScaledVector(t1, r), w);
+  if (kind === 'goggles-up') {   // lenses (pushed up: they catch the sky)
+    for (const [c, q] of [[c0, n[0]], [c1, n[1]]]) { const g = new THREE.CylinderGeometry(r * 0.92, r * 0.92, r * 0.12, 16); g.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(up, q)); g.translate(c.x, c.y, c.z); add(g, '#9fd6e8'); }
+  }
+  // the arms (or the strap's sides): from each rim's outer edge straight back along the head
+  for (const [c, t] of [[c0, t0], [c1, t1]]) { const o = c.clone().addScaledVector(t, -r * 0.95), back = face.clone().negate().addScaledVector(t.clone().setY(0).normalize(), 0.75).normalize(); rod(o, o.clone().addScaledVector(back, r * (kind.startsWith('goggles') ? 2.4 : 1.8)), w); }
+}
+
+/** #29: a waistcoat shrink-wrapped to the model: rings from y0 up to y1, each the body's slab there (slabFit) a little
+ *  bigger, open down the front (the breast shows), with a thin rim. ctr: the body's axis (the neck's centre). */
+function wrapVest(b, y0, y1, ctr, maxR, u) {
+  const rings = 7, seg = 20, gap = 0.9;   // the opening at the front (radians)
+  const pos = [], idx = [];
+  for (let i = 0; i < rings; i++) {
+    const y = y0 + (y1 - y0) * (i / (rings - 1));
+    const f = slabFit(b, y, Math.max(0.006, 0.15 * u), ctr.x, ctr.z, maxR) || { x: ctr.x, z: ctr.z, rx: u, rz: u };
+    const g = gap * (0.6 + 0.8 * (i / (rings - 1)));   // a V: wider at the top
+    for (let k = 0; k <= seg; k++) {
+      const a = g / 2 + (Math.PI * 2 - g) * (k / seg);
+      pos.push(f.x + Math.sin(a) * f.rx * 1.07, y, f.z + Math.cos(a) * f.rz * 1.07);
+    }
+  }
+  for (let i = 0; i < rings - 1; i++) for (let k = 0; k < seg; k++) { const a = i * (seg + 1) + k, c = a + seg + 1; idx.push(a, c, a + 1, a + 1, c, c + 1); }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setIndex(idx);
+  g.computeVertexNormals();
+  const back = g.clone(); back.setIndex(idx.slice().reverse()); back.computeVertexNormals();   // (seen from inside at the opening)
+  const m = mergeGeometries([g.toNonIndexed(), back.toNonIndexed()], false);
+  m.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array(m.attributes.position.count * 2), 2));
+  return m;
 }
 
 /** batch-2 (#6): a waistcoat round the body at p, on a model the sizes weren't drawn for: the centre and radius of the
@@ -406,9 +513,10 @@ function fitRing(b, p, R, half) {
 // Head-top pieces are placed from the crown: atTop(dx, dy, dz) is at(K, dx, dy - TOP, dz), TOP being where the crown sat
 // above H on the models the sizes were drawn for (0.6 u), so a hat's height above its wearer's head no longer depends on
 // how far headPoint lands under the crown.
-function accessory(name, col, u, H, N, B, bb, K = H, sink = () => 0, fit = null, ringK = 1, ringTilt = Math.PI / 2.3, lift = 0) {
+function accessory(name, col, u, H, N, B, bb, K = H, sink = () => 0, fit = null, ringK = 1, ringTilt = Math.PI / 2.3, lift = 0, eyes = null, beak = null, vest = null, top = null) {
   const out = [];
   const add = (geo, color, p, rx = 0, ry = 0, rz = 0) => { geo.rotateX(rx); geo.rotateY(ry); geo.rotateZ(rz); geo.translate(p.x, p.y, p.z); out.push({ geo, color }); };
+  const addG = (geo, color) => out.push({ geo, color });   // (already placed)
   const at = (base, dx = 0, dy = 0, dz = 0) => new THREE.Vector3(base.x + dx * u, base.y + dy * u, base.z + dz * u);
   const TOP = 0.6;
   const atTop = (dx = 0, dy = 0, dz = 0) => at(K, dx, dy - TOP + lift, dz);   // lift: the look's own raise (Fifi's bow)
@@ -426,59 +534,61 @@ function accessory(name, col, u, H, N, B, bb, K = H, sink = () => 0, fit = null,
     case 'tophat': { const d = sink(0.55); add(cyl(0.55, 0.55, 1.2), '#161616', atTop(0, 1.2 + d, -0.1)); add(cyl(0.9, 0.9, 0.08, 16), '#161616', atTop(0, 0.62 + d, -0.1)); break; }
     case 'tophat-big': { const d = sink(0.7); add(cyl(0.7, 0.7, 1.6), '#161616', atTop(0.2, 1.4 + d, -0.1), 0, 0, 0.35); add(cyl(1.1, 1.1, 0.1, 16), '#161616', atTop(0.05, 0.65 + d, -0.1), 0, 0, 0.35); break; }
     case 'pearls': { const r = ring(N); for (let k = 0; k < 9; k++) { const a = (k / 9) * Math.PI * 2; add(sph(0.16), '#f6f1e6', onRing(r, Math.cos(a) * 0.95, 0, Math.sin(a) * 0.85 + 0.2)); } break; }
-    case 'monocle': add(tor(0.32, 0.05), '#d4a02a', at(H, 0.55, 0.05, 0.55), 0, Math.PI / 2.4, 0); break;
+    // #29: eyewear sits on the measured eyes (MODEL_FIT), or isn't worn
+    case 'monocle': if (eyes) eyewear('monocle', eyes, '#d4a02a', addG); break;
     case 'fascinator': add(cyl(0.05, 0.4, 1.2, 6), '#f08ab8', atTop(0.3, 0.9, -0.2), 0, 0, -0.5); add(sph(0.3), '#f08ab8', atTop(0.25, 0.5, -0.1)); break;
-    case 'gloves': add(sph(0.45), '#ffffff', at(B, 1.3, 0, -0.4)); add(sph(0.45), '#ffffff', at(B, -1.3, 0, -0.4)); break;
+    case 'gloves': break;   // #29: dropped (white balls at a pigeon's sides)
     case 'beret': add(cyl(0.85, 0.7, 0.28, 14), C(col, '#c4302b'), atTop(0.15, 0.62 + sink(0.7), -0.05), 0, 0, 0.25); break;
-    case 'waistcoat': { const r = body(B, 1.3, 0.2, 0.7); add(new THREE.CylinderGeometry(1.25 * u * r.k, 1.35 * u * r.k, 1.4 * u, 12), C(col, '#222222'), onRing(r, 0, 0, 0.15)); break; }
-    case 'bowtie': add(box(0.9, 0.35, 0.2), C(col, '#111111'), at(N, 0, -0.1, 0.95)); break;
-    case 'baton': add(cyl(0.05, 0.05, 2.4, 6), '#f4f0e6', at(B, 1.3, 0.3, 0.6), 0.6, 0, 0.3); break;
+    case 'waistcoat': if (vest) add(vest(N.y - 0.25 * u, N.y - 2.6 * u), C(col, '#222222'), new THREE.Vector3()); break;   // #29: shrink-wrapped to the body, open at the front
+    case 'bowtie': { const r = ring(N); add(box(0.9, 0.35, 0.2), C(col, '#111111'), onRing(r, 0, -0.1, 0.98)); add(box(0.25, 0.25, 0.25), C(col, '#111111'), onRing(r, 0, -0.1, 1.02)); break; }
+    case 'baton': { const r = body(B, 1.3, 0.3, 0.7); add(cyl(0.05, 0.05, 2.4, 6), '#f4f0e6', onRing(r, 1.3, 0, 0.6), 0.6, 0, 0.3); break; }
     case 'plume': add(cyl(0.05, 0.3, 1.4, 6), col || '#f0f0f0', atTop(0.4, 1.2, -0.2), 0, 0, -0.4); break;
-    case 'jabot': add(cyl(0.1, 0.5, 0.6, 8), '#f8f4ea', at(N, 0, -0.35, 0.95)); break;
+    case 'jabot': { const r = ring(N); add(cyl(0.1, 0.5, 0.6, 8), '#f8f4ea', onRing(r, 0, -0.35, 0.98), 0.2); break; }
     case 'sweatband': add(tor(0.62, 0.14), C(col, '#2fa39a'), atTop(0, 0.6 + sink(0.62), -0.05), Math.PI / 2); break;
-    case 'whistle': add(cyl(0.12, 0.12, 0.4, 6), '#c0c4c8', at(N, 0, -0.9, 1.0), Math.PI / 2); add(tor(0.9, 0.04), '#c4302b', at(N, 0, -0.2, 0.2), Math.PI / 2.4); break;
-    case 'stopwatch': add(cyl(0.3, 0.3, 0.12, 12), '#d4a02a', at(N, 0, -0.9, 1.0), Math.PI / 2); break;
-    case 'notepad': add(box(0.7, 0.9, 0.12), '#f4f0e6', at(B, -1.2, 0.1, 0.3)); break;
+    case 'whistle': { const r = ring(N); add(cyl(0.12, 0.12, 0.4, 6), '#c0c4c8', onRing(r, 0, -0.9, 1.0), Math.PI / 2); add(tor(0.9 * r.k, 0.04), '#c4302b', onRing(r, 0, -0.2, 0.2), Math.PI / 2.4); break; }
+    case 'stopwatch': { const r = ring(N); add(cyl(0.3, 0.3, 0.12, 12), '#d4a02a', onRing(r, 0, -0.9, 1.0), Math.PI / 2); add(tor(0.9 * r.k, 0.03), '#222222', onRing(r, 0, -0.2, 0.2), Math.PI / 2.4); break; }
+    case 'notepad': { const r = body(B, 1.3, 0.1, 0.7); add(box(0.7, 0.9, 0.12), '#f4f0e6', onRing(r, -1.2, 0, 0.3)); break; }
     case 'bandana-neck': { const r = ring(N); add(tor(0.95 * r.k, 0.24), C(col, '#c4302b'), onRing(r, 0, 0, 0.15), Math.PI / 2.2); add(cyl(0.05, 0.45, 0.6, 3), C(col, '#c4302b'), onRing(r, 0, -0.35, 0.95), Math.PI); break; }
     case 'bandana-head': add(sph(0.62), C(col, '#1d1d1d'), atTop(0, 0.32, -0.05)); break;
-    case 'glasses-round': add(tor(0.26, 0.04), '#2a2a2a', at(H, 0.3, 0.05, 0.7)); add(tor(0.26, 0.04), '#2a2a2a', at(H, -0.3, 0.05, 0.7)); break;
-    case 'spectacles': add(tor(0.24, 0.035), '#d4a02a', at(H, 0.28, 0.05, 0.65)); add(tor(0.24, 0.035), '#d4a02a', at(H, -0.28, 0.05, 0.65)); break;
-    case 'pencil': add(cyl(0.06, 0.06, 1.2, 6), '#e8c23d', at(H, 0.6, 0.4, -0.2), 0, 0, 1.2); break;
+    case 'glasses-round': if (eyes) eyewear('round', eyes, '#2a2a2a', addG); break;
+    case 'spectacles': if (eyes) eyewear('specs', eyes, '#d4a02a', addG); break;
+    case 'pencil': { const p = eyes ? eyes.at[1].clone().add(new THREE.Vector3(eyes.r * 0.6, eyes.r * 2.2, -eyes.r * 1.6)) : at(H, 0.6, 0.4, -0.2); add(cyl(0.06, 0.06, 1.2, 6), '#e8c23d', p, 0.3, 0, 1.2); break; }   // #29: tucked behind the ear
     case 'stick': add(cyl(0.08, 0.08, (bb.max.y - bb.min.y) / u * 0.9, 6), '#6b4a2a', new THREE.Vector3(B.x + 1.5 * u, (bb.max.y + bb.min.y) / 2 * 0.9, B.z + 1.2 * u)); break;
     case 'cap-captain': { const d = sink(0.7); add(cyl(0.7, 0.7, 0.4, 14), '#f4f0e6', atTop(0, 0.55 + d, -0.05)); add(box(1.1, 0.06, 0.7), '#1a2440', atTop(0, 0.36 + d, 0.45)); add(cyl(0.72, 0.72, 0.12, 14), '#1a2440', atTop(0, 0.4 + d, -0.05)); break; }
     case 'cap-sailor': add(cyl(0.65, 0.6, 0.35, 14), '#ffffff', atTop(0, 0.55 + sink(0.6), -0.05)); break;
-    case 'goggles': add(tor(0.3, 0.08), C(col, '#3aa0d8'), atTop(0.3, 0.45, 0.4)); add(tor(0.3, 0.08), C(col, '#3aa0d8'), atTop(-0.3, 0.45, 0.4)); add(tor(0.75, 0.05), '#333333', atTop(0, 0.45, 0), Math.PI / 2); break;
+    case 'goggles': if (eyes) eyewear('goggles', eyes, C(col, '#3aa0d8'), addG); break;
+    case 'goggles-up': if (eyes) eyewear('goggles-up', eyes, C(col, '#5a4a2a'), addG); break;
     case 'pendant': { const r = ring(N); add(tor(0.9 * r.k, 0.03), '#d4a02a', onRing(r, 0, 0, 0.2), Math.PI / 2.3); add(sph(0.25), '#5ad0e8', onRing(r, 0, -0.8, 0.95)); break; }
-    case 'scarf-plaid': add(tor(0.95, 0.28), '#8e2c2c', at(N, 0, 0, 0.15), Math.PI / 2.2); add(box(0.4, 1.2, 0.12), '#2a5a3a', at(N, 0.3, -0.8, 0.9)); break;
-    case 'book': add(box(0.9, 1.1, 0.25), '#5a3a2a', at(B, -1.4, 0, 0)); break;
-    case 'bottlecaps': for (let k = 0; k < 7; k++) { const a = (k / 7) * Math.PI * 2; add(cyl(0.2, 0.2, 0.06, 8), '#2a6ad8', at(N, Math.cos(a) * 1.0, -0.1, Math.sin(a) * 0.9 + 0.2), Math.PI / 2); } break;
-    case 'spyglass': add(cyl(0.12, 0.18, 1.4, 8), '#d4a02a', at(B, 1.3, 0.2, 0.3), Math.PI / 2.5); break;
+    case 'scarf-plaid': { const r = ring(N); add(tor(0.95 * r.k, 0.28), '#8e2c2c', onRing(r, 0, 0, 0.1), Math.PI / 2.2); add(box(0.4, 1.2, 0.12), '#2a5a3a', onRing(r, 0.3, -0.8, 0.95)); break; }
+    case 'book': { const r = body(B, 1.3, 0, 0.7); add(box(0.25, 1.1, 0.9), '#5a3a2a', onRing(r, -1.35, 0, 0)); break; }
+    case 'bottlecaps': { const r = ring(N); for (let k = 0; k < 7; k++) { const a = (k / 7) * Math.PI * 2; add(cyl(0.2, 0.2, 0.06, 8), '#2a6ad8', onRing(r, Math.cos(a) * 1.0, -0.1, Math.sin(a) * 0.9 + 0.1), Math.PI / 2); } break; }
+    case 'spyglass': { const r = body(B, 1.3, 0.2, 0.7); add(cyl(0.12, 0.18, 1.4, 8), '#d4a02a', onRing(r, 1.3, 0, 0.3), Math.PI / 2.5); break; }
     case 'moss': add(sph(1.6).scale(1, 0.35, 1), '#5a8a3a', at(B, 0, 1.2, -0.3)); break;
     case 'mushroom': add(cyl(0.12, 0.12, 0.4, 6), '#f4f0e6', at(B, 0.6, 1.9, -0.3)); add(sph(0.35).scale(1, 0.5, 1), '#c4302b', at(B, 0.6, 2.15, -0.3)); break;
     case 'daisy': add(cyl(0.6, 0.6, 0.06, 10), '#ffffff', at(B, 0, 1.75, -0.2)); add(sph(0.22), '#e8c23d', at(B, 0, 1.8, -0.2)); break;
     case 'ear-stripe': add(box(0.12, 0.25, 0.6), '#c4302b', at(H, 0.55, 0, -0.1)); add(box(0.12, 0.25, 0.6), '#c4302b', at(H, -0.55, 0, -0.1)); break;
     case 'apron': add(box(1.4, 1.6, 0.1), C(col, '#6b4a2a'), at(B, 0, 0, 1.1)); break;
-    case 'wrench': add(box(0.18, 2.0, 0.1), '#8a9098', at(B, 1.3, 0.2, 0.5), 0, 0, 0.5); break;
-    case 'aviator': add(sph(0.75).scale(1, 0.75, 1.05), '#6b4a2a', atTop(0, 0.25, -0.1)); add(tor(0.25, 0.07), '#c0c4c8', atTop(0.3, 0.5, 0.45)); add(tor(0.25, 0.07), '#c0c4c8', atTop(-0.3, 0.5, 0.45)); break;
-    case 'scarf-long': add(tor(0.95, 0.25), C(col, '#c4302b'), at(N, 0, 0, 0.1), Math.PI / 2.2); add(box(0.4, 0.15, 2.4), C(col, '#c4302b'), at(N, 0.4, -0.2, -1.6), 0.2); break;
+    case 'wrench': { const r = body(B, 1.3, 0.2, 0.7); add(box(0.18, 2.0, 0.1), '#8a9098', onRing(r, 1.3, 0, 0.5), 0, 0, 0.5); break; }
+    case 'aviator': add(sph(0.75).scale(1, 0.75, 1.05), '#6b4a2a', atTop(0, 0.25, -0.1)); if (eyes) eyewear('goggles-up', eyes, '#c0c4c8', addG); break;
+    case 'scarf-long': { const r = ring(N); add(tor(0.95 * r.k, 0.25), C(col, '#c4302b'), onRing(r, 0, 0, 0.1), Math.PI / 2.2); add(box(0.4, 0.15, 2.4), C(col, '#c4302b'), onRing(r, 0.4, -0.2, -1.6), 0.2); break; }
     case 'headscarf': add(sph(0.7).scale(1, 0.7, 1.1), C(col, '#c4302b'), atTop(0, 0.3, -0.15)); break;
-    case 'spoon': add(cyl(0.06, 0.06, 1.8, 6), '#c8a070', at(B, 1.3, 0.4, 0.5), 0, 0, 0.3); add(sph(0.25).scale(1, 0.4, 1.3), '#c8a070', at(B, 1.55, 1.3, 0.5)); break;
+    case 'spoon': { const r = body(B, 1.3, 0.4, 0.7); add(cyl(0.06, 0.06, 1.8, 6), '#c8a070', onRing(r, 1.3, 0, 0.5), 0, 0, 0.3); add(sph(0.25).scale(1, 0.4, 1.3), '#c8a070', onRing(r, 1.55, 0.9, 0.5)); break; }
     case 'token': { const r = ring(N); add(tor(0.9 * r.k, 0.03), '#5a3a2a', onRing(r, 0, 0, 0.2), Math.PI / 2.3); add(cyl(0.25, 0.25, 0.05, 12), '#d4a02a', onRing(r, 0, -0.8, 1.0), Math.PI / 2); break; }
     case 'cap-conductor': { const d = sink(0.65); add(cyl(0.7, 0.65, 0.45, 14), '#3a3060', atTop(0, 0.55 + d, -0.05)); add(box(0.9, 0.06, 0.5), '#1a1530', atTop(0, 0.35 + d, 0.45)); break; }
     case 'pocketwatch': add(cyl(0.22, 0.22, 0.08, 12), '#d4a02a', at(B, 0.4, 0.3, 1.05), Math.PI / 2); break;
-    case 'tie': add(box(0.3, 1.1, 0.06), C(col, '#c4302b'), at(N, 0, -0.7, 0.95)); break;
-    case 'crust': add(box(0.3, 1.0, 0.25), '#c9823e', at(B, 1.1, 0.3, 0.6), 0, 0, 0.4); break;
+    case 'tie': { const r = ring(N); add(box(0.3, 1.1, 0.06), C(col, '#c4302b'), onRing(r, 0, -0.7, 0.98)); break; }
+    case 'crust': { const r = body(B, 1.3, 0.3, 0.7); add(box(0.3, 1.0, 0.25), '#c9823e', onRing(r, 1.1, 0, 0.6), 0, 0, 0.4); break; }
     case 'collar': { const r = ring(N); add(tor(0.9 * r.k, 0.12), C(col, '#c4302b'), onRing(r, 0, 0, 0.1), ringTilt); add(cyl(0.18, 0.18, 0.05, 10), '#d4a02a', onRing(r, 0, -0.8, 0.85), Math.PI / 2); break; }
     case 'bow': add(box(0.9, 0.4, 0.2), C(col, '#e87aa8'), atTop(0, 0.55, -0.2)); break;
     case 'mortarboard': { const d = 0; /* the board rests on the crown, whatever the head's shape */ add(box(1.5, 0.08, 1.5), '#161616', atTop(0, 0.7 + d, -0.1)); add(cyl(0.55, 0.55, 0.3, 10), '#161616', atTop(0, 0.52 + d, -0.1)); break; }
     case 'collar-bell': { const r = ring(N); add(tor(0.9 * r.k, 0.1), '#c4302b', onRing(r, 0, 0, 0.1), Math.PI / 2.3); add(sph(0.22), '#d4a02a', onRing(r, 0, -0.8, 0.85)); break; }
     case 'bread': add(sph(1.6).scale(1.6, 0.6, 0.9), '#d9a46a', new THREE.Vector3(B.x, bb.min.y - 0.6 * u, B.z)); break;
-    case 'shawl': add(tor(1.05, 0.4), '#b07ab0', at(N, 0, -0.2, 0.1), Math.PI / 2.1); break;
+    case 'shawl': { const r = ring(N); add(tor(1.05 * r.k, 0.4), '#b07ab0', onRing(r, 0, -0.4, 0.1), Math.PI / 2.1); break; }
     case 'cushion': add(box(4, 0.6, 4), '#8e2c4c', new THREE.Vector3(B.x, bb.min.y - 0.3 * u, B.z)); break;
-    case 'saddle': add(box(2.2, 0.5, 2.8), '#5a3a2a', at(B, 0, 1.6, -0.6)); add(box(2.6, 0.12, 3.4), '#1a2440', at(B, 0, 1.35, -0.6)); break;
+    case 'saddle': { const z = B.z - 0.6 * u, y = top ? top(B.x, z, 0.6 * u) : B.y + 1.6 * u; add(box(2.2, 0.5, 2.8), '#5a3a2a', new THREE.Vector3(B.x, y + 0.15 * u, z)); add(box(2.6, 0.12, 3.4), '#1a2440', new THREE.Vector3(B.x, y - 0.02 * u, z)); break; }   // #29: on the back
     case 'crest': add(new THREE.ConeGeometry(0.35 * u, 1.2 * u, 6), C(col, '#3a70d0'), atTop(0, 0.75, -0.3), -0.5); break;
-    case 'scroll': add(cyl(0.15, 0.15, 1.2, 8), '#f4ead0', at(B, 1.1, 0, 0.4), 0, 0, Math.PI / 2); break;
-    case 'crumb': add(sph(0.3), '#d9b07a', at(H, 0, -0.3, 1.0)); break;
+    case 'scroll': { const r = body(B, 1.3, 0, 0.7); add(cyl(0.15, 0.15, 1.2, 8), '#f4ead0', onRing(r, 1.1, 0, 0.4), 0, 0, Math.PI / 2); break; }
+    case 'crumb': add(sph(0.3), '#d9b07a', beak ? new THREE.Vector3(beak.x, beak.y - 0.1 * u, beak.z + 0.1 * u) : at(H, 0, -0.3, 1.0)); break;   // #29: in the beak
     case 'cap-peaked': { const d = sink(0.7); add(cyl(0.7, 0.7, 0.35, 14), '#161616', atTop(0, 0.5 + d, -0.05)); add(box(1.0, 0.06, 0.6), '#161616', atTop(0, 0.35 + d, 0.5)); break; }
     // photo mode (#9): Flicker's film canister on a red cord (black body, yellow band, grey cap)
     case 'canister': { const r = ring(N); add(tor(0.9 * r.k, 0.035), '#c4302b', onRing(r, 0, 0, 0.2), Math.PI / 2.3); const c = onRing(r, 0, -0.95, 1.0); add(cyl(0.22, 0.22, 0.55, 10), '#1d1d1f', c); add(cyl(0.225, 0.225, 0.2, 10), '#e8c23d', c); add(cyl(0.16, 0.16, 0.12, 8), '#9a9ea4', new THREE.Vector3(c.x, c.y + 0.32 * u, c.z)); break; }
