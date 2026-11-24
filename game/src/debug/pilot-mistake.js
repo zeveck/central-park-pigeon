@@ -118,8 +118,12 @@ function handler(P, g, s, out, dt) {
     const t = s.tgt, dx = t.x - v.x, dz = t.z - v.z;
     out.stick.x = clamp(wrap(Math.atan2(dx, dz) - v.yaw) * 2.4);
     out.stick.y = g.slow ?? 1;
-    if (Math.abs(v.speed) < 0.1 && s.t > 2) s.stuck = (s.stuck || 0) + dt; else s.stuck = 0;
-    return s.stuck >= (g.secs ?? 3) || Math.hypot(dx, dz) < 1.5;
+    // stuck = moved < 0.3 m over the last 2 s (round 2: against the rink boards the speed jitters ±0.3 with the stick held, so a
+    // speed test never fired, the goal timed out and the mistake's exit never ran)
+    s.hist = s.hist || []; s.hist.push({ t: s.t, x: v.x, z: v.z }); while (s.hist.length && s.hist[0].t < s.t - 2) s.hist.shift();
+    const h0 = s.hist[0], moved = h0 ? Math.hypot(v.x - h0.x, v.z - h0.z) : Infinity;
+    if (s.t > 2.5 && moved < 0.3) s.stuck = (s.stuck || 0) + dt; else s.stuck = 0;
+    return s.stuck >= Math.max(0.5, (g.secs ?? 3) - 2) || Math.hypot(dx, dz) < 1.5;
   }
   if (g.msDrivePath) {
     if (!s.pts) {

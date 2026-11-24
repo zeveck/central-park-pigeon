@@ -141,7 +141,10 @@ const I = {
   loseRace: (times = 1) => ({
     name: times > 1 ? 'lose the race twice' : 'lose the race', route: 'input',
     build: () => {
-      const one = [{ msHover: { x: RACE.start.x - 20, z: RACE.start.z - 25 }, alt: 6, until: (G) => !G.race.run, timeout: 300 }, idle()];
+      // the race doesn't end when Coach gets home ('Finish anyway!'): wait for him, then leave the course (> 175 m from its
+      // centre, race.js), which is a loss (round 2: hovering 'until the race ends' never lost one)
+      const one = [{ msHover: { x: RACE.start.x - 20, z: RACE.start.z - 25 }, alt: 6, until: (G) => !G.race.run || G.race.run.coachDone, timeout: 300 },
+        { msHover: { x: 0, z: 470 }, alt: 10, until: (G) => !G.race.run, timeout: 120 }, idle()];
       const again = [{ sfLandNear: { x: 4, z: 563.6 }, alt: 6, r: 1.8, timeout: 90 }, { peck: 'race-start' }, { msUntil: (G) => G.race.run?.t > 0, timeout: 20 }, ...one];
       return times > 1 ? [...one, ...again] : one;
     },
@@ -549,6 +552,7 @@ export async function install() {
       const makes = (g) => ['ask', 'peck', 'call', 'waitEvent', 'msTalk', 'sfTalk', 'talk'].some((k) => g[k] != null);
       const target = (g) => g && (g.landNear || g.walkTo || g.flyTo3 || g.sfLandNear);
       const spentClue = (g) => (typeof g.peck === 'string' && g.peck.startsWith('clue:') && flags['clue.' + g.peck.slice(5)] ? g.peck.slice(5) : null)
+        || (typeof g.peck === 'string' && g.peck.startsWith('sign:') && G.signs.live(g.peck.slice(5)) ? g.peck : null)   // (round 3: a sign already flipped isn't a peck target)
         || (g.waitEvent === 'talent' && g.match?.clue && flags['clue.' + g.match.clue] ? g.match.clue : null);
       const lying = (item, at) => at && G.items.world.some((w) => fitsItem(item, w.id) && Math.hypot(w.x - at.x, w.z - at.z) < 12);
       let start = 0;
@@ -562,10 +566,10 @@ export async function install() {
             if (k >= start) { kept.length = k; while (kept.length > start && isMove(kept[kept.length - 1])) at = target(kept.pop()) || at; }
           } else while (kept.length > start && isMove(kept[kept.length - 1])) at = target(kept.pop()) || at;   // a Peck: its moves
           how.push(`skip spent ${sc}`);
-          if (g.waitEvent && seg[i + 1]?.pickItem && !fitsItem(seg[i + 1].pickItem, s.carried?.id) && !lying(seg[i + 1].pickItem, at)) i++;   // its item, gone
+          if (g.waitEvent && seg[i + 1]?.pickItem && !lying(seg[i + 1].pickItem, at)) i++;   // its item, gone (carried or not: a pick where none lies is pointless)
           continue;
         }
-        if (g.pickItem && kept.length > start && isMove(kept[kept.length - 1]) && !kept.slice(start).some(makes) && !fitsItem(g.pickItem, s.carried?.id)) {
+        if (g.pickItem && kept.length > start && isMove(kept[kept.length - 1]) && !kept.slice(start).some(makes)) {   // (round 2: not only when empty-beaked)
           const at = target(kept[kept.length - 1]);
           if (at && !lying(g.pickItem, at)) {
             while (kept.length > start && isMove(kept[kept.length - 1])) kept.pop();

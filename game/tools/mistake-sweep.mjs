@@ -198,8 +198,11 @@ export async function runMistake(page, args, { errors = [] } = {}) {
       await page.evaluate(() => window.__ms.stop());
       // with the autopilot on an idle goal: it presses through a dialogue the step's end opens (round 1: the auto part-eyes
       // scene, the geese truce), as a player would; a stopped autopilot left them open and they read as leftovers
-      await page.evaluate(() => window.__ms.start([{ sfIdle: true, frames: 60, timeout: 60, fightOk: true }], 70));
+      // (round 2: and a menu the step's end opens, e.g. the Board after the Prologue, closed as a player would: an open menu pauses
+      // the game, so a polaroid's hide timer waited behind it and read as a leftover)
+      await page.evaluate(() => window.__ms.start([{ closeMenus: true, timeout: 10 }, { sfIdle: true, frames: 60, timeout: 60, fightOk: true }], 70));
       for (let k = 0; k < 15; k++) { const r = await page.evaluate(() => window.__ms.run('idle', 4, false)); if (r.hit) break; }
+      for (let k = 0; k < 5 && (await page.evaluate(() => !!window.__sfG.menus.open)); k++) await page.evaluate(() => window.__ms.run('idle', 2, false));
       await page.evaluate(() => window.__ms.stop());
       // timed overlays (a join's polaroid closes 3.5 s after it opens) get up to 12 s more; one still up after that is stuck
       // (plain game steps: __ms.run('idle') returns at once when the park is already idle)
