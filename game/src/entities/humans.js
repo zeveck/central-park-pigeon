@@ -46,7 +46,7 @@ const MODELS = ['human-park', 'human-ranger', 'human-vendor', 'human-prickett', 
   'human-photographer', 'human-delivery', 'human-dog-sitter'];
 // accessories a model already wears (modelled), so a role's code accessory is skipped on it
 export const MODEL_HAS = { 'human-vendor': ['paperhat'], 'human-walter': ['capbraid'], 'human-tourist': ['camera'], 'human-birder': ['binoculars'], 'human-businessperson': ['phone'], 'human-halal-cart-man': ['paperhat'], 'human-pizza-counterman': ['paperhat'],
-  'human-construction': ['hardhat'], 'human-cyclist': ['helmet'], 'human-painter': ['beret'] };   // #46
+  'human-construction': ['hardhat'], 'human-cyclist': ['helmet'], 'human-painter': ['beret'], 'human-photographer': ['camera'] };   // #46
 // a missing one-shot clip → the nearest this model has
 const CLIP_ALT = { throw: ['pickup', 'wave', 'call', 'cheer'], pickup: ['throw', 'wave'], cheer: ['wave', 'jump', 'argue', 'call'], scold: ['argue', 'shrug', 'call'], taunt: ['wave', 'gawk', 'call', 'shrug'], wave: ['call', 'cheer', 'bow'], attack: ['scold', 'argue'], stomp: ['scold', 'argue'] };
 const LOOPS = new Set(['idle', 'walk', 'run', 'sit', 'jog', 'balance', 'scan-walk', 'phone-walk', 'phone', 'cook', 'look', 'think', 'catch-breath', 'sway', 'taichi']);   // #46: sway, taichi
