@@ -13,24 +13,28 @@ anchovy only where the anchovy is). When Gus isn't carrying one that fits:
 |---|---|
 | Carrying it, usable | the delivery target (unchanged) |
 | Carrying a cold slice the step needs hot | the halal griddle (unchanged, fix-19 `coldSlice()`) |
-| Lying within reach, hot or cold | the item (the nearest copy) |
 | Lying within 3 m of the step's target | stay on the target |
+| Lying within reach (hot or cold), or a live source | the nearest of them, ranked together by distance: the item; someone holding one (the slice tourists); a Slice Line with a slice waiting. A cold slice lying, where a hot one is wanted, counts 150 m further (`COLD_EXTRA`: it still needs the griddle) |
 | An ally is fetching it (`clues.fetching`, < 30 s) | the step's own target |
-| Out of reach (on the water) or gone, with an item-keeper rule | the keeper's spot (the place its toast names) |
-| Gone, no keeper rule | a live source: someone holding one (the slice tourists), a Slice Line with a slice waiting; else where an earlier step of the scheme had Gus pick it up (Pickles for the anchovy) |
+| Out of reach (on the water) or gone, with an item-keeper rule | the keeper's spot, named "The peas: back at the Boathouse picnic table" |
+| Gone, nothing else | where an earlier step of the scheme had Gus pick it up (Pickles for the anchovy) |
 
 Not counted as "lying": a different item, one still guarded (Pickles' sill, the picnickers' tub: `items.guardReason(it,
 true)`, no side effects), a huge one. Items not yet obtainable (the shelf box before the Knock, a grate's key) aren't in
 `items.world`, so they never show.
 
 Spoiler guard: an item Gus has never had on this step (and no earlier step picked it up, no keeper rule) keeps the step's
-own target, so a glint on a roof (den-crows' shiny) isn't pointed out. Slices and boxes (the pizza economy) always count.
+own target. Slices and boxes (the pizza economy) always count. Review fix: a lying item Gus has never moved (still within
+0.5 m of where it was found, or still a live clue's own item and not put down by Gus) isn't pointed at unless it's a
+slice, a box or a keeper item, so the roof glints (den-crows s2's CPW-72 shiny, gear-sunglasses' Plaza shiny) stay the
+puzzle even after Gus has carried some other shiny. On a step where one route needs no item (den-raccoons s2, part-body
+s1, den-meermob s2), the item target shows only once Gus has had that item on the step.
 What Gus has carried on each step is kept in the save (`state.had`, 'scheme.sN' → item ids; noted on every pickup and
 every half second).
 
 When every route of a step needs the item, the item target replaces the delivery target; when one route needs none (an
-alternative), it's added beside it and the guide picks the nearer. The "Where to?" line names the item target
-(`ui/guide.js`). `systems/slices.js` gained `waitingDrops()` (the Slice Lines with a slice waiting).
+alternative), it's added beside it and the guide picks the nearer. The "Where to?" line names the item target, and the
+guide's suggestion says "<the step's place>. First: the peas (40 m S)." when the distance is to the item (`ui/guide.js`). `systems/slices.js` gained `waitingDrops()` (the Slice Lines with a slice waiting).
 
 A visible change beyond the issue's cases: on a step that needs a slice, before Gus has one, the compass now points at the
 nearest slice to be had (one lying, a tourist holding one, a Slice Line) instead of the step's place; the goal card still
@@ -54,7 +58,16 @@ whole-game). No autopilot or goal script steers by it, so no closed-loop records
   carried it), so slices and boxes were made to always count; the re-run is clean.
   Not re-run: the round-2 "compass not at" notes on truce-cats-rats.s3 W (box) and truce-dogs-squirrels.s3 W (tennis-sack)
   and meermob alt Q; the rule covers them (boxes always count; the sack has a keeper rule).
-- Screenshots, one per row (compass + map): design/screenshots/fix-42/ in the fix-9 worktree (`<row>-compass.png`, `<row>-map.png`; design/screenshots/ is gitignored, so they stay local).
+- Review fixes, state level (node, `SchemeEngine.targets()` on a stub world, scratchpad t42.mjs): den-crows s2 with a
+  shiny had and the roof glint unmoved → Vesper (a shiny Gus dropped 30 m off → the shiny); gear-sunglasses s2 with the
+  Plaza glint unmoved → Grand Army Plaza (the earlier step's place), not the roof; den-rats s3: cold slice 400 m vs Slice
+  Line 20 m → the Line; cold 20 m vs Line 100 m → the Line; hot 120 m vs Line 100 m → the Line; cold 20 m alone → the
+  slice; den-rhoda s3 tourist holding 200 m vs cold slice 60 m → the tourist; den-raccoons s2 slice lying, never had →
+  nothing added, had → the slice; den-ducks s3 peas gone or on the water → "The peas: back at the Boathouse picnic
+  table"; the five sweep moments unchanged (peas, wrench, bench anchovy, 110th slice, ball → the item; wrench 1.95 m from
+  Rigby → Rigby; peas carried → Commodore Puddles).
+  Browser re-run of the two slice cases (rhoda C, meermob alt C: the only sweep cases the ranking change could touch; ducks, raccoons and biscuit items are keeper items with no live sources): PENDING (heavy lock busy).
+- Screenshots (first commit), one per row (compass + map): design/screenshots/fix-42/ in the fix-9 worktree (`<row>-compass.png`, `<row>-map.png`; design/screenshots/ is gitignored, so they stay local).
   1-carried (den-ducks s3, peas carried → Commodore Puddles) · 2-cold (den-rats s3, cold slice → Subway Sue + the halal
   griddle) · 3-dropped (den-raccoons s3, wrench dropped → the wrench) · 3b-dropped-cold (den-rhoda s3, cold slice dropped
   → the slice) · 4-out-of-reach (den-ducks s3, peas on the Lake, keeper held for the shot → the Boathouse picnic table;

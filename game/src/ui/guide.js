@@ -212,7 +212,9 @@ export class Guide {
       const b = now[0], ph = b.step.needs?.phase || b.step.alts?.[0]?.needs?.phase;
       const limited = ph && phaseList(ph).length <= 2;
       const far = b.pos && b.d >= 12 ? ` (${this.distText(b.pos)})` : '';
-      return { id: b.id, title: title(b.id), text: `${where(b.step)}${far}.${limited ? ` ${PHASE_LABEL[st.phase]} is the time for it.` : ''}` };
+      // #42 review: the distance is to the item when the compass is on it: say so (it was "…out on the Lake (12 m)" with the 12 m to the peas)
+      const first = b.pos?.item ? `. First: ${/^(The|Someone) /.test(b.pos.label) ? b.pos.label[0].toLowerCase() + b.pos.label.slice(1) : b.pos.label}` : '';
+      return { id: b.id, title: title(b.id), text: `${where(b.step)}${first}${far}.${limited ? ` ${PHASE_LABEL[st.phase]} is the time for it.` : ''}` };
     }
     nap.sort((a, b) => a.score - b.score);
     if (nap.length) {

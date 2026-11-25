@@ -28,6 +28,8 @@ const NUDGE_AFTER = 180;   // game seconds on one step
 const NEAR = 80, AFTER_FAIL = 60;
 // #42: an item put down within BESIDE m of the step's target keeps the compass on the target
 const BESIDE = 3;
+// #42 review: a cold slice lying about, where a hot one is wanted, ranks as this many metres further than it is (griddle trip)
+const COLD_EXTRA = 150;
 /** Does this item id fit what a step wants (needsReason's rule: any slice will do where a plain one is wanted)? */
 const fitsWant = (want, id) => !!id && (id === want || (want === 'slice' && id.startsWith('slice')));
 
@@ -567,37 +569,47 @@ export class SchemeEngine {
   }
 
   /** #42: the compass target for the step's item when Gus isn't carrying one that fits, or null (the step's own targets):
-   *    lying within reach (hot or cold)   the item (the nearest; once picked up cold, the griddle rule takes over)
    *    lying within BESIDE m of a target  null (put down right by whoever it's for: stay on them)
+   *    lying within reach (hot or cold),  the nearest of these (a cold slice where a hot one is wanted counts COLD_EXTRA m
+   *    or a live source                   further): the item; someone holding one; a Slice Line with one waiting
    *    an ally is fetching it             null
-   *    out of reach (water) or gone       where the item keeper puts it back (its toast's place)
-   *    gone, no keeper                    a live source (someone holding one, a Slice Line with one waiting), else where
-   *                                       an earlier step had Gus pick it up
+   *    out of reach (water) or gone       where the item keeper puts it back ("The peas: back at …")
+   *    else                               where an earlier step had Gus pick it up
    *  Not counted: a different item (a plain slice where the anchovy is wanted), one still guarded (Pickles' sill, the
-   *  picnickers' tub), a huge one (haulers move those). */
+   *  picnickers' tub), a huge one (haulers move those), one Gus has never moved (a glint's shiny, unless keeper/economy).
+   *  On a step where one route needs no item, only an item Gus has had on this step. */
   #itemTarget(id, step, base) {
     const G = this.G, c = this.st.carried;
-    const need = this.#wants(step).filter(Boolean);
+    const wants = this.#wants(step), need = wants.filter(Boolean);
     if (!need.length || (c && need.some((w) => fitsWant(w.item, c.id)))) return null;   // carried: the target (or, cold, the griddle)
-    const known = need.filter((w) => this.#known(id, w));
+    // review: where one route needs no item (den-raccoons s2, part-body s1, den-meermob s2), only an item Gus has had on this
+    // step (else every alt step with a slice bribe would point at the nearest slice from the start)
+    const had = this.had[`${id}.s${this.stepIndex(id) + 1}`] || [];
+    const known = need.filter((w) => this.#known(id, w) && (wants.every(Boolean) || had.some((q) => fitsWant(w.item, q))));
     if (!known.length) return null;
     const fits = (wid) => known.some((w) => fitsWant(w.item, wid));
     const d = (a, b) => Math.hypot(a.x - b.x, a.z - b.z), g = G.gus.position;
-    const nearest = (ps) => ps.sort((a, b) => d(a, g) - d(b, g))[0];
     const tgt = (p, label, item, dy = 1.5) => ({ x: p.x, z: p.z, y: (p.y ?? G.terrain.heightAt(p.x, p.z)) + dy, icon: 'target', label, item });
-    const lying = G.items.world.filter((w) => fits(w.id) && !w.sill && G.items.def(w.id).cls !== 'huge' && !G.items.guardReason(w, true));
+    // review: an item Gus has never moved (still where it was found, or still a live clue's own item) isn't pointed out unless
+    // it's the economy or the keeper's: a glint's shiny on a roof stays the puzzle even once he's carried some other shiny
+    const clueItem = (w) => !w.placed && G.clues?.list?.some((q) => q.active && q.itemUid === w.uid);
+    const unmoved = (w) => !this.keeperRule(w.id) && !G.items.def(w.id).slice && w.id !== 'box' && ((w.origin && d(w, w.origin) < 0.5) || clueItem(w));
+    const lying = G.items.world.filter((w) => fits(w.id) && !w.sill && G.items.def(w.id).cls !== 'huge' && !G.items.guardReason(w, true) && !unmoved(w));
     if (lying.some((w) => base.some((t) => d(t, w) <= BESIDE))) return null;
-    const dry = lying.filter((w) => !G.wetAt(w.x, w.z, w.y ?? 400));
-    if (dry.length) { const w = nearest(dry); return tgt(w, theItem(G.items.def(w.id).name, true), w.id, 0.9); }
+    const name = (id) => G.items.def(id).name;
+    // review: lying items and live sources ranked together by distance; a cold slice where a hot one is wanted counts as
+    // COLD_EXTRA m further (it still needs the griddle)
+    const hotOnly = (wid) => known.filter((w) => fitsWant(w.item, wid)).every((w) => w.hot);
+    const cands = [];
+    for (const w of lying) if (!G.wetAt(w.x, w.z, w.y ?? 400)) cands.push({ p: w, cost: d(w, g) + (G.items.def(w.id).slice && !G.items.isHot(w) && hotOnly(w.id) ? COLD_EXTRA : 0), label: theItem(name(w.id), true), item: w.id, dy: 0.9 });
+    for (const a of G.humans?.agents || []) if (a.out && a.holds && fits(a.holds)) cands.push({ p: a, cost: d(a, g), label: `Someone with ${theItem(name(a.holds)).replace(/^the ([aeiou])?/, (m, v) => (v ? 'an ' + v : 'a '))}`, item: a.holds, dy: 1.9 });
+    if (fits('slice')) for (const L of G.slices?.waitingDrops?.() || []) cands.push({ p: L, cost: d(L, g), label: L.label, item: 'slice', dy: 1.9 });
+    if (cands.length) { const b = cands.sort((x, y) => x.cost - y.cost)[0]; return tgt(b.p, b.label, b.item, b.dy); }
     if (known.some((w) => { const f = G.clues?.fetching?.get(w.item); return f != null && G.state.time - f < 30; })) return null;
     for (const w of known) {
       const r = this.keeperRule(w.item);
-      if (r) { const at = this.keeperSpot(r); return tgt(at, at.label[0].toUpperCase() + at.label.slice(1), w.item); }
+      if (r) { const at = this.keeperSpot(r); return tgt(at, `${theItem(name(w.item), true)}: back at ${at.label}`, w.item); }
     }
-    const live = [];
-    for (const a of G.humans?.agents || []) if (a.out && a.holds && fits(a.holds)) live.push({ x: a.x, z: a.z, y: a.y, label: `Someone with ${theItem(G.items.def(a.holds).name).replace(/^the ([aeiou])?/, (m, v) => (v ? 'an ' + v : 'a '))}`, item: a.holds });
-    if (fits('slice')) for (const L of G.slices?.waitingDrops?.() || []) live.push({ ...L, item: 'slice' });
-    if (live.length) { const p = nearest(live); return tgt(p, p.label, p.item, 1.9); }
     for (const w of known) { const p = this.#pickedAt(id, w.item); if (p) return tgt(p, p.label, w.item, 2.2); }
     return null;
   }
