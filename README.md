@@ -237,6 +237,20 @@ of the lake and the hills, bridges you can cross, real fences, trotting dogs,
 pigeons that fly in to join the flock, puzzles that can't be lost for good,
 and photo mode.
 
+Later fix batches, from the owner's own issues, made water and roofs solid,
+fitted hats and collars, gave Gus a symmetric flight model, matched animal
+coats to their portraits and ran a "mistake sweep" that tries to break every
+quest. The latest batch was:
+
+> --fix #42 #46 #44 #45 #43 --publish --no-confirm
+
+It added Super Jumbo Bagels on 110th Street (Manny's walk-up window, a bagel
+menu, and Mama Mask's riddle quest "The Jumbo Order" with an Everything Bagel
+scarf), bagels you can drop as bribes so a wary animal tells you where its
+boss is and what the boss wants, 15 more park people so the crowds aren't
+clones, a compass that points at the dropped or lost item a step needs, and a
+pass over every line in the game so what's said matches what's seen and heard.
+
 gamegen planned the game in a design document, had review agents vet it over
 three rounds (86 findings, every must-fix fixed), and shared the design as a
 page. It then made the art, models, music and sound with these plugins, built
@@ -266,10 +280,10 @@ and a polish pass tidied every screen.
 
 <br clear="right">
 
-- [meshgen](https://github.com/zeveck/meshgen): 100 textured 3D models made
+- [meshgen](https://github.com/zeveck/meshgen): 116 textured 3D models made
   with [Meshy](https://www.meshy.ai/): Gus standing and flying, the park's
   animals (pigeons, squirrels, ducks of several kinds, geese, crows, raccoons,
-  rats, cats, dogs, horses, owls, hawks, turtles, herons, songbirds), 18
+  rats, cats, dogs, horses, owls, hawks, turtles, herons, songbirds), 33
   rigged and animated people, the vehicles (taxi, van, pedicab, carriage,
   Zamboni, ice-cream truck, rowboat), props and landmarks like Bethesda
   Fountain, Bow Bridge and Belvedere Castle. The Mecha-Pigeon and the Empire
@@ -280,12 +294,14 @@ and a polish pass tidied every screen.
 - [audiogen](https://github.com/zeveck/audiogen): all the sound, made with
   [ElevenLabs](https://elevenlabs.io/): 19 pieces of music (a different mood
   for each time of day, the finale and the sting), 10 ambience loops, about
-  120 sound effects and 63 voice lines, from the coos to the photographer's
+  120 sound effects and about 190 voice lines, from the coos to the photographer's
   "THAT'S the shot".
 
-The whole game cost about **$102.91** to make: about $15.61 of imagegen2
-pictures, $3.48 of nanogen edits, $24.60 of ElevenLabs audio and $59.22 of
-Meshy models (2,961 prepaid credits). The full ledger is in
+The whole game cost about **$122.24** to make, by the ledger: about $102.91
+for the first release (about $15.61 of imagegen2 pictures, $3.48 of nanogen
+edits, $24.60 of ElevenLabs audio and $59.22 of Meshy models, 2,961 prepaid
+credits), and about $19 since for the fixes, most of it the 15 new people
+(657 Meshy credits). The full ledger is in
 [design/ASSETS.md](design/ASSETS.md), and the design is in
 [design/GAME_DESIGN.md](design/GAME_DESIGN.md).
 
