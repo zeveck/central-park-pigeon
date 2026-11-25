@@ -82,6 +82,8 @@ export function installBagelBribes(G) {
   function end(keepState = false) {
     if (!T) return;
     const a = T.a;
+    // #44 review: it had the bagel (the crew joined, or the phase ended, before it ate): it still says what it knows
+    if (T.prop && !T.spoke) words(T);
     T.prop?.removeFromParent();
     a.treatHop = false; a.treatSpeed = 0;
     if (!keepState && a.state === 'treat') { a.state = 'idle'; a.t = 1.5; a.tx = a.x; a.tz = a.z; }
@@ -99,6 +101,7 @@ export function installBagelBribes(G) {
   }
   function words(W = T, at0 = 0) {
     const { a, key, B, friendly } = W;
+    W.spoke = true;
     if (W.horseFar || key === 'herons' || friendly || key === 'swells') return;
     const lines = [];
     const H = LEAD_HINTS[key];

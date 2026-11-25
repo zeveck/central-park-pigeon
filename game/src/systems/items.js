@@ -273,7 +273,7 @@ export class Items {
       id: 'item:' + it.uid, kind: 'item', get x() { return it.x; }, get y() { return it.y; }, get z() { return it.z; }, r: 0.9,
       // fix-16: a guarded item says so in the prompt ("Guarded: the peas"), so a refused Peck is never a mystery
       label: () => (this.def(it.id).cls === 'huge' || (it.id === 'box' && it.placed) ? null : this.guardReason(it, true) ? `Guarded: ${theItem(this.def(it.id).name)}` : `Pick up ${theItem(this.def(it.id).name)}`),
-      enabled: () => this.world.includes(it),
+      enabled: () => this.world.includes(it) && it.mesh?.visible !== false,   // #44 review: no prompt for an order Manny is still making (hidden)
       priority: it.low ? 2 : 5,   // fun pass: a guarded item (the anchovy on Pickles' sill) gives way to the character beside it
       act: () => this.pickUp(it),
     });

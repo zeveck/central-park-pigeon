@@ -286,8 +286,8 @@ add('jumbo-order.s1', { mark: M.start, m: {
   O: I.order('talk to Mama Mask with a plain bagel in the beak', (G) => [...bagelOrder('plain'), { pickItem: 'bagel', timeout: 30 }, idle()], (G) => (G.state.carried?.id === 'bagel' ? true : 'no plain bagel carried')),
 } });
 add('jumbo-order.s2', { fixture: 'jumbo-order.s2', mark: M.start, m: {
-  O: I.order('two wrong orders in a row (the second takes the first back)', (G) => [...bagelOrder('poppy', 'scallion'), { pickItem: 'bagel-poppy-scallion', timeout: 30 }, ...bagelOrder('plain', 'strawberry'), { pickItem: 'bagel-plain-strawberry', timeout: 30 }, idle()],
-    (G) => (G.state.carried?.id === 'bagel-plain-strawberry' && !G.items.world.some((w) => w.id === 'bagel-poppy-scallion') ? true : `carrying ${G.state.carried?.id}, poppy lying about: ${G.items.world.some((w) => w.id === 'bagel-poppy-scallion')}`)),
+  O: I.order('two wrong orders in a row (picking up the second puts the first down)', (G) => [...bagelOrder('poppy', 'scallion'), { pickItem: 'bagel-poppy-scallion', timeout: 30 }, ...bagelOrder('plain', 'strawberry'), { pickItem: 'bagel-plain-strawberry', timeout: 30 }, idle()],
+    (G) => (G.state.carried?.id === 'bagel-plain-strawberry' && G.items.world.some((w) => w.id === 'bagel-poppy-scallion') ? true : `carrying ${G.state.carried?.id}, poppy lying about: ${G.items.world.some((w) => w.id === 'bagel-poppy-scallion')}`)),
   W: { name: '0 crumbs: the free order, then the shortfall, then a nap and free again', route: 'poke', poke: (G) => { G.state.crumbs = 0; },
     build: (G) => [...bagelOrder('plain', 'plain'), { pickItem: 'bagel-plain-plain', timeout: 30 }, ...atBell, { wait: 1 }, { closeMenus: true }, idle(), ...napTo(G, nextPhase(G.state.phase)), idle()],
     took: (G) => (G.state.crumbs === 0 && !G.state.phaseUsed?.['bagel.free'] ? true : `crumbs ${G.state.crumbs}, free used ${!!G.state.phaseUsed?.['bagel.free']}`) },

@@ -254,14 +254,9 @@ export function installBagelShop(G) {
   const questOpen = () => E.isOpen(ID);
   let cooking = null;   // { it, t } while Manny's at the oven (runtime only: a load shows the order at once)
   const ordered = new Set();   // uids Manny put on the shelf (the keeper's put-backs are the others)
-  G.items.guards.push((it, peek) => {
-    if (!it.counter) return null;
-    if (cooking?.it === it) return 'Manny\'s still making it.';
-    // a carried bagel goes back to Manny first (so wrong bagels never pile up by the bell); the quest bagel stays with Gus
-    const c = st().carried;
-    if (!peek && c && isBagel(c.id) && !(c.id === QUEST_BAGEL && questOpen())) { G.items.take(); manny('takeBack', 3); G.bus.emit('bagelBack', { item: c.id }); }
-    return null;
-  });
+  // (an order Manny is still making is hidden, and a hidden item has no prompt and can't be pecked: items.js)
+  // #44 review: Manny never takes a carried bagel back (a just-bought bribe would be thrown away); a bagel Gus puts down by
+  // the counter can't take the Peck from Manny or the bell (priority 6), and picking an order up swaps as anywhere else
   G.bus.on('pickup', (t, e) => { if (isBagel(e.item)) ordered.delete(e.uid); });
 
   const mannyLine = () => (!flags()['bagel.met'] ? 'welcome' : st().phase === 'night' ? 'night' : 'hello');
@@ -272,10 +267,7 @@ export function installBagelShop(G) {
     if (onShelf()) { manny('waiting', 2.6); return; }
     const c = st().carried;
     let delay = 0;
-    if (c && isBagel(c.id)) {
-      if (c.id === QUEST_BAGEL && questOpen()) { manny('keep', 3); delay = 1.2; }
-      else { G.items.take(); manny('takeBack', 3); G.bus.emit('bagelBack', { item: c.id }); delay = 1.6; }
-    }
+    if (c && c.id === QUEST_BAGEL && questOpen()) { manny('keep', 3); delay = 1.2; }
     const open = () => {
       const k = mannyLine();
       flags()['bagel.met'] = true;
@@ -445,12 +437,17 @@ export function installBagelShop(G) {
     const s = { id: 'news', el, back() { G.menus.closeAll(); G.resume(); } };
     el.addEventListener('click', (e) => { if (e.target.closest('[data-act="ok"]')) s.back(); });
     G.menus.add(s);
-    G.newsCheck = () => {
-      if (flags()['news.bagels']) return;
+    // #44 review: the flags are set only once the card is actually up (a scene or menu at Continue: it tries again)
+    let tries = 0;
+    const show = () => {
+      if (flags()['news.bagels'] || G.screen !== 'play') return;
+      if (G.menus.open || G.dialogue.open || G.cutscene?.running || G.midScene?.()) { if (++tries < 600) G.later(1, show); return; }
+      G.openMenu('news');
+      if (!G.menus.is('news')) { if (++tries < 600) G.later(1, show); return; }
       flags()['news.bagels'] = true;
       flags()['news.bagels.old'] = true;
-      G.later(1.2, () => { if (G.screen === 'play' && !G.menus.open && !G.dialogue.open) G.openMenu('news'); });
     };
+    G.newsCheck = () => { if (flags()['news.bagels']) return; tries = 0; G.later(1.2, show); };
   }
 
   // ------------------------------------------------------------ Mama Mask: the riddle, her answers, the payoff
@@ -468,6 +465,7 @@ export function installBagelShop(G) {
     if (!isBagel(id)) return null;
     const open = questOpen(), idx = E.stepIndex(ID);
     if (open && idx === 0) return null;   // the talk wins: the riddle plays (she doesn't tell off a bagel she hasn't asked for)
+    if (id === QUEST_BAGEL && open && idx === 2) return null;   // the step's give (#44 review: ahead of the union line too)
     if (E.isOpen('part-talons') && E.stepIndex('part-talons') === 1 && !flags()['union.paid']) return [MAMA.union];
     if (id === QUEST_BAGEL) {
       if (open && idx === 2) return null;   // the step's give
@@ -530,7 +528,7 @@ export function installBagelShop(G) {
   G.bagelShop = { manny: MN, placeOrder, counter, order };   // (debug and checks: src/debug/bagel-checks.js)
 
   // ------------------------------------------------------------ the update
-  let lastKept = null;
+  const said = new Set(), atLoad = new Set();   // keeper put-backs Manny has spoken for; quest bagels already lying about at a load
   G.mods.push({
     update(dt) {
       // the order: Manny at the oven, then it shows on the shelf
@@ -548,9 +546,10 @@ export function installBagelShop(G) {
         }
       }
       // the item keeper put the quest bagel back on the shelf: Manny made two
-      const kept = G.items.world.find((w) => w.id === QUEST_BAGEL && !w.counter && !ordered.has(w.uid) && Math.hypot(w.x - COUNTER.x, w.z - COUNTER.z) < 0.6);
-      if (kept && kept.uid !== lastKept) {
-        lastKept = kept.uid;
+      // (#44 review: only the keeper's own spawn: never placed by Gus, its origin the counter, and not there at the last load)
+      const kept = G.items.world.find((w) => w.id === QUEST_BAGEL && !w.counter && !w.placed && !ordered.has(w.uid) && !atLoad.has(w.uid) && w.origin && Math.hypot(w.origin.x - COUNTER.x, w.origin.z - COUNTER.z) < 0.1 && Math.hypot(w.x - COUNTER.x, w.z - COUNTER.z) < 0.6);
+      if (kept && !said.has(kept.uid)) {
+        said.add(kept.uid);
         const g = G.gus.position;
         if (Math.hypot(g.x - COUNTER.x, g.z - COUNTER.z) < 60) G.later(0.4, () => manny('two', 3.4));
       }
@@ -564,6 +563,6 @@ export function installBagelShop(G) {
       c.holder.rotation.y = MN.yaw;
       if (near) c.mixer.update(dt);
     },
-    restore() { cooking = null; MN.want = FACE_PARK; ordered.clear(); for (const w of G.items.world) if (w.counter) { ordered.add(w.uid); if (w.mesh) w.mesh.visible = true; } lastKept = null; },
+    restore() { cooking = null; MN.want = FACE_PARK; ordered.clear(); for (const w of G.items.world) if (w.counter) { ordered.add(w.uid); if (w.mesh) w.mesh.visible = true; } said.clear(); atLoad.clear(); for (const w of G.items.world) if (w.id === QUEST_BAGEL) atLoad.add(w.uid); },
   });
 }

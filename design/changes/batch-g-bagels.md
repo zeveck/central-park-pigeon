@@ -406,3 +406,12 @@ No must-fix is left open.
 - **Ledger's line** for the Everything Bagel scarf comes the first time Gus talks to him owning it (before the stash opens).
 - **"New in the park"** is a menu card shown 1.2 s after Continue (so the sweep's recovery planner, which closes open menus, isn't blocked by it). New Game and the new jumbo-order fixture set `news.bagels`; the older fixtures were left as they were.
 - **Voices:** the songbirds' first lead hint ("…By day! *car alarm*") is voiced with an imitated alarm ("Wee-oo wee-oo!") in place of the stage direction; its bubble keeps the text.
+
+### After the code review (2026-11-25)
+
+- **Manny no longer takes a carried bagel back** (the design's take-back threw away a just-bought bribe bagel with no warning). The pile it guarded against can't happen any more: Manny and the bell have priority 6, so a bagel put down by the counter never takes the Peck, and picking a new order up swaps as anywhere else (the old bagel is put down). His "No refunds" line is unused; the quest bagel still gets "Hang on to that one, pal."
+- While Manny cooks, the hidden order has no prompt and can't be pecked (no "Guarded" toast, no fail event).
+- "Lost it? I made two." only for the item keeper's own put-back (never placed by Gus, its origin the counter, not already lying there at a load).
+- "New in the park" sets its flags only once the card is actually up; with a scene or menu in the way at Continue it tries again each second.
+- The quest bagel at step 3 is given even while the Rink Job's union slice is unpaid.
+- A crowd animal that already had the bagel when its treat ended early (the crew joined, the phase ended) still says its hint and tip.
