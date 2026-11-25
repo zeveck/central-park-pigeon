@@ -251,7 +251,7 @@ export const WRONG_PLACE = {
   crows: ['Vesper looks around. "Nobody to trade with, kid."', '"No deal here. Come back with a customer."'],
   biscuit: ['Biscuit sniffs everything. Twice. "Nothing to fetch!"', '"I\'m a DOG, Gus. I don\'t do deep."'],
   strix: ['Strix blinks. "Nothing hidden here. I would SEE it."', '"Even my eyes need something to look at, dear."'],
-  raccoons: ['Rigby taps his wrench. "Nothing to rig, boss."', '"No wheels, no latch, no job."'],
+  raccoons: ['Rigby shrugs. "Nothing to rig, boss."', '"No wheels, no latch, no job."'],
   rats: ['Sue sniffs the kerb. "No grate, no game."', '"We\'re GRATE rats, Gus. Find me a grate."'],
   rhoda: ['Rhoda circles once. "Nothing worth lifting."', '"Call me when it\'s HEAVY."'],
   meermob: ['Big Sal cracks his neck. "Nothing to haul here, kid."', '"The Mob don\'t lift air."'],

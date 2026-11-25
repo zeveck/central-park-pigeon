@@ -411,7 +411,8 @@ export class Collect {
     if (onWall && this.pc.zoo > 3 && !this.spratOut) {
       this.spratOut = true;
       G.audio.play('sea-lion-bark', { at: zo.at });
-      const from = { x: 88.3, y: G.terrain.heightAt(88.3, 115.6) + 1.5, z: 115.6 }, to = { x: g.position.x + Math.sin(g.yaw) * 0.5, z: g.position.z + Math.cos(g.yaw) * 0.5 };
+      const from = { x: 88.5, y: G.terrain.heightAt(88.5, 108.3) + 1.4, z: 108.3 }   // #43: from the sea lion on the pool's north rim (landmarks.js)
+      , to = { x: g.position.x + Math.sin(g.yaw) * 0.5, z: g.position.z + Math.cos(g.yaw) * 0.5 };
       to.y = G.surfaceY(to.x, to.z, g.position.y + 0.3);
       const it = G.items.spawn('sprat', from.x, from.z, { y: from.y });
       G.clues.anims.push({ t: 0, secs: 1.1, step: (k) => { it.x = from.x + (to.x - from.x) * k; it.z = from.z + (to.z - from.z) * k; it.y = from.y + (to.y - from.y) * k + Math.sin(Math.PI * k) * 4; it.mesh.position.set(it.x, it.y, it.z); it.mesh.rotation.z = k * 9; }, done: () => { const sv = st.items.find((q) => q.uid === it.uid); if (sv) { sv.x = it.x; sv.y = it.y; sv.z = it.z; } } });
@@ -446,7 +447,17 @@ export class Collect {
     this.#postcardTick(dt);
   }
 
-  music() { return this.musicT > 0 ? 'busker' : null; }
+  music() {
+    if (this.musicT > 0) return 'busker';
+    // #43: the sax busker by the Bethesda fountain plays his one riff (Vibrato's rival; it was never heard), Afternoons when
+    // Gus is near, and under the Choir's join scene, where he joins in (G.saxUntil, den-choir.js)
+    const st = this.st, g = this.G.gus?.position;
+    if (this.G.saxUntil > st.time) return 'sax';
+    // #43: the carousel's band organ (the postcard: "The organ plays your song"), on the ride and near it in the Afternoon
+    if (this.ride?.kind === 'carousel' || (st.phase === 'afternoon' && g && Math.hypot(g.x + 17.6, g.z - 106.1) < 20 && g.y < 25)) return 'carousel';
+    if (st.phase === 'afternoon' && g && Math.hypot(g.x - 10, g.z - 286) < 24 && g.y < 30) return 'sax';
+    return null;
+  }
   napBlock() { return this.ride || this.G.blockNapFor > 0 ? 'Not now' : null; }
   onNap() { this.spratOut = false; this.pc = {}; return []; }
   restore() { this.G.gus.staminaBonus = Math.min(0.35, this.C.pretzels.length * 0.0175); this.ride = null; }
@@ -460,7 +471,7 @@ export class Collect {
       { id: 'strays', label: 'Strays', have: st.collectibles.strays.length, of: 40 },
       { id: 'summits', label: 'Summit Perches', have: st.collectibles.summits.length, of: 12 },
       { id: 'postcards', label: 'Postcards', have: st.postcards.length, of: POSTCARDS.length },   // #44: from the list (17)
-      { id: 'favours', label: 'Favours', have: st.favours.length, of: 50 },
+      // #43: no Favours row: no favour is ever awarded (the regulars' favour lines are flavour now), so it could never move
       { id: 'meters', label: 'Full thread meters', have: meters, of: 5 },
       { id: 'scarves', label: 'Scarves', have: st.scarves.length, of: SCARVES.length },   // #44: from the list (11)
     ];

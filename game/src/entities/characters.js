@@ -73,6 +73,8 @@ export class Characters {
       c.root = new THREE.Group();
       c.root.add(c.mesh);
       if (c.acc) c.root.add(c.acc);
+      // #43: Strix gets her spectacles back with den-strix (her lines and portrait say they're lost until then)
+      if (id === 'strix') { c.accSpecs = this.#accessories({ ...c, look: { ...look, acc: [...(look.acc || []), 'spectacles'] } }); if (c.accSpecs) { c.accSpecs.visible = false; c.root.add(c.accSpecs); } }
       c.root.scale.setScalar(look.scale || 1);
       this.group.add(c.root);
       this.list.push(c);
@@ -209,7 +211,7 @@ export class Characters {
       lines = pool[i].map((text, k) => ({ who: id, text, voice: k === 0 && (this.talkIdx[id] === 0) ? T.voice : null }));
     } else if (Array.isArray(T)) {
       const i = (this.talkIdx[id] = ((this.talkIdx[id] ?? -1) + 1)) % T.length;
-      lines = T[i].map((text) => ({ who: id, text }));
+      lines = T[i].map((t) => (typeof t === 'string' ? { who: id, text: t } : { who: id, ...t }));   // #43: a regular's line may carry a sound ({ text, voice })
     } else lines = [{ who: id, text: '…' }];
     if (c) c.yaw = Math.atan2(G.gus.position.x - c.x, G.gus.position.z - c.z);
     const ev = { who: id };
@@ -313,6 +315,7 @@ export class Characters {
       if (!vis) continue;
       // perf pass (render only): no accessories past ACC_DIST (a draw call each, a few pixels at that range)
       if (c.acc) { const near = d < ACC_DIST[G.preset?.id ?? 'medium']; if (c.acc.visible !== near) c.acc.visible = near; }
+      if (c.accSpecs) c.accSpecs.visible = d < ACC_DIST[G.preset?.id ?? 'medium'] && !!G.state.flags['den-strix'];
       c.bobT += dt;
       c.root.position.set(c.x + ox, c.y + oy + (c.gait ? 0 : Math.abs(Math.sin(c.bobT * 1.3)) * 0.004), c.z);   // batch-3 (#11): a dog's back stays level
       c.root.rotation.set(rx, c.yaw, rz, 'YXZ');
@@ -569,6 +572,7 @@ function accessory(name, col, u, H, N, B, bb, K = H, sink = () => 0, fit = null,
     case 'daisy': add(cyl(0.6, 0.6, 0.06, 10), '#ffffff', at(B, 0, 1.75, -0.2)); add(sph(0.22), '#e8c23d', at(B, 0, 1.8, -0.2)); break;
     case 'ear-stripe': add(box(0.12, 0.25, 0.6), '#c4302b', at(H, 0.55, 0, -0.1)); add(box(0.12, 0.25, 0.6), '#c4302b', at(H, -0.55, 0, -0.1)); break;
     case 'apron': add(box(1.4, 1.6, 0.1), C(col, '#6b4a2a'), at(B, 0, 0, 1.1)); break;
+    case 'torch': { const r = body(B, 1.3, 0.2, 0.7); add(cyl(0.11, 0.11, 1.2, 8), '#c4302b', onRing(r, 1.3, -0.2, 0.5), 0, 0, 0.5); add(cyl(0.06, 0.06, 0.9, 6), '#c8a050', onRing(r, 1.75, 0.6, 0.6), 0, 0, -0.4); add(cyl(0.09, 0.05, 0.25, 6), '#d4a02a', onRing(r, 2.15, 0.85, 0.65), 0, 0, -1.2); break; }   // #43: Socket's welding torch (his portrait; the wrench is Rigby's want)
     case 'wrench': { const r = body(B, 1.3, 0.2, 0.7); add(box(0.18, 2.0, 0.1), '#8a9098', onRing(r, 1.3, 0, 0.5), 0, 0, 0.5); break; }
     case 'aviator': add(sph(0.75).scale(1, 0.75, 1.05), '#6b4a2a', atTop(0, 0.25, -0.1)); if (eyes) eyewear('goggles-up', eyes, '#c0c4c8', addG); break;
     case 'scarf-long': { const r = ring(N); add(tor(0.95 * r.k, 0.25), C(col, '#c4302b'), onRing(r, 0, 0, 0.1), Math.PI / 2.2); add(box(0.4, 0.15, 2.4), C(col, '#c4302b'), onRing(r, 0.4, -0.2, -1.6), 0.2); break; }

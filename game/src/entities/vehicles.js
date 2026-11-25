@@ -442,7 +442,7 @@ export class Vehicles {
     if (onIce && Math.abs(v.speed) > 0.5 && v.hopper < 1) {
       v.hopper = Math.min(1, v.hopper + dt / Z.hopperSecs);
       if (this.G.updates % 9 === 0) { const r = this.#rear(v, -1.6); this.G.particles.burst('dust', r.x, v.y + 0.3, r.z, 1, { spread: 0.6, color: [0.95, 0.97, 1] }); }
-      if (v.hopper >= 1) { this.G.toast('Hopper full! Tap F to Dump.'); this.G.audio.synth('meterTick'); }
+      if (v.hopper >= 1) { this.G.toast('Hopper full! Coo to Dump.'); this.G.audio.synth('meterTick'); }
     }
     this.#move(v, dt);
     this.#piles(v);
@@ -516,7 +516,7 @@ export class Vehicles {
   #horn(v, dt, input) {
     const G = this.G;
     if (v.id !== 'zamboni') {
-      if (input.pressed('coo')) { if (v.def.remote) G.audio.synth('whistle', { vol: 0.6 }); else G.audio.play(v.id === 'pedicab' ? 'coo' : 'cab-horn', { at: v, vol: 0.8 }); }
+      if (input.pressed('coo')) { if (v.def.remote) G.audio.synth('whistle', { vol: 0.6 }); else if (v.id === 'pedicab') G.audio.synth('bikeBell', { vol: 0.8 }); else G.audio.play('cab-horn', { at: v, vol: 0.8 }); }   // #43: the pedicab's "Horn" is a bike bell (it was a coo)
       return;
     }
     // the Zamboni: tap F = Dump (full hopper), hold F 0.3 s = Spray

@@ -517,7 +517,7 @@ export class Climb {
         h.rotation.set(-0.4, Math.PI + (i ? 0.3 : -0.3), 0);
       }
       if (B.ok) {
-        if (!B.said) { B.said = true; G.bubbles.add('Rhoda: "Hold STILL, you big lug!"', { at: { x: this.x, y: this.h + 18, z }, ttl: 2.4 }); G.audio.voice('rhoda-call', { vol: 0.9 }); }
+        if (!B.said) { B.said = true; G.bubbles.add('Rhoda: "Hold STILL, you big lug!"', { at: { x: this.x, y: this.h + 18, z }, ttl: 2.4 }); G.audio.voice('rhoda-hold-still', { vol: 0.9 }); }
         this.h += dt * 7 * Math.sin(clamp01(u / 2) * Math.PI) * 1.4;
         this.x += (0 - this.x) * dt;
       } else this.x += Math.sin(t * 5) * dt * 3;

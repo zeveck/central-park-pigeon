@@ -260,12 +260,12 @@ export class SchemeEngine {
       G.polaroid?.({ title: '+1 CREW', name: c.name, portrait: c.boss });
       G.crowds?.setFriendly(g.crew, true);
       const boss = CHARACTERS[c.boss];
-      if (boss?.voice) G.later(0.6, () => G.audio.voice(boss.voice + '-join'));
+      if (boss?.voice) G.later(0.6, () => { if (!G.audio.playedRecently(boss.voice + '-join', 90)) G.audio.voice(boss.voice + '-join'); });   // #43: not again if the join scene's line just said it
     }
     if (g.part && !st.parts.includes(g.part)) { st.parts.push(g.part); G.audio.play('part-fanfare'); }   // polish (P3): no bare "+ PART" toast: the Workshop cutaway's polaroid and note say which part
     if (g.gear && !st.gear.includes(g.gear)) st.gear.push(g.gear);
     if (g.line && !st.lines.includes(g.line)) { st.lines.push(g.line); G.toast(`Slice Lines ${st.lines.length}/3`); G.audio.synth('meterTick'); }
-    if (g.truce && !st.truces.includes(g.truce)) { st.truces.push(g.truce); G.toast(`Truces ${st.truces.length}/4`); G.audio.synth('meterTick'); }
+    if (g.truce && !st.truces.includes(g.truce)) { st.truces.push(g.truce); G.toast(`Truces ${st.truces.length}/${THREAD.feuds.meter.max}`); G.audio.synth('meterTick'); }
     if (g.deal) st.deals += g.deal;
     if (g.scarf && !st.scarves.includes(g.scarf)) st.scarves.push(g.scarf);
     G.bus.emit('schemeDone', { scheme: s.id });

@@ -6,7 +6,7 @@ export function installDenRats(G) {
   const E = G.schemes;
   E.registerScript('rats.meet', (ctx, done) => G.say([
     L('sue', 'Subway Sue. I run the grates. Seven of \'em, and every train under this park.'),
-    L('sue', 'Want a ticket? A whole slice from that $1 SLICE joint over there. HOT. Down the stairs.'),
+    L('sue', 'Want a ticket? A whole slice from that $1 SLICE joint over there. HOT. Down the grate.'),
     L('crumbsy', 'And the crust. Don\'t forget the crust. The crust is the best part.'),
   ], done));
   G.bus.on('pickup', (t, e) => {
@@ -32,7 +32,7 @@ export function installDenRats(G) {
       { say: [
         L('sue', '…Hot. All the way down. You know how rare that is?'),
         L('pinstripe', 'A rat in a tie notices these things. Welcome to the network, Gus.'),
-        L('sue', 'The Grate Rats are yours. Any grate, any time. And my boys\'ll bring slices to Merchants\' Gate.', 'sue-join'),
+        L('sue', 'Ya did good, kid. The Grate Rats are in. Any grate. And slices to Merchants\' Gate.', 'sue-join'),
       ] },
       { follow: true },
       { do: () => { if (ex) G.chars.goHome(ex); done(); } },

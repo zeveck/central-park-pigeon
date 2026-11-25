@@ -15,7 +15,7 @@ export function installDenRhoda(G) {
   E.registerScript('rhoda.sal', (ctx, done) => {
     const sal = G.chars.find('bigsal');
     G.cutscene.run('rhoda-sal', [
-      { say: [L('bigsal', 'Big Sal. The Meer Mob. You want something, kid? Get in line. Behind HER.', 'bigsal-greeting')] },
+      { say: [L('bigsal', 'Big Sal. The Meer Mob. You want something, kid? Get in line. Behind HER.', 'bigsal-rhoda')] },
       { do: () => { if (sal) G.chars.animate(sal, 'cheer', 0.8); G.audio.play('hawk-screech', { vol: 0.8 }); } },
       { cam: { pos: [sal ? sal.x + 6 : -73, (sal?.y ?? 2) + 2, sal ? sal.z - 6 : 1020], look: [64, 24, 1000], secs: 1.4 } },
       { wait: 1.2 },

@@ -795,7 +795,7 @@ export const CLUES = [
   { id: 'wrench', type: 'glint', x: -41.6, z: 429.4, item: 'wrench', active: { scheme: 'den-raccoons', step: 2, flags: ['delacorte.backstage'] } },
   // part-beak: the foreman's lucky sticker, down the 77th E grate
   { id: 'sticker-grate', type: 'grate', x: 128, z: 377, active: { scheme: 'part-beak', step: 1 }, does: { item: 'sticker', at: 'ally' } },
-  // sab-middle: the Boathouse lot's gate key, teetering on the booth's hook
+  // sab-middle: the Boathouse lot's gate key, teetering on its hook by the lot gate (#43: the hook's iron post is drawn with the clue, clues.js)
   { id: 'lot-key', type: 'teeter', x: 45.4, z: 310.4, y: 2.1, active: { scheme: 'sab-middle', step: 1, not: ['lot.keyDown'] }, does: { item: 'gate-key', at: { x: 45, z: 309.4 }, flags: ['lot.keyDown'] } },
   // the ranger carts (sabotage at Night once the way in is open)
   { id: 'cart-middle', type: 'rig', x: 46, z: 318, r: 7, active: { scheme: 'sab-middle', step: 2, flags: ['boathouse.gateOpen'] }, does: { sabotage: 'middle' } },
@@ -847,10 +847,10 @@ export const BLOCKERS = [
     mimic: { flags: ['waiter.moved'], to: { x: -104, z: 166 }, line: 'Coming! Coming!', sound: 'phoneRing' },
     bully: { refuse: '"No geese on the patio!" He doesn\'t budge.' } },
   { id: 'jogger', human: 'jogger', near: 15, active: { scheme: 'gear-headlamp', step: 2, not: ['jogger.stopped'] },
-    mimic: { flags: ['jogger.stopped'], stop: 12, line: 'Huh? Who\'s calling?', sound: 'phoneRing' }, bully: { refuse: 'He speeds up. Cardio!' } },
+    mimic: { flags: ['jogger.stopped'], stop: 12, line: 'Huh? Who\'s calling?', sound: 'phoneRing' }, bully: { refuse: 'The jogger speeds up. Cardio!' } },
   { id: 'rckid', human: 'rckid', active: { scheme: 'part-wings', step: 2, not: ['remote.left'] },
     mimic: { needs: ['den-songbirds'], flags: ['remote.left'], kids: true, to: { x: 96, z: -30 }, item: 'remote', line: 'ICE CREAM!', sound: 'jingle' },
-    bully: { refuse: 'He hugs the remote tighter. "MINE."' } },
+    bully: { refuse: 'The kid hugs the remote tighter. "MINE."' } },
   { id: 'prickett', human: 'prickett', active: { scheme: 'den-horses', step: 2 },
     mimic: { flags: ['prickett.moved'], to: { x: 76, z: -9 }, line: 'Prickett Pest-Pro, Del speaking!', sound: 'phoneRing' },
     bully: { flags: ['prickett.moved'], to: { x: 80, z: -5 }, line: 'Whoa! Easy, birds!' } },   // 3b: den-horses' script drives the van off (src/schemes/den-horses.js)
@@ -867,7 +867,7 @@ export const BLOCKERS = [
 export const TRADES = [
   { id: 'sunglasses', human: 'selfie', wants: 'shiny', gives: { gear: 'sunglasses' }, crumbs: 10, attention: 'selfie.attention', notYet: "He won't look up from his selfies, kid.", scheme: 'gear-sunglasses', wanted: 'sunglasses' },
   { id: 'pen', human: 'artist', wants: 'cufflink', gives: { gear: 'pen' }, crumbs: 10, scheme: 'gear-pen', wanted: 'pen', after: 'The artist dashes off a portrait of Gus in thanks.' },
-  { id: 'headlamp', human: 'jogger', wants: 'key', gives: { gear: 'headlamp' }, crumbs: 10, attention: 'jogger.stopped', stoppedOk: true, notYet: 'He never stops, kid. Not for crows.', scheme: 'gear-headlamp', wanted: 'headlamp' },
+  { id: 'headlamp', human: 'jogger', wants: 'key', gives: { gear: 'headlamp' }, crumbs: 10, attention: 'jogger.stopped', stoppedOk: true, notYet: 'Joggers never stop, kid. Not for crows.', scheme: 'gear-headlamp', wanted: 'headlamp' },
   { id: 'remote', human: 'rckid', wants: 'shiny', gives: { gear: 'remote' }, crumbs: 10, scheme: 'part-wings', wanted: 'remote' },
   { id: 'wrench', human: 'stagehand', wants: 'earring', gives: { item: 'wrench' }, crumbs: 10, scheme: 'den-raccoons', wanted: 'wrench' },
   { id: 'cone', human: 'foreman', wants: 'sticker', gives: { flags: ['foreman.deal'] }, crumbs: 10, scheme: 'part-beak', wanted: 'cone', after: '"Take a cone, kid. It\'s behind the shed gate."' },
@@ -932,8 +932,8 @@ export const PRETZELS = [
 // at: where it happens (r metres). phase: when. kind: how it's triggered (collect.js).
 export const POSTCARDS = [
   { id: 'carousel', name: 'Carousel', at: { x: -17.6, z: 106.1, r: 6.2 }, phase: 'afternoon', kind: 'ride', secs: 12.5, line: 'Round and round. The organ plays your song.' },
-  { id: 'strawberry', name: 'Strawberry Fields', at: { x: -86, z: 276, r: 2.4 }, phase: 'afternoon', kind: 'coo', human: 'busker', line: 'He plays a riff for you. Crumbs land in the case.' },
-  { id: 'bow-bridge', name: 'Bow Bridge', at: { x: -31.6, z: 312, r: 6 }, phase: 'afternoon', kind: 'perch', flags: ['wedding.cleared'], spike: 'P7', line: '"Two doves! Stunning!"' },
+  { id: 'strawberry', name: 'Strawberry Fields', at: { x: -86, z: 276, r: 2.4 }, phase: 'afternoon', kind: 'coo', human: 'busker', line: 'He plays a riff for you. Crumbs land at his feet.' },
+  { id: 'bow-bridge', name: 'Bow Bridge', at: { x: -31.6, z: 312, r: 6 }, phase: 'afternoon', kind: 'perch', flags: ['wedding.cleared'], spike: 'P7', line: '"A dove! Stunning!" (It\'s Gus. Nobody checks.)' },
   { id: 'gapstow', name: 'Gapstow Bridge', at: { x: 61, z: 43.2, r: 2.2 }, phase: 'day', kind: 'coo', human: 'gapstow-selfie', spike: 'P5', line: 'A selfie with the skyline. And a pigeon.' },
   { id: 'chess', name: 'Chess & Checkers House', at: { x: -6.6, z: 64, r: 1.6 }, phase: ['morning', 'afternoon'], kind: 'peck', human: 'chess', line: '"That was MY rook!" "YOU moved it!"' },
   { id: 'sheep-meadow', name: 'Sheep Meadow', at: { x: -46, z: 160, r: 0.8 }, phase: 'afternoon', kind: 'still', secs: 4, towel: true, line: 'Sunbathing. Like the humans. Exactly like the humans.' },
@@ -943,7 +943,7 @@ export const POSTCARDS = [
   { id: 'loch', name: 'The Loch', at: { x: -56.1, z: 875.4, r: 2.6 }, kind: 'waterfall', line: 'Down the little waterfall. Splash!' },
   { id: 'sled-dog', name: 'Sled Dog Statue', at: { x: 37.4, z: 173, r: 1.4 }, phase: 'day', kind: 'perch', minY: 1.2, secs: 2.5, line: 'The kids pat the bronze dog. And you.' },
   { id: 'mushroom', name: 'Mushroom Statue', at: { x: 77, z: 327.3, r: 1.8 }, phase: 'afternoon', kind: 'perch', minY: 2, secs: 2.5, line: 'On top of the giant mushroom, with the climbing kids.' },
-  { id: 'zoo', name: 'Zoo Wall', at: { x: 91.3, z: 112.6, r: 21 }, phase: 'afternoon', kind: 'sprat', minY: 2, line: 'Feeding time! A flung sprat. Caught it!' },
+  { id: 'zoo', name: 'Zoo Wall', at: { x: 91.3, z: 112.6, r: 21 }, phase: 'afternoon', kind: 'sprat', minY: 2, line: 'Feeding time! A sea lion flips you a sprat. Caught it!' },
   { id: 'ramble', name: 'The Ramble', at: { x: -18, z: 360, r: 25 }, phase: 'morning', kind: 'birders', line: 'The birders gasp… then sigh. "Just a pigeon."' },
   { id: 'north-woods', name: 'North Woods', at: { x: -81.4, z: 1031, r: 9 }, phase: 'night', kind: 'coyote', minY: 2.5, coyote: { from: { x: -64, z: 1000 }, to: { x: -40, z: 992 } }, line: 'There, in the clearing. The coyote. It\'s REAL.' },
   { id: 'mall', name: 'The Mall', at: { x: 1.4, z: 214, r: 0.6 }, phase: 'morning', kind: 'hat', human: 'dolores', line: 'On the Pigeon Lady\'s hat. She doesn\'t mind.' },

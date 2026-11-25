@@ -15,7 +15,7 @@ export function installGearPen(G) {
   E.registerScript('pen.cufflink', (ctx, done) => G.say([L(null, 'A gold cufflink, warm from under a very expensive shoe.')], done));
   E.registerScript('pen.portrait', (ctx, done) => G.later(1.2, () => G.say([
     L(null, 'The artist dashes off a portrait of Gus in thanks: three lines and an attitude.'),
-    L('vesper', 'A paint pen. Enamel signs, kid. The ones a peck won\'t shift. And the picture goes in the Workshop.'),
+    L('vesper', 'A paint pen. Enamel signs, kid. The ones a peck won\'t shift.'),
   ], done)));
 
   // the patio table (furniture: always there; Gus can land on it)

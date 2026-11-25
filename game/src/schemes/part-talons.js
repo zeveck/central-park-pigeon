@@ -69,7 +69,7 @@ export function installPartTalons(G) {
       ] },
       { cam: { ...G.shot({ x: S.x, y: y + 1.4, z: S.z - S.d / 2 }, { dist: 3.2, height: 0.3, yaw: Math.PI, lookY: 0 }), secs: 1.2 } },
       { wait: 1.6 },
-      { say: [L(null, 'A ranger\'s notice on the steel door: a cart, in a parking box. The South cart sleeps right here.'), L(null, 'Prickett\'s stock AND the last ranger cart, behind one steel door. Nothing with paws opens that.')] },
+      { say: [L(null, 'A ranger\'s notice on the steel door: a cart, in a parking box. The South cart sleeps right here.'), L(null, 'His stock inside, and the last ranger cart parked across the door. Nothing with paws opens that.')] },
       { follow: true },
       { do: () => { if (p) { G.humans.goTo(p, { x: S.x - 18, z: S.z + 6 }, 1.4, () => { p.out = false; p.busy = false; }); } done(); } },
     ], null, () => { pushing = false; showOpen = false; pallet.visible = false; if (p) { p.busy = false; p.mode = 'linger'; } G.street.setPhase?.(G.state.phase); });   // Fixes-3 (B2)

@@ -39,7 +39,7 @@ export function installDenTurtles(G) {
       { wait: 1.8 },
       { do: () => cheer(G, list, 1.2) },
       { say: [
-        L('eldest', 'Our rock… is a rock again. Mmm. We remember you, pigeon.', 'eldest-join'),
+        L('eldest', 'The Elders… remember you. Our rock… a rock again. Mmm.', 'eldest-join'),
         L('eldest', 'When you are stuck… ask the Elders. On your Scheme Board. We see… everything. Slowly.'),
         L('shelly', 'And every truce in this park gets sealed on THIS rock. Bring them here, dear.'),
       ] },

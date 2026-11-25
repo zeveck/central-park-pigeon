@@ -20,7 +20,7 @@ export function installDenCrows(G) {
     joinScene(G, 'crows-join', {
       members: ['vesper', 'ledger', 'glint', 'cawdry'], kind: 'fly', sfx: 'crow-caw',
       lines: [
-        L('vesper', 'Three shinies. Acceptable. More than acceptable. Welcome to the Exchange, kid.', 'vesper-join'),
+        L('vesper', 'Pleasure doing business, pigeon. Three shinies. Welcome to the Exchange, kid.', 'vesper-join'),
         L('ledger', 'Entered. Trades are ten crumbs, Vesper\'s fee. Every one goes in the book.'),
         L('glint', 'Next time, something BLUE. Just saying.'),
         L('vesper', 'Now. You\'ve been building something in your head since the Pond. Come and see where to build it for real.'),

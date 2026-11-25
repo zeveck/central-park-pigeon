@@ -57,7 +57,7 @@ export function installDenHorses(G) {
       { do: () => { if (duke) { duke.script = true; duke.here = { x: V.x - 4, z: V.z + 3.4, scripted: true }; G.chars.arrive(duke, { x: V.x - 4, z: V.z + 3.4, y: G.surfaceY(V.x - 4, V.z + 3.4, 3) }, 'road', 1.6); } } },
       { cam: { ...G.shot({ x: V.x - 2, y: vy, z: V.z }, { dist: 12, height: 3.5, yaw: -0.4, lookY: 1.2 }), secs: 1.2 } },
       { wait: 1.6 },
-      { do: () => { if (duke) { face(duke, V); bubbleOver(G, duke, '*the officer writes a ticket*', 2.4, 2.4); } G.audio.play('paper-rustle', { at: V }); } },
+      { do: () => { if (duke) { face(duke, V); bubbleOver(G, duke, '*Duke writes a ticket. With a hoof.*', 2.4, 2.4); } G.audio.play('paper-rustle', { at: V }); } },
       { say: bully
         ? [L('prickett', 'Whoa! Easy, birds! Geese! On Central Park SOUTH!'), L('duke', 'Parked on a horse trough. That\'s a ticket, by the book.')]
         : [L('prickett', 'A TICKET? I was answering my PHONE! …Which nobody was on.'), L('duke', 'Parked on a horse trough. That\'s a ticket, by the book.')] },
@@ -89,7 +89,7 @@ export function installDenHorses(G) {
       { wait: 2.6 },
       { do: () => { cheer(G, list); G.audio.play('horse-whinny', { at: TROUGH }); } },
       { say: [
-        L('clementine', 'Ahh. Cold water, and nobody\'s van in it. The Carriage Horses are with you, kid.', 'clementine-join'),
+        L('clementine', 'You\'ve got the whole carriage line, sweetheart. Cold water, and no van in it.', 'clementine-join'),
         L('clementine', 'Stuck gates, jammed doors: we KICK. Anything huge by a road: we PULL. And I\'ll save you the driver\'s lunch slice at the Pond carriage stop.'),
         L('dapple', 'Can we see the Ramble now? The REAL woods?'),
         L('bigben', 'Hup.'),

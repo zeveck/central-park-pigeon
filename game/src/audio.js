@@ -23,7 +23,7 @@ export const MUSIC = {
   'day-b': ['park-day-b', 'park-day-b-2'],
   dusk: ['park-dusk', 'park-dusk-b'], night: ['park-night', 'park-night-b'], city: ['city-ring'],   // fun pass: second takes (clarinet waltz, lounge piano), alternating after each gap
   scheme: ['scheme-workshop'], encounter: ['encounter'], stealth: ['stealth'], race: ['race'], rink: ['rink-waltz'],
-  wedding: ['wedding-quartet'], finale: ['finale-stomp-and-climb'], busker: ['busker-riff'], sax: ['sax-busker-riff'],
+  wedding: ['wedding-quartet'], finale: ['finale-stomp-and-climb'], busker: ['busker-riff'], sax: ['sax-busker-riff'], carousel: ['carousel-organ'],   // #43: the carousel's band organ
 };
 const DAY_GAP = [30, 60];   // day loops: an ambience-only stretch between takes
 // Fixes-2 (P10): Dusk and Night have one ~90 s take each, so they get gaps too (a little longer: the night bed carries it)
@@ -43,7 +43,10 @@ const voiceGain = (f) => { const m = /^(bribe-[a-z]+|mamamask|manny)-/.exec(f); 
 const SFX_GAIN = { 'bread-rain': 10, 'pedicab-pedal': 6, 'rc-boat-whine': 7, 'photographer-thats-the-shot': 1.6,
   // fun pass (levels measured against their neighbours: decoded RMS of the loudest 20%): the glow hum sat ~12 dB under the
   // splashes, the photographer's yelp ~5 dB over his "THAT'S the shot", the glass ~8 dB under the knock clatter
-  'battery-glow': 2.5, 'photographer-fall': 0.6, 'glass-smash': 1.5 };
+  'battery-glow': 2.5, 'photographer-fall': 0.6, 'glass-smash': 1.5,
+  // #43 (decoded RMS of the loudest 20%, against the same character's call line): the new Strix greeting sat ~4 dB under,
+  // Mimi's ~3 dB (the rest are within 2 dB of their neighbours)
+  'strix-greeting': 1.55, 'mimi-greeting': 1.4 };
 const CORE_SFX = ['coo', 'coo-2', 'flap', 'flap-2', 'peck', 'peck-2', 'gulp', 'landing', 'take-off', 'sign-plate-pop', 'crumb-scatter', 'scheme-step-chime', 'pick-up', 'drop-thud', 'whoosh'];
 
 export class AudioEngine {
@@ -125,7 +128,7 @@ export class AudioEngine {
   #sfxBuffer(name) {
     if (!this.ctx) return Promise.resolve(null);
     if (!this.sfx.has(name)) {
-      const dir = /-(greeting|call|join)$|^(ranger-hey-shoo|vinnie-flying-rat|prickett-impossible|photographer-thats-the-shot|photographer-fall|mecha-feed-the-birds|dove-|crowd-chant-take|manny-|mamamask-|bribe-)/.test(name) ? 'voice/' : 'sfx/';   // #44/#45: manny-, mamamask-, bribe-
+      const dir = /-(greeting|call|join)$|^(ranger-hey-shoo|vinnie-flying-rat|duchess-frenzy|rigby-ready|rhoda-hold-still|bigsal-rhoda|prickett-impossible|photographer-thats-the-shot|photographer-fall|mecha-feed-the-birds|dove-|crowd-chant-take|manny-|mamamask-|bribe-)/.test(name) ? 'voice/' : 'sfx/';   // #44/#45: manny-, mamamask-, bribe-
       this.sfx.set(name, this.#decode(BASE + dir + name + '.mp3').catch((e) => { console.warn('sfx', name, e.message); return null; }));
     }
     return this.sfx.get(name);
@@ -392,7 +395,9 @@ export class AudioEngine {
     this.loops.clear();
   }
 
-  voice(name, opts = {}) { return this.play(name, { vol: 1, ...opts }); }
+  voice(name, opts = {}) { (this.voicedAt ||= {})[name] = this.ctx?.currentTime ?? 0; return this.play(name, { vol: 1, ...opts }); }
+  /** #43: was this voice line played in the last `secs` seconds (so a join bark isn't heard twice, once unsubtitled)? */
+  playedRecently(name, secs) { const t = this.voicedAt?.[name]; return t != null && this.ctx && this.ctx.currentTime - t < secs; }
 
   /** One chatter blip for the typewriter: a short slice of the species' voice, pitched. */
   blip(base = 'coo', pitch = 1) {
@@ -476,7 +481,7 @@ export class AudioEngine {
     return { stop };
   }
 
-  /** Synthesized sounds. kind: uiMove uiSelect uiBack tick staminaLow ding napChime phoneRing carAlarm jingle bikeBell boing meterTick. wobble: Mimic's pitch wobble. */
+  /** Synthesized sounds. kind: uiMove uiSelect uiBack tick staminaLow ding napChime phoneRing carChirp jingle bikeBell boing meterTick. wobble: Mimic's pitch wobble. */
   synth(kind, { wobble = false, vol = 1 } = {}) {
     if (!this.ctx) return;
     const w = wobble ? 30 : 0;
@@ -495,9 +500,8 @@ export class AudioEngine {
           this.#tone({ type: 'square', f: (k % 2 ? 480 : 440), t0: r * 1.6 + k * 0.05, dur: 0.05, vol: 0.06 * vol, detune: dt() });
         }
         break;
-      case 'carAlarm':
-        for (let k = 0; k < 6; k++) this.#tone({ type: 'sawtooth', f: 600, f2: 1400, t0: k * 0.32, dur: 0.3, vol: 0.06 * vol, detune: dt() });
-        for (let k = 0; k < 6; k++) this.#tone({ type: 'square', f: 900, t0: 2 + k * 0.18, dur: 0.12, vol: 0.05 * vol, detune: dt() });
+      case 'carChirp':   // #43: a car's unlock chirp, "bwip-bwip" (was carAlarm, six buzzy sweeps that read as a toy siren)
+        for (const t0 of [0, 0.16]) { this.#tone({ type: 'square', f: 2050, t0, dur: 0.07, vol: 0.09 * vol, detune: dt() }); this.#tone({ type: 'sine', f: 4100, t0, dur: 0.05, vol: 0.03 * vol }); }
         break;
       case 'jingle': this.jingle({ wobble, vol }); break;
       case 'needleScratch': this.#tone({ type: 'sawtooth', f: 2400, f2: 160, dur: 0.22, vol: 0.12 * vol }); this.#noise({ dur: 0.18, vol: 0.25 * vol, hp: 1200 }); this.#tone({ type: 'sawtooth', f: 300, f2: 1900, t0: 0.2, dur: 0.12, vol: 0.08 * vol }); break;   // 3b

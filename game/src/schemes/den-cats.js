@@ -189,7 +189,7 @@ export function installDenCats(G) {
       L('queenie', '*sniff* …Anchovy. From 72nd. And HOT. Across the whole park?'),
       L('whiskerton', 'Well. That\'s a first, and I\'ve seen every mayor.'),
       L('pickles', 'Is there… any left? Just the crust? No? Fine.'),
-      L('queenie', 'The Bodega Cats are yours, darling. Anything on a ledge, we knock it off. It\'s what we live for.', 'queenie-join'),
+      L('queenie', 'Alright, sugar. The Bodega Cats are yours. Anything on a ledge, we knock it off. We live for it.', 'queenie-join'),
       // fun pass (P5): the cats' first job is on the house: Pickles knocks the strips off the Racers' gatehouse roost
       L('queenie', 'First job\'s on the house. Pickles. The Reservoir. Those strips on the gatehouse.'),
       L('pickles', 'For SCIENCE.'),

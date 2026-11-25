@@ -41,9 +41,9 @@ export const SCHEMES = [
         does: { script: 'prologue.feeders' }, target: { sign: 'S1' },
       }),
       S(2, {
-        goal: 'Flip the Pond\'s three red DON\'T signs: east path, Gapstow Bridge, south shore.', where: 'The red DON\'T signs on the Pond\'s east path, on Gapstow Bridge and on the south shore', obstacle: 'The rangers keep fixing them. Get all three live at once.',
-        nudge: { by: 'monty', text: 'Word is there\'s one on Gapstow Bridge and one on the south shore.' },
-        answer: { text: 'Peck the signs at Gapstow Bridge and the Pond\'s south shore while the first is still flipped.', icon: null },
+        goal: 'Flip the Pond\'s three red DON\'T signs: east path, by Gapstow Bridge, south shore.', where: 'The red DON\'T signs on the Pond\'s east path, at the east end of Gapstow Bridge and on the south shore', obstacle: 'The rangers keep fixing them. Get all three live at once.',
+        nudge: { by: 'monty', text: 'Word is there\'s one by Gapstow Bridge and one on the south shore.' },
+        answer: { text: 'Peck the signs by Gapstow Bridge and on the Pond\'s south shore while the first is still flipped.', icon: null },
         needs: { phase: 'day', signs: ['S1', 'S2', 'S3'] }, on: { type: 'signsLive', signs: ['S1', 'S2', 'S3'] },
         does: { script: 'prologue.frenzy', give: { crew: 'swells', flock: 6, talent: 'coo' } }, target: { signs: ['S1', 'S2', 'S3'] },
       }),
@@ -72,24 +72,24 @@ export const SCHEMES = [
     id: 'den-raccoons', title: 'A Wrench for Rigby', thread: 'sign', act: '2', start: 'nest-north', gives: { crew: 'raccoons', talent: 'rig' },
     opensWhen: { flags: ['den-crows'] },
     steps: [
-      S(1, { goal: 'Meet Rigby in the North Woods, from Dusk.', where: 'Rigby paces the North Woods, north of the Reservoir and the North Meadow', obstacle: 'Rigby needs a wrench. The Delacorte stagehand has one.', needs: { phase: 'dusk', place: 'north-woods' }, on: { type: 'talk', who: 'rigby' }, does: { script: 'raccoons.meet' }, target: { who: 'rigby' }, nudge: { by: 'socket', text: 'Rigby\'s in the North Woods from Dusk. Follow the clanking.' } }),
+      S(1, { goal: 'Meet Rigby in the North Woods, from Dusk.', where: 'Rigby paces the North Woods, north of the Reservoir and the North Meadow', obstacle: 'Rigby needs a wrench. The Delacorte stagehand has one.', needs: { phase: 'dusk', place: 'north-woods' }, on: { type: 'talk', who: 'rigby' }, does: { script: 'raccoons.meet' }, target: { who: 'rigby' }, nudge: { by: 'socket', text: 'Rigby\'s in the North Woods from Dusk. Follow the chittering.' } }),
       S(2, {
         goal: 'Get the stagehand\'s wrench at the Delacorte Theater.', where: 'The Delacorte Theater\'s stage door, just west of Turtle Pond', obstacle: 'It\'s backstage at the Delacorte.', nudge: { by: 'ringo', text: 'Guard at the stage door loves a hot slice. Everyone knows.' },
-        answer: { text: 'Peck a hot slice to the stage-door guard at Dusk, then peck the wrench off the prop table. Or find the stagehand\'s earring with Night Eyes and trade.', icon: 'crows' },
+        answer: { text: 'Peck a hot slice to the stage-door guard at Dusk, then peck up the wrench by the stage. Or find the stagehand\'s earring with Night Eyes and trade.', icon: 'crows' },
         alts: [
           // the earring is found at Night (Night Eyes: clues earring-eyes / earring); the trade itself completes the step at Dusk
           { needs: { phase: 'dusk', place: 'delacorte', ally: 'crows', crumbs: 10, human: 'stagehand', flags: ['den-strix'] }, before: { phase: 'night', place: 'shakespeare-garden', ally: 'strix' }, on: { type: 'trade', id: 'wrench' } },
           { needs: { phase: 'dusk', place: 'delacorte', item: 'slice', hot: true, human: 'guard' }, on: { type: 'pickup', item: 'wrench' }, does: { script: 'raccoons.wrench' } },
         ],
       }),
-      S(3, { goal: 'Bring the wrench to Rigby in the North Woods.', where: 'Rigby paces the North Woods, north of the Reservoir and the North Meadow', obstacle: '', needs: { phase: 'dusk', place: 'north-woods', item: 'wrench' }, on: { type: 'give', item: 'wrench', to: 'rigby' }, does: { script: 'raccoons.join' }, answer: { text: 'At Dusk, carry the wrench to Rigby in the North Woods and peck him.', icon: null }, nudge: { by: 'mamamask', text: 'Rigby\'s pacing by the North Woods drain, sweetie. Bring him that wrench at Dusk.' } }),
+      S(3, { goal: 'Bring the wrench to Rigby in the North Woods.', where: 'Rigby paces the North Woods, north of the Reservoir and the North Meadow', obstacle: '', needs: { phase: 'dusk', place: 'north-woods', item: 'wrench' }, on: { type: 'give', item: 'wrench', to: 'rigby' }, does: { script: 'raccoons.join' }, answer: { text: 'At Dusk, carry the wrench to Rigby in the North Woods and peck him.', icon: null }, nudge: { by: 'mamamask', text: 'Rigby\'s pacing by the Loch, sweetie. Bring him that wrench at Dusk.' } }),
     ],
   },
   {
     id: 'sab-middle', title: 'The Middle Cart', thread: 'sign', act: '2', start: 'nest-mall', gives: { setFlags: ['cart.middle'] },
     opensWhen: { flags: ['den-raccoons', 'den-cats'] },
     steps: [
-      S(1, { goal: 'Get into the lot by the Loeb Boathouse.', where: 'The locked gate of the Loeb Boathouse lot, on the Lake\'s east arm', obstacle: 'The gate is locked. The key hangs on the booth\'s hook, teetering.', answer: { text: 'Call the cats to knock the key off the hook, peck it, then peck the gate.', icon: 'cats' }, needs: { phase: 'night', place: 'boathouse', ally: 'cats' }, on: { type: 'flag', flag: 'boathouse.gateOpen' }, does: { script: 'sab.middle.gate' }, nudge: { by: 'pickles', text: 'A key on a hook, wobbling? That\'s a cat job, pigeon. Obviously.' } }),
+      S(1, { goal: 'Get into the lot by the Loeb Boathouse.', where: 'The locked gate of the Loeb Boathouse lot, on the Lake\'s east arm', obstacle: 'The gate is locked. The key hangs on a hook by the gate, teetering.', answer: { text: 'Call the cats to knock the key off the hook, peck it, then peck the gate.', icon: 'cats' }, needs: { phase: 'night', place: 'boathouse', ally: 'cats' }, on: { type: 'flag', flag: 'boathouse.gateOpen' }, does: { script: 'sab.middle.gate' }, nudge: { by: 'pickles', text: 'A key on a hook, wobbling? That\'s a cat job, pigeon. Obviously.' } }),
       S(2, { goal: 'Sabotage the ranger cart in the Boathouse lot.', where: 'The ranger cart parked in the Loeb Boathouse lot', obstacle: 'It\'s parked. Somebody with paws could do something about that.', answer: { text: 'Call the raccoons to the parked cart at Night and Ask them.', icon: 'raccoons' }, needs: { phase: 'night', place: 'boathouse', ally: 'raccoons', flags: ['boathouse.gateOpen'] }, on: { type: 'talent', clue: 'cart-middle' }, does: { script: 'sab.middle.done' }, nudge: { by: 'ringo', text: 'Parked cart, no ranger. Call the Crew, boss. We love a parked cart.' } }),
     ],
   },
@@ -122,9 +122,9 @@ export const SCHEMES = [
     id: 'den-rats', title: 'A Whole Hot Slice', thread: 'slice', act: '1', start: 'nest-pond', gives: { crew: 'rats', talent: 'travel', line: 'columbus' },
     opensWhen: { flags: ['prologue'] },
     steps: [
-      S(1, { goal: 'Meet Subway Sue on the subway grate at Columbus Circle.', where: 'Subway Sue sits on the subway grate at Columbus Circle, the park\'s south-west corner', obstacle: 'Sue wants a whole slice. Hot. Down the stairs.', needs: { phase: 'any', place: 'columbus-grate' }, on: { type: 'talk', who: 'sue' }, does: { script: 'rats.meet' } }),
+      S(1, { goal: 'Meet Subway Sue on the subway grate at Columbus Circle.', where: 'Subway Sue sits on the subway grate at Columbus Circle, the park\'s south-west corner', obstacle: 'Sue wants a whole slice. Hot. Down the grate.', needs: { phase: 'any', place: 'columbus-grate' }, on: { type: 'talk', who: 'sue' }, does: { script: 'rats.meet' } }),
       S(2, { goal: 'Get a slice off the tourist on the bench by the $1 SLICE joint.', where: 'The tourist on the bench outside the red $1 SLICE joint, just west of Columbus Circle', obstacle: 'He\'s eating it. Slowly.', nudge: { by: 'chip', text: 'Tourists drop EVERYTHING when a flock comes at them.' }, answer: { text: 'Hold Coo at him with a flock of 6 or more.', icon: null }, needs: { phase: 'day', place: 'slice-columbus' }, on: { type: 'pickup', item: 'slice' }, target: { at: { x: -143, z: -17.5, label: 'The slice tourist' } } }),
-      S(3, { goal: 'Get the slice to Subway Sue at Columbus Circle while it\'s hot.', where: 'Subway Sue sits on the subway grate at Columbus Circle', obstacle: 'Slices go cold. Some folks care.', needs: { phase: 'any', place: 'columbus-grate', item: 'slice', hot: true }, on: { type: 'give', item: 'slice', to: 'sue' }, does: { script: 'rats.join' }, nudge: { by: 'express', text: 'Fifteen metres, joint to grate. Fly it straight down, kid. Steam\'s still coming off it.' }, answer: { text: 'Fly the slice straight from the joint to Sue at the Columbus Circle grate inside 60 seconds and peck her.', icon: null } }),
+      S(3, { goal: 'Get the slice to Subway Sue at Columbus Circle while it\'s hot.', where: 'Subway Sue sits on the subway grate at Columbus Circle', obstacle: 'Slices go cold. Some folks care.', needs: { phase: 'any', place: 'columbus-grate', item: 'slice', hot: true }, on: { type: 'give', item: 'slice', to: 'sue' }, does: { script: 'rats.join' }, nudge: { by: 'express', text: 'Fifty metres, joint to grate. Fly it straight down, kid. Steam\'s still coming off it.' }, answer: { text: 'Fly the slice straight from the joint to Sue at the Columbus Circle grate inside 60 seconds and peck her.', icon: null } }),
     ],
   },
   {
@@ -134,7 +134,7 @@ export const SCHEMES = [
       S(1, { goal: 'Meet Queenie outside the DELI GROCERY at 110th & Lenox.', where: 'Queenie lounges outside the blue DELI GROCERY at 110th & Lenox, past the park\'s north end', obstacle: 'Queenie wants an anchovy slice from the CPW & 72nd joint. HOT.', needs: { phase: 'any', place: 'bodega-110' }, on: { type: 'talk', who: 'queenie' }, does: { script: 'cats.meet' } }),
       // Fun pass (P4): the fan on the bench is the red herring (a swarm gets "Mob me all you like"); the slice cooling on the
       // bodega sill beside Pickles is the way: wake a cat beside something on a ledge (src/schemes/den-cats.js)
-      S(2, { goal: 'Get an anchovy slice at the $1 SLICE joint on CPW & 72nd.', where: 'Pickles dozes on the window sill of the red $1 SLICE joint at Central Park West & 72nd', obstacle: 'The fan on the bench never lets go. But the counterman\'s left a fresh one cooling on the sill, right next to Pickles. Pickles is asleep. Pickles is a CAT.', nudge: { by: 'whiskerton', text: 'Wake a cat beside something on a ledge, dear, and see what happens. Every time.' }, answer: { text: 'By day, peck Pickles awake (or Coo right under the bodega window): he stares at you and slowly pushes the slice off the sill.', icon: null }, needs: { phase: 'day', place: 'slice-cpw72' }, on: { type: 'pickup', item: 'slice-anchovy' }, target: { who: 'pickles' } }),
+      S(2, { goal: 'Get an anchovy slice at the $1 SLICE joint on CPW & 72nd.', where: 'Pickles dozes on the sill of the blue DELI GROCERY, next to the red $1 SLICE joint at Central Park West & 72nd', obstacle: 'The fan on the bench never lets go. But the counterman\'s left a fresh one cooling on the sill, right next to Pickles. Pickles is asleep. Pickles is a CAT.', nudge: { by: 'whiskerton', text: 'Wake a cat beside something on a ledge, dear, and see what happens. Every time.' }, answer: { text: 'By day, peck Pickles awake (or Coo right under the bodega window): he stares at you and slowly pushes the slice off the sill.', icon: null }, needs: { phase: 'day', place: 'slice-cpw72' }, on: { type: 'pickup', item: 'slice-anchovy' }, target: { who: 'pickles' } }),
       S(3, {
         goal: 'Get the anchovy slice to Queenie at 110th & Lenox, hot.', where: 'Queenie lounges outside the blue DELI GROCERY at 110th & Lenox', obstacle: '820 m. Over the park, it\'ll be cold by 96th Street.', does: { script: 'cats.join' }, nudge: { by: 'whiskerton', text: 'Rats go under the park faster than you go over it, dear. Or there\'s the halal man\'s griddle at Dusk.' }, answer: { text: 'Rats from the 72nd W grate to 96th E, or warm it on the halal griddle at 110th & Fifth at Dusk.', icon: 'rats' },
         alts: [
@@ -163,11 +163,11 @@ export const SCHEMES = [
     id: 'truce-cats-rats', title: 'Enough for Everyone', thread: 'feuds', act: '2', start: 'nest-north', gives: { truce: 'cats-rats', line: 'harlem' },
     opensWhen: { flags: ['den-turtles', 'den-cats', 'den-rats'] },
     steps: [
-      S(1, { goal: 'See the bins outside the DELI GROCERY at 110th & Lenox.', where: 'The bins outside the blue DELI GROCERY at 110th & Lenox', obstacle: 'They\'d share… if there were enough for everyone.', needs: { phase: 'any', place: 'bodega-110' }, on: { type: 'reach', place: 'bodega-110' }, does: { script: 'catsrats.bins' } }),
+      S(1, { goal: 'See the bins on 110th Street by the DELI GROCERY at Lenox.', where: 'The bins on 110th Street, by the blue DELI GROCERY at Lenox', obstacle: 'They\'d share… if there were enough for everyone.', needs: { phase: 'any', place: 'bodega-110' }, on: { type: 'reach', place: 'bodega-110' }, does: { script: 'catsrats.bins' } }),
       S(2, {
-        goal: 'Get a whole pizza box.', where: 'Whole boxes sit on the pickup shelf at the CPW & 72nd $1 SLICE, and ride with the East Drive cyclist in the Afternoon', obstacle: 'A box is heavy, and somebody always has hold of it.',
-        nudge: { by: 'pinstripe', text: 'A whole box? The cyclist on East Drive carries one every Afternoon. Or that shelf at 72nd is VERY close to the edge.' },
-        answer: { text: 'Call the cats to the pickup shelf at the CPW & 72nd joint by day (a box teeters on its edge). Or at Afternoon, have the songbirds ring the East Drive cyclist\'s phone, or the geese chase him, so he drops his box.', icon: 'cats' },
+        goal: 'Get a whole pizza box.', where: 'Whole boxes sit on the pickup shelf at the CPW & 72nd $1 SLICE, and ride with the East Drive delivery man, Afternoons', obstacle: 'A box is heavy, and somebody always has hold of it.',
+        nudge: { by: 'pinstripe', text: 'A whole box? The delivery man on East Drive carries one every Afternoon. Or that shelf at 72nd is VERY close to the edge.' },
+        answer: { text: 'Call the cats to the pickup shelf at the CPW & 72nd joint by day (a box teeters on its edge). Or at Afternoon, have the songbirds ring the East Drive delivery man\'s phone, or the geese chase him, so he drops his box.', icon: 'cats' },
         alts: [
           { needs: { phase: 'afternoon', place: 'east-drive-90', ally: 'songbirds', human: 'cyclist' }, on: { type: 'pickup', item: 'box' } },
           { needs: { phase: 'afternoon', place: 'east-drive-90', ally: 'geese', human: 'cyclist' }, on: { type: 'pickup', item: 'box' } },
@@ -220,9 +220,9 @@ export const SCHEMES = [
     id: 'den-horses', title: 'The Van on the Trough', thread: 'spikes', act: '1–2', start: 'nest-pond', gives: { crew: 'horses', talent: 'kick', line: 'carriage', setFlags: ['spikes.P5', 'spikes.P6'] },
     opensWhen: { flags: ['prologue'], anyOf: [['den-songbirds', 'den-geese']] },
     steps: [
-      S(1, { goal: 'Talk to Clementine on the carriage line, Central Park South.', where: 'Clementine stands with the carriages on Central Park South, by the trough', obstacle: 'That van\'s parked on our trough again.', needs: { phase: 'morning', place: 'cps-carriage-line' }, on: { type: 'talk', who: 'clementine' }, does: { script: 'horses.trough' }, target: { who: 'clementine' } }),
+      S(1, { goal: 'Talk to Clementine on the carriage line, Central Park South.', where: 'Clementine stands with the carriages on Central Park South', obstacle: 'That van\'s parked on our trough again.', needs: { phase: 'morning', place: 'cps-carriage-line' }, on: { type: 'talk', who: 'clementine' }, does: { script: 'horses.trough' }, target: { who: 'clementine' } }),
       S(2, {
-        goal: 'Move Prickett off the horses\' trough on Central Park South.', where: 'Prickett leans on his van by the carriage line, Central Park South', obstacle: 'He\'s leaning on the van, on the phone to nobody.',
+        goal: 'Move Prickett off the horses\' trough on Central Park South.', where: 'Prickett leans on his van at the trough, east along Central Park South by the Plaza', obstacle: 'He\'s leaning on the van, on the phone to nobody.',
         nudge: { by: 'chip', text: 'He\'s ON the phone to nobody, Gus. So make it RING. That\'s my favourite trick. Or send a goose. Nobody argues with a goose.' },
         answer: { text: 'At Morning, Call the songbirds (or the geese) to Prickett by his van on Central Park South and Ask them.', icon: 'songbirds' },
         alts: [
@@ -238,7 +238,7 @@ export const SCHEMES = [
     id: 'part-talons', title: 'The Rink Job', thread: 'spikes', act: '2–3', start: 'nest-pond', gives: { part: 'talons', setFlags: ['cart.south', 'shed.open', 'prickett.quit'], scarf: 'racing-red' },
     opensWhen: { flags: ['den-raccoons', 'den-horses'], anyOf: [['sab-middle', 'sab-north']] },
     steps: [
-      S(1, { goal: 'See what Prickett hides in the Wollman Rink shed.', where: 'Wollman Rink\'s yard, by the north boards', obstacle: 'Prickett\'s stock AND the last ranger cart, behind one steel door. Nothing with paws opens that.', answer: { text: 'At Morning, fly to Wollman Rink and watch the yard by the north boards.', icon: null }, needs: { phase: 'morning', place: 'wollman-rink' }, on: { type: 'reach', place: 'wollman-rink' }, does: { script: 'rink.stock' } }),
+      S(1, { goal: 'See what Prickett hides in the Wollman Rink shed.', where: 'Wollman Rink\'s yard, by the north boards', obstacle: 'Prickett\'s stock behind one steel door, and the last ranger cart parked across it. Nothing with paws opens that.', answer: { text: 'At Morning, fly to Wollman Rink and watch the yard by the north boards.', icon: null }, needs: { phase: 'morning', place: 'wollman-rink' }, on: { type: 'reach', place: 'wollman-rink' }, does: { script: 'rink.stock' } }),
       S(2, { goal: 'Rig the Zamboni in Wollman Rink\'s garage.', where: 'The Zamboni garage at Wollman Rink\'s south end', obstacle: 'The garage door is buckled. The raccoons want a slice first ("union rules").', nudge: { by: 'ringo', text: 'Garage door\'s buckled, boss. Needs a good KICK. And Mama Mask won\'t lift a paw till she gets her slice. Union rules.' }, answer: { text: 'At Dusk, Call the horses to the Zamboni garage at the rink\'s south end and Ask them. Peck Rigby or Mama Mask with any slice, then Ask the raccoons at the Zamboni.', icon: 'horses' }, needs: { phase: 'dusk', place: 'wollman-rink', allies: ['horses', 'raccoons'], item: 'slice' }, on: { type: 'flag', flag: 'zamboni.rigged' }, does: { setFlags: ['zamboni.rigged'] } }),
       S(3, { goal: 'Launch the Zamboni over Wollman Rink\'s north boards.', where: 'The ice of Wollman Rink, by the north boards', obstacle: 'The boards and the parked cart stand between the ice and the shed.', nudge: { by: 'ringo', text: 'She\'d FLY off a big enough bump, boss. A frozen one. In the KEEP CLEAR bit. Then floor it, straight north!' }, answer: { text: 'At Night, drive laps till the hopper\'s full, Dump the snow in the KEEP CLEAR chevrons by the north boards, hold Spray till it freezes, back off and drive straight at it, north, flat out.', icon: null }, needs: { phase: 'night', place: 'wollman-rink', flags: ['zamboni.rigged'] }, on: { type: 'flag', flag: 'rink.launched' }, does: { script: 'setpiece.rinkjob' } }),
     ],
@@ -269,7 +269,7 @@ export const SCHEMES = [
     steps: [
       S(1, { goal: 'See the dog walker on Cedar Hill, in the Morning.', where: 'Cedar Hill, the grassy slope east of the Ramble', obstacle: 'No squirrel digs where the dogs run.', answer: { text: 'At Morning, go to Cedar Hill when the dog walker is out.', icon: null }, needs: { phase: 'morning', place: 'cedar-hill', human: 'dogwalker' }, on: { type: 'reach', place: 'cedar-hill' }, does: { script: 'dogs.chase' } }),
       S(2, { goal: 'Dig up Old Pecan\'s 1974 cache on Cherry Hill.', where: 'The dust plume on Cherry Hill, just west of Bethesda Terrace', obstacle: 'A dust plume on Cherry Hill.', nudge: { by: 'pecan', text: 'Nineteen seventy-four, Gus. Cherry Hill. I buried something BIG there. There\'s a plume. I\'m nearly sure there\'s a plume.' }, answer: { text: 'By day, Call the squirrels to the dust plume on Cherry Hill and Ask them.', icon: 'squirrels' }, needs: { phase: 'day', place: 'cherry-hill', ally: 'squirrels' }, on: { type: 'talent', clue: 'pecan-cache' }, does: { script: 'dogs.cache' } }),
-      S(3, { goal: 'Take the sack to the dog walker on Cedar Hill.', where: 'The dog walker on Cedar Hill, east of the Ramble, in the Morning', obstacle: 'Eight dogs. One sack.', nudge: { by: 'pretzel', text: 'A BALL? Where? WHERE? …Bring us balls, Gus. LOTS of balls. Nobody chases a squirrel with a ball in the air.' }, answer: { text: 'At Morning, carry the sack (low and slow) to Cedar Hill and drop it by the dog walker.', icon: null }, needs: { phase: 'morning', place: 'cedar-hill', item: 'tennis-sack', human: 'dogwalker' }, on: { type: 'drop', item: 'tennis-sack', place: 'cedar-hill' }, does: { script: 'dogs.balls' } }),
+      S(3, { goal: 'Take the sack to the dog walker on Cedar Hill.', where: 'The dog walker on Cedar Hill, east of the Ramble, in the Morning', obstacle: 'A pack of dogs. One sack.', nudge: { by: 'pretzel', text: 'A BALL? Where? WHERE? …Bring us balls, Gus. LOTS of balls. Nobody chases a squirrel with a ball in the air.' }, answer: { text: 'At Morning, carry the sack (low and slow) to Cedar Hill and drop it by the dog walker.', icon: null }, needs: { phase: 'morning', place: 'cedar-hill', item: 'tennis-sack', human: 'dogwalker' }, on: { type: 'drop', item: 'tennis-sack', place: 'cedar-hill' }, does: { script: 'dogs.balls' } }),
     ],
   },
   {
@@ -293,7 +293,7 @@ export const SCHEMES = [
     ],
   },
   {
-    id: 'den-rhoda', title: 'Rhoda Raids the Meer', thread: 'feuds', act: '2–3', start: 'nest-north', gives: { crew: 'rhoda', talent: 'lift', setFlags: ['spike.P4.cleared'] },
+    id: 'den-rhoda', title: 'Rhoda Raids the Meer', thread: 'feuds', act: '2–3', start: 'nest-north', gives: { crew: 'rhoda', talent: 'lift', truce: 'hawks-pigeons', setFlags: ['spike.P4.cleared'] },   // #43: the design's fourth feud (hawks vs pigeons) is settled here; without it the Truces meter stuck at 3/4
     opensWhen: { flags: ['prologue', 'den-raccoons'] },
     steps: [
       S(1, { goal: 'Ask Big Sal at the Blockhouse what\'s wrong at the Meer.', where: 'Big Sal holds court at the old stone Blockhouse, west of Harlem Meer', obstacle: 'Rhoda raids the Meer.', needs: { phase: 'day', place: 'meer' }, on: { type: 'talk', who: 'bigsal' }, does: { script: 'rhoda.sal' }, target: { who: 'bigsal' } }),
@@ -305,7 +305,7 @@ export const SCHEMES = [
     id: 'den-meermob', title: 'Show Me Your Crew', thread: 'feuds', act: '3', start: 'nest-north', gives: { crew: 'meermob', flock: 14, talent: 'muscle' },
     opensWhen: { flags: ['den-rhoda'] },
     steps: [
-      S(1, { goal: 'Fly the flypast through the Blockhouse arch.', where: 'The arch of the old stone Blockhouse, west of Harlem Meer', obstacle: 'Big Sal: "Show me your crew." Thirty or more.', nudge: { by: 'feathers', text: 'Thirty, kid. Through the arch, low and in a line. I count every head.' }, answer: { text: 'By day, with a flock of 30 or more, fly low through the Blockhouse arch.', icon: null }, needs: { phase: 'day', place: 'blockhouse', flock: 30 }, on: { type: 'flag', flag: 'meer.flypast' }, does: { script: 'meer.flypast' } }),
+      S(1, { goal: 'Fly the flypast through the Blockhouse.', where: 'The gap in the old stone Blockhouse\'s walls, west of Harlem Meer', obstacle: 'Big Sal: "Show me your crew." Thirty or more.', nudge: { by: 'feathers', text: 'Thirty, kid. In through the gap, low and in a line. I count every head.' }, answer: { text: 'By day, with a flock of 30 or more, fly low in through the gap in the Blockhouse walls.', icon: null }, needs: { phase: 'day', place: 'blockhouse', flock: 30 }, on: { type: 'flag', flag: 'meer.flypast' }, does: { script: 'meer.flypast' } }),
       S(2, {
         goal: 'Seal the deal with Big Sal at the Blockhouse.', where: 'Big Sal at the old stone Blockhouse, west of Harlem Meer', obstacle: 'Feast: 60 crumbs. Or three slices.',
         nudge: { by: 'knuckles', text: 'Sal don\'t shake on an empty stomach. Sixty crumbs. Or slices. He ain\'t fussy about slices.' },
@@ -371,7 +371,7 @@ export const SCHEMES = [
     steps: [
       S(1, {
         // Fun pass (P8): no swarm (a flock at the table gets "Shoo!"): a wine glass on the next table's edge is a cat job
-        goal: 'Get the cufflink on the Tavern on the Green patio.', where: 'The waiter on the Tavern on the Green patio, west of Sheep Meadow', obstacle: 'The waiter is standing on it. He won\'t move off it… unless something more expensive than a cufflink needs him.', does: { script: 'pen.cufflink' }, nudge: { by: 'pickles', text: 'A glass, right on the edge of a table? Darling. It\'s practically a REQUEST.' }, answer: { text: 'At Afternoon, in sunglasses, Call the cats to the Tavern patio and Ask them by the wine glass teetering on the table edge: the waiter rushes over with a dustpan. Or have the songbirds ring the patio phone.', icon: 'cats' },
+        goal: 'Get the cufflink on the Tavern on the Green patio.', where: 'The waiter on the Tavern on the Green patio, west of Sheep Meadow', obstacle: 'The waiter is standing on it. He won\'t move off it… unless something more expensive than a cufflink needs him.', does: { script: 'pen.cufflink' }, nudge: { by: 'pickles', text: 'A glass, right on the edge of a table? Darling. It\'s practically a REQUEST.' }, answer: { text: 'At Afternoon, in sunglasses, Call the cats to the Tavern patio and Ask them by the wine glass teetering on the table edge: the waiter rushes over to sweep it up. Or have the songbirds ring the patio phone.', icon: 'cats' },
         alts: [
           { needs: { phase: 'afternoon', place: 'tavern', gear: 'sunglasses', ally: 'cats', human: 'waiter' }, on: { type: 'pickup', item: 'cufflink' } },
           { needs: { phase: 'afternoon', place: 'tavern', gear: 'sunglasses', ally: 'songbirds', human: 'waiter' }, on: { type: 'pickup', item: 'cufflink' } },
@@ -387,7 +387,7 @@ export const SCHEMES = [
       // Fun pass (P9): Grate Fetch in Act 1 (it slept until part-beak), and one dive fewer
       S(1, { goal: 'Find the jogger\'s lost key.', where: 'The subway grate on Central Park West at 86th, by the Reservoir', obstacle: 'It went through a grate by the Reservoir, mid-lap.', nudge: { by: 'pinstripe', text: 'Something jingly down OUR grate at 86th. Ask us.' }, answer: { text: 'By day, Call the rats to the 86th Street West grate (Central Park West) and Ask them.', icon: 'rats' }, needs: { phase: 'day', place: 'grate-86w', ally: 'rats' }, on: { type: 'talent', clue: 'key-grate' }, does: { script: 'headlamp.key' }, target: { at: { x: -128, z: 547.96, label: 'The 86th Street grate' } } }),
       S(2, {
-        goal: 'Trade the key to the Reservoir jogger.', where: 'The joggers circle the Reservoir track, Mornings and Dusk', obstacle: 'He never stops running.', does: { script: 'headlamp.trade' }, nudge: { by: 'cawdry', text: 'Jogger stops once a lap. Water fountain, north gatehouse. Like clockwork.' }, answer: { text: 'At Morning or Dusk, wait with the crows at the water fountain by the Reservoir\'s north gatehouse: the jogger stops there once a lap. Ask the crows while he drinks. (Or have the songbirds ring his phone.)', icon: 'crows' },
+        goal: 'Trade the key to the Reservoir jogger.', where: 'The joggers circle the Reservoir track, Mornings and Dusk', obstacle: 'The jogger never stops running.', does: { script: 'headlamp.trade' }, nudge: { by: 'cawdry', text: 'Jogger stops once a lap. Water fountain, north gatehouse. Like clockwork.' }, answer: { text: 'At Morning or Dusk, wait with the crows at the water fountain by the Reservoir\'s north gatehouse: the jogger stops there once a lap. Ask the crows while the jogger drinks. (Or have the songbirds ring his phone.)', icon: 'crows' },
         alts: [
           { needs: { phase: ['morning', 'dusk'], place: 'reservoir-track', allies: ['songbirds', 'crows'], crumbs: 10, item: 'key', human: 'jogger' }, on: { type: 'trade', id: 'headlamp' } },
           { needs: { phase: ['morning', 'dusk'], place: 'north-gatehouse', ally: 'crows', crumbs: 10, item: 'key', human: 'jogger' }, on: { type: 'trade', id: 'headlamp' } },
@@ -445,9 +445,9 @@ export const SCHEMES = [
     opensWhen: { flags: ['prologue'] },
     steps: [
       S(1, {
-        goal: 'Borrow the old film camera from the tourist\'s window ledge over CPW.', where: 'A tourist\'s window ledge on Central Park West, between 71st and 72nd', obstacle: 'He\'s guarding it while he snaps the skyline. Get in his shot, or give him a Coo.',
-        nudge: { by: 'cawdry', text: 'Tourist in a window over CPW, past 71st. Old camera on the ledge. Stand in his shot and he forgets everything.' },
-        answer: { text: 'Fly to the ledge under the tourist\'s window on Central Park West, between 71st and 72nd. Land on the ledge beside his balcony (or stand in front of his lens) and hold still a moment, or Coo below him. When he turns away, Peck the old camera on the ledge.', icon: null },
+        goal: 'Borrow the old film camera from the tourist\'s window ledge over CPW.', where: 'A tourist\'s window ledge on Central Park West, between 71st and 72nd', obstacle: 'She\'s guarding it while she snaps the skyline. Get in her shot, or give her a Coo.',
+        nudge: { by: 'cawdry', text: 'Tourist in a window over CPW, past 71st. Old camera on the ledge. Stand in her shot and she forgets everything.' },
+        answer: { text: 'Fly to the ledge under the tourist\'s window on Central Park West, between 71st and 72nd. Land on the ledge beside her balcony (or stand in front of her lens) and hold still a moment, or Coo below her. When she turns away, Peck the old camera on the ledge.', icon: null },
         needs: { phase: 'any', place: 'cpw-71-window' }, on: { type: 'pickup', item: 'camera' }, target: { at: { x: -129.6, z: 262.35, label: 'The tourist\'s camera' } },
       }),
       S(2, {

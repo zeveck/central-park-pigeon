@@ -61,6 +61,9 @@ export class Street {
     }
     if (this.prickett) {
       this.prickett.out = vanHere && phase === 'morning';
+      // #43: at the van he's "on the phone to nobody" (den-horses): a phone in place of his clipboard
+      const acc = ['spraytank', 'wand', this.prickett.out ? 'phone-left' : 'clipboard'];
+      if (String(acc) !== String(this.prickett.spec.acc)) { this.prickett.spec.acc = acc; G.humans.redress(this.prickett); }
       this.prickett.x = PROLOGUE.vanStop.x - 1.6; this.prickett.z = PROLOGUE.vanStop.z + 2.2; this.prickett.y = undefined; this.prickett.yaw = Math.PI;
       // Fixes-3: back in his own hands (a Mimic/Bully at the trough, or a scene cut off by a load, left him walking free)
       Object.assign(this.prickett, { script: true, busy: false, mode: 'home', target: null, oneShot: null });

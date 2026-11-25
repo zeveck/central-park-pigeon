@@ -38,7 +38,7 @@ export async function installDenSongbirds(G) {
       { cam: { ...G.shot({ x: P3.x, y, z: P3.z - 24 }, { dist: 16, height: 3, yaw: 1.2, lookY: 0.5 }), secs: 1.4 } },   // (from over the park: the ledge, its strips and the circling birds)
       { wait: 1.6 },
       { say: [
-        L('mimi', '*a perfect car alarm* …Ha! Gotcha. Oh, it\'s the pigeon with the scarf.', 'mimi-greeting'),
+        L('mimi', '*a perfect car chirp* …Ha! Gotcha! Oh, it\'s the pigeon with the scarf.', 'mimi-greeting'),
         L('mimi', 'See that stone ledge over the big columns, sweetie? Our STAGE. Sing up there and the columns throw it right down Central Park West.'),
         L('mimi', 'Every doorman, every dog walker, every bus stop for six blocks. And now? SPIKES. All along the edge.'),
         L('jay', 'CAW CAW! …Sorry. Doing my crow. Prickett did it. Glued them on in a rush, one dab each. Half of them are hanging off the lip.'),
@@ -51,9 +51,10 @@ export async function installDenSongbirds(G) {
   // ---------------------------------------------------------------- step 2: the cats knock the strips off; the starlings land
   E.registerScript('songbirds.cornice', (ctx, done) => {
     G.audio.play('starling-chatter', { at: G.gus.position });
+    G.later(1.3, () => { G.audio.synth('carChirp'); G.later(0.45, () => G.audio.synth('carChirp', { vol: 0.35 })); });   // #43: the chirp she does, and its echo off the columns
     G.later(0.6, () => G.say([
-      L('mimi', 'Our stage! *ahem* *a perfect car alarm* …Hear that echo? Half of Central Park West just checked their cars. Thank your terrifying friends, darling.'),
-      L('mimi', 'But they have all heard my car alarm a hundred times. My act needs a NEW sound. Something nobody in this park can do. Bring me one and the Racket is yours.'),
+      L('mimi', 'Our stage! *ahem* *a perfect car chirp* …Hear that echo? Half of Central Park West just checked their cars. Thank your terrifying friends, darling.'),
+      L('mimi', 'But they have all heard my car chirp a hundred times. My act needs a NEW sound. Something nobody in this park can do. Bring me one and the Racket is yours.'),
       L('chip', 'Psst. Afternoons, the ice-cream truck by the Plaza. That tune? Nobody can do that tune.'),
     ], done));
   });
@@ -83,7 +84,7 @@ export async function installDenSongbirds(G) {
       { do: () => { cheer(G, list); G.audio.play('songbird-chatter', { at: G.gus.position }); } },
       { say: [
         L('mimi', 'Every kid on the Plaza. With ONE tune. Sweetie, you\'re a genius. The Racket is yours.', 'mimi-join'),
-        L('jay', 'Phone rings, car alarms, ranger whistles, ice cream. Point us at a human and they WANDER OFF.'),
+        L('jay', 'Phone rings, car chirps, ranger whistles, ice cream. Point us at a human and they WANDER OFF.'),
         L('ruby', '"All the world\'s a stage." And we just stole it.'),
       ] },
       { follow: true },

@@ -134,12 +134,21 @@ export class Clues {
           let obj;
           if (d.spikeSite) obj = new THREE.Mesh(this.geo.strip, this.mats.strip);
           else if (d.prop === 'glass') obj = this.#wineGlass();   // fun pass (P8)
-          else obj = this.G.items.makeMesh(d.does?.item === 'gate-key' ? 'key' : d.does?.item === 'box' ? 'box' : d.does?.item || 'slice');
+          else obj = this.G.items.makeMesh(d.does?.item === 'gate-key' ? 'gate-key' : d.does?.item === 'box' ? 'box' : d.does?.item || 'slice');
           const top = d.spikeSite ? this.G.collision.surface(p.x, p.z, 400).y - c.y + 0.03 : 0;
           obj.position.set(p.x - c.x, top, p.z - c.z);
           g.add(obj);
           return obj;
         });
+        // #43: the lot's gate key hangs on a hook by the gate ("Locked. The key hangs on a hook by the gate."): an iron post
+        // from the ground, a short arm and a hook, at the key (it used to hang in mid-air). Always there (not in g, which hides).
+        if (d.id === 'lot-key') {
+          const iron = new THREE.MeshStandardMaterial({ color: 0x2b2d30, roughness: 0.6, metalness: 0.5 }), H = c.y - this.G.terrain.heightAt(d.x, d.z);
+          const post = new THREE.Group(); post.position.set(d.x, c.y - H, d.z);
+          const bx = (w, h, dd, x, y, z) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, dd), iron); m.position.set(x, y, z); m.castShadow = true; post.add(m); };
+          bx(0.06, H + 0.25, 0.06, 0, (H + 0.25) / 2, 0.32); bx(0.035, 0.035, 0.34, 0, H + 0.22, 0.16); bx(0.02, 0.12, 0.02, 0, H + 0.16, 0);
+          this.group.add(post);
+        }
         break;
       }
       case 'net': {
@@ -222,7 +231,7 @@ export class Clues {
     if (d.key) {
       G.interact.register({ id: 'door:' + d.id, kind: 'door', x: d.x, y: y + 0.3, z: d.z, r: 2, dy: 2.5, priority: 5,
         label: () => (!door.open ? (this.st.carried?.id === d.key ? 'Unlock the gate' : 'Locked gate') : null),
-        act: () => { if (this.st.carried?.id === d.key) { this.G.items.take(); this.openDoor(d.id); } else { G.audio.play('peck', { at: d }); G.toast('Locked. The key hangs on the booth\'s hook.'); } } });
+        act: () => { if (this.st.carried?.id === d.key) { this.G.items.take(); this.openDoor(d.id); } else { G.audio.play('peck', { at: d }); G.toast('Locked. The key hangs on a hook by the gate.'); } } });
     }
   }
 
@@ -839,7 +848,8 @@ export class Clues {
     this.#actAt(c, ag, talent, () => {
       if (near.length) {
         if (talent === 'bully') G.humans.flee({ x: c.x, z: c.z }, 5, { by: 'bully' });
-        else { G.audio.synth(['phoneRing', 'carAlarm', 'whistle'][Math.floor(st.time) % 3], { wobble: true }); G.humans.lure({ x: c.x, z: c.z }, 6); }
+        else { const k = Math.floor(st.time) % 3; if (k === 2) G.audio.play('ranger-whistle', { rate: 1.04 }); else G.audio.synth(k ? 'carChirp' : 'phoneRing', { wobble: true });   // #43: phone ring, car chirp, the real ranger whistle (what she says she does)
+          G.humans.lure({ x: c.x, z: c.z }, 6); }
       }
       if (delayed) G.toast(`The rangers are distracted: ${delayed} sign${delayed > 1 ? 's' : ''} stay${delayed > 1 ? '' : 's'} up 3 minutes longer`);
       G.bus.emit('talent', { ally: crew, talent, clue: 'generic', x: ag.x, z: ag.z });

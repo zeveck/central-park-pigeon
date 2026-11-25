@@ -16,7 +16,7 @@ export function installDenSquirrels(G) {
       L('hazel', 'All three! Wait. Did I bury those? I did! I\'m brilliant. YOU\'RE brilliant.'),
       L('nutmeg', 'Two hundred and twelve. Two hundred and thirteen? Recount. Later.'),
       L('twitch', 'Gus-you\'re-in-we\'re-in-everyone\'s-in-'),
-      L('hazel', 'The Acorn Syndicate digs for you now. Dust plume? Call us.', 'hazel-join'),
+      L('hazel', 'Syndicate\'s in! Now where\'d I put my acorn? Dig? Call us.', 'hazel-join'),
     ],
   }, done));
   mechaLine(G, 'hazel', 'squirrels', 'There\'s a giant pigeon in the Ramble! Did I bury that? …I didn\'t bury that.');

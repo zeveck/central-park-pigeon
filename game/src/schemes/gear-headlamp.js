@@ -8,7 +8,7 @@ export function installGearHeadlamp(G) {
   const E = G.schemes;
   E.registerScript('headlamp.key', (ctx, done) => G.say([L('express', 'A KEY! On a little sneaker keyring! Somebody runs a LOT.'), L('pinstripe', 'Smells of sweat and determination. Jogger\'s, for sure.')], done));
   E.registerScript('headlamp.trade', (ctx, done) => G.later(1.4, () => G.say([
-    L(null, 'The jogger jogs on the spot, pockets the key, and tosses the crows his old headlamp. "Keep it! I\'ve got six!"'),
+    L(null, 'The jogger jogs on the spot, pockets the key, and tosses the crows an old headlamp. "Keep it! I\'ve got six!"'),
     L('cawdry', 'A light for the night woods. The owl won\'t like it. That\'s the point.'),
   ], done)));
 }

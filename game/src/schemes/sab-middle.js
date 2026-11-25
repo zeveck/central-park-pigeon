@@ -1,5 +1,5 @@
 // sab-middle, "The Middle Cart" (Sign War). At Night the cats knock the lot
-// key off the booth's hook; Gus unlocks the gate; the raccoons pull the spark
+// key off its hook by the gate; Gus unlocks the gate; the raccoons pull the spark
 // plug and pop a hubcap. Middle signs stay flipped for good.
 import { L } from './_ssf-common.js';
 

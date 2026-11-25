@@ -25,7 +25,7 @@ export function installTruceDogsSquirrels(G) {
       { do: () => { for (let k = 0; k < 4; k++) G.later(k * 0.35, () => G.bubbles.add(k % 2 ? 'EEK!' : 'WOOF!', { at: { x: hill.x + (k - 2) * 2.5, y: G.surfaceY(hill.x, hill.z, 30) + 1.2, z: hill.z + (k % 2) * 3 }, ttl: 1.2, range: 80 })); } },
       { wait: 1.6 },
       { say: [
-        L('hazel', 'See? SEE? Every Morning. Eight dogs. No squirrel digs where the dogs run, Gus.'),
+        L('hazel', 'See? SEE? Every Morning. THOSE dogs. No squirrel digs where the dogs run, Gus.'),
         L('biscuit', 'They\'re not MY dogs! …They\'re my FRIENDS\' dogs. They just really like squirrels.'),
         L('pecan', 'In my day we had a trick for dogs. Nineteen seventy-four. I buried it on Cherry Hill.'),
       ] },

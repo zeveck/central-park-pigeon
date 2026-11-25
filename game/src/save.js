@@ -105,6 +105,9 @@ export function migrate(data) {
   const fresh = freshState();
   const out = { ...fresh, ...data };
   for (const k of ['signs', 'spikes', 'carts', 'collectibles', 'stats']) out[k] = { ...fresh[k], ...(data[k] || {}) };
+  // #43: progress recomputed from what's done, so older saves show counts that can complete
+  out.truces = [...(out.truces || [])];
+  if (out.flags?.['den-rhoda'] && !out.truces.includes('hawks-pigeons')) out.truces.push('hawks-pigeons');   // den-rhoda now gives the 4th truce
   out.v = SAVE_VERSION;
   delete out.settings;
   return out;

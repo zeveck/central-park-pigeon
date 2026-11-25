@@ -20,9 +20,9 @@ export const ITEM_DEFS = {
   'slice-anchovy': { name: 'Anchovy slice', cls: 'light', model: 'pizza-slice', slice: true, anchovy: true },
   box: { name: 'Pizza box', cls: 'heavy', model: 'pizza-box' },
   shiny: { name: 'Shiny', cls: 'light', code: 'shiny' },
-  key: { name: 'Lost key', cls: 'light', code: 'key' },
+  key: { name: 'Lost key', cls: 'light', code: 'key-sneaker' },   // #43: the jogger's key, on its little sneaker keyring
   'gate-key': { name: 'Gate key', cls: 'light', code: 'key' },
-  cufflink: { name: 'Cufflink', cls: 'light', code: 'shiny' },
+  cufflink: { name: 'Cufflink', cls: 'light', code: 'cufflink' },   // #43: gold, as everyone says
   earring: { name: 'Earring', cls: 'light', code: 'shiny' },
   wrench: { name: 'Wrench', cls: 'light', code: 'wrench' },
   sticker: { name: 'Lucky sticker', cls: 'light', code: 'disc' },
@@ -131,7 +131,9 @@ export class Items {
       tan: ruleMaterial({ color: 0xb08a5a }),
       dark: ruleMaterial({ color: 0x333338 }),
       rust: ruleMaterial({ color: 0x7a4a30 }),
-      tennis: ruleMaterial({ map: tennisMap(), roughness: 0.95 }),   // fix-40: Biscuit's ball, optic yellow with its white seam
+      tennis: ruleMaterial({ map: tennisMap(), roughness: 0.95 }),
+      tub: ruleMaterial({ color: 0xe9efe4, roughness: 0.6, side: THREE.DoubleSide }),   // #43: the picnickers' tub of peas
+      white: ruleMaterial({ color: 0xf4f4f0 }),   // fix-40: Biscuit's ball, optic yellow with its white seam
     };
   }
 
@@ -169,16 +171,39 @@ export class Items {
     }
     switch (d.code) {
       case 'shiny': add(new THREE.OctahedronGeometry(0.035), this.mats.shiny, 0, 0.035); break;
+      case 'cufflink': add(new THREE.CylinderGeometry(0.03, 0.03, 0.008, 16), this.mats.gold, 0, 0.03, 0, Math.PI / 2); add(new THREE.CylinderGeometry(0.006, 0.006, 0.03, 8), this.mats.gold, 0, 0.03, -0.018, Math.PI / 2); add(new THREE.CylinderGeometry(0.014, 0.014, 0.006, 12), this.mats.gold, 0, 0.03, -0.034, Math.PI / 2); break;   // #43: a gold disc on a stud
+      case 'key-sneaker':   // #43: the key plus "a little sneaker keyring": a white sneaker charm with a coral stripe
+        add(new THREE.TorusGeometry(0.02, 0.007, 6, 12), this.mats.gold, -0.03, 0.01, 0, Math.PI / 2); add(new THREE.BoxGeometry(0.06, 0.008, 0.012), this.mats.gold, 0.015, 0.01, 0);
+        add(new THREE.BoxGeometry(0.022, 0.012, 0.045), this.mats.white, -0.06, 0.008, 0.01); add(new THREE.BoxGeometry(0.02, 0.014, 0.02), this.mats.white, -0.06, 0.02, -0.002); add(new THREE.BoxGeometry(0.024, 0.005, 0.046), this.mats.red, -0.06, 0.003, 0.01);
+        break;
       case 'key': add(new THREE.TorusGeometry(0.02, 0.007, 6, 12), this.mats.gold, -0.03, 0.01, 0, Math.PI / 2); add(new THREE.BoxGeometry(0.06, 0.008, 0.012), this.mats.gold, 0.015, 0.01, 0); break;
       case 'wrench': add(new THREE.BoxGeometry(0.16, 0.012, 0.022), this.mats.steel, 0, 0.01, 0); add(new THREE.TorusGeometry(0.02, 0.008, 5, 10, 4.5), this.mats.steel, 0.09, 0.01, 0, Math.PI / 2); break;
-      case 'peas': for (let k = 0; k < 5; k++) add(new THREE.SphereGeometry(0.014, 8, 6), this.mats.green, (k - 2) * 0.016, 0.014, (k % 2) * 0.012); break;
+      case 'peas':   // #43: a small open tub, heaped with peas (it was 5 loose peas; every line calls it "the tub")
+        add(new THREE.CylinderGeometry(0.055, 0.046, 0.06, 16, 1, true), this.mats.tub, 0, 0.03);
+        add(new THREE.CircleGeometry(0.046, 16), this.mats.tub, 0, 0.002, 0, -Math.PI / 2);
+        add(new THREE.TorusGeometry(0.055, 0.004, 5, 18), this.mats.green, 0, 0.06, 0, Math.PI / 2);
+        add(new THREE.CylinderGeometry(0.05, 0.05, 0.004, 16), this.mats.green, 0, 0.05);
+        for (let k = 0; k < 9; k++) add(new THREE.SphereGeometry(0.012, 8, 6), this.mats.green, Math.cos(k * 2.4) * 0.03 * (k ? 1 : 0), 0.058 + (k % 3) * 0.004, Math.sin(k * 2.4) * 0.03 * (k ? 1 : 0));
+        break;
       case 'specs': add(new THREE.TorusGeometry(0.018, 0.004, 5, 12), this.mats.dark, -0.022, 0.02, 0); add(new THREE.TorusGeometry(0.018, 0.004, 5, 12), this.mats.dark, 0.022, 0.02, 0); break;
       case 'falafel': add(new THREE.IcosahedronGeometry(0.025, 1), this.mats.rust, 0, 0.025); break;
       case 'ball': add(new THREE.SphereGeometry(0.06, 18, 12), this.mats.tennis, 0, 0.06, 0, 0.5, 0, 0.3); break;
       case 'sail': add(new THREE.PlaneGeometry(0.4, 0.5), this.mats.cream, 0, 0.02, 0, -Math.PI / 2); break;
       case 'sack': add(new THREE.SphereGeometry(0.16, 12, 10), this.mats.tan, 0, 0.14); break;
       case 'pipe': add(new THREE.CylinderGeometry(0.15, 0.15, 3, 10), this.mats.rust, 0, 0.15, 0, 0, 0, Math.PI / 2); break;
-      case 'cart': add(new THREE.BoxGeometry(0.6, 0.5, 0.9), this.mats.steel, 0, 0.5); break;
+      case 'cart': {   // #43: a wire shopping cart ("It has… WHEELS"): open basket of bars, rim, handle, legs and four wheels
+        const bar = (w, h, d, x, y, z) => add(new THREE.BoxGeometry(w, h, d), this.mats.steel, x, y, z);
+        const W = 0.6, D = 0.9, y0 = 0.32, y1 = 0.78, ym = (y0 + y1) / 2, H = y1 - y0;
+        bar(W, 0.012, D, 0, y0, 0);                                                     // the floor grid's frame
+        for (const s of [-1, 1]) { bar(0.014, 0.014, D, s * W / 2, y1, 0); bar(W, 0.014, 0.014, 0, y1, s * D / 2); bar(0.01, 0.01, D, s * W / 2, ym, 0); }   // rim + mid rail
+        for (let k = 0; k <= 9; k++) for (const s of [-1, 1]) bar(0.008, H, 0.008, s * W / 2, ym, -D / 2 + k * D / 9);   // long-side bars
+        for (let k = 1; k < 6; k++) for (const s of [-1, 1]) bar(0.008, H, 0.008, -W / 2 + k * W / 6, ym, s * D / 2);    // end bars
+        for (let k = 1; k < 6; k++) bar(0.008, 0.008, D, -W / 2 + k * W / 6, y0 + 0.008, 0);                              // floor wires
+        add(new THREE.CylinderGeometry(0.018, 0.018, W + 0.06, 8), this.mats.red, 0, y1 + 0.12, -D / 2 - 0.1, 0, 0, Math.PI / 2);   // the handle (red grip)
+        for (const s of [-1, 1]) { bar(0.014, 0.16, 0.014, s * W / 2, y1 + 0.05, -D / 2 - 0.05); bar(0.02, y0 - 0.06, 0.02, s * (W / 2 - 0.04), (y0 + 0.06) / 2, -D / 2 + 0.06); bar(0.02, y0 - 0.06, 0.02, s * (W / 2 - 0.04), (y0 + 0.06) / 2, D / 2 - 0.06); }   // handle struts, legs
+        for (const [x, z] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) add(new THREE.CylinderGeometry(0.05, 0.05, 0.03, 12), this.mats.dark, x * (W / 2 - 0.04), 0.05, z * (D / 2 - 0.06), 0, 0, Math.PI / 2);   // wheels
+        break;
+      }
       case 'box-small': add(new THREE.BoxGeometry(0.08, 0.03, 0.12), this.mats.dark, 0, 0.015); break;
       case 'camera': add(new THREE.BoxGeometry(0.13, 0.08, 0.06), this.mats.tan, 0, 0.04); add(new THREE.CylinderGeometry(0.025, 0.025, 0.03, 12), this.mats.dark, 0, 0.04, 0.04, Math.PI / 2); break;   // (if the GLB is missing)
       case 'bagel': this.#bagel(g, d); break;   // #44

@@ -65,6 +65,9 @@ export async function installWedding(G) {
   group.add(basket);
   const glow = new THREE.Mesh(new THREE.CircleGeometry(0.9, 24).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0x7fe0ff, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending, depthWrite: false }));
   glow.visible = false; group.add(glow);
+  // #43: the sunken rowboat Bubbles sees ("Something in it GLOWS"): the Boathouse rowboat's shape, dark and tilted, on the bottom
+  const sunk = new THREE.Mesh(new THREE.CapsuleGeometry(0.55, 2.0, 3, 8).rotateX(Math.PI / 2).scale(1, 0.4, 1), new THREE.MeshStandardMaterial({ color: 0x4a3320, roughness: 1 }));
+  sunk.rotation.set(0.55, 0.9, 0.3); group.add(sunk);   // nose-down, its stern breaking the surface (the water hides anything deeper)
   const bouquet = new THREE.Group();
   bouquet.add(new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.2, 8).rotateX(Math.PI).translate(0, -0.08, 0), ruleMaterial({ color: 0x6f9a52 })));
   for (let k = 0; k < 7; k++) { const f = new THREE.Mesh(new THREE.SphereGeometry(0.055, 8, 6), ruleMaterial({ color: [0xfff4f6, 0xf7b8c8, 0xffffff, 0xf2d06b][k % 4] })); f.position.set(Math.cos(k) * 0.07 * (k ? 1 : 0), 0.03 + (k % 2) * 0.02, Math.sin(k) * 0.07 * (k ? 1 : 0)); bouquet.add(f); }
@@ -183,7 +186,7 @@ export async function installWedding(G) {
       { do: () => {
         R.trackDove = null; if (ph) { G.humans.play(ph, 'cheer', 1.5); bubbleHuman(G, ph, '*sniff*… Gorgeous. GORGEOUS.', 2.6); } flash(); G.audio.play('crowd-ooh', { at: BASKET }); } },
       { wait: 1.4 },
-      { say: [L(null, 'The photographer, wiping his eyes: "Gorgeous! Now EVERYONE in for the group shot!"'), L('dove', 'Forty-one weddings, darling. Still nobody checked.', 'dove-places-darling')] },
+      { say: [L(null, 'The photographer, wiping his eyes: "Gorgeous! Now EVERYONE in for the group shot!"'), L('dove', 'Places, darling. Forty-one weddings. None checked.', 'dove-places-darling')] },
       { do: () => {
         R.release = null;
         if (dove) G.chars.goHome(dove);
@@ -370,6 +373,7 @@ export async function installWedding(G) {
   const update = (dt) => {
     const st = G.state;
     showBasket();
+    sunk.position.set(BATTERY.x + 0.2, waterY() - 0.5, BATTERY.z + 0.1);
     glow.visible = !!st.flags['part-power.s1'] && !st.flags['battery.up'] && st.phase !== 'night';
     if (glow.visible) { glow.position.set(BATTERY.x, waterY() - 0.25, BATTERY.z); glow.material.opacity = 0.35 + 0.2 * Math.sin(st.time * 2.4); }
     // Fixes-2 (P7): the release camera follows Dove up out of the basket (she stays big in frame)

@@ -29,7 +29,7 @@ export function installDenMeerMob(G) {
       { wait: shown * 0.11 + 0.6 },
       { say: ok
         ? [L('feathers', `…twenty-nine, THIRTY. ${n > 30 ? `…${say(n)}. ` : ''}Huh.`), L('bigsal', 'Huh.'), L('knuckles', 'Huh.')]
-        : [L('feathers', `…${say(n)}. That's IT?`), L('bigsal', 'Thirty, kid. Through the arch. Come back when you got a CREW.')] },
+        : [L('feathers', `…${say(n)}. That's IT?`), L('bigsal', 'Thirty, kid. Through the gap. Come back when you got a CREW.')] },
       { follow: true },
       { do: () => { if (fe) fe.script = false; if (ok) G.state.flags[FLYPAST.flag] = true; else cool = 8; } },
     ]);
@@ -49,7 +49,7 @@ export function installDenMeerMob(G) {
       { wait: 1.6 },
       { do: () => { cheer(G, list); G.audio.play('gang-coo-murmur', { at: g }); } },
       { say: [
-        L('bigsal', 'That\'s a feast. The Meer Mob\'s with you, kid. All fourteen.', 'bigsal-join'),
+        L('bigsal', 'You got heart, kid. The Mob\'s with ya. All fourteen.', 'bigsal-join'),
         L('bigsal', 'Something too big to carry? Peck it and say the word. The Mob LIFTS it. Muscle.'),
         L('tiny', 'I\'m Tiny.'),
         L('feathers', 'That\'s forty-four of us in your swirl now, give or take. I\'ll keep counting.'),
@@ -59,7 +59,7 @@ export function installDenMeerMob(G) {
     ]);
   });
   G.bus.on('talk', (t, e) => {
-    if (e.who === 'bigsal' && onStep(G, 'den-meermob', 1)) G.later(0, () => { if (!G.dialogue.open) G.say([L('bigsal', 'Show me your crew, kid. Thirty birds. Through the arch.'), L('feathers', `You've got ${derived(G.state).flock}. I counted.`)]); });
+    if (e.who === 'bigsal' && onStep(G, 'den-meermob', 1)) G.later(0, () => { if (!G.dialogue.open) G.say([L('bigsal', 'Show me your crew, kid. Thirty birds. Through the gap.', 'bigsal-greeting'), L('feathers', `You've got ${derived(G.state).flock}. I counted.`)]); });
   });
   mechaLine(G, 'bigsal', 'meermob', 'A pigeon the size of a building? Kid. Now THAT\'S a crew.');
   return {

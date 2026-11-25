@@ -18,7 +18,7 @@ export function installDenRaccoons(G) {
       L('rigby', '*turns it over* Chrome-vanadium. Balanced. Oh, she\'s beautiful.'),
       L('socket', 'With that and my torch, boss, we could weld a whole pigeon.'),
       L('mamamask', 'Union rules, sweetie: you feed us, we work. But for you, the first job\'s free.'),
-      L('rigby', 'The Night Crew\'s yours. Wheels, latches, ranger carts. Point me at it, boss.', 'rigby-join'),
+      L('rigby', 'Alright, kid. The union\'s with ya. Wheels, latches, carts. Point me at it.', 'rigby-join'),
     ],
   }, done));
   mechaLine(G, 'rigby', 'raccoons', 'Saw the iron bird in the cave. Socket wants to weld it. I want to drive it. Ringo wants to race it.');

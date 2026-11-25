@@ -11,6 +11,16 @@
 import { CREW, CREWS, CHARACTERS, FEUDS, WRONG_PLACE, awakeReason } from '../data/crews.js';
 import { PLACES } from '../world/layout.js';
 
+// #43: what each boss's <voice>-call.mp3 says (the generation texts, tags stripped): the Call bubble shows it
+const CALL_LINES = {
+  hazel: 'Hazel\'s here! What are we digging?', puddles: 'Commodore Puddles, reporting for duty!', vesper: 'You rang? The Exchange is open.',
+  biscuit: 'I\'m here! I\'m here! What do I fetch?', strix: 'Professor Strix. Present, if not thrilled.', rigby: 'Night Crew\'s here. Where\'s the job?',
+  sue: 'Next stop: you. Sue\'s here.', rhoda: 'Rhoda, on the wing. Who needs lifting?', bigsal: 'Meer Mob\'s here. Who we leanin\' on?',
+  queenie: 'Queenie\'s here, baby. Make it quick.', clementine: 'Easy now. Clementine\'s here.', mimi: 'Mimi\'s on! What sound you need?',
+  gertrude: 'GERTRUDE IS HERE! MOVE IT!', duchess: 'The Swells have arrived, darling.', eldest: 'We... are... here.', vibrato: 'The Choir has ARRIVED!',
+  wingate: 'Coach Wingate! Let\'s GO, people!',
+};
+
 export class Allies {
   constructor(G) {
     this.G = G;
@@ -55,7 +65,8 @@ export class Allies {
     G.audio.play(crew.blip === 'coo' ? 'coo-gather' : crew.blip, { at: to });
     G.later(3, () => {
       if (CHARACTERS[crew.boss]?.voice) G.audio.voice(CHARACTERS[crew.boss].voice + '-call');
-      G.bubbles.add(CHARACTERS[crew.boss].name.split(' ').pop() + ' is here.', { at: () => ({ x: c.x, y: c.y + 0.7, z: c.z }), ttl: 2 });
+      const said = CALL_LINES[crew.boss];   // #43: the bubble shows what the boss's call voice actually says
+      G.bubbles.add(said ? `${CHARACTERS[crew.boss].name.split(' ').pop()}: "${said}"` : CHARACTERS[crew.boss].name.split(' ').pop() + ' is here.', { at: () => ({ x: c.x, y: c.y + 0.7, z: c.z }), ttl: said ? 2.8 : 2 });
     });
     G.bus.emit('call', { ally: crewId, x: to.x, z: to.z });
     return true;

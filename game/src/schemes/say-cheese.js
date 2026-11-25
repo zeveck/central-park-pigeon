@@ -115,7 +115,7 @@ export function installSayCheese(G) {
   G.items.guards.push((it, peek) => {
     if (it.id !== 'camera' || !onStep(G, 'say-cheese', 1) || flags()['photo.distracted']) return null;
     if (!peek) say(['Hey! That\'s my OLD camera, buddy. Shoo.', 'Nope. Mine. Go be in somebody else\'s picture.'][refusals++ % 2], 2.8);
-    return 'He\'s watching his camera. Get in his shot, or give him a Coo.';
+    return 'She\'s watching her camera. Get in her shot, or give her a Coo.';
   });
 
   // ------------------------------------------------------------ the photobomb (or a Coo)
@@ -142,7 +142,7 @@ export function installSayCheese(G) {
     say(how === 'coo' ? 'Huh? Who said that? …Oh! A pigeon! Hold still, little guy!' : 'Ha! A pigeon right in my shot! That\'s a keeper!', 3.2);
     // review: the hint is in his own bubble, and the toast waits until both bubbles are gone (toasts drew over them)
     G.later(3.4, () => say('Wait right there! I need my good lens. Nobody touch my old camera on the ledge!', 3.4));
-    G.later(7.0, () => { if (onStep(G, 'say-cheese', 1)) G.toast('He\'s gone in for his lens. Peck the old camera on the ledge.', { seconds: 5 }); });
+    G.later(7.0, () => { if (onStep(G, 'say-cheese', 1)) G.toast('She\'s gone in for her lens. Peck the old camera on the ledge.', { seconds: 5 }); });
     G.bus.emit('photobomb', { scheme: 'say-cheese' });
   };
   G.bus.on('coo', (t, e) => {

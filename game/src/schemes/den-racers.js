@@ -59,7 +59,7 @@ export function installDenRacers(G) {
       { wait: 1.6 },
       { do: () => { cheer(G, list); G.audio.play('gang-coo-murmur', { at: g }); G.particles.burst('crumbs', g.x, g.y + 0.3, g.z, 16, { spread: 1.2 }); } },
       { say: [
-        L('wingate', 'A FEAST. Now THAT\'S a cool-down. The Racers fly with you, Gus.', 'wingate-join'),
+        L('wingate', 'Racers are IN! Now hustle! A FEAST. THAT\'S a cool-down, Gus.', 'wingate-join'),
         L('wingate', 'Fly with the team and your boost lasts twice as long. Draft, rookie. Draft!'),
         L('wheezy', 'I… finished… a FEAST. That\'s… a first.'),
       ] },

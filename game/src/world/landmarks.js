@@ -182,6 +182,13 @@ B['zoo'] = (L, ctx) => {
   }
   ctx.batch.mesh('stone', new THREE.CylinderGeometry(6, 6, 0.6, 24), { x: x - 3, y: y + 0.3, z: z + 3 });
   ctx.batch.mesh('glassDark', new THREE.CylinderGeometry(5.5, 5.5, 0.05, 24), { x: x - 3, y: y + 0.6, z: z + 3 });
+  // #43: the sea lions (the Zoo Wall postcard's "Feeding time!" had an empty pool): two lounging in the water, one up on
+  // the north rim, head raised (the sprat is flipped from there: collect.js). Render-only, no collision.
+  for (const [dx, dz, yaw, rim] of [[-1.6, -1.2, 0.7, 0], [2.0, 1.0, 2.5, 0], [0.2, 5.4, 3.14, 1]]) {
+    const by = y + (rim ? 0.88 : 0.66);
+    ctx.batch.mesh('rubber', new THREE.CapsuleGeometry(0.28, 0.9, 4, 10).rotateX(Math.PI / 2).scale(1, 0.75, 1).rotateX(rim ? -0.35 : 0), { x: x - 3 + dx, y: by, z: z + 3 + dz, yaw });
+    ctx.batch.mesh('rubber', new THREE.SphereGeometry(0.19, 10, 8).scale(1, 0.9, 1.25).translate(0, rim ? 0.42 : 0.12, rim ? 0.62 : 0.68), { x: x - 3 + dx, y: by, z: z + 3 + dz, yaw });
+  }
   block(ctx, x - w / 2, x + w / 2, z - d / 2, z + d / 2);
 };
 
@@ -598,6 +605,14 @@ B['gatehouse'] = (L, ctx) => {
   roofPrism(ctx, 'slate', { x: L.x, z: L.z, y: y + 4.5, w: 7.6, d: 6, h: 2.4, yaw: L.yaw });
   rimPerches(ctx, { x: L.x, z: L.z, y: y + 6.9, w: 7.0, d: 0.3, yaw: L.yaw, tag: 'ridge', sides: [0] });   // (fix-25: the roof collides as its prism)
   blockAround(ctx, L.x, L.z, 6);
+  // #43: the drinking fountain where the jogger stops once a lap (people.js stop (-4, 759.4); Cawdry's "Water fountain,
+  // north gatehouse"): a stone pedestal, an iron bowl and a spout. Render-only.
+  if (L.id === 'north-gatehouse') {
+    const fx = -5.0, fz = 759.3, fy = ctx.heightAt(fx, fz);
+    ctx.batch.mesh('stone', new THREE.CylinderGeometry(0.17, 0.24, 0.9, 12), { x: fx, y: fy + 0.45, z: fz });
+    ctx.batch.mesh('iron', new THREE.CylinderGeometry(0.3, 0.2, 0.1, 14), { x: fx, y: fy + 0.95, z: fz });
+    ctx.batch.box('iron', { x: fx, y: fy + 1.04, z: fz }, { w: 0.04, h: 0.08, d: 0.04 });
+  }
 };
 
 B['fence-ring'] = (L, ctx) => {

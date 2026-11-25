@@ -182,14 +182,15 @@ export class Fights {
       G.items.take();
       G.chars.animate(f.dog, 'cheer', 2.4);
       G.audio.play('dog-happy-bark', { at: f.dog });
-      G.say([{ who: 'biscuit', text: 'MY BALL! You found my BALL! You\'re my best friend now. Forever.' }]);
+      G.say([{ who: 'biscuit', text: 'Best friends! Best friends FOREVER! You found my BALL!', voice: 'biscuit-join' }]);   // #43: the join bark, with its words
     } else if (name === 'strix') {
       G.items.take();
-      G.say([{ who: 'strix', text: 'My spectacles! On foot, through MY woods, and I barely heard you. Remarkable, dear.' }]);
+      G.say([{ who: 'strix', text: 'Very well. Class is in session, Gus. My spectacles! I barely heard you.', voice: 'strix-join' }]);   // #43
     } else if (name === 'vinnie') {
       G.chars.animate(f.rig, 'cheer', 2);
       G.audio.play('rig-start', { at: f.rig });
       G.bubbles.add('Ya flying RAT!', { at: () => ({ x: f.vin.x, y: (f.vin.y || 0) + 2.05, z: f.vin.z }), ttl: 2.5 });
+      G.audio.voice('vinnie-flying-rat', { at: f.vin });   // #43: the shipped bark, now heard with its bubble
       G.say([{ who: 'rigby', text: 'She\'s rigged, boss. Hop in. Mind the mustard.' }]);
     } else if (name === 'rhoda') {
       G.audio.play('hawk-screech', { at: f.hawk });
@@ -436,7 +437,7 @@ export class Fights {
           const l = d || 1; g.x += ((g.x - a.x) / l) * 1.0; g.z += ((g.z - a.z) / l) * 1.0;
           G.audio.play('biscuit-tackle', { at: g, vol: 0.6, rate: 1.3 });
           this.#hit('broom');
-        } else if (blocked) G.bubbles.add('Ow! Stupid TREE!', { at: () => ({ x: a.x, y: (a.y || 0) + 2.05, z: a.z }), ttl: 1.6 });
+        } else if (blocked) G.bubbles.add('Ow! Who PUT that there?!', { at: () => ({ x: a.x, y: (a.y || 0) + 2.05, z: a.z }), ttl: 1.6 });
         f.state = 'chase'; f.cool = V.cooldown * (f.assist ? 1.6 : 1); f.t = 0;
       }
     }

@@ -424,7 +424,7 @@ export class Finale {
     const p = Math.min(1, t / 4.5);
     const f = this.doorCam?.from || [d.x - 5.5, d.y + 2.4, d.z - 7.5];
     this.cam([f[0] + (d.x - f[0]) * p * 0.42, f[1] + 0.6 - p * 0.5, f[2] + (d.z - f[2]) * p * 0.42], [d.x, d.y + 1.3, d.z]);
-    if (t > 2.6 && !this.saidDoors) { this.saidDoors = true; G.bubbles.add('Rigby: "Get in here, boss. She\'s ready."', { at: { x: d.x, y: d.y + 2.6, z: d.z }, ttl: 2.2 }); G.audio.voice('rigby-greeting', { vol: 0.9 }); }
+    if (t > 2.6 && !this.saidDoors) { this.saidDoors = true; G.bubbles.add('Rigby: "Get in here, boss. She\'s ready."', { at: { x: d.x, y: d.y + 2.6, z: d.z }, ttl: 2.2 }); G.audio.voice('rigby-ready', { vol: 0.9 }); }
     return t > 4.6;
   }
 

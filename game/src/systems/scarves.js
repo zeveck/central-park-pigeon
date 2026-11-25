@@ -16,7 +16,7 @@ import { derived } from '../state/gamestate.js';
 import { CHARACTERS } from '../data/crews.js';
 
 const PRICE = MARKET.ledger.pricesFalafel;
-const COMMENTS = { 'taxi-checker': 'Ooh, the taxi one!', 'subway-blue': 'Very express. Very blue.', 'maple-stripes': 'Autumnal! Love it.', 'ramble-cable': 'Cable knit. Classy.', 'cream-mohair': 'So FLUFFY.', 'rainbow-stripe': 'The Choir colours! Bravo!', 'racing-red': 'Fast scarf. FAST.', 'wedding-white': 'Bridal. Bold.', 'bread-print': 'FEED THE BIRDS! On a scarf!', 'everything-bagel': 'Smells like a Sunday morning.', 'slice-orange': 'The classic.' };
+const COMMENTS = { 'taxi-checker': 'Ooh, the taxi one!', 'subway-blue': 'Very express. Very blue.', 'maple-stripes': 'Autumnal! Love it.', 'ramble-cable': 'Cable knit. Classy.', 'cream-mohair': 'So FLUFFY.', 'rainbow-stripe': 'The Choir colours! Bravo!', 'racing-red': 'Fast scarf. FAST.', 'wedding-white': 'Bridal. Bold.', 'bread-print': 'Bread! On a scarf! Very on-message.', 'everything-bagel': 'Smells like a Sunday morning.', 'slice-orange': 'The classic.' };
 
 export class Scarves {
   constructor(G) { this.G = G; this.t = 0; }

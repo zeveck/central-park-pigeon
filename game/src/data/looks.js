@@ -103,7 +103,7 @@ export const LOOKS = {
   slowpoke: { species: 'turtle', tint: [0.95, 0.85, 0.75], acc: ['ear-stripe'] },
   // Night Crew
   rigby: { species: 'raccoon', model: 'raccoon-stand', acc: [] },
-  socket: { species: 'raccoon', model: 'raccoon-stand', tint: [0.75, 0.75, 0.75], acc: ['goggles-up:#5a4a2a', 'apron:#6b4a2a', 'wrench'] },
+  socket: { species: 'raccoon', model: 'raccoon-stand', tint: [0.75, 0.75, 0.75], acc: ['goggles-up:#5a4a2a', 'apron:#6b4a2a', 'torch'] },   // #43: the welding torch from his portrait (was a wrench, which undercut Rigby's "can't fix nothin' without a wrench")
   ringo: { species: 'raccoon', model: 'raccoon-stand', acc: ['aviator', 'scarf-long:#c4302b'] },
   mamamask: { species: 'raccoon', model: 'raccoon-stand', acc: ['headscarf:#c4302b', 'apron:#d8d0c0', 'spoon'] },
   // Grate Rats

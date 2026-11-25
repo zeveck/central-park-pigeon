@@ -51,7 +51,7 @@ export async function installDenGeese(G) {
       a: 'gertrude', b: 'puddles', title: 'TRUCE', caption: 'Geese & ducks',
       lines: [L('gertrude', 'The Lake\'s arm is YOURS, duck. The Great Lawn is OURS.'), L('puddles', 'The Commodore accepts. Mrs. Puddles accepts. Which is what really matters.')],
       after: [
-        L('gertrude', 'And YOU, pigeon. The Honk chases anything you point at. ANYTHING.', 'gertrude-join'),
+        L('gertrude', 'FINE! The Honk is WITH YOU! We chase what you point at. ANYTHING.', 'gertrude-join'),
         L('gander', 'A human in your way? We hiss. They run. They drop things. It\'s beautiful.'),
         L('puddles', 'And the ducks work the whole Lake now. Bow Bridge included. Ducks to stations!'),
       ],

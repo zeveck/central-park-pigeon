@@ -430,7 +430,7 @@ export const SCARVES = [
   { id: 'rainbow-stripe', name: "The Choir's rainbow stripe", how: 'A gift when the Choir joins' },
   { id: 'racing-red', name: "Ringo's racing red", how: 'After the Rink Job' },
   { id: 'wedding-white', name: "Dove's wedding white", how: 'After the Wedding' },
-  { id: 'bread-print', name: '"FEED THE BIRDS" bread-print', how: 'All 30 signs PERMANENT' },
+  { id: 'bread-print', name: 'Bread-print (the FEED THE BIRDS scarf)', how: 'All 30 signs PERMANENT' },
   { id: 'everything-bagel', name: 'Everything bagel', how: "Mama Mask's thank-you" },   // #44: The Jumbo Order
 ];
 export function scarfScreen(G) {

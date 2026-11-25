@@ -24,7 +24,7 @@ export const THREADS = [
   {
     id: 'feuds', name: 'Feuds & Truces', goal: 'Make peace, then make plans.', icon: 'truce',
     meter: { label: 'Truces', max: 4, of: 'truces' },
-    antagonist: { name: 'the feuds', portrait: null, line: 'Four feuds keep the park divided. Settle them on the Elders\' rock.' },
+    antagonist: { name: 'the feuds', portrait: null, line: 'Four feuds keep the park divided. Most of them get settled on the Elders\' rock.' },
     reward: 'A peace medal; truce combos everywhere',
   },
   {
