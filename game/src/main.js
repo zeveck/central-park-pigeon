@@ -652,6 +652,7 @@ import { installReport } from './ui/report.js';
 import { installPhoto } from './ui/photo.js';   // photo mode (#9)
 import { installSayCheese } from './schemes/say-cheese.js';   // photo mode (#9): the quest
 import { installBagelShop } from './schemes/bagel-shop.js';   // #44: Super Jumbo Bagels, The Jumbo Order
+import { installBagelBribes } from './schemes/bagel-bribes.js';   // #45: bagels as bribes
 import { installOffline } from './ui/offline.js';
 
 const DT = 1 / 60;
@@ -1013,6 +1014,7 @@ async function boot() {
   await installFinale(G);       // finale: script 'finale', G.finale (a mod), the climb's own scene via G.altView
   installSayCheese(G);          // photo mode (#9): Say Cheese (the tourist's camera, Flicker)
   installBagelShop(G);          // #44: Super Jumbo Bagels on 110th, Manny's menu, The Jumbo Order
+  installBagelBribes(G);        // #45: a bagel dropped near wary animals: their boss's region and what the boss wants
   // perf pass: small-detail culling for everything but the big pooled/instanced layers (gfx/detail-cull.js)
   G.detailCull = new DetailCull({ k: { high: 0.0015, medium: 0.002, low: 0.004 }[preset.id] });
   G.detailCull.add(...world.children.filter((o) => !['terrain', 'water', 'static', 'props', 'trees', 'taxis', 'gus', 'flock', 'particles', 'humans', 'crowds', 'characters', 'crumbs'].includes(o.name)));

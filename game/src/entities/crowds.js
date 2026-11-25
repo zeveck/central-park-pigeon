@@ -332,6 +332,9 @@ export class Crowds {
   }
 
   #decide(a, dt, g, gusLow) {
+    // #45: an animal treating itself to a bagel (schemes/bagel-bribes.js drives it) makes no other decision until it's
+    // done; the phase ending mid-treat ends it (the bagel stays where it is if it hasn't been grabbed)
+    if (a.state === 'treat') { if (!this.active(a)) { this.onTreatEnd?.(a); a.state = 'away'; } return; }
     if (!this.active(a)) { a.state = 'away'; return; }
     if (a.state === 'away') a.state = 'idle';
     // batch-3: standing on the water or inside something built after it spawned (a scheme's table, a stall): to clear ground
@@ -390,6 +393,7 @@ export class Crowds {
     if (a.state === 'wander') sp = gdef.speed * 0.5;
     else if (a.state === 'scatter') sp = gdef.speed * (gdef.fly ? 2.6 : 1.8);
     else if (a.state === 'greet') sp = gdef.speed * 0.9;
+    else if (a.state === 'treat') sp = a.treatSpeed || 0;   // #45
     if (sp > 0) {
       const dx = a.tx - a.x, dz = a.tz - a.z, d = Math.hypot(dx, dz);
       if (d > 0.08) {
@@ -544,7 +548,7 @@ export class Crowds {
       const hop = moving && GROUPS[a.group].hop ? Math.abs(Math.sin(a.phase * 1.4)) * GROUPS[a.group].hop * (a.state === 'greet' ? 1.6 : 1) : 0;
       const bob = a.water ? Math.sin(a.phase * 0.4) * 0.02 : 0;
       const fl = a.air > 0 ? Math.sin(a.air * Math.PI) * 1.4 : 0;
-      const cheer = a.state === 'cheer' ? Math.abs(Math.sin(a.phase * 2)) * 0.15 : 0;
+      const cheer = a.state === 'cheer' || a.treatHop ? Math.abs(Math.sin(a.phase * 2)) * 0.15 : 0;   // #45: a bagel's excitement
       const nod = a.model === 'horse' ? Math.sin(a.phase * 0.15 + a.i) * 0.02 : 0;
       _p.set(a.x, a.yBase + hop + bob + fl + cheer, a.z);
       const gaitA = im.geometry.attributes.aGaitI;   // batch-3 (#11): a dog trots with a level back (no roll, no bounce)
@@ -586,6 +590,22 @@ export class Crowds {
     }
     for (const h of Object.values(this.hats || {})) { h.visible = h.count > 0; h.instanceMatrix.needsUpdate = true; }
     this.drawn = { full, lod, songbirds: songs, horses, fullTris: tris, byModel, meshes: Object.values(this.meshes).filter((m) => m.n > 0).length + Object.values(this.hats || {}).filter((h) => h.count > 0).length };
+  }
+
+  /** #45: public hooks for the bagel bribes (schemes/bagel-bribes.js): the group's behaviour, a target that can be walked
+   *  to, and a lead hint heard by bribe (the region is marked as #24's slip does; no 1-in-3 rule, no wait; it sets hintAt so
+   *  a passive slip doesn't repeat straight after). */
+  groupDef(a) { return GROUPS[a.group]; }
+  keepTarget(a) { this.#keepTarget(a); }
+  noteLeadHint(crew) {
+    const G = this.G;
+    (this.hintAt ||= {})[crew] = G.state.time;
+    const st = G.state.leadHints || (G.state.leadHints = {});
+    if (st[crew]) return false;
+    st[crew] = 1;
+    const c = CREW[crew], P = LEAD_HINTS[crew]?.place || c?.haunt;
+    if (P) G.later(2.6, () => G.toast(`${c.name.replace(/^The /, '')}: marked on your map`, { seconds: 3 }));
+    return true;
   }
 
   /** A nap: animals go back to their haunts. */
