@@ -5,7 +5,7 @@ Plan: design/changes/mistake-sweep.md (rounds, one browser). Tool: `node game/to
 Each run: the step's fixture → its goal script to the most loaded moment → ONE mistake (real inputs; Ruffled outside a fight is the
 one poke, G.hurt) → the goal script again, planned from wherever things are, until the step's flag. Times are game seconds.
 
-Totals: PASS 53 · PASS-HELPED 2 · FAIL-SCRIPT 2 · LEFTOVERS 1 (58 runs)
+Totals: PASS 55 · PASS-HELPED 2 · FAIL-SCRIPT 2 · LEFTOVERS 1 (60 runs)
 
 Columns: mistake took (game s it took) · recovery (keeper put-backs, sill refills, tows, naps, what repairSpent put back on a Continue,
 and any help the driver needed) · retries (re-plans after a stuck goal) · game s / cap (max(600, 3 x the recorded step) after the
@@ -69,9 +69,11 @@ starting 4+ times, Ruffled after the mistake) · nudge (the compass, the keeper'
 | 3 | prologue.s2 | Q: save, quit, Continue | input | yes (-4.4 s) | - | -1 | 0 / 600 | 81 | 0 | - | - | **LEFTOVERS** |
 | 4 | den-biscuit.s3 | F: leave Cedar Hill mid-fight | input | yes (12 s) | - | 0 | 36.7 / 600 | 15 | 0 | - | - | **PASS** |
 | 4 | den-ducks.s3 | W: drop the peas over the Lake | input | yes (7.5 s) | keeper 1 | 0 | 34.2 / 600 | 17 | 0 | - | - | **PASS** |
-| 4 | den-meermob.s2.alt | C: wait until the slice is cold | input | yes (59.7 s) | naps 1 | 3 | 225 / 600 | 139 | 0 | - | - | **FAIL-SCRIPT**: not finished; the oracle says the step is still doable: {"item":"renews","phase":"ok","trigger":"coo: nothing spent / slice NOT at hand"} |
 | 4 | den-raccoons.s3 | W: drop the wrench over Turtle Pond | input | yes (7.5 s) | keeper 1 | 0 | 79.8 / 600 | 14 | 0 | - | - | **PASS** |
-| 4 | den-rhoda.s3 | C: wait until the slice is cold | input | yes (59.8 s) | naps 3, helped: nap round | 3 | 235.4 / 600 | 132 | 0 | - | - | **PASS-HELPED** |
+| 5 | den-meermob.s2.alt | C: wait until the slice is cold | input | yes (59.7 s) | naps 1 | 3 | 225 / 600 | 133 | 0 | - | NUDGE-WRONG: the compass points at bigsal, the slice lies at 49, 1066 | **FAIL-SCRIPT**: not finished; the oracle says the step is still doable: {"item":"renews","phase":"ok","trigger":"coo: nothing spent / slice NOT at hand"} |
+| 5 | den-rhoda.s3 | C: wait until the slice is cold | input | yes (59.8 s) | naps 3, helped: nap round | 3 | 235.4 / 600 | 131 | 0 | - | - | **PASS-HELPED** |
+| 5 | jumbo-order.s2 | O: two wrong orders in a row (picking up the second puts the first down) | input | yes (33.8 s) | - | 0 | 5 / 600 | 72 | 0 | - | - | **PASS** |
+| 5 | jumbo-order.s3 | A: wander 120 m off for 2 min | input | yes (144.6 s) | - | 0 | 19.6 / 600 | 82 | 0 | - | - | **PASS** |
 
 ## Not passed
 

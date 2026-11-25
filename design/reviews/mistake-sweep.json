@@ -2352,7 +2352,7 @@
   "den-rhoda.s3|C": {
    "case": "den-rhoda.s3",
    "code": "C",
-   "round": 4,
+   "round": 5,
    "fixture": "den-rhoda.s3",
    "cap": 600,
    "recorded": 143.5,
@@ -2509,7 +2509,7 @@
    "helped": "nap round",
    "errors": 0,
    "verdict": "PASS-HELPED",
-   "wallSecs": 132,
+   "wallSecs": 131,
    "job": "001-den-rhoda.s3-C.out"
   },
   "part-power.s3|O": {
@@ -2601,7 +2601,7 @@
   "den-meermob.s2.alt|C": {
    "case": "den-meermob.s2.alt",
    "code": "C",
-   "round": 4,
+   "round": 5,
    "fixture": "den-meermob.s2",
    "cap": 600,
    "recorded": null,
@@ -2763,11 +2763,13 @@
     "repaired": null
    },
    "loops": [],
-   "nudge": [],
+   "nudge": [
+    "NUDGE-WRONG: the compass points at bigsal, the slice lies at 49, 1066"
+   ],
    "leftovers": {},
    "retries": 3,
    "errors": 0,
-   "wallSecs": 139,
+   "wallSecs": 133,
    "job": "002-den-meermob.s2.alt-C.out"
   },
   "den-ducks.s3|Q": {
@@ -6817,6 +6819,178 @@
    "verdict": "PASS",
    "wallSecs": 119,
    "job": "040-part-body.s3-Q.out"
+  },
+  "jumbo-order.s2|O": {
+   "case": "jumbo-order.s2",
+   "code": "O",
+   "round": 5,
+   "fixture": "jumbo-order.s2",
+   "cap": 600,
+   "recorded": 97.4,
+   "begin": {
+    "key": "jumbo-order.s2",
+    "code": "O",
+    "fixtureStep": 2,
+    "phase": "dusk"
+   },
+   "mark": {
+    "t": 3500.5,
+    "phase": "dusk",
+    "step": 2,
+    "carried": null,
+    "at": [
+     -33.3,
+     927.2
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "two wrong orders in a row (picking up the second puts the first down)",
+   "route": "input",
+   "took": true,
+   "mistakeSecs": 33.8,
+   "afterMistake": {
+    "t": 3534.3,
+    "phase": "dusk",
+    "step": 2,
+    "carried": "bagel-plain-strawberry",
+    "at": [
+     -62.6,
+     1068.5
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "put the bagel-plain-strawberry down",
+     "result": "done",
+     "at": {
+      "t": 3539.3,
+      "phase": "dusk",
+      "step": 3,
+      "carried": "bagel-sesame-jalapeno",
+      "at": [
+       -63,
+       1068.8
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 5,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 0,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 0,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {},
+   "retries": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "wallSecs": 72,
+   "job": "003-jumbo-order.s2-O.out"
+  },
+  "jumbo-order.s3|A": {
+   "case": "jumbo-order.s3",
+   "code": "A",
+   "round": 5,
+   "fixture": "jumbo-order.s3",
+   "cap": 600,
+   "recorded": 34,
+   "begin": {
+    "key": "jumbo-order.s3",
+    "code": "A",
+    "fixtureStep": 3,
+    "phase": "dusk"
+   },
+   "mark": {
+    "t": 3597.9,
+    "phase": "dusk",
+    "step": 3,
+    "carried": "bagel-sesame-jalapeno",
+    "at": [
+     -62.6,
+     1068.5
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "mistake": "wander 120 m off for 2 min",
+   "route": "input",
+   "took": true,
+   "mistakeSecs": 144.6,
+   "afterMistake": {
+    "t": 3742.5,
+    "phase": "dusk",
+    "step": 3,
+    "carried": "bagel-sesame-jalapeno",
+    "at": [
+     -17.2,
+     959.5
+    ],
+    "mode": "walk",
+    "driving": null,
+    "fight": null,
+    "race": null
+   },
+   "attempts": [
+    {
+     "attempt": 0,
+     "how": "",
+     "result": "done",
+     "at": {
+      "t": 3762.1,
+      "phase": "dusk",
+      "step": 4,
+      "carried": null,
+      "at": [
+       -31.5,
+       926.8
+      ],
+      "mode": "walk",
+      "driving": null,
+      "fight": null,
+      "race": null
+     }
+    }
+   ],
+   "gameSecs": 19.6,
+   "recovery": {
+    "keeper": 0,
+    "refill": 0,
+    "tow": 0,
+    "naps": 0,
+    "fails": 0,
+    "raceLost": 0,
+    "starts": 1,
+    "repaired": null
+   },
+   "loops": [],
+   "nudge": [],
+   "leftovers": {},
+   "retries": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "wallSecs": 82,
+   "job": "004-jumbo-order.s3-A.out"
   }
  }
 }
