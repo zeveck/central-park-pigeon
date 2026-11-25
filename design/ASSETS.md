@@ -380,3 +380,20 @@ All lettering (fascia, blade sign, A-frame chalk, neon OPEN) is drawn in code; n
 Voice lines: the full list with texts is game/src/data/bagels.js (MANNY, MAMA, BRIBES) plus data/lead-hints.js (hint1/hint2). Words couldn't be machine-checked (the key has no speech-to-text); durations were checked per clip (0.30–1.02 s per word) and the levels were checked in the browser against the existing voices (see the fix-44 notes).
 
 **Running total: ≈ $121.84** (previous $120.16 + $1.68).
+
+## Consistency pass fixes (#43), 2026-11-25 (budget $20)
+
+Takes in `.gamegen/candidates/consistency/`. Every voice uses its character's existing voice id (eleven_v4); the generation text is the line's opening words as now shown (design/reviews/consistency-pass.md has the rows). The six voice files with no readable source text could not be transcribed (speech-to-text was not permitted in this session), so the four that play were regenerated from their current lines; crowd-chant-take-3 is unused and was left.
+
+| ID | File | Tool | Text / prompt | Tries | Est. cost |
+|---|---|---|---|---|---|
+| Boss voices: replaced (13) | voice/{mimi,gertrude,eldest,clementine,wingate,sue,rhoda,vesper,strix}-greeting, {duchess,puddles,rhoda}-join, vinnie-flying-rat | audiogen TTS | e.g. mimi "[mischievously] Bwip-bwip! Ha! Gotcha!"; gertrude "[shouting] HONK. This arm of the Lake is GOOSE TERRITORY!"; vinnie (new voice for him: Mister Gruff mSOmKHC6GZcZbSTGlqHO) "Ya flying RAT!" | 1 each | ≈ $0.13 |
+| Boss voices: new (4) | voice/duchess-frenzy, rigby-ready, rhoda-hold-still, bigsal-rhoda | audiogen TTS | "Well, well. A feeding frenzy, on MY Pond." / "Get in here, boss. She's ready." / "Hold STILL, you big lug!" / "Big Sal. The Meer Mob. You want something, kid?" | 1 each | ≈ $0.04 |
+| Bribe voices (9) | voice/bribe-{cats-hint2,horses-hint1,horses-hint2,meermob-hint2,racers-hint1,songbirds-hint1,squirrels-hint2,raccoons-tip,meermob-tip} | audiogen TTS, the crews' #45 voices | the lead hints / tips as reworded (step, by day, by the gatehouse, bwip-bwip, gap, the stagehand's wrench) | 1 each | ≈ $0.09 |
+| Carousel band organ | music/carousel-organ.mp3 (15 s) | audiogen music | cheerful fairground carousel band organ waltz, calliope pipes, glockenspiel, bass drum, instrumental | 1 | ≈ $0.08 |
+| Strix without spectacles | portraits/strix-nospecs.webp (512²) | imagegen2 medium, edit of strix.webp | the same owl, no spectacles (shown until den-strix) | 1 | ≈ $0.06 |
+| **Total** | | | | | **≈ $0.40** |
+
+Code-built, no generation: the peas tub, the wire shopping cart, the gold cufflink, the sneaker key charm, the sunken rowboat, the sea lions, the key bracket at the Boathouse lot gate, the north gatehouse drinking fountain, Prickett's phone, Socket's welding torch, Strix's spectacles after den-strix, the car unlock chirp (synth); the shipped ranger-whistle.mp3 and duck-dive-bloop.mp3 are now played.
+
+**Running total: ≈ $122.24** (previous $121.84 + $0.40).
