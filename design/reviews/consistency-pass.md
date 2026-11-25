@@ -17,7 +17,7 @@ Every player-facing line in the game is in a table below. Lines that name nothin
 
 Distinct mismatches by kind (roughly): **voice ~38** (spoken words differ from the subtitle; 6 files can't be checked), **prop ~22**, **sound ~10**, **place ~10**, **fact ~15**, **look ~8**.
 
-How the voice check worked: each file's generation text comes from /workspaces/gg-test1/.audiogen-history.jsonl. 56 of the 62 files were found there. The other 6 are on corrupted log lines and appear nowhere else in the repo, so they are listed as **unknown; needs a listen**: vesper-greeting, strix-greeting, duchess-join, puddles-join, vinnie-flying-rat, crowd-chant-take-3. A voiced bark plays on the dialogue line or bubble it's attached to (ui/dialogue.js:86, characters.js:209, allies.js:57), so "shown with" is the subtitle on screen while it plays.
+How the voice check worked: each file's generation text comes from .audiogen-history.jsonl. 56 of the 62 files were found there. The other 6 are on corrupted log lines and appear nowhere else in the repo, so they are listed as **unknown; needs a listen**: vesper-greeting, strix-greeting, duchess-join, puddles-join, vinnie-flying-rat, crowd-chant-take-3. A voiced bark plays on the dialogue line or bubble it's attached to (ui/dialogue.js:86, characters.js:209, allies.js:57), so "shown with" is the subtitle on screen while it plays.
 
 ## Fix status (fix stage, 2026-11-25, branch fix/batch9)
 
@@ -170,7 +170,7 @@ Total generation if everything is done: well under $1 of the $50 art budget.
 
 ### game/src/data/dialogue.js (96 lines; 17 boss entries = 41 lines, 51 regulars = 105 lines, Prologue = 11 lines)
 
-Voice on boss lines: `voice` plays on the first line of the first-ever talk (entities/characters.js:209), unless a scheme speaks first. Generation texts: /workspaces/gg-test1/.audiogen-history.jsonl.
+Voice on boss lines: `voice` plays on the first line of the first-ever talk (entities/characters.js:209), unless a scheme speaks first. Generation texts: .audiogen-history.jsonl.
 
 | line(s) | who | text (short) | names | checked against | verdict | proposed fix |
 |---|---|---|---|---|---|---|
@@ -312,7 +312,7 @@ No player-read text; used as the reference for every bio and portrait check abov
 
 ### Voice files (game/assets/audio/voice/, 62 files)
 
-Generation text from /workspaces/gg-test1/.audiogen-history.jsonl (56 found; the other 6 sit on corrupted lines of that log and appear nowhere else in the repo: vesper-greeting, duchess-join, strix-greeting, puddles-join, vinnie-flying-rat, crowd-chant-take-3). "Shown with" = the subtitle on screen when it plays.
+Generation text from .audiogen-history.jsonl (56 found; the other 6 sit on corrupted lines of that log and appear nowhere else in the repo: vesper-greeting, duchess-join, strix-greeting, puddles-join, vinnie-flying-rat, crowd-chant-take-3). "Shown with" = the subtitle on screen when it plays.
 
 | file | generated from | shown with (where) | verdict | fix |
 |---|---|---|---|---|
@@ -334,7 +334,7 @@ Generation text from /workspaces/gg-test1/.audiogen-history.jsonl (56 found; the
 Scope note: there are 14 den-*.js files (den-biscuit and den-strix have no scheme file; their scripts live in systems/fights.js, outside this fragment) but 16 den-* goal cards; all 16 cards are covered here.
 Coverage: every `L(...)` line, toast, bubble, cling and guard string in the 14 files (192 strings), and every title/goal/where/obstacle/nudge/answer in the 16 den-* cards (46 steps, 216 strings). Total **408 strings checked**.
 
-Voice key: the bark plays on the line it's attached to (characters.js:209, joinScene, `L(who, text, voice)`), so what you hear is the generation text while the box shows the line. Generation text comes from /workspaces/gg-test1/.audiogen-history.jsonl. Voice IDs: mimi o9B86nZP8mMLaT5FBEzP, eldest pqHfZKP75CvOlQylNhV4, clementine 2OEeJcYw2f3bWMzzjVMU, gertrude 7sAIIIXrQKek5xiLc1R6, wingate pNInz6obpgDQGcFmaJgB, bigsal SOYHLrjzK2X1ezoPC6cr, hazel FGY2WhTYpPnrIDTdsKH5, vesper N2lVS1w4EtoT3dr4eOWO, rigby LysucvtFmzi1NVAE0rKp, vibrato JBFqnCBsd6RMkjVDRZzb, sue dmWfLQZJq7wNPv9WmtiM, rhoda EXAVITQu4vr4xnSDxMaL, queenie WQhVGGVQ8EhNpBYHFE8c, puddles 8VJBrRk4O7tFoB5kqxa6. Each regeneration: audiogen voice, eleven_v4, about $0.01 for a short line.
+Voice key: the bark plays on the line it's attached to (characters.js:209, joinScene, `L(who, text, voice)`), so what you hear is the generation text while the box shows the line. Generation text comes from .audiogen-history.jsonl. Voice IDs: mimi o9B86nZP8mMLaT5FBEzP, eldest pqHfZKP75CvOlQylNhV4, clementine 2OEeJcYw2f3bWMzzjVMU, gertrude 7sAIIIXrQKek5xiLc1R6, wingate pNInz6obpgDQGcFmaJgB, bigsal SOYHLrjzK2X1ezoPC6cr, hazel FGY2WhTYpPnrIDTdsKH5, vesper N2lVS1w4EtoT3dr4eOWO, rigby LysucvtFmzi1NVAE0rKp, vibrato JBFqnCBsd6RMkjVDRZzb, sue dmWfLQZJq7wNPv9WmtiM, rhoda EXAVITQu4vr4xnSDxMaL, queenie WQhVGGVQ8EhNpBYHFE8c, puddles 8VJBrRk4O7tFoB5kqxa6. Each regeneration: audiogen voice, eleven_v4, about $0.01 for a short line.
 
 Every sfx a den file plays exists in game/assets/audio/sfx/ (duck-quack-mallard, squirrel-chatter, raccoon-chitter, crowd-cheer, choir-coo-chorus, brass-stinger, rat-squeak, subway-rumble, crow-caw, crow-caw-2, shed-door-fold, turtle-grumble, hawk-screech, hawk-dive-whistle, knock-clatter, cat-meow, starling-chatter, songbird-chatter, crumb-scatter, gang-coo-murmur, goose-honk, paper-rustle, engine-loop, splash-hop, horse-whinny). The synths (`jingle`, `tick`, `uiBack`) exist in audio.js. All crew names in the lines match crews.js.
 
@@ -805,7 +805,7 @@ Unlock-chirp replacement for `carAlarm` (recommended; the owner's idea, and it s
 Alternative: audiogen sfx "car key-fob unlock chirp, two short electronic beeps, close, dry, no engine" (~$0.12 per take; play with `rate` jitter for the wobble). The synth is cheaper and wobble-able; the sample sounds more real. Either way, rename `carAlarm` → `carChirp` in clues.js:842 and the audio.js doc comment, and change every line that says "car alarm" (dialogue.js:23 and :23 after, dialogue-sf.js:10/33, lead-hints.js:22: parent's/fork's scope) to "car-unlock chirp" / "*bwip-bwip!* (a car unlocking)". Also swap the generic `'whistle'` for `G.audio.play('ranger-whistle', { rate: 1 + wobble })` so the "ranger whistle" she claims is the real whistle sample (free; the file is already shipped and unused).
 
 ### Voice reference used
-Generation text per file from /workspaces/gg-test1/.audiogen-history.jsonl (scratchpad voices.txt). `vinnie-flying-rat`, `crowd-chant-take-3`, `duchess-join`, `vesper-greeting`, `strix-greeting`: no history entry (corrupt lines in the log) → unknown, needs a listen.
+Generation text per file from .audiogen-history.jsonl (scratchpad voices.txt). `vinnie-flying-rat`, `crowd-chant-take-3`, `duchess-join`, `vesper-greeting`, `strix-greeting`: no history entry (corrupt lines in the log) → unknown, needs a listen.
 
 ### main.js (38 strings)
 | line(s) | who/where | text (short) | names | checked against | verdict | proposed fix |
