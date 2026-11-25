@@ -1,6 +1,6 @@
 # Consistency pass (#43): every line a player reads or hears vs what's there
 
-Audit stage, 2026-11-25. Read-only: no game file has been changed. Checked against the code on branch fix/batch9 (worktree wt-fix9).
+Audit stage, 2026-11-25 (read-only); fix stage the same day: see "Fix status". Checked against the code on branch fix/batch9 (worktree wt-fix9).
 
 ## Coverage
 
@@ -18,6 +18,65 @@ Every player-facing line in the game is in a table below. Lines that name nothin
 Distinct mismatches by kind (roughly): **voice ~38** (spoken words differ from the subtitle; 6 files can't be checked), **prop ~22**, **sound ~10**, **place ~10**, **fact ~15**, **look ~8**.
 
 How the voice check worked: each file's generation text comes from /workspaces/gg-test1/.audiogen-history.jsonl. 56 of the 62 files were found there. The other 6 are on corrupted log lines and appear nowhere else in the repo, so they are listed as **unknown; needs a listen**: vesper-greeting, strix-greeting, duchess-join, puddles-join, vinnie-flying-rat, crowd-chant-take-3. A voiced bark plays on the dialogue line or bubble it's attached to (ui/dialogue.js:86, characters.js:209, allies.js:57), so "shown with" is the subtitle on screen while it plays.
+
+## Fix status (fix stage, 2026-11-25, branch fix/batch9)
+
+Every mismatch row below has been dealt with; this table is the status by fix. "words" = the line changed, "thing" = the game changed to match the line. Scripted dialogue lines (in cutscenes a replay drives) were kept no longer than before, so recorded "next" presses still land on finished lines; where the voiced words couldn't fit, the voice was regenerated instead.
+
+| # | fix | how | status |
+|---|---|---|---|
+| 5a | Truces meter stuck at 3/4 | thing: den-rhoda `gives.truce: 'hawks-pigeons'` (the design's 4th feud); toast max read from the thread; save migrate adds the truce to old saves with den-rhoda done; thread line "Most of them get settled on the Elders' rock" | done (check-schemes, den-rhoda record + replay) |
+| 5b | Completionist "Favours 0/50" | words/UI: the row is gone (nothing awards a favour); Nutmeg, Glint, Ringo, Pickles reworded as flavour (no "Favour") | done (computed from state each time, so old saves show it right) |
+| 1 | Mimi's car alarm | thing: synth `carChirp` (two "bwip" blips) replaces `carAlarm`; Mimic rotation = phone ring, car chirp, the real ranger-whistle.mp3; the chirp + an echo play on her stage line; words "car chirp" in dialogue.js (2), dialogue-sf.js (Jay, Mimi), den-songbirds (4), lead hint "*bwip-bwip*"; mimi-greeting regenerated "Bwip-bwip! Ha! Gotcha!"; bribe-songbirds-hint1 regenerated | done |
+| 2 | Ducks' tub of peas | thing: `peas` mesh is an open tub heaped with peas (items.js), on the table and in the beak | done |
+| 3 | Voiced barks vs subtitles | Prologue Duchess: new duchess-frenzy; Dove's Prologue line unvoiced; greetings: subtitles start with the bark (Duchess talk, Hazel, Puddles, Biscuit, Rigby, Vibrato, Big Sal, Queenie) or the bark regenerated to the line (Eldest, Clementine, Gertrude, Wingate, Mimi, Sue, Rhoda, Vesper, Strix); Big Sal's bark moved to den-meermob, new bigsal-rhoda for den-rhoda; joins: subtitles start with the bark (Hazel, Rigby, Vibrato, Vesper, Queenie, Sue, Wingate, Big Sal, Clementine, Gertrude, Eldest, Mimi), Rhoda/Duchess/Puddles joins regenerated; Biscuit and Strix joins now play on their win lines; the auto join bark after a scene no longer repeats a bark the scene just played (audio.playedRecently); finale rigby-ready and rhoda-hold-still; Wedding Dove "Places, darling. Forty-one weddings. None checked." | done |
+| 4 | Ally call bubbles | words: the bubble shows the call voice's words (allies.js CALL_LINES) | done |
+| 6 | Cats-rats truce not on the rock | thing: after the kerb lines the bosses go to the Elders' rock via truceScene (Slowpoke walks in, polaroid) | done (truce-cats-rats re-recorded + replayed) |
+| 7 | Shopping cart a steel box | thing: wire cart (bars, rim, red handle, legs, 4 wheels) | done |
+| 8 | Strix's spectacles | thing: strix-nospecs.webp (imagegen2) in dialogue and roster until den-strix; her model wears spectacles after den-strix | done |
+| 9 | Sax busker silent | thing: 'sax' music near him on Afternoons and under the Choir join; line "By the fountain, the sax busker joins in…"; "by the fountain" not "under the arcade" | done |
+| 10 | Missing props | key: an iron post with an arm and hook at the key, by the lot gate (clues.js) + words "a hook by the gate" (toast, card, keeper label); north gatehouse drinking fountain; Prickett holds a phone at the van; gold cufflink; sunken rowboat under the glow; Zoo: three sea lions in/on the pool, the sprat now flips from the rim sea lion, postcard "A sea lion flips you a sprat" | done |
+| 11 | Looks | Socket holds a welding torch; Rigby wrong-place "Rigby shrugs."; tourist she/her (prompt, toast, card); jogger/RC kid lines neutral ("The jogger", "The kid", "Joggers never stop"); East Drive "delivery man" (the #46 model is a delivery man); "Eight dogs" → "THOSE dogs" / "A pack of dogs" (an 8-dog walker was tried and dropped: not proven RNG-free); bread-print scarf renamed, Ledger "Bread! On a scarf!" | done |
+| 12 | Places | "by the south gatehouse"; "Fifty metres"; Pickles' sill under the DELI GROCERY; Clementine/Prickett card wheres; Bella "from the Mall to Cherry Hill"; busker by the fountain; Nutmeg Sheep Meadow; Clementine "by day"; Nightcap "at Dusk"; Gapstow "by"/"east end of" | done |
+| 13 | Named things | "Down the grate"; Blockhouse "gap" (no arch: cards, Big Sal, Feathers, the bribe tip); "by the Loch"; Duke's officer "on his break" / "Duke writes a ticket. With a hoof."; Stilts "the joggers"; Queenie "on the step"; Pickles "a slice"; "peck up the wrench by the stage"; "Follow the chittering"; "rushes over to sweep it up"; "Crumbs land at his feet"; 110th bins "on 110th Street"; sneaker charm on the jogger's key (thing); Workshop portrait line cut; "A dove! Stunning!"; "Who PUT that there?!" | done |
+| 14 | Sounds | Bubbles' "*dives*" plays duck-dive-bloop (regular lines can carry a sound); carousel band organ (audiogen music, on the ride and near it on Afternoons); pedicab horn = bikeBell synth; "Hopper full! Coo to Dump." | done |
+| 15 | Unknown voice files | not transcribable here (speech-to-text was refused by the session's permissions): vesper-greeting, strix-greeting, duchess-join, puddles-join, vinnie-flying-rat regenerated from their lines; vinnie-flying-rat now plays with its bubble; crowd-chant-take-3 unused, left | done / 1 left (unused) |
+| — | part-talons "behind one steel door" | words: "His stock inside, and the last ranger cart parked across the door." + card | done |
+| — | lead hint "She keeps the books" (Hazel) | words | done |
+| — | Wingate's stale "SPIKED"/"Strips on our roost" | words ("Our gatehouse roost. Ruined." / "Always something on our roost. Spikes. Cats.") | done |
+| — | item-sources "pecan cache" | words: "Old Pecan's cache on Cherry Hill" | done |
+| — | Not changed | Clementine "that's pepperoni" for an anchovy slice; "The CAKE!"; "stage door" (the guard is the door); orphan *-call voices of non-callable crews; the rink door's crumple sfx | left: low or not a mismatch |
+
+### Proof (fix stage)
+
+- check-schemes: 34 schemes, 92 steps, all checks pass (two card `where`s were shortened to stay under 120 characters).
+- truce-cats-rats (the scene now goes to the Elders' rock): closed-loop record of the main route (12,489 frames) and of the alt route (11,349 frames; the old alt solution ran out before the longer scene ended), and both replays complete. design/solutions/truce-cats-rats{,.alt}.json re-recorded. design/solutions/whole-game.json passes through this scene too and was not re-run (not asked; it will need a re-record when the whole game is next replayed).
+- den-rhoda (its gives now include the truce): closed-loop record OK (14,339 frames) and the committed solution replays to completion.
+- Counters, in the game: an old save `{ flags: den-rhoda…, truces: [3] }` migrates to 4 truces; the Feuds meter max is 4; the Completionist rows are pretzels, strays, Summit Perches, postcards, full thread meters, scarves (no Favours).
+- Screenshots (design/screenshots/fix-43/, each looked at): peas-tub-table, cufflink-and-keys (gold cufflink, sneaker-charm key, plain gate key), shopping-cart, zoo-sea-lions, sunken-rowboat(-2), lot-key-post, north-gatehouse-fountain, prickett-phone-front, socket-torch-front, strix-dialogue-nospecs (portrait without spectacles), strix-spectacles-after (model wears them after den-strix), ally-call-bubble ("Mimi: "Mimi's on! What sound you need?"").
+- Text scanner on the dialogue and the call-bubble screens: nothing from these changes; it flags two things that were there before (the den-songbirds S2 goal card wraps "edge." onto its own line at 960×540, and a compass tick clipped at the bar's end).
+- Listen-through, measured (decoded RMS of the loudest 20%, design/screenshots/fix-43/levels.json): every new voice is within 2 dB of the same character's call line except the Strix greeting (−4 dB) and Mimi's (−3 dB), now given gains 1.55 and 1.4 (audio.js SFX_GAIN); the carousel organ (−13.1 dB) sits with the sax riff (−13.5) and the busker riff (−15.6). The words themselves couldn't be machine-checked (speech-to-text wasn't permitted); each file was generated from exactly the text in the table.
+- Console errors: 0 in every browser session.
+
+### Bagel shop (#44) and bribes (#45): added in the fix stage
+
+125 voice files (Manny 12, Mama Mask 23, bribes 90) checked against bagels.js and lead-hints.js by their generation text (matched to the shipped file by size), plus every player string in data/bagels.js, schemes/bagel-shop.js and schemes/bagel-bribes.js (menu, A-frame chalk, toasts, overlay, bubbles, labels) and the props and sounds they name (bell + bell-ding, griddle sizzle, kettle steam, munch, the shelf, the A-frame, neon OPEN, blade sign).
+
+| file / line | text (short) | names | checked against | verdict | fix |
+|---|---|---|---|---|---|
+| MANNY ×12, MAMA ×23 voices | e.g. "Ding ding. What'll it be, pal?", riddle 1-3, the wrong-bagel answers | bell, oven, kettle | voice texts = shown texts (all 35); bell-ding on the bell; griddle sizzle; kettle steam on done2 | OK | — |
+| BRIBES ×17 crews: excited/thanks/lead/tip/refuse/closer | | | voice texts = shown texts | OK except two tips | |
+| bribe raccoons tip | "The stagehands at the Delacorte got a whole box of 'em." | a box of wrenches | one wrench, the stagehand's trade (den-raccoons) | MISMATCH-prop | words + voice: "The stagehand at the Delacorte's got one. Just sayin'." (regenerated) |
+| bribe meermob tip | "Fly the arch at the Blockhouse." | arch | no arch (see den-meermob) | MISMATCH-prop | words + voice: "Fly in through the Blockhouse gap. With STYLE." |
+| bribe *-hint1/2 (lead hints voiced) | squirrels 2, racers 1, cats 2, horses 1+2, songbirds 1 | | lead-hints.js after this pass | MISMATCH-voice (the hints were reworded here) | 6 regenerated to the new hints |
+| bribe meermob hint2 | "You want the Mob? Big Sal. Up at the Blockhouse. Ask nice." | | the shipped file matched no record of this text | voice unknown | regenerated (QzTKubutNn9TjrB7Xb2Q) |
+| bribe songbirds hint1 | voiced "Wee-oo wee-oo!" for "*car alarm*" | | fix 1 | MISMATCH-sound | "Bwip-bwip!" |
+| A-frame "SQUIRRELS TALK FOR PLAIN" | | | squirrels take any bagel; plain is the cheap one | OK (advice) | — |
+| A-frame "PIGEONS WELCOME (FOR ONCE)", fascia, blade, neon OPEN | | | drawn in code (bagel-shop.js) | OK | — |
+| BAGEL_EAT raccoons "Into the drain kitchen." | | | Mama Mask's bio (drain kitchen is her line, not a prop) | OK | — |
+| toasts/overlay ("Land first, Gus. Critters don't look up.", the Duchess toast, "New in the park", scarf, map) | | | bagel-bribes.js:37 needs landing; shop on 110th across the North Woods gate | OK | — |
+
+bagel files touched in this pass: data/bagels.js (two BRIBES tips only). bagel-shop.js and bagel-bribes.js were not edited.
 
 ## Fixes, ordered by how much a player would notice
 
