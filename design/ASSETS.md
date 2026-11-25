@@ -329,3 +329,32 @@ The camera cost more than the ≈ $0.60 forecast (two retakes); the change stays
 | **Total** | | | | **≈ $1.26** |
 
 **Running total: ≈ $106.12** (working cap $150; $1.26 of the $50 for these fixes).
+
+## Meshy models: 15 more park people (#46, 2026-11-25; the owner approved the Meshy spend, cap ~700 credits)
+
+15 rigged meshgen characters so the park isn't clones: 8 women or girls and 7 men, a NYC autumn mix of ages (8 to 70s), builds and skin tones (no real people, no logos, no text). Each comes from an imagegen2 high concept picture, `.gamegen/candidates/people-46/concepts/<id>.png` (contact sheet `_sheet.jpg`), made with `people-46/gen.sh`: the same style line and A-pose block as `concepts/gen.sh` kind `human`, with human-park plus human-walter (men), human-wedding (women) or human-child (the kid) and the gus-stand anchor as style references. All 15 concepts were accepted first time. Props that would need their own models (the stroller, easel, scooter, bike, newspaper, shopping bags) were left out; the role accessories in code (sax, guitar, selfie phone, box, helmet, hard hat, beret, slice) still apply, and a model that wears one already skips it (`MODEL_HAS`).
+
+Same pipeline as the 12 of 2026-11-14: `meshgen character --polycount 9000` at the height below, a dry run first and then `--max-credits 44`, 2 jobs at a time; idle (0) plus the free walk and run plus one or two role clips. Every model faces +Z, stands on y = 0, ~9.3k triangles, no meshgen warnings; each preview sheet was checked. Originals and sheets: `.gamegen/candidates/people-46/models/human-<id>/`. Game copies optimised with `tools/optimize-assets.mjs --originals .gamegen/candidates/people-46/models` (1024 WebP q88, no quantization); the distance LOD is built at load (`gfx/simplify.js`), as for every person. `game/tools/list-models.mjs` regenerated the manifest.
+
+| ID | Kind | Tris | Credits | Cost | Verdict | GLB (original → optimized, MiB) | Clips (action ids) / notes |
+|---|---|---|---|---|---|---|---|
+| human-nanny | character, 1.68 m | 9383 | 44 | $0.88 | accepted, first try | 4.81 → 1.27 | Black Caribbean woman, 40s, plum puffer, mustard beanie; wave 290 Wave_One_Hand, chat 56 Stand_and_Chat |
+| human-taichi-elder | character, 1.56 m | 9380 | 44 | $0.88 | accepted, first try | 4.82 → 1.29 | East Asian woman, 70s, red quilted jacket; taichi 377 (a slow wide-stance palm form, loops), look 336 |
+| human-old-man | character, 1.70 m | 9301 | 44 | $0.88 | accepted, first try | 5.06 → 1.41 | white man, 70s, flat cap, waxed jacket; sit 33 Chair_Sit_Idle_M, wave 290 |
+| human-street-musician | character, 1.84 m | 9333 | 44 | $0.88 | accepted, first try | 5.21 → 1.49 | Black man, 30s, locs, rust beanie, denim jacket; sway 415 Happy_Sway_Standing (loops), bow 42 |
+| human-cyclist | character, 1.68 m | 9356 | 41 | $0.82 | accepted, first try | 4.61 → 1.22 | Latina woman, 20s, hi-vis jacket, helmet modelled; wave 290 |
+| human-construction | character, 1.78 m | 9312 | 44 | $0.88 | accepted, first try | 5.42 → 1.56 | heavyset Latino man, 50s, hard hat modelled, hi-vis vest; pickup 276, scold 311 |
+| human-student | character, 1.62 m | 9340 | 44 | $0.88 | accepted, first try | 4.86 → 1.37 | South Asian student, 19, glasses, backpack; sit 32 Chair_Sit_Idle_F, phone 312 |
+| human-runner | character, 1.80 m | 9346 | 44 | $0.88 | accepted, first try | 5.00 → 1.30 | white man, 30s, grey hoodie; jog 15 Run_03, catch-breath 31 |
+| human-newspaper-man | character, 1.75 m | 9318 | 44 | $0.88 | accepted, first try | 4.90 → 1.35 | Middle Eastern man, 50s, glasses, peacoat; sit 33, think 364 (seated) |
+| human-shopper | character, 1.66 m | 9317 | 44 | $0.88 | accepted, first try | 4.54 → 1.36 | East Asian woman, 30s, trench coat, crossbody bag; sit 32, wave 28 |
+| human-scooter-kid | character, 1.25 m | 9310 | 44 | $0.88 | accepted, first try | 4.82 → 1.58 | Black girl, ~8, yellow raincoat; cheer 298, jump 44 |
+| human-painter | character, 1.60 m | 9241 | 44 | $0.88 | accepted, first try | 4.89 → 1.51 | white woman, 60s, paint-smeared smock, red beret modelled; look 336, sit 32 |
+| human-photographer | character, 1.72 m | 9354 | 47 | $0.94 | accepted, first try | 4.65 → 1.30 | East Asian man, 20s, bomber, camera on a strap; photo 258 CrouchLookAroundBow, gawk 333, cheer 298 (added with `animate` for 3: the wedding script plays cheer on him) |
+| human-delivery | character, 1.72 m | 9322 | 41 | $0.82 | accepted, first try | 4.54 → 1.20 | South Asian man, 30s, red rain jacket, knit hat; call 29 |
+| human-dog-sitter | character, 1.70 m | 9288 | 44 | $0.88 | accepted, first try | 5.13 → 1.47 | white woman, 20s, ginger bun, orange fleece; pulled 562 Stumble_Walk, pickup 276 |
+| **Total** | 15 characters | | **657** | **$13.14** | no retakes | 73.3 → 20.7 MiB (21.7 MB) | |
+
+Meshy: **657 credits ($13.14)** of the ~700 approved; balance afterwards 184. imagegen2: 15 pictures × ≈ $0.06 = **≈ $0.90** (1758 output tokens each, no retakes). This change: **≈ $14.04**.
+
+**Running total: ≈ $120.16** (previous $106.12 + Meshy $13.14 + pictures $0.90). The Meshy credits were prepaid, so the cash spend is about $0.90.

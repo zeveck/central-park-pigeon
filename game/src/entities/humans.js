@@ -39,12 +39,17 @@ import { simplifiedGeometry, simplifierReady } from '../gfx/simplify.js';
 
 const MODELS = ['human-park', 'human-ranger', 'human-vendor', 'human-prickett', 'human-walter', 'human-wedding',
   'human-dolores', 'human-chess-player', 'human-jogger', 'human-tourist', 'human-child', 'human-teen-skater', 'human-birder',
-  'human-businessperson', 'human-halal-cart-man', 'human-pizza-counterman', 'human-dog-walker', 'human-carriage-driver'];
+  'human-businessperson', 'human-halal-cart-man', 'human-pizza-counterman', 'human-dog-walker', 'human-carriage-driver',
+  // #46: 15 more park people
+  'human-nanny', 'human-taichi-elder', 'human-old-man', 'human-street-musician', 'human-cyclist', 'human-construction',
+  'human-student', 'human-runner', 'human-newspaper-man', 'human-shopper', 'human-scooter-kid', 'human-painter',
+  'human-photographer', 'human-delivery', 'human-dog-sitter'];
 // accessories a model already wears (modelled), so a role's code accessory is skipped on it
-export const MODEL_HAS = { 'human-vendor': ['paperhat'], 'human-walter': ['capbraid'], 'human-tourist': ['camera'], 'human-birder': ['binoculars'], 'human-businessperson': ['phone'], 'human-halal-cart-man': ['paperhat'], 'human-pizza-counterman': ['paperhat'] };
+export const MODEL_HAS = { 'human-vendor': ['paperhat'], 'human-walter': ['capbraid'], 'human-tourist': ['camera'], 'human-birder': ['binoculars'], 'human-businessperson': ['phone'], 'human-halal-cart-man': ['paperhat'], 'human-pizza-counterman': ['paperhat'],
+  'human-construction': ['hardhat'], 'human-cyclist': ['helmet'], 'human-painter': ['beret'] };   // #46
 // a missing one-shot clip → the nearest this model has
 const CLIP_ALT = { throw: ['pickup', 'wave', 'call', 'cheer'], pickup: ['throw', 'wave'], cheer: ['wave', 'jump', 'argue', 'call'], scold: ['argue', 'shrug', 'call'], taunt: ['wave', 'gawk', 'call', 'shrug'], wave: ['call', 'cheer', 'bow'], attack: ['scold', 'argue'], stomp: ['scold', 'argue'] };
-const LOOPS = new Set(['idle', 'walk', 'run', 'sit', 'jog', 'balance', 'scan-walk', 'phone-walk', 'phone', 'cook', 'look', 'think', 'catch-breath']);
+const LOOPS = new Set(['idle', 'walk', 'run', 'sit', 'jog', 'balance', 'scan-walk', 'phone-walk', 'phone', 'cook', 'look', 'think', 'catch-breath', 'sway', 'taichi']);   // #46: sway, taichi
 // seats (visual): where a seated agent's model is drawn
 const SEAT = { stool: 0.12, bench: 0.08, carriage: 0 };
 const WALK = 1.25, RUN = 3.6, JOG = 2.8;
@@ -78,7 +83,7 @@ class Agent {
     this.out = true;
     this.script = false;
     this.seated = false;
-    this.scale = spec.kid ? (this.model === 'human-child' ? 0.88 : 0.62) : 1;
+    this.scale = spec.kid ? (KID_SCALE[this.model] ?? 0.62) : 1;   // #46: the kid models are already child-sized
   }
 }
 
@@ -119,7 +124,8 @@ export class Humans {
     this.range = { high: 120, medium: 90, low: 35 }[preset.id] || 90;
     const total = cap + this.capFrozen;
     this.lowVip = preset.id === 'low';
-    const per = { 'human-park': total, 'human-ranger': 3, 'human-vendor': Math.min(8, total), 'human-prickett': 1, 'human-walter': 3, 'human-wedding': 1, 'human-dolores': 2, 'human-carriage-driver': 3, 'human-halal-cart-man': 1, 'human-pizza-counterman': 2 };
+    const per = { 'human-park': Math.min(8, total),   // #46: was `total` (it was most of the crowd)
+      'human-ranger': 3, 'human-vendor': Math.min(8, total), 'human-prickett': 1, 'human-walter': 3, 'human-wedding': 1, 'human-dolores': 2, 'human-carriage-driver': 3, 'human-halal-cart-man': 1, 'human-pizza-counterman': 2 };
     this.#buildAgents();
     // Polish-1: each pool starts with a clone or two and grows on demand (#assign) up to its cap; the
     // wedding party's models always have room for every vip agent
@@ -130,7 +136,7 @@ export class Humans {
       this.pools[m] = [];
       if (!this.gltf[m]) continue;
       this.poolMax[m] = Math.max(per[m] ?? Math.min(total, 8), (per[m] ?? 0) + (vipNeed[m] || 0));
-      const start = m === 'human-park' ? per[m] : Math.min(this.poolMax[m], 2);
+      const start = Math.min(this.poolMax[m], 2);   // #46: human-park no longer pre-builds a full pool
       for (let i = 0; i < start; i++) this.pools[m].push(this.#makeClone(m));
     }
     this.#buildProps();
@@ -777,7 +783,13 @@ const DEFAULT_FLAVOUR = {
   'human-halal-cart-man': ['call', 'wave', 'cook'], 'human-pizza-counterman': ['shrug', 'scold'], 'human-dog-walker': ['pulled', 'pickup'],
   'human-carriage-driver': ['bow'], 'human-dolores': ['throw'], 'human-jogger': ['warmup'], 'human-teen-skater': ['wobble'],
   'human-birder': ['look'], 'human-businessperson': ['phone'],
+  // #46
+  'human-nanny': ['wave', 'chat'], 'human-taichi-elder': ['taichi', 'look'], 'human-old-man': ['wave'], 'human-street-musician': ['sway', 'bow'],
+  'human-cyclist': ['wave'], 'human-construction': ['pickup'], 'human-student': ['phone'], 'human-runner': ['catch-breath'],
+  'human-newspaper-man': ['think'], 'human-shopper': ['wave'], 'human-scooter-kid': ['cheer', 'jump'], 'human-painter': ['look'],
+  'human-photographer': ['photo', 'gawk'], 'human-delivery': ['call'], 'human-dog-sitter': ['pickup', 'pulled'],
 };
+const KID_SCALE = { 'human-child': 0.88, 'human-scooter-kid': 0.92 };   // a kid role on an adult model shrinks it to 0.62
 const CARRIAGE_BOX = { fwd: 0.9, up: 1.25 };
 const PEOPLE_FLOOR = { high: 4, medium: 3, low: 2 };   // perf pass: was 8 / 6 / 3, set while the world alone was over the caps
 const DOG_TINTS = [{}, { color: 0xd8c8b0 }, { color: 0x8a6a4a }, {}, { color: 0x404048 }];

@@ -70,7 +70,7 @@ async function buildHumans() {
     for (const m of ms) add(m, spec.acc, spec.holds, spec.act, spec.role);
   }
   add('human-prickett', ['spraytank', 'wand', 'clipboard'], null, 'stand', 'prickett');
-  const all = ['human-park', 'human-ranger', 'human-vendor', 'human-prickett', 'human-walter', 'human-wedding', 'human-dolores', 'human-chess-player', 'human-jogger', 'human-tourist', 'human-child', 'human-teen-skater', 'human-birder', 'human-businessperson', 'human-halal-cart-man', 'human-pizza-counterman', 'human-dog-walker', 'human-carriage-driver'];
+  const all = ['human-park', 'human-ranger', 'human-vendor', 'human-prickett', 'human-walter', 'human-wedding', 'human-dolores', 'human-chess-player', 'human-jogger', 'human-tourist', 'human-child', 'human-teen-skater', 'human-birder', 'human-businessperson', 'human-halal-cart-man', 'human-pizza-counterman', 'human-dog-walker', 'human-carriage-driver', 'human-nanny', 'human-taichi-elder', 'human-old-man', 'human-street-musician', 'human-cyclist', 'human-construction', 'human-student', 'human-runner', 'human-newspaper-man', 'human-shopper', 'human-scooter-kid', 'human-painter', 'human-photographer', 'human-delivery', 'human-dog-sitter'];
   for (const m of all) if (![...outfits.values()].some((o) => o.model === m)) add(m, [], null, 'stand', '(none)');
   const gl = {};
   await Promise.all(all.map(async (m) => { try { gl[m] = await loader.loadAsync(MODELS + m + '.glb'); } catch { /* missing */ } }));

@@ -43,6 +43,8 @@ const SPOTS = {
   'great-lawn': { view: { gus: { x: -20, z: 452, mode: 'walk', yaw: 0.2 } } },   // batch-3 (#12): the backstops, the Reservoir fence behind
   'fifth-110th': { view: { gus: { x: 119, z: 1062, mode: 'walk', yaw: -2.5 } } },
   'high-midpark': { view: { gus: { x: 0, z: 330, y: 95, mode: 'fly', yaw: 0 } } },
+  mall: { view: { gus: { x: 6, z: 186, mode: 'walk', yaw: 0 } } },   // #46: the Mall's walkers, up towards Bethesda
+  plaza: { view: { gus: { x: 99, z: -13, mode: 'walk', yaw: 3.0 } } },   // #46: Grand Army Plaza (the selfie, the halal line)
   stomp: { finale: 'stomp', settle: 120 },
   climb: { finale: 'climb', settle: 120 },
 };
