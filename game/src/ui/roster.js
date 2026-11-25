@@ -3,7 +3,7 @@
 // (portrait, name, one-line bio, favour tick), the crew's talents and its
 // crowd count; plus the 8 Mecha parts on a picture of the real Mecha (Fixes-1).
 
-import { CREWS, CHARACTERS, TALENTS, CREW_COUNT } from '../data/crews.js';
+import { CREWS, CHARACTERS, TALENTS, CREW_COUNT, portraitOf } from '../data/crews.js';
 import { PARTS, PART_NAMES } from '../data/schemes.js';
 import { overlay } from './menu.js';
 import { icon } from './icons.js';
@@ -37,7 +37,7 @@ export function rosterScreen(G) {
     const people = [c.boss, ...c.regulars];
     page.innerHTML = `<h3 style="margin-top:0">${esc(c.name)} ${joined ? '· joined' : '· not yet'}</h3>
       <p><b>Talent:</b> ${c.talents.map((t) => esc(TALENTS[t].name)).join(', ')}${c.flock ? ` · +${c.flock} flock` : ''} · <b>Crowd:</b> about ${c.count}</p>
-      <div class="chars">${people.map((id) => { const ch = CHARACTERS[id]; return `<div class="ch${joined ? '' : ' locked'}"><img src="assets/portraits/${ch.portrait === 'strix' && !st.flags['den-strix'] ? 'strix-nospecs' : ch.portrait}.webp" alt=""><div class="n">${esc(ch.name)}${id === c.boss ? ' (boss)' : ''}</div><div class="b">${esc(ch.bio)}</div>${st.favours.includes(id) ? '<div class="b"><b>Favour done</b></div>' : ''}</div>`; }).join('')}</div>`;
+      <div class="chars">${people.map((id) => { const ch = CHARACTERS[id]; return `<div class="ch${joined ? '' : ' locked'}"><img src="assets/portraits/${portraitOf(id, st)}.webp" alt=""><div class="n">${esc(ch.name)}${id === c.boss ? ' (boss)' : ''}</div><div class="b">${esc(ch.bio)}</div>${st.favours.includes(id) ? '<div class="b"><b>Favour done</b></div>' : ''}</div>`; }).join('')}</div>`;
   };
   const s = {
     id: 'roster', el,

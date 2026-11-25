@@ -5,7 +5,7 @@
 //
 //   dialogue.say([{ who: 'duchess', text: '…', voice: 'duchess-greeting' }, …], onDone)
 
-import { CHARACTERS, CREW } from '../data/crews.js';
+import { CHARACTERS, CREW, portraitOf } from '../data/crews.js';
 import { glyph } from './glyphs.js';
 
 const CPS = 42;   // characters a second
@@ -118,7 +118,7 @@ export class Dialogue {
     const c = CHARACTERS[L.who];
     const pic = c ? (c.portrait || L.who) : L.who;
     if (!PORTRAITS.has(pic)) return null;
-    if (pic === 'strix' && !this.G.state.flags['den-strix']) return 'assets/portraits/strix-nospecs.webp';   // #43: she's lost her spectacles until den-strix
+    if (pic === 'strix') return `assets/portraits/${portraitOf('strix', this.G.state)}.webp`;   // #43: she's lost her spectacles until den-strix
     return `assets/portraits/${pic === 'gus' && this.G.gusPortrait ? this.G.gusPortrait() : pic}.webp`;   // fun pass: Gus in the scarf he's wearing
   }
 

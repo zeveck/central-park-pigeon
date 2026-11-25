@@ -57,6 +57,7 @@ Every mismatch row below has been dealt with; this table is the status by fix. "
 - Text scanner on the dialogue and the call-bubble screens: nothing from these changes; it flags two things that were there before (the den-songbirds S2 goal card wraps "edge." onto its own line at 960×540, and a compass tick clipped at the bar's end).
 - Listen-through, measured (decoded RMS of the loudest 20%, design/screenshots/fix-43/levels.json): every new voice is within 2 dB of the same character's call line except the Strix greeting (−4 dB) and Mimi's (−3 dB), now given gains 1.55 and 1.4 (audio.js SFX_GAIN); the carousel organ (−13.1 dB) sits with the sax riff (−13.5) and the busker riff (−15.6). The words themselves couldn't be machine-checked (speech-to-text wasn't permitted); each file was generated from exactly the text in the table.
 - Console errors: 0 in every browser session.
+- Review follow-up: the Choir's sax timer resets on load / New Game; the cart and tub are merged to one mesh per material (cart 3, tub 2); the part-talons narrator line is back under its old length; the carousel's ambience bed is skipped under the carousel music; the cats-rats rock scene starts from the kerb scene's onDone (re-recorded main + alt closed-loop: identical inputs, both replays complete; route-index.json entries refreshed from a footprint replay); Strix's no-spectacles portrait also on the Call wheel, the Board's Elders answer and clue icons (crews.js portraitOf).
 
 ### Bagel shop (#44) and bribes (#45): added in the fix stage
 

@@ -31,8 +31,7 @@ export function installTruceCatsRats(G) {
       // #43: then they shake on the Elders' rock like every truce (truceScene: both bosses fly there, Slowpoke walks in);
       // before, the camera cut to an empty rock while everyone stayed at the kerb
       { do: () => { disperse(G, list.filter((c) => c && !['queenie', 'sue'].includes(c.id))); } },
-      { do: () => G.later(0, () => truceScene(G, 'catsrats-rock', { a: 'queenie', b: 'sue', caption: 'Cats & rats',
-        after: [L('express', 'Slice Relay\'s open, Gus! Any grate, once a phase: a hot one pops right up. And the cats send slices to the Meer now.')] }, done)) },
-    ]);
+    ], () => truceScene(G, 'catsrats-rock', { a: 'queenie', b: 'sue', caption: 'Cats & rats',   // (from onDone, like dogs-squirrels: no camera cut between)
+      after: [L('express', 'Slice Relay\'s open, Gus! Any grate, once a phase: a hot one pops right up. And the cats send slices to the Meer now.')] }, done));
   });
 }

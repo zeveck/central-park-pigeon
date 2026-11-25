@@ -194,6 +194,8 @@ export const CHARACTERS = {
 };
 for (const [id, c] of Object.entries(CHARACTERS)) { c.id = id; c.portrait = id; }
 CHARACTERS.ranger.portrait = 'ranger';
+/** #43: the portrait to show for a character: Strix has lost her spectacles until den-strix (strix-nospecs.webp). */
+export const portraitOf = (id, st) => (id === 'strix' && !st?.flags?.['den-strix'] ? 'strix-nospecs' : (CHARACTERS[id]?.portrait || id));
 
 // ------------------------------------------------------------------ crowds: where everyone lives
 // kind: lawn (ground in a circle), water (on a water body), pavement (city

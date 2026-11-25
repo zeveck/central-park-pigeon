@@ -10,6 +10,7 @@
 // gone ("A rat took your slice while you napped."). Grate travel takes whatever Gus holds.
 
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';   // #43: merged code-built items
 import { SLICE, GRATES, CLUES } from '../world/layout.js';
 import { ruleMaterial } from '../gfx/load-model.js';
 import { GUS_STAND, GUS_FLY } from '../entities/gus-rig.js';
@@ -109,6 +110,20 @@ export function poseCarried(gus, mesh, def, heat = null) {
 
 const COOLING = 0.4;      // fix-19: below this much heat the label says "Cooling, still counts"
 const HOVER_WARM_R = 3;   // fix-19: the griddle warms a carried slice within this many metres
+
+/** #43: bake a code-built item's parts into one mesh per material (fewer draw calls and shadow casters). */
+function mergeByMaterial(g) {
+  const by = new Map();
+  for (const m of [...g.children]) {
+    m.updateMatrix();
+    const geo = m.geometry.clone();
+    geo.applyMatrix4(m.matrix);
+    if (!by.has(m.material)) by.set(m.material, []);
+    by.get(m.material).push(geo);
+    g.remove(m); m.geometry.dispose();
+  }
+  for (const [mat, geos] of by) { const mm = new THREE.Mesh(mergeGeometries(geos), mat); mm.castShadow = true; g.add(mm); for (const q of geos) q.dispose(); }
+}
 
 export class Items {
   constructor(G) {
@@ -210,6 +225,7 @@ export class Items {
       case 'sprat': add(new THREE.ConeGeometry(0.018, 0.11, 6), this.mats.shiny, 0, 0.02, 0, 0, 0, Math.PI / 2); break;
       default: add(new THREE.CylinderGeometry(0.03, 0.03, 0.006, 12), this.mats.gold, 0, 0.003); break;
     }
+    if (d.code === 'cart' || d.code === 'peas') mergeByMaterial(g);   // #43: the wire cart (~53 parts) and the tub (13) as one mesh per material
     return g;
   }
 

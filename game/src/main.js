@@ -1497,7 +1497,7 @@ async function boot() {
     if (near(6.6, 286, 40) || near(97, -40, 35)) beds.push({ name: 'fountain', vol: 0.55 });
     else if (near(51.7, 88.6, 45) && st.phase !== 'night') beds.push({ name: 'wollman-rink', vol: 0.5 });
     else if (near(-38.5, 443, 50) && st.phase === 'dusk') beds.push({ name: 'delacorte-rehearsal', vol: 0.6 });
-    else if (near(-17.6, 106, 35) && st.phase === 'afternoon') beds.push({ name: 'carousel-organ', vol: 0.5 });
+    else if (near(-17.6, 106, 35) && st.phase === 'afternoon' && G.audio.music.want !== 'carousel') beds.push({ name: 'carousel-organ', vol: 0.5 });   // #43: not under the carousel music (collect.js)
     else if (near(-60, 873, 30)) beds.push({ name: 'waterfall', vol: 0.6 });
     else if (terrain.shapes.water.some((w) => !w.stream && Math.hypot(p.x - (w.b.x0 + w.b.x1) / 2, p.z - (w.b.z0 + w.b.z1) / 2) < Math.max(w.b.x1 - w.b.x0, w.b.z1 - w.b.z0) / 2 + 15)) beds.push({ name: 'water-lapping', vol: 0.45 });
     return beds;
@@ -1542,6 +1542,7 @@ async function boot() {
     for (const sg of G.signs.list) { sg.pending = false; sg.feedAt = null; }
     G.food.eatAcc = 0; G.food.gulpT = 0;
     G.swarming = false; cooHeld = 0;
+    G.saxUntil = 0;   // #43: the Choir join's sax (a game-clock time) must not carry into another save or a New Game
     G.wheel.close(false);
     G.fog.state = st; G.fog.load();
     G.setPhase(st.phase);

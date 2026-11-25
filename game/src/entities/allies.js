@@ -8,7 +8,7 @@
 // reason. A Call to the wrong place plays a funny line and nothing is lost.
 // Called allies go home when Gus naps.
 
-import { CREW, CREWS, CHARACTERS, FEUDS, WRONG_PLACE, awakeReason } from '../data/crews.js';
+import { CREW, CREWS, CHARACTERS, FEUDS, WRONG_PLACE, awakeReason, portraitOf } from '../data/crews.js';
 import { PLACES } from '../world/layout.js';
 
 // #43: what each boss's <voice>-call.mp3 says (the generation texts, tags stripped): the Call bubble shows it
@@ -31,7 +31,7 @@ export class Allies {
 
   /** Recruited allies the wheel shows (up to 12), in crew order. */
   list() {
-    return CREWS.filter((c) => c.callable && this.st.crews.includes(c.id)).slice(0, 12).map((c) => ({ crew: c.id, name: CHARACTERS[c.boss].name, boss: c.boss, portrait: c.boss, reason: this.reason(c.id), here: this.isHere(c.id) }));
+    return CREWS.filter((c) => c.callable && this.st.crews.includes(c.id)).slice(0, 12).map((c) => ({ crew: c.id, name: CHARACTERS[c.boss].name, boss: c.boss, portrait: portraitOf(c.boss, this.st), reason: this.reason(c.id), here: this.isHere(c.id) }));
   }
 
   /** Why this ally can't come here and now, or null. */

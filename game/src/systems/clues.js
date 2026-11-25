@@ -21,7 +21,7 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { CLUES, DOORS, BLOCKERS, TRADES, SPIKE_SITES, PLACES, TRANSVERSES, PARK, NESTS } from '../world/layout.js';
-import { CREW, CHARACTERS, HAULERS, TALENT_CLUES, TALENT_ACT, phaseList } from '../data/crews.js';
+import { CREW, CHARACTERS, HAULERS, TALENT_CLUES, TALENT_ACT, phaseList, portraitOf } from '../data/crews.js';
 import { ITEM_DEFS } from './items.js';
 import { ruleMaterial } from '../gfx/load-model.js';
 import { derived } from '../state/gamestate.js';
@@ -320,7 +320,7 @@ export class Clues {
       // first-time talent icon
       const ic = c.def.icon;
       if (ic && !st.seenTalents.includes(CREW[ic].talents[0]) && !c.iconBubble) {
-        c.iconBubble = G.bubbles.add('', { kind: 'icon', html: `<img alt="" src="assets/portraits/${CREW[ic].boss}.webp">`, at: { x: c.x, y: c.y + (c.def.type === 'dig' ? 3.1 : 1.6), z: c.z }, ttl: 0, range: 90 });
+        c.iconBubble = G.bubbles.add('', { kind: 'icon', html: `<img alt="" src="assets/portraits/${portraitOf(CREW[ic].boss, G.state)}.webp">`, at: { x: c.x, y: c.y + (c.def.type === 'dig' ? 3.1 : 1.6), z: c.z }, ttl: 0, range: 90 });
       }
       // a clue on screen for 2 s gets a "?" ping on the compass
       if (!st.cluePings) st.cluePings = {};

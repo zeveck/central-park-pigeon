@@ -9,7 +9,7 @@
 
 import { SCHEME, SCHEMES } from '../data/schemes.js';
 import { THREADS, THREAD } from '../data/threads.js';
-import { CREW, CHARACTERS, PHASE_LABEL, CREW_COUNT } from '../data/crews.js';
+import { CREW, CHARACTERS, PHASE_LABEL, CREW_COUNT, portraitOf } from '../data/crews.js';
 import { icon } from './icons.js';
 import { overlay } from './menu.js';
 import { derived } from '../state/gamestate.js';
@@ -54,7 +54,7 @@ export function boardScreen(G) {
     else if (step) {
       body += `<div class="st">Step ${E.stepIndex(id) + 1} of ${s.steps.length}</div><div class="gl">${esc(step.goal)}</div>${step.obstacle ? `<div class="ob">${esc(step.obstacle)}</div>` : ''}`;
       if (E.nudgeShown(id) && step.nudge) body += `<div class="nd"><b>${esc(CHARACTERS[step.nudge.by]?.name)}:</b> ${esc(step.nudge.text)}</div>`;
-      if (G.ui.eldersFor === id) { const a = E.eldersAnswer(id); body += `<div class="an">${a.icon ? `<img src="assets/portraits/${CREW[a.icon]?.boss}.webp" alt="" style="width:26px;height:26px;border-radius:50%;vertical-align:middle;margin-right:4px">` : ''}${esc(a.text)}</div>`; }
+      if (G.ui.eldersFor === id) { const a = E.eldersAnswer(id); body += `<div class="an">${a.icon ? `<img src="assets/portraits/${portraitOf(CREW[a.icon]?.boss, G.state)}.webp" alt="" style="width:26px;height:26px;border-radius:50%;vertical-align:middle;margin-right:4px">` : ''}${esc(a.text)}</div>`; }
       const tags = [];
       if (info.phases) tags.push(`<span class="tag phase">${phaseTag(info.phases)}</span>`);
       if (info.crumbs) tags.push(`<span class="tag cost">${info.crumbs} crumbs${G.state.crumbs < info.crumbs ? ` (you have ${G.state.crumbs})` : ''}</span>`);
