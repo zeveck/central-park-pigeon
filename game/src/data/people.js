@@ -15,7 +15,7 @@ const P = (x, z, yaw = 0) => ({ x, z, yaw });
 // #46: 15 more people mixed in (the most-cloned slots first); a list's order spreads them so neighbours differ.
 // Sitters need a 'sit' clip: park, chess-player, dolores, carriage-driver, old-man, student, newspaper-man, shopper, painter.
 const MIX = {
-  walkers: ['human-nanny', 'human-businessperson', 'human-tourist', 'human-old-man', 'human-birder', 'human-student', 'human-dog-walker', 'human-jogger', 'human-shopper', 'human-newspaper-man', 'human-park', 'human-dog-sitter', 'human-taichi-elder', 'human-street-musician'],
+  walkers: ['human-taichi-elder', 'human-businessperson', 'human-tourist', 'human-old-man', 'human-birder', 'human-student', 'human-dog-walker', 'human-jogger', 'human-shopper', 'human-newspaper-man', 'human-park', 'human-dog-sitter', 'human-nanny', 'human-street-musician'],
   tourists: ['human-tourist', 'human-photographer', 'human-cyclist', 'human-old-man', 'human-nanny', 'human-tourist', 'human-taichi-elder', 'human-businessperson'],
   mall: ['human-tourist', 'human-student', 'human-businessperson', 'human-scooter-kid', 'human-old-man', 'human-shopper', 'human-birder', 'human-child'],
   city: ['human-businessperson', 'human-delivery', 'human-tourist', 'human-shopper', 'human-newspaper-man', 'human-construction', 'human-chess-player'],
@@ -128,7 +128,7 @@ export const AMBIENT = [
   { role: 'amb-runner', model: 'human-jogger', n: 2, phases: ['morning', 'afternoon', 'dusk'], act: 'route', path: EAST_DRIVE, speed: 2.7, models: ['human-runner', 'human-cyclist'] },
   // tourists: Bethesda (the terrace and round the fountain), Bow Bridge's north landing, Strawberry Fields
   { role: 'amb-tourist', model: 'human-tourist', phases: 'day', act: 'stand', spots: ring({ x: 6.6, z: 285.3 }, 8.6, 7, 0.4), models: ['human-tourist', 'human-photographer', 'human-shopper', 'human-scooter-kid', 'human-businessperson', 'human-tourist', 'human-dog-sitter'], look: 'gawk', flavour: ['wave', 'gawk', 'cheer', 'jump'] },
-  { role: 'amb-tourist', model: 'human-tourist', n: 4, phases: 'day', act: 'wander', at: S(6.6, 264), r: 8, models: ['human-tourist', 'human-nanny', 'human-student', 'human-birder'], flavour: ['gawk', 'wave'] },
+  { role: 'amb-tourist', model: 'human-tourist', n: 4, phases: 'day', act: 'wander', at: S(6.6, 264), r: 8, models: ['human-tourist', 'human-shopper', 'human-student', 'human-birder'], flavour: ['gawk', 'wave'] },
   { role: 'amb-tourist', model: 'human-tourist', phases: 'day', act: 'stand', spots: [S(-28.6, 334.5, Math.PI + 0.3), S(-30.2, 335.2, Math.PI + 0.1), S(-26.8, 336.0, Math.PI + 0.6)], models: ['human-tourist', 'human-photographer', 'human-taichi-elder'], look: 'gawk', flavour: ['wave'] },
   { role: 'amb-tourist', model: 'human-tourist', phases: 'day', act: 'stand', spots: ring({ x: -88, z: 272.95 }, 4.6, 6, 0.9), models: ['human-tourist', 'human-street-musician', 'human-shopper', 'human-businessperson', 'human-tourist', 'human-scooter-kid'], look: 'gawk', flavour: ['wave', 'gawk'] },
   // Wollman Rink: more skaters on a wider and a tighter oval
