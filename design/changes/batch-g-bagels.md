@@ -388,3 +388,21 @@ Evidence: V = verified in code at HEAD 3eaffe5 (worktree), P = partly verified, 
 | Art: portrait crop, postcard light, proof shots | nice | collect.js:260–278 | Fixed: Pillow crop, a lantern key light in the payoff, polaroid in the shots. |
 
 No must-fix is left open.
+
+---
+
+## Build notes: where the code's reality won (2026-11-25)
+
+- **The shop is all in its own module** (`schemes/bagel-shop.js`), not a `CITY.storefronts` entry: a storefront entry would have run inside the city build and put its colliders in the middle of the arrays. Everything (frame, walk-up window, fascia, door, blade sign, neon, A-frame) is built after the world, with no rng draws.
+- **The counter's shelf sticks out in front of the window, under open sky** (z 1068.85…1069.25, top 1.05 m), and orders sit on it. The item keeper spawns its put-backs on the top surface at (x, z), and under the fascia that would have been the fascia's roof; on the shelf it's the shelf. So no engine change to the keeper. The invisible pane fills the window behind the shelf.
+- **The fascia is flat** (a black box with a perch along its top front edge), not the slice joints' sloped awning.
+- **No lantern light in the payoff:** adding a light to the scene recompiles every material (a hitch). The scene uses a close side-on two-shot instead.
+- **Manny's hat and apron are the shop's own pieces,** not humans.js's `paperhat`/`apron`: the paperhat sat as a slab above the chess player's modelled flat cap, and a flat 1 m board stood out in front of his cardigan. The deli cap is a white wedge on top of his cap; the long apron is a surface that follows his measured front (humanFit's waist/chest surfaces). humans.js is untouched (only its exported clone/accessory helpers are used). His yaw (π faces the park) was found in shots.
+- **Mama Mask's bagel answers:** Jumbo step 1 current returns null *before* the part-talons union check, so the riddle always plays first (with a bagel in the beak during the Rink Job's step 2 too); the union line then comes on the next peck.
+- **Socket eats any bagel even while he has another scheme's nudge to give** (sab-north's is his, and it's open whenever the Jumbo Order is): the first closed-loop recording stuck there, with Mama Mask saying "Give that one to Socket" and Socket only talking. A talk step to Socket still wins.
+- **Bribes are judged only while Gus is low** (on the ground or under 1.5 m), so "Land first, Gus. Critters don't look up." (once a phase, on a drop from higher) is true: a bagel dropped from the air waits until Gus comes down near it.
+- **Live bagels are any bagel Gus put down** (`placed`, not an order on the counter, not the quest bagel while the Jumbo Order is open), so they stay live across a save and load. Drops while not in play (repairSpent on Continue) are ignored; `drop` also carries `repair` and `uid`.
+- **The Duchess's pointer** waits until the Swells have joined (it's her line) and fires 5.6 s after the first region goes on the map.
+- **Ledger's line** for the Everything Bagel scarf comes the first time Gus talks to him owning it (before the stash opens).
+- **"New in the park"** is a menu card shown 1.2 s after Continue (so the sweep's recovery planner, which closes open menus, isn't blocked by it). New Game and the new jumbo-order fixture set `news.bagels`; the older fixtures were left as they were.
+- **Voices:** the songbirds' first lead hint ("…By day! *car alarm*") is voiced with an imitated alarm ("Wee-oo wee-oo!") in place of the stage direction; its bubble keeps the text.

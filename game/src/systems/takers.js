@@ -8,8 +8,10 @@
 
 import { TAKERS, CHARACTERS, phaseList } from '../data/crews.js';
 import { ITEM_DEFS } from './items.js';
+import { isBagel, BAGEL_EAT } from '../data/bagels.js';   // #44
 
 const isSlice = (id) => !!id && id.startsWith('slice');
+const isFood = (id) => isSlice(id) || isBagel(id);   // #44: a bagel is eaten like a slice
 // fix-19: who eats a slice Gus gives away (characters by crew; humans: anyone seated, or a dog walker's dog)
 const EATER_CREWS = ['rats', 'raccoons', 'biscuit'];
 const EAT_LINES = {
@@ -19,7 +21,7 @@ const EAT_LINES = {
   dog: ['The dog wolfs it down. Tail going like a propeller.', 'Gulp. The dog looks round for more.'],
   person: ['Ooh, pizza! Thanks, little guy.', 'For me? Well, don\'t mind if I do.'],
 };
-const fits = (want, id) => want === id || (want === 'slice' && isSlice(id) && id !== 'slice-anchovy') || (want === 'slice' && id === 'slice-anchovy');
+const fits = (want, id) => want === id || (want === 'slice' && isSlice(id) && id !== 'slice-anchovy') || (want === 'slice' && id === 'slice-anchovy') || (want === 'bagel*' && isBagel(id));   // #44: 'bagel*' = any bagel
 
 export class Takers {
   constructor(G) { this.G = G; this.humanTargets = []; }
@@ -57,22 +59,23 @@ export class Takers {
   /** Would this character eat the slice Gus carries? */
   eaterGive(charId) {
     const G = this.G, c = G.state.carried;
-    if (!c || !isSlice(c.id) || !EATER_CREWS.includes(CHARACTERS[charId]?.crew)) return false;
+    if (!c || !isFood(c.id) || !EATER_CREWS.includes(CHARACTERS[charId]?.crew)) return false;
     if (G.chars?.find(charId)?.here) return false;   // a Called ally keeps its Ask
     // review: never the anchovy while den-cats is open (Express sits on the 72nd W grate mid-relay); never someone a step
     // wants to talk to, or who gives a step's nudge (Biscuit on den-biscuit step 1, Pretzel, Crumbsy, Mama Mask…): they talk
     if (c.id === 'slice-anchovy' && G.schemes.isOpen('den-cats')) return false;
-    if (this.#wantsTalk(charId)) return false;
+    // #44: Socket eats any bagel even while he has a nudge to give (Mama Mask sends Gus to him with the wrong ones); a talk step still wins
+    if (this.#wantsTalk(charId, { nudges: !(isBagel(c.id) && charId === 'socket') })) return false;
     if (this.entryFor(charId) || this.#stepWants(charId, c.id)) return false;
     return !this.#byQueenie();
   }
-  #wantsTalk(charId) {
+  #wantsTalk(charId, { nudges = true } = {}) {
     const E = this.G.schemes;
     for (const id of E.openList()) {
       const st = E.step(id);
       if (!st) continue;
       if ([st, ...(st.alts || [])].some((o) => o.on?.type === 'talk' && o.on.who === charId)) return true;
-      if (st.nudge?.by === charId) return true;   // (shown or still to come: a player goes back to them for the hint)
+      if (nudges && st.nudge?.by === charId) return true;   // (shown or still to come: a player goes back to them for the hint)
     }
     return false;
   }
@@ -83,7 +86,7 @@ export class Takers {
   /** The nearest seated person or dog walker within reach who'd take a slice (no taker role, not busy), or null. */
   #eaterHuman() {
     const G = this.G, c = G.state.carried, p = G.gus.position;
-    if (!c || !isSlice(c.id) || this.#byQueenie()) return null;
+    if (!c || !isFood(c.id) || this.#byQueenie()) return null;
     let best = null, bd = 1.8;
     for (const a of G.humans.agents) {
       if (!a.out || a.busy || a.script || a.holds || TAKERS['human:' + a.role] || !(a.spec?.act === 'sit' || a.role === 'dogwalker')) continue;
@@ -99,8 +102,11 @@ export class Takers {
     G.items.take();
     G.audio.play('slice-handover', { at: G.gus.position, rate: 0.9 });
     G.particles.burst('crumbs', G.gus.position.x, G.gus.position.y + 0.3, G.gus.position.z, 8);
-    const lines = EAT_LINES[who.kind] || EAT_LINES.person;
+    // #44: a bagel has its own thank-yous (Socket and Ringo their own)
+    const bagel = isBagel(c.id), own = bagel && BAGEL_EAT[who.id];
+    const lines = own ? [].concat(own) : bagel ? [].concat(BAGEL_EAT[who.kind] || BAGEL_EAT.person) : EAT_LINES[who.kind] || EAT_LINES.person;
     const text = (name ? name + ': ' : '') + lines[Math.floor(G.state.time * 3) % lines.length];
+    if (bagel) G.audio.play('bagel-munch', { at: G.gus.position, vol: 0.8 });
     G.bubbles.add(text, { at: who.at, ttl: 3, range: 60 });
     G.bus.emit('eaten', { item: c.id, by: who.id });
   }
@@ -113,7 +119,13 @@ export class Takers {
     if (!c) return null;
     const list = TAKERS[who];
     if (!list) return null;
-    return list.find((e) => fits(e.wants, c.id) && (!e.phase || phaseList(e.phase).includes(this.G.state.phase))) || null;
+    for (const e of list) {
+      if (!fits(e.wants, c.id) || (e.phase && !phaseList(e.phase).includes(this.G.state.phase))) continue;
+      // #44: an entry with `when` applies only when it gives a line (Gus keeps the item); null lets a talk or a step's give win
+      if (e.when) { const r = e.when(this.G, c.id); if (r == null) continue; return { ...e, keep: r }; }
+      return e;
+    }
+    return null;
   }
 
   /** The prompt for a named character when Gus carries something (characters.js asks). */
@@ -144,7 +156,14 @@ export class Takers {
     const e = this.entryFor(who);
     const name = who.startsWith('human:') ? null : who;
     const say = (text) => G.say([{ who: name, text }]);
-    if (e?.keep) { say(e.keep); return true; }
+    if (e?.keep) {
+      // #44: a `when` entry may answer with several voiced lines ({ text, voice })
+      if (Array.isArray(e.keep)) G.say(e.keep.map((l) => (typeof l === 'string' ? { who: name, text: l } : { who: name, ...l })));
+      else if (typeof e.keep === 'object') G.say([{ who: name, ...e.keep }]);
+      else say(e.keep);
+      G.bus.emit('offered', { item: c.id, to: who });
+      return true;
+    }
     const hot = G.items.isHot(c);
     if (e?.hot && !hot) { say(e.cold || "It's COLD, pal."); G.audio.synth('uiBack'); G.bus.emit('fail', { kind: 'cold', to: who, item: c.id }); return true; }   // fun pass (P7, P10)
     if (!e && !this.#stepWants(who, c.id)) {

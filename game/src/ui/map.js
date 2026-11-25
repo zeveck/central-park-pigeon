@@ -132,7 +132,7 @@ export function mapScreen(G) {
       <button type="button" class="btn small" data-act="clear">${icon('waypoint')}<span>Clear waypoint</span></button>
       <button type="button" class="btn small" data-act="close">${icon('close')}<span>Close</span></button></div>
     <div class="wrap" style="margin-top:8px"><canvas></canvas></div><div class="muted howto" style="font-size:13px;margin-top:4px"></div>
-    <div class="legend"><span><i style="background:#e07b39"></i>You</span><span><i style="background:#a07444"></i>Nest</span><span><i style="background:#2f7d46"></i>Grate (subway)</span><span><i style="background:#c4302b"></i>Sign</span><span><i style="background:#6f9a4a"></i>Flipped</span><span><i style="background:#3e5b3a;border-radius:2px"></i>Ranger cart</span><span><i style="background:#f2c230"></i>Slice</span><span><i style="background:#2fa39a"></i>Waypoint</span><span><i style="background:#fff;border:2px solid #e07b39"></i>Scheme target</span><span><i style="background:transparent;border:2px dashed #fff"></i>Other cards</span>
+    <div class="legend"><span><i style="background:#e07b39"></i>You</span><span><i style="background:#a07444"></i>Nest</span><span><i style="background:#2f7d46"></i>Grate (subway)</span><span><i style="background:#c4302b"></i>Sign</span><span><i style="background:#6f9a4a"></i>Flipped</span><span><i style="background:#3e5b3a;border-radius:2px"></i>Ranger cart</span><span><i style="background:#f2c230"></i>Slice</span><span><i style="background:#1e1c1b;border:2px solid #e0a83a"></i>Bagels</span><span><i style="background:#2fa39a"></i>Waypoint</span><span><i style="background:#fff;border:2px solid #e07b39"></i>Scheme target</span><span><i style="background:transparent;border:2px dashed #fff"></i>Other cards</span>
       <span class="hints" data-auto='[["move","Cursor"],["uiOk","Waypoint"],["uiBack","Close"]]' style="margin:0 0 0 auto"></span></div>`);
   const wrap = el.querySelector('.wrap');
   const OPEN_ZOOM = 2.6;
@@ -217,6 +217,7 @@ export function mapScreen(G) {
     for (const c of RANGER_CARTS) { const cart = G.rangers?.cart(c.id); if (cart && seenAt(cart.x, cart.z)) sq(cart.x, cart.z, G.state.carts[c.id] ? '#888' : '#3e5b3a', 4); }
     for (const sp of SPIKE_SITES) if (G.state.spikes[sp.id] === 'installed' && seenAt(sp.x, sp.z)) { const [px, py] = v.toPx(sp.x, sp.z); g.fillStyle = '#c4302b'; g.beginPath(); g.moveTo(px - 5, py + 4); g.lineTo(px - 2.5, py - 5); g.lineTo(px, py + 4); g.lineTo(px + 2.5, py - 5); g.lineTo(px + 5, py + 4); g.fill(); }
     for (const j of SLICE.joints) if (seenAt(j.counter.x, j.counter.z)) dot(j.counter.x, j.counter.z, '#f2c230', 4, '#b85e25');
+    dot(-64, 1068, '#1e1c1b', 4.5, '#e0a83a');   // #44: Super Jumbo Bagels, from New Game (a 24-hour landmark, like the carts)
     if (G.state.lines.length) for (const d of SLICE.drops) dot(d.x, d.z, '#f2c230', 3);
     const gr = SLICE.griddle[G.state.phase];
     if (gr && seenAt(gr.x, gr.z)) sq(gr.x, gr.z, '#f2c230', 3);

@@ -105,6 +105,12 @@ played), so you can keep more than one park going or share the game with
 someone else in your house. After the finale the park is yours to
 roam, with postcards, Summit Perches and golden pretzels to collect.
 
+**Super Jumbo Bagels.** On 110th Street, across from the North Woods gate,
+Manny's walk-up bagel shop is open 24 hours. Mama Mask has a riddle for an
+order ("The Jumbo Order", with a postcard and an Everything Bagel scarf for
+getting it right), and a plain bagel dropped near wary animals loosens their
+beaks: they'll tell you where their boss is and what the boss wants.
+
 **Photo mode.** Early on, a tourist on Central Park West leaves his old camera
 on the balcony rail, and Flicker the crow knows where to get film. Once you
 have it (V, D-pad right, or the camera button), the park freezes: orbit and

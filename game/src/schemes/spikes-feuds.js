@@ -42,8 +42,7 @@ export async function installSpikesFeuds(G) {
   mergeTalk(TALK);
   window.__sfG = G;
    // debug: the record/replay tool resets cutscenes and dialogue between jobs (tools/sf-run.mjs)
-  // Mama Mask takes the union slice too (the same deal as Rigby's)
-  if (!TAKERS.mamamask) TAKERS.mamamask = [{ wants: 'slice', any: true, flags: ['union.paid'], line: 'Mama Mask takes it. "Union rules. NOW we work."' }];
+  // Mama Mask takes the union slice too (the same deal as Rigby's): #44 moved her entry into data/crews.js TAKERS
   // the overlays
   const style = document.createElement('style'); style.textContent = CSS; document.head.appendChild(style);
   for (const id of ['sf-flash', 'sf-stamp', 'sf-freeze']) { const d = document.createElement('div'); d.id = id; document.body.appendChild(d); }

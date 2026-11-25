@@ -53,6 +53,7 @@ const P = {
   bug: '<ellipse cx="12" cy="14" rx="5.2" ry="6.4"/><circle cx="12" cy="6.4" r="3"/><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6.8 11 3 9M6.6 15H2.5M7.2 18.6 4 21M17.2 11 21 9M17.4 15h4.1M16.8 18.6 20 21M10 4 8.4 2M14 4l1.6-2"/></g><path d="M12 8.5v11.5" stroke="#f6efe2" stroke-width="1.2"/>',
   home: '<path d="M3 11 12 3l9 8v10h-6v-6H9v6H3z"/>',
   elders: '<ellipse cx="12" cy="14" rx="8" ry="5" fill="#6f9a4a"/><path d="M6 13l3-3 3 3 3-3 3 3" fill="none" stroke="#3e5b3a" stroke-width="1.4"/><circle cx="20.5" cy="12" r="2" fill="#8bb05a"/>',
+  bagel: '<ellipse cx="12" cy="13" rx="9.5" ry="7.5" fill="#d29a4a"/><ellipse cx="12" cy="12" rx="9" ry="6.5" fill="#e8b45e"/><ellipse cx="12" cy="12" rx="3" ry="2" fill="#7a4a22"/><circle cx="7" cy="10" r="0.9" fill="#fff6e0"/><circle cx="16.5" cy="9.5" r="0.9" fill="#fff6e0"/><circle cx="15" cy="15.5" r="0.9" fill="#3a2a1a"/><circle cx="8.5" cy="15" r="0.9" fill="#fff6e0"/>',   // #44
   postcard: '<rect x="2.5" y="5" width="19" height="14" rx="1.5" fill="#fffaf0" stroke="#8a7a6a"/><path d="M13 8v8M15 9h4M15 12h4" stroke="#8a7a6a"/><rect x="4.5" y="7.5" width="6" height="5" fill="#9fd0f0"/>',
 };
 
@@ -68,5 +69,6 @@ export const phaseIcon = (phase) => icon(phase, 'ic tod');
 export function itemIcon(id) {
   if (!id) return '';
   if (id.startsWith('slice')) return icon('slice');
+  if (id === 'bagel' || id.startsWith('bagel-')) return icon('bagel');   // #44
   return icon({ box: 'box', shiny: 'shiny', key: 'key', 'gate-key': 'key', peas: 'peas', ball: 'ball', camera: 'camera' }[id] || 'item');
 }

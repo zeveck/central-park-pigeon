@@ -36,6 +36,7 @@ const PLAN = {
   'part-legs': { done: ['den-ducks', 'den-squirrels', 'den-crows', 'den-cats', 'den-biscuit', 'gear-headlamp', 'den-strix', 'den-turtles', 'truce-dogs-squirrels', 'den-songbirds', 'den-horses'], phase: 'night', crumbs: 60 },
   'den-rhoda': { done: ['den-ducks', 'den-squirrels', 'den-crows', 'den-raccoons'], phase: 'morning', crumbs: 50 },
   'part-power': { done: ['den-ducks', 'den-squirrels', 'den-crows', 'den-biscuit', 'den-turtles', 'den-geese', 'den-raccoons', 'den-rhoda'], phase: 'morning', crumbs: 60 },
+  'jumbo-order': { done: ['den-ducks', 'den-squirrels', 'den-crows', 'den-raccoons'], phase: 'dusk', crumbs: 10 },   // #44
   'den-meermob': { done: ['den-ducks', 'den-squirrels', 'den-crows', 'den-cats', 'den-racers', 'den-biscuit', 'den-turtles', 'den-geese', 'den-raccoons', 'den-rhoda'], phase: 'morning', crumbs: 75, strays: 14 },
 };
 
@@ -77,7 +78,9 @@ function apply(st, id) {
   if (lane && !st.lanes.includes(lane)) st.lanes.push(lane);
 }
 
+const only = process.argv.slice(2);   // #44: node sf-fixtures.mjs <key>… writes just those
 for (const [key, P] of Object.entries(PLAN)) {
+  if (only.length && !only.includes(key)) continue;
   const id = key.replace(/\.alt$/, '');
   const st = JSON.parse(JSON.stringify(base));
   st.flags['prologue.card'] = true;
@@ -96,6 +99,7 @@ for (const [key, P] of Object.entries(PLAN)) {
   const nest = NESTS.find((n) => n.id === SCHEME[id].start) || NESTS[0];
   st.lastNest = nest.id;
   st.gus = null;   // goToScheme puts Gus at the scheme's start Nest
+  if (id === 'jumbo-order') st.flags['news.bagels'] = true;   // #44: (the older fixtures are kept as they were)
   const fx = { scheme: id, note: `Built by game/tools/sf-fixtures.mjs: the post-Prologue state (sf-base.json) with ${P.done.join(', ')} done, ${P.crumbs} crumbs, ${P.phase}, Gus at ${nest.name}.`, state: st };
   fs.writeFileSync(path.join(ROOT, 'data/fixtures', key + '.json'), JSON.stringify(fx));
   console.log('wrote', key, '· crews', st.crews.join(','), '· flock', Object.values(st.flockFrom).reduce((a, b) => a + b, 0));

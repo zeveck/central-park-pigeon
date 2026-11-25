@@ -189,6 +189,7 @@ export const CHARACTERS = {
   vinnie: { name: 'Vinnie', role: 'human', bio: 'The hot dog man on the Mall.', at: { x: 10, z: 205 }, out: 'day' },
   dolores: { name: 'Dolores', role: 'human', bio: 'The Pigeon Lady. Feeds pigeons whatever the signs say.', at: { x: 1.4, z: 214 }, out: 'morning' },
   ranger: { name: 'The ranger', role: 'human', bio: 'Keeps the signs straight.', at: { x: 22, z: 104 }, out: 'day' },
+  manny: { name: 'Manny', role: 'human', bio: 'Super Jumbo Bagels. Open 24 hours.', at: { x: -64, z: 1069.95 }, out: 'any' },   // #44: the shop module's own clone (schemes/bagel-shop.js), not a humans.js agent
   gus: { name: 'Gus', role: 'player', bio: 'A scruffy Central Park pigeon with a plan.', out: 'any' },
 };
 for (const [id, c] of Object.entries(CHARACTERS)) { c.id = id; c.portrait = id; }
@@ -313,6 +314,9 @@ export const TAKERS = {
   puddles: [{ wants: 'peas' }, { wants: 'slice', keep: 'Pizza? Do you KNOW what cheese does to a duck?' }],
   vesper: [{ wants: 'shiny', line: 'Vesper turns it in the light. "Acceptable."' }],
   rigby: [{ wants: 'wrench' }, { wants: 'slice', any: true, flags: ['union.paid'], line: 'Mama Mask takes it. "Union rules. NOW we work."' }],
+  // #44: the union slice (was added at install by spikes-feuds.js) and her bagel answers (schemes/bagel-shop.js G.jumboAnswer:
+  // a line or lines she says and Gus keeps the bagel, or null when the talk or a step's give should win instead)
+  mamamask: [{ wants: 'slice', any: true, flags: ['union.paid'], line: 'Mama Mask takes it. "Union rules. NOW we work."' }, { wants: 'bagel*', when: (G, id) => G.jumboAnswer?.(id) ?? null }],
   strix: [{ wants: 'spectacles' }],
   bigsal: [{ wants: 'slice', any: true, line: 'Big Sal takes it. "That\'s one."' }],
   ledger: [{ wants: 'falafel', any: true, line: "Crows can't resist a falafel. It's documented." }],

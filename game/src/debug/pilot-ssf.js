@@ -168,3 +168,27 @@ reg((P, g, s, out, dt) => {
   if (done) { s.i++; s.sub = {}; }
   return false;
 });
+
+// #44: { bagelOrder: [base, schmear] } or { bagelOrder: 'to-go' }: in Manny's menu, move the focus by the screen's own
+// row/column navigation (data-row / data-col: the same presses at every window size) to each button in turn and press
+// uiOk: the bagel, the schmear, then Order (or just the Row 0 "to go" button)
+reg((P, g, s, out) => {
+  if (!g.bagelOrder) return undefined;
+  const G = P.G;
+  if (s.done) return ++s.after > 8;
+  if (!G.menus.is('bagels')) return false;
+  const el = G.menus.top.el;
+  const ids = g.bagelOrder === 'to-go' ? ['to-go'] : ['base:' + g.bagelOrder[0], 'schmear:' + g.bagelOrder[1], 'order'];
+  s.k ||= 0;
+  const want = el.querySelector(`[data-id="${ids[s.k]}"]`);
+  if (!want) throw new Error('no bagel menu button ' + ids[s.k]);
+  s.m = (s.m || 0) + 1;
+  if (s.m % 4) return false;
+  const cur = document.activeElement?.closest?.('[data-row]');
+  if (!cur || !el.contains(cur)) { out.held.add('uiDown'); return false; }
+  const dr = +want.dataset.row - +cur.dataset.row, dc = +want.dataset.col - +cur.dataset.col;
+  if (dr) out.held.add(dr > 0 ? 'uiDown' : 'uiUp');
+  else if (dc) out.held.add(dc > 0 ? 'uiRight' : 'uiLeft');
+  else { out.held.add('uiOk'); if (++s.k >= ids.length) { s.done = true; s.after = 0; } }
+  return false;
+});

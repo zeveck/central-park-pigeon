@@ -431,6 +431,7 @@ export const SCARVES = [
   { id: 'racing-red', name: "Ringo's racing red", how: 'After the Rink Job' },
   { id: 'wedding-white', name: "Dove's wedding white", how: 'After the Wedding' },
   { id: 'bread-print', name: '"FEED THE BIRDS" bread-print', how: 'All 30 signs PERMANENT' },
+  { id: 'everything-bagel', name: 'Everything bagel', how: "Mama Mask's thank-you" },   // #44: The Jumbo Order
 ];
 export function scarfScreen(G) {
   const el = overlay('scarf', `<h2>Scarf</h2><p class="muted">Ledger's Scarf Stash. Pick one and Gus swaps it with a twirl.</p><div class="list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px"></div><div class="row" style="margin-top:10px">${btn('back', 'Back', 'back')}</div>${hints()}`);

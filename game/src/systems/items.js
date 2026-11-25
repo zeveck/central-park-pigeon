@@ -13,6 +13,7 @@ import * as THREE from 'three';
 import { SLICE, GRATES, CLUES } from '../world/layout.js';
 import { ruleMaterial } from '../gfx/load-model.js';
 import { GUS_STAND, GUS_FLY } from '../entities/gus-rig.js';
+import { BAGELS, QUEST_BAGEL, SCHMEAR_LOOK } from '../data/bagels.js';   // #44
 
 export const ITEM_DEFS = {
   slice: { name: 'Pizza slice', cls: 'light', model: 'pizza-slice', slice: true },
@@ -39,6 +40,8 @@ export const ITEM_DEFS = {
   camera: { name: 'Old film camera', cls: 'light', model: 'tourist-camera', code: 'camera' },   // photo mode (#9): Say Cheese
   cart: { name: 'Shopping cart', cls: 'huge', code: 'cart' },
 };
+// #44: the bagels (Super Jumbo Bagels): food like the slice (they sink, Ruffled and naps take them), code-built
+for (const b of BAGELS) ITEM_DEFS[b.id] = { name: b.name, cls: 'light', code: 'bagel', food: true, base: b.base, schmear: b.schmear };
 export const HEAVY_LIMITS = { maxAlt: 2, maxSpeed: 6 };
 
 const HOT = SLICE.hotFor;
@@ -178,10 +181,51 @@ export class Items {
       case 'cart': add(new THREE.BoxGeometry(0.6, 0.5, 0.9), this.mats.steel, 0, 0.5); break;
       case 'box-small': add(new THREE.BoxGeometry(0.08, 0.03, 0.12), this.mats.dark, 0, 0.015); break;
       case 'camera': add(new THREE.BoxGeometry(0.13, 0.08, 0.06), this.mats.tan, 0, 0.04); add(new THREE.CylinderGeometry(0.025, 0.025, 0.03, 12), this.mats.dark, 0, 0.04, 0.04, Math.PI / 2); break;   // (if the GLB is missing)
+      case 'bagel': this.#bagel(g, d); break;   // #44
       case 'sprat': add(new THREE.ConeGeometry(0.018, 0.11, 6), this.mats.shiny, 0, 0.02, 0, 0, 0, Math.PI / 2); break;
       default: add(new THREE.CylinderGeometry(0.03, 0.03, 0.006, 12), this.mats.gold, 0, 0.003); break;
     }
     return g;
+  }
+
+  /** #44: a jumbo bagel, about 14 cm across: two halves (tori) with the crust from the atlas (the menu's own bagel), and
+   *  the schmear as a disc between them (none for no schmear), flecked. Shared geometry and materials. */
+  #bagel(g, d) {
+    const B = (this.bagelKit ||= (() => {
+      const tex = typeof document === 'undefined' ? null : new THREE.TextureLoader().load('assets/textures/bagel-crust.webp');
+      if (tex) { tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4; }
+      // the atlas: four seamless crust tiles in quadrants; each base's torus has its UVs mapped once round into its quadrant
+      const Q = { plain: [0, 0.5], sesame: [0.5, 0.5], poppy: [0, 0], everything: [0.5, 0] };
+      const FALL = { plain: 0xc98a3e, sesame: 0xd29a4a, poppy: 0xb07a3a, everything: 0xc08a48 };
+      const ring = new THREE.TorusGeometry(0.048, 0.022, 10, 22).rotateX(Math.PI / 2);
+      const p = ring.attributes.position;
+      for (let i = 0; i < p.count; i++) p.setY(i, p.getY(i) * 0.75);   // a little flatter than round
+      ring.computeVertexNormals();
+      const mat = tex ? ruleMaterial({ map: tex, roughness: 0.75 }) : null;
+      const half = {}, crust = {};
+      for (const [k, q] of Object.entries(Q)) {
+        const g2 = ring.clone(), uv = g2.attributes.uv;
+        for (let i = 0; i < uv.count; i++) uv.setXY(i, q[0] + 0.004 + uv.getX(i) * 0.492, q[1] + 0.004 + uv.getY(i) * 0.492);
+        half[k] = g2;
+        crust[k] = mat || ruleMaterial({ color: FALL[k], roughness: 0.75 });
+      }
+      const disc = new THREE.CylinderGeometry(0.06, 0.06, 0.008, 20);
+      const sm = {};
+      for (const [k, L] of Object.entries(SCHMEAR_LOOK)) sm[k] = { mat: ruleMaterial({ color: L.color, roughness: 0.6 }), fleck: L.fleck != null ? ruleMaterial({ color: L.fleck }) : null, fleck2: L.fleck2 != null ? ruleMaterial({ color: L.fleck2 }) : null };
+      return { crust, half, disc, sm, fleckGeo: new THREE.BoxGeometry(0.008, 0.004, 0.006) };
+    })());
+    const add = (geo, mat, x, y, z, ry = 0) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.rotation.y = ry; m.castShadow = true; g.add(m); return m; };
+    const crust = B.crust[d.base] || B.crust.plain, half = B.half[d.base] || B.half.plain;
+    const t = 0.022 * 0.75;
+    const has = d.schmear && d.schmear !== 'none';
+    add(half, crust, 0, t, 0);
+    if (has) {
+      const S = B.sm[d.schmear];
+      add(B.disc, S.mat, 0, 2 * t + 0.002, 0);
+      if (S.fleck) for (let k = 0; k < 7; k++) { const a = k * 0.9; add(B.fleckGeo, k % 2 && S.fleck2 ? S.fleck2 : S.fleck, Math.cos(a) * 0.045, 2 * t + 0.007, Math.sin(a) * 0.045, a); }
+      add(half, crust, 0, 3 * t + 0.008, 0);
+    } else add(half, crust, 0, 3 * t - 0.002, 0);
+    g.userData.bagel = true;
   }
 
   // ------------------------------------------------------------ world items
@@ -275,7 +319,7 @@ export class Items {
   }
 
   /** Q: drop what Gus carries in front of him. */
-  drop() {
+  drop({ repair = false } = {}) {
     const c = this.state.carried;
     if (!c) return null;
     const g = this.G.gus;
@@ -289,8 +333,10 @@ export class Items {
       const d = this.def(c.id), name = theItem(d.name, true);
       this.G.audio.play('duck-dive-bloop', { vol: 0.6, at: g.position });
       this.G.particles.splash?.(x, g.position.y, z, 8);
-      this.G.bus.emit('drop', { item: c.id, x, z, water: true });
+      this.G.bus.emit('drop', { item: c.id, uid: c.uid, x, z, water: true, repair });
       if (d.slice) { this.G.toast(`${name} sank. There are always more.`); return null; }
+      // #44: a bagel sinks too (Manny always makes another); the quest bagel goes back by its keeper rule instead
+      if (d.food && !(c.id === QUEST_BAGEL && this.G.schemes?.keeperRule(c.id))) { this.G.toast('The bagel sank. Manny\'s got more.'); return null; }
       const to = this.homeFor(c);
       this.G.toast(`${name} floated back to ${to.label}.`, { seconds: 4 });
       return this.spawn(c.id, to.x, to.z, { origin: c.origin, uid: c.uid });
@@ -298,7 +344,7 @@ export class Items {
     const y = Math.min(g.position.y, this.G.surfaceY(x, z, g.position.y + 0.1));
     const it = this.spawn(c.id, x, z, { born: c.born, origin: c.origin, uid: c.uid, y, placed: true });
     this.G.audio.play(this.def(c.id).cls === 'heavy' ? 'drop-thud' : 'drop-thud', { vol: 0.6, at: g.position });
-    this.G.bus.emit('drop', { item: c.id, x, z });
+    this.G.bus.emit('drop', { item: c.id, uid: c.uid, x, z, repair });   // #44: uid (the bribes find the bagel by it)
     return it;
   }
 
@@ -437,11 +483,18 @@ export class Items {
     if (c && this.def(c.id).slice) c.born = null;   // a carried slice goes cold
     const gone = {};
     let others = false;   // something Gus never had (the anchovy on the sill, a slice a human dropped): "the", not "your"
-    for (const it of [...this.world]) if (this.def(it.id).slice || it.id === 'box') { this.remove(it); gone[it.id] = (gone[it.id] || 0) + 1; if (!it.placed) others = true; }
+    for (const it of [...this.world]) {
+      const d = this.def(it.id);
+      // #44: bagels on the ground go too, except an order waiting on Manny's counter (it.counter); the quest bagel comes back by its keeper
+      if (!(d.slice || it.id === 'box' || (d.food && !it.counter))) continue;
+      this.remove(it);
+      const k = d.food ? 'bagel' : it.id;
+      gone[k] = (gone[k] || 0) + 1; if (!it.placed) others = true;
+    }
     // batch-2 (#20): say what went ("A rat took your slice while you napped."; it was "A rat got it.")
     const ids = Object.keys(gone);
     if (ids.length) {
-      const word = (id) => { const w = { slice: 'slice', 'slice-anchovy': 'anchovy slice', box: 'pizza box' }[id] || this.def(id).name.toLowerCase(); return gone[id] > 1 ? w + 'es'.slice(w.endsWith('x') ? 0 : 1) : w; };
+      const word = (id) => { const w = { slice: 'slice', 'slice-anchovy': 'anchovy slice', box: 'pizza box', bagel: 'bagel' }[id] || this.def(id).name.toLowerCase(); return gone[id] > 1 ? w + 'es'.slice(w.endsWith('x') ? 0 : 1) : w; };
       const what = ids.map(word).join(' and ');
       const many = ids.length > 1 || gone[ids[0]] > 1;
       notes.push(`${many ? 'Rats' : 'A rat'} took ${others ? 'the' : 'your'} ${what} while you napped.`);
@@ -456,6 +509,7 @@ export class Items {
     const d = this.def(c.id);
     this.take();
     if (d.slice) return `The ${d.name.toLowerCase()} is gone. There are always more.`;
+    if (d.food && !(c.id === QUEST_BAGEL && this.G.schemes?.keeperRule(c.id))) return 'The bagel is gone. Manny\'s got more.';   // #44
     // fix-23: never onto the water (a heavy item dropped in the Rhoda fight over the Meer was out of reach for good)
     if (d.cls === 'heavy' && !this.G.wetAt(this.G.gus.position.x, this.G.gus.position.z, this.G.gus.position.y)) { const g = this.G.gus.position; this.spawn(c.id, g.x, g.z, { origin: c.origin }); return `You dropped ${theItem(d.name)}. It's marked on the compass.`; }
     const to = this.homeFor(c);

@@ -700,6 +700,7 @@ export const PLACES = {
   'museum-79': { name: 'Natural history museum, CPW & 79th', x: -130, z: Z(79), r: 16 },
   'grate-86w': { name: '86th Street W grate', x: -128, z: Z(85.6), r: 6 },   // fun pass (P9): the jogger's key
   'cpw-71-window': { name: 'The tourist\'s window, CPW & 71st', x: -129.6, z: 262.35, r: 6 },   // photo mode (#9): Say Cheese step 1
+  'bagel-110': { name: 'Super Jumbo Bagels (110th St)', x: -64, z: 1068, r: 10 },   // #44: The Jumbo Order step 2
   'north-gatehouse': { name: 'Reservoir north gatehouse', x: -12, z: 758, r: 8 },
   'south-gatehouse': { name: 'Reservoir south gatehouse', x: 14, z: 566, r: 8 },
   'wollman-rink': { name: 'Wollman Rink', x: 51.7, z: 88.6, r: 22 },
@@ -946,4 +947,6 @@ export const POSTCARDS = [
   { id: 'ramble', name: 'The Ramble', at: { x: -18, z: 360, r: 25 }, phase: 'morning', kind: 'birders', line: 'The birders gasp… then sigh. "Just a pigeon."' },
   { id: 'north-woods', name: 'North Woods', at: { x: -81.4, z: 1031, r: 9 }, phase: 'night', kind: 'coyote', minY: 2.5, coyote: { from: { x: -64, z: 1000 }, to: { x: -40, z: 992 } }, line: 'There, in the clearing. The coyote. It\'s REAL.' },
   { id: 'mall', name: 'The Mall', at: { x: 1.4, z: 214, r: 0.6 }, phase: 'morning', kind: 'hat', human: 'dolores', line: 'On the Pigeon Lady\'s hat. She doesn\'t mind.' },
+  // #44: awarded by The Jumbo Order's payoff (schemes/bagel-shop.js), with no crumbs ("no crumb pile")
+  { id: 'jumbo-order', name: 'The Jumbo Order', at: { x: -32, z: 927.3, r: 0 }, kind: 'scheme', crumbs: 0, line: 'Sesame. Jalapeño. Jumbo. Steam out of her ears.' },
 ];

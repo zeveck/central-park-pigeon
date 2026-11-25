@@ -81,9 +81,11 @@ export function boardScreen(G) {
       const got = G.state.postcards.includes(p.id), shot = G.collect.shots[p.id];
       return `<div class="pc pcard${got ? '' : ' todo'}" style="--r:${((p.id.length * 37) % 5) - 2}deg"><div class="ti">${esc(p.name)}</div>${got ? (shot ? `<img alt="" src="${shot}" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;margin-top:4px">` : '<div class="ob">Collected.</div>') : '<div class="ob">Not yet.</div>'}</div>`;
     }).join('');
-    const rows = c.rows.map((r) => `<div class="m"><span>${esc(r.label)} ${r.have}/${r.of}</span><span class="bar"><i style="width:${Math.min(100, (r.have / r.of) * 100)}%"></i></span></div>`).join('');
+    // #44: "New!" on the rows the bagel update added to, for a save from before it (flag news.bagels.old), until they're full
+    const fresh = (r) => G.state.flags['news.bagels.old'] && ['postcards', 'scarves'].includes(r.id) && r.have < r.of;
+    const rows = c.rows.map((r) => `<div class="m"><span>${esc(r.label)} ${r.have}/${r.of}${fresh(r) ? ' <b class="new">New!</b>' : ''}</span><span class="bar"><i style="width:${Math.min(100, (r.have / r.of) * 100)}%"></i></span></div>`).join('');
     return `<div class="lane"><div class="lh"><div class="t">${icon('postcard')}<span>${c.complete ? 'COMPLETIONIST' : 'Completionist'}</span></div><div class="g">Everything to find in the park.</div>${rows}</div></div>
-      <div class="lane" style="grid-column: span 3"><div class="lh"><div class="t">${icon('postcard')}<span>Park Postcards ${G.state.postcards.length}/16</span></div><div class="g">Sixteen little park moments.</div></div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px">${cards}</div></div>`;
+      <div class="lane" style="grid-column: span 3"><div class="lh"><div class="t">${icon('postcard')}<span>Park Postcards ${G.state.postcards.length}/${Object.keys(P).length}</span></div><div class="g">Little park moments.</div></div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px">${cards}</div></div>`;
   };
 
   const render = () => {

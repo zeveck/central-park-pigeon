@@ -244,6 +244,8 @@ Coordinates are game metres. +z is north from 59th Street (z = 0) to 110th Stree
 
 ### Central Park and NYC life (who's out, and what it's for)
 
+**Super Jumbo Bagels** (#44; design/changes/batch-g-bagels.md): a 24-hour walk-up bagel shop on 110th Street across from the North Woods gate (black fascia, a tall blade sign, a neon OPEN, a chalk A-frame; all lettering in code), on the map from New Game. Manny (an old-timer in a paper hat and long apron, his own clone of the chess player) runs it: peck him or the bell for the menu (a plain bagel to go for 2 crumbs, or one of four bagels with one of five schmears). **The Jumbo Order** (after the Night Crew joins; the Slice Run lane): Mama Mask's riddle ("little seeds, like sand… the schmear with the green fire") → order a Sesame bagel with Jalapeño schmear → give it to her at Dusk or Night. Every wrong bagel says which half is wrong, and Gus keeps it (Socket eats anything). Rewards: the 17th postcard (no crumbs) and the Everything Bagel scarf. **Bagels as bribes** (#45): a bagel put down near wary crowd animals gets one excited; it eats it (or scampers off with it) and lets slip its boss's region (#24's lead hint, if new) and the crew's **tip**, what the boss wants. Ducks, owls and hawks refuse but still talk; herons just refuse. The menu, Manny, the A-frame, the map dot and a one-time Duchess toast teach it.
+
 Everything here reuses the human, animal and prop assets. It's where most of the "this is New York" feeling comes from.
 
 | Who / what | Where, when | What it's for |
@@ -276,7 +278,7 @@ Everything here reuses the human, animal and prop assets. It's where most of the
 
 ### Park Postcards (every famous place has something to do)
 
-16 small, one-minute "park moments". Each gives 10 crumbs and a postcard on the Scheme Board (part of Completionist). They reuse existing assets.
+17 small, one-minute "park moments". Each gives 10 crumbs and a postcard on the Scheme Board (part of Completionist). They reuse existing assets. The 17th, **The Jumbo Order**, is The Jumbo Order's payoff (Mama Mask biting her bagel) and pays no crumbs (#44).
 
 | Landmark | The moment |
 |---|---|
@@ -505,9 +507,9 @@ Gear shows on Gus's model as small code-built attachments.
 Ledger, the crows' bookkeeper, wears a plaid scarf himself and is a snob about knitwear. The first time Gus lands near him in his slice-orange scarf: "Now THAT is a scarf. Hand-knit? Tell me it's hand-knit." From then on he runs a little scarf trade on the side.
 
 - **Currency: falafel.** The halal cart man tosses a falafel ball to any pigeon who coos at his cart while he works (Afternoon at Grand Army Plaza, Dusk at 110th & Fifth): one per visit per phase. A falafel ball is a light item. Ledger takes them at the Exchange oak ("Crows can't resist a falafel. It's documented.").
-- **The stash:** 10 scarves, each a few falafel. Most are bought; a few are earned and can't be bought, which turns them into small bonus goals:
+- **The stash:** 11 scarves, each a few falafel. Most are bought; a few are earned and can't be bought, which turns them into small bonus goals:
   - bought from Ledger: Gus's slice orange (the starting scarf), taxi checker (yellow and black), deep subway blue, autumn maple stripes, a Ramble-green cable knit, a fluffy cream mohair;
-  - earned: the **Choir's rainbow stripe** (Vibrato's gift when the Choir joins), **Ringo's racing red** (after the Rink Job), **Dove's wedding white** (after the Wedding), and the **"FEED THE BIRDS" bread-print** (when all 30 signs are permanent).
+  - earned: the **Choir's rainbow stripe** (Vibrato's gift when the Choir joins), **Ringo's racing red** (after the Rink Job), **Dove's wedding white** (after the Wedding), and the **"FEED THE BIRDS" bread-print** (when all 30 signs are permanent), and the **Everything Bagel** (Mama Mask's thank-you for The Jumbo Order, #44: charcoal with golden bagel rings; Ledger: "Sesame stitch. From a RACCOON. …It's documented.").
 - **Wearing one:** at any Nest, "Scarf" opens a small wardrobe of everything in the stash. Pick one and Gus swaps it with a little twirl. Crews comment now and then ("Ooh, the taxi one!"). The scarf shows on Gus in the world, in his portrait frame on the Board, and in the finale.
 - **It's purely for fun.** Scarves change nothing in play, cost nothing on the main path, and count toward Completionist. Falafel is only for scarves, so the slice economy and crumbs stay simple.
 - **Assets:** one shared code-built scarf mesh (the wrap and two tails Gus already wears) with 10 knit-pattern textures (nanogen seamless tiles, about $0.04 each), a falafel-ball item model (code: a small bumpy sphere with a generated texture), a falafel icon, and Ledger's compliment and trade lines.
@@ -535,6 +537,8 @@ Fights are 30 to 90 seconds with generous telegraphs. A hit costs one feather. L
 The main path costs about 200 crumbs. **Never grind:** a player who flips the signs that lie on their way earns more than the next cost before reaching it. Act 1 costs about 80 (Racers' feast and five trades) against about 40 (Prologue) + 10 incidental flips (~150) + postcards. The autopilot's main-path run checks it: at every trade and feast it must already have the crumbs without a detour. The HUD crumb counter flashes the shortfall on a feast card ("Feast: 60. You have 41."), and the Board marks the three nearest uneaten piles on the compass.
 
 **Slices** are bribes, not Gus's food (he tries one in the Prologue tutorial card: "Too big. Must be for someone important.").
+
+**Bagels** (#44, #45) are a crumb spend at Super Jumbo Bagels: 2 crumbs plain, 4 with a schmear, one free order a phase when Gus is short. They're food like slices: they sink in water ("The bagel sank. Manny's got more."), Ruffled and naps take them off the ground (not an order waiting on Manny's counter), and anyone who'd eat a slice eats a bagel. Dropped near wary animals they're bribes (see the crews' lead hints).
 
 **20 Golden Pretzels** are hidden (rooftops, water towers, the Ramble cave, under Bow Bridge, the top of the obelisk and more). Each adds a little stamina permanently.
 

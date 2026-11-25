@@ -5,12 +5,14 @@
 //   20 golden pretzels (PRETZELS) touch one to take it: each trims the climb's stamina drain a little, for good
 //   12 Summit Perches  the first landing on each reveals the map round it with a sweeping camera pan
 //                      (fog pushed out); after the Spikes thread (Prickett quits) each visit pays 5 crumbs
-//   16 Park Postcards  (POSTCARDS) one-minute moments; each pays 10 crumbs and pins a postcard (a snapshot
+//   17 Park Postcards  (POSTCARDS) one-minute moments; each pays 10 crumbs and pins a postcard (a snapshot
 //                      of the moment) on the Scheme Board
 // Completionist: pretzels, strays, Summit Perches, postcards, favours, full thread meters, scarves.
 
 import * as THREE from 'three';
 import { STRAY_SPOTS, PRETZELS, POSTCARDS, WATERFALLS, SUMMIT_PERCHES } from '../world/layout.js';
+import { SCARVES } from '../ui/screens.js';   // #44: the Completionist counts the list
+const p0crumbs = (p) => p?.crumbs ?? 10;
 import { GANG_MIX, PIGEON_LAYERS } from '../data/looks.js';
 import { patchMorphArray } from '../gfx/morphs.js';
 import { ruleMaterial } from '../gfx/load-model.js';
@@ -257,14 +259,14 @@ export class Collect {
     });
   }
 
-  /** Award a postcard: 10 crumbs, a snapshot polaroid, the Board. */
-  award(id) {
+  /** Award a postcard: 10 crumbs (#44: opts.crumbs; The Jumbo Order pays none), a snapshot polaroid, the Board. */
+  award(id, { crumbs = p0crumbs(this.P[id]) } = {}) {
     const G = this.G, st = this.st, p = this.P[id];
     if (!p || st.postcards.includes(id)) return false;
     st.postcards.push(id);
-    st.crumbs += 10;
+    st.crumbs += crumbs;
     G.audio.play('camera-shutter');
-    G.toast(`Park Postcard ${st.postcards.length}/16: ${p.name}`, { kind: 'stamp', seconds: 4 });
+    G.toast(`Park Postcard ${st.postcards.length}/${POSTCARDS.length}: ${p.name}`, { kind: 'stamp', seconds: 4 });
     G.later(0.15, () => {
       if (p.line) G.bubbles.add(p.line, { at: { x: G.gus.position.x, y: G.gus.position.y + 0.9, z: G.gus.position.z }, ttl: 3.5, range: 80 });
       try {
@@ -457,10 +459,10 @@ export class Collect {
       { id: 'pretzels', label: 'Golden pretzels', have: st.collectibles.pretzels.length, of: 20 },
       { id: 'strays', label: 'Strays', have: st.collectibles.strays.length, of: 40 },
       { id: 'summits', label: 'Summit Perches', have: st.collectibles.summits.length, of: 12 },
-      { id: 'postcards', label: 'Postcards', have: st.postcards.length, of: 16 },
+      { id: 'postcards', label: 'Postcards', have: st.postcards.length, of: POSTCARDS.length },   // #44: from the list (17)
       { id: 'favours', label: 'Favours', have: st.favours.length, of: 50 },
       { id: 'meters', label: 'Full thread meters', have: meters, of: 5 },
-      { id: 'scarves', label: 'Scarves', have: st.scarves.length, of: 10 },
+      { id: 'scarves', label: 'Scarves', have: st.scarves.length, of: SCARVES.length },   // #44: from the list (11)
     ];
     return { rows, complete: rows.every((r) => r.have >= r.of) };
   }

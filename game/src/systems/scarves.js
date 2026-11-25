@@ -16,7 +16,7 @@ import { derived } from '../state/gamestate.js';
 import { CHARACTERS } from '../data/crews.js';
 
 const PRICE = MARKET.ledger.pricesFalafel;
-const COMMENTS = { 'taxi-checker': 'Ooh, the taxi one!', 'subway-blue': 'Very express. Very blue.', 'maple-stripes': 'Autumnal! Love it.', 'ramble-cable': 'Cable knit. Classy.', 'cream-mohair': 'So FLUFFY.', 'rainbow-stripe': 'The Choir colours! Bravo!', 'racing-red': 'Fast scarf. FAST.', 'wedding-white': 'Bridal. Bold.', 'bread-print': 'FEED THE BIRDS! On a scarf!', 'slice-orange': 'The classic.' };
+const COMMENTS = { 'taxi-checker': 'Ooh, the taxi one!', 'subway-blue': 'Very express. Very blue.', 'maple-stripes': 'Autumnal! Love it.', 'ramble-cable': 'Cable knit. Classy.', 'cream-mohair': 'So FLUFFY.', 'rainbow-stripe': 'The Choir colours! Bravo!', 'racing-red': 'Fast scarf. FAST.', 'wedding-white': 'Bridal. Bold.', 'bread-print': 'FEED THE BIRDS! On a scarf!', 'everything-bagel': 'Smells like a Sunday morning.', 'slice-orange': 'The classic.' };
 
 export class Scarves {
   constructor(G) { this.G = G; this.t = 0; }
@@ -33,7 +33,10 @@ export class Scarves {
     });
     G.bus.on('talk', (t, e) => {
       if (e.who !== 'ledger' || !this.st.flags['ledger.met'] || this.st.carried?.id === 'falafel') return;
-      G.say([{ who: 'ledger', text: this.st.falafel ? `Your account: ${this.st.falafel} falafel. Shall we look at the stash?` : 'The stash is open. Falafel only. It\'s documented.' }], () => G.openMenu('stash'));
+      // #44: the first time he sees the Everything Bagel scarf
+      const eb = this.st.scarves.includes('everything-bagel') && !this.st.flags['ledger.everything'];
+      if (eb) this.st.flags['ledger.everything'] = true;
+      G.say([...(eb ? [{ who: 'ledger', text: 'Sesame stitch. From a RACCOON. …It\'s documented.' }] : []), { who: 'ledger', text: this.st.falafel ? `Your account: ${this.st.falafel} falafel. Shall we look at the stash?` : 'The stash is open. Falafel only. It\'s documented.' }], () => G.openMenu('stash'));
     });
     G.bus.on('schemeDone', (t, e) => { if (['den-choir', 'part-talons', 'part-power'].includes(e.scheme)) G.later(4, () => G.toast('A new scarf for the stash!', { kind: 'stamp' })); });
     G.bus.on('scarf', (t, e) => { this.comment = { id: e.id, t: 0 }; });

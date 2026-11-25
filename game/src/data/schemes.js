@@ -466,6 +466,42 @@ export const SCHEMES = [
     ],
   },
 
+  // ================================================================ #44: "The Jumbo Order" (src/schemes/bagel-shop.js)
+  // Mama Mask's bagel, worked out from her riddle and ordered from Manny's menu at Super Jumbo Bagels on 110th (across from
+  // the North Woods gate). A leaf: it gives a postcard and the Everything Bagel scarf (in its script), nothing any scheme
+  // reads. Last before the finale (openList()[0] doesn't change). Step 2's auto alt covers a right bagel bought early.
+  {
+    id: 'jumbo-order', title: 'The Jumbo Order', thread: 'slice', act: '2', start: 'nest-north', gives: {},
+    opensWhen: { flags: ['den-raccoons'] },
+    steps: [
+      S(1, {
+        goal: 'Talk to Mama Mask in the North Woods (or wherever the raccoons are), from Dusk.', where: 'Mama Mask, on the Loch\'s bank in the North Woods, from Dusk', obstacle: 'She\'s been on her feet all night, and she wants something.',
+        nudge: { by: 'socket', text: 'Mama\'s been on her feet all night, boss. Go say hi. She\'s on the bank by the Loch.' },
+        answer: { text: 'From Dusk, find Mama Mask (red headscarf, apron, spoon) on the Loch\'s bank in the North Woods and peck her.', icon: null },
+        needs: { phase: 'dusk-night', place: 'north-woods' }, on: { type: 'talk', who: 'mamamask' },
+        does: { script: 'jumbo.order', setFlags: ['jumbo.asked'] }, target: { who: 'mamamask' },
+      }),
+      S(2, {
+        goal: 'Order Mama Mask\'s bagel at Super Jumbo Bagels on 110th Street.', where: 'Super Jumbo Bagels, 110th Street, across from the North Woods gate', obstacle: 'Mama Mask wants: "Little seeds, like sand. Just the one kind. And the schmear with the green fire in it."',
+        nudge: { by: 'ringo', text: 'Peck Manny or the bell, boss. Then read that menu slow. Mama\'s riddles are all colours.' },
+        answer: { text: 'At Super Jumbo Bagels on 110th Street (the black sign across from the North Woods gate), peck Manny and order a Sesame bagel with Jalapeño schmear. Peck it on the counter to take it.', icon: null },
+        needs: { phase: 'any', place: 'bagel-110' }, on: { type: 'pickup', item: 'bagel-sesame-jalapeno' },
+        alts: [
+          { needs: { phase: 'any', place: 'bagel-110' }, on: { type: 'pickup', item: 'bagel-sesame-jalapeno' }, does: { setFlags: ['jumbo.ordered'] } },
+          { needs: { item: 'bagel-sesame-jalapeno' }, on: { type: 'auto' }, does: { setFlags: ['jumbo.ordered'] } },
+        ],
+        target: { at: { x: -62.5, z: 1069.05, label: 'Super Jumbo Bagels' } },
+      }),
+      S(3, {
+        goal: 'Bring the bagel to Mama Mask in the North Woods, from Dusk.', where: 'Mama Mask, on the Loch\'s bank in the North Woods, from Dusk', obstacle: 'A Sesame bagel with Jalapeño schmear, for Mama Mask.',
+        nudge: { by: 'ringo', text: 'Mama only comes out from Dusk, boss. She\'ll be by the Loch.' },
+        answer: { text: 'From Dusk, carry the Sesame + Jalapeño bagel to Mama Mask on the Loch\'s bank and peck her.', icon: null },
+        needs: { phase: 'dusk-night', place: 'north-woods', item: 'bagel-sesame-jalapeno' }, on: { type: 'give', item: 'bagel-sesame-jalapeno', to: 'mamamask' },
+        does: { take: { item: 'bagel-sesame-jalapeno' }, script: 'jumbo.done' }, target: { who: 'mamamask' },
+      }),
+    ],
+  },
+
   // ================================================================ finale
   {
     id: 'finale', title: 'Feed the Birds', thread: null, act: 'Finale', start: 'nest-ramble', gives: {},

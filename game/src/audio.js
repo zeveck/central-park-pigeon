@@ -36,6 +36,10 @@ const SFX_VARIANTS = {
   'crow-caw': ['crow-caw', 'crow-caw-2'], 'squirrel-chatter': ['squirrel-chatter', 'squirrel-chatter-2'],
 };
 // files that came out quiet (audio report): gain in code
+// #44/#45: the new voices, levelled to the existing ones (measured in the browser: median speech RMS of the old voice clips
+// −18 dBFS; these came out quieter), held under their peaks' headroom
+const VOICE_GAIN = { 'bribe-rats': 2.2, 'bribe-turtles': 1.6, 'bribe-crows': 1.6, 'bribe-strix': 1.6, 'bribe-choir': 1.5, 'bribe-meermob': 1.45, 'bribe-ducks': 1.35, 'bribe-raccoons': 1.3, 'bribe-rhoda': 1.3, mamamask: 1.1, manny: 1.1 };
+const voiceGain = (f) => { const m = /^(bribe-[a-z]+|mamamask|manny)-/.exec(f); return (m && VOICE_GAIN[m[1]]) || 1; };
 const SFX_GAIN = { 'bread-rain': 10, 'pedicab-pedal': 6, 'rc-boat-whine': 7, 'photographer-thats-the-shot': 1.6,
   // fun pass (levels measured against their neighbours: decoded RMS of the loudest 20%): the glow hum sat ~12 dB under the
   // splashes, the photographer's yelp ~5 dB over his "THAT'S the shot", the glass ~8 dB under the knock clatter
@@ -121,7 +125,7 @@ export class AudioEngine {
   #sfxBuffer(name) {
     if (!this.ctx) return Promise.resolve(null);
     if (!this.sfx.has(name)) {
-      const dir = /-(greeting|call|join)$|^(ranger-hey-shoo|vinnie-flying-rat|prickett-impossible|photographer-thats-the-shot|photographer-fall|mecha-feed-the-birds|dove-|crowd-chant-take)/.test(name) ? 'voice/' : 'sfx/';
+      const dir = /-(greeting|call|join)$|^(ranger-hey-shoo|vinnie-flying-rat|prickett-impossible|photographer-thats-the-shot|photographer-fall|mecha-feed-the-birds|dove-|crowd-chant-take|manny-|mamamask-|bribe-)/.test(name) ? 'voice/' : 'sfx/';   // #44/#45: manny-, mamamask-, bribe-
       this.sfx.set(name, this.#decode(BASE + dir + name + '.mp3').catch((e) => { console.warn('sfx', name, e.message); return null; }));
     }
     return this.sfx.get(name);
@@ -346,7 +350,7 @@ export class AudioEngine {
       src.buffer = buf;
       src.playbackRate.value = (opts.rate ?? 1) * (files ? 0.94 + Math.random() * 0.12 : 1);
       const g = c.createGain();
-      g.gain.value = sp.vol * (SFX_GAIN[file] || 1);
+      g.gain.value = sp.vol * (SFX_GAIN[file] || voiceGain(file));
       const p = c.createStereoPanner();
       p.pan.value = sp.pan;
       src.connect(g).connect(p).connect(this.busSfx);
@@ -506,6 +510,7 @@ export class AudioEngine {
         break;
       }
       case 'warpArrive': [392, 523.25, 783.99, 1046.5].forEach((f, i) => this.#tone({ type: 'sine', f: f * 1.5, f2: f, t0: i * 0.05, dur: 1.1, vol: 0.09 * vol, detune: (i - 1.5) * 9 })); this.#noise({ dur: 0.5, vol: 0.05 * vol, hp: 5000 }); break;   // Batch-2 (#13)
+      case 'kettle': this.#tone({ f: 2900, f2: 3400, dur: 0.9, vol: 0.09 * vol, detune: dt() }); this.#noise({ dur: 0.8, vol: 0.05 * vol, hp: 4000 }); break;   // #44: steam out of Mama Mask's ears
       case 'whistle': this.#tone({ f: 2300, f2: 2600, dur: 0.35, vol: 0.12 * vol, detune: dt() }); this.#tone({ f: 2600, f2: 2000, t0: 0.4, dur: 0.4, vol: 0.12 * vol }); break;
       default: break;
     }

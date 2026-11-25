@@ -358,3 +358,25 @@ Same pipeline as the 12 of 2026-11-14: `meshgen character --polycount 9000` at t
 Meshy: **657 credits ($13.14)** of the ~700 approved; balance afterwards 184. imagegen2: 15 pictures × ≈ $0.06 = **≈ $0.90** (1758 output tokens each, no retakes). This change: **≈ $14.04**.
 
 **Running total: ≈ $120.16** (previous $106.12 + Meshy $13.14 + pictures $0.90). The Meshy credits were prepaid, so the cash spend is about $0.90.
+
+## Super Jumbo Bagels (#44) and bagel bribes (#45), 2026-11-25 (budget $20 per change)
+
+All lettering (fascia, blade sign, A-frame chalk, neon OPEN) is drawn in code; no generated image carries text. Takes in `.gamegen/candidates/bagels/` (img/, audio/); `bagel-shop.jpg` (a local photo) was a mood reference only and was never an input. Prices as in the earlier sections (imagegen2 from logged tokens; nanogen and audiogen from their skills' price notes).
+
+| ID | File | Tool | Prompt (short) | Tries | Est. cost |
+|---|---|---|---|---|---|
+| Menu sheet: 4 bagels | game/assets/ui/bagels/bagel-{plain,sesame,poppy,everything}.webp (128² cut-outs) | imagegen2 medium, transparent, gus-stand reference | four chunky bagels from above at ¾: plain, pale sesame, black poppy, everything; style line | 1 | $0.06 |
+| Menu sheet: 4 schmear tubs | game/assets/ui/bagels/schmear-{plain,scallion,strawberry,jalapeno}.webp | imagegen2 medium, transparent | open tubs: off-white, pale green + dark flecks, pink + red bits, pale green + jalapeño chips (scallion's cream paled in Pillow so jalapeño is the green one) | 1 | $0.05 |
+| Bagel crust atlas | game/assets/textures/bagel-crust.webp (1024², 2×2 seamless tiles) | nanogen (edit from the bagel sheet) + Pillow (grid lines trimmed, light evened, edges blended; plain from poppy minus dots) | crust close-ups: plain, sesame, poppy, everything | 3 | $0.12 |
+| Shop back wall | game/assets/textures/bagel-shop-back.webp (1024×400) | nanogen flash 2K 21:9, refs tex-facade-storefront + key art | flat frontal bagel-shop interior: wire bins, deck oven, cream/black tiles; no text, no people | 1 | $0.06 |
+| Manny's card | design/mockups/cards/manny.png → game/assets/portraits/manny.webp (crop [274, 0, 738, 464]) | imagegen2 high, edit of concepts/human-chess-player.png, vinnie.png card reference | the chess player with a paper deli hat, long floury white apron, a bagel in hand | 1 | $0.07 |
+| Scarf: Everything bagel | game/assets/textures/scarf-everything-bagel.jpg (512²) | nanogen, scarf-bread-print reference | charcoal knit with intarsia golden bagel rings and sesame/poppy dots, seamless | 2 | $0.08 |
+| Gus in the Everything bagel scarf | game/assets/portraits/gus-everything-bagel.webp (crop [146, 0, 658, 512] of the edit) | imagegen2 medium, edit of gus-scarf.png + the scarf tile | same Gus, the new scarf | 1 | $0.06 |
+| SFX bell-ding, bagel-munch | game/assets/audio/sfx/{bell-ding,bagel-munch}.mp3 (1.07 s, 1.54 s) | audiogen sfx | a chrome counter service bell struck once; a cartoon animal munching a chewy bagel | 1 each | $0.24 |
+| Voices #44: Manny ×12, Mama Mask ×23 | game/assets/audio/voice/{manny,mamamask}-*.mp3 | audiogen TTS eleven_v4 | new voices: Manny = "Frank Sullivan" (bRlp5mUWs01wX4H4oW4X, warm late-60s New Yorker); Mama Mask = "Jasper Arnold" (cibGBHebxgbzkwF6iySQ, warm brassy, [raspy, New York]) | 1 each | $0.28 |
+| Voices #45: 90 crew-member lines in 17 new voices | game/assets/audio/voice/bribe-<crew>-{excited,thanks,lead,tip,hint1,hint2,refuse,closer}.mp3 | audiogen TTS eleven_v4 | a younger/smaller sibling of each boss's register (catalogue voices; none shared with any boss or human: `V` map in .gamegen/candidates/audio/jobs.py, `crew-<crew>`) | 1 each | $0.66 |
+| **Total** | | | | | **≈ $1.68** (#44 ≈ $1.02, #45 ≈ $0.66) |
+
+Voice lines: the full list with texts is game/src/data/bagels.js (MANNY, MAMA, BRIBES) plus data/lead-hints.js (hint1/hint2). Words couldn't be machine-checked (the key has no speech-to-text); durations were checked per clip (0.30–1.02 s per word) and the levels were checked in the browser against the existing voices (see the fix-44 notes).
+
+**Running total: ≈ $121.84** (previous $120.16 + $1.68).

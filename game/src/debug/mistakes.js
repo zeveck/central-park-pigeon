@@ -277,6 +277,27 @@ add('den-meermob.s2.alt', { goal: 'den-meermob.alt', fixture: 'den-meermob.s2', 
   C: I.cold(), N: I.nap('night', 'between slices'),
 }, nMark: (G) => (G.state.counts?.['den-meermob.s2'] || 0) >= 1 && !G.state.carried, qMark: (G) => (G.state.counts?.['den-meermob.s2'] || 0) >= 2 && !G.state.carried });
 
+// #44 The Jumbo Order (design/changes/batch-g-bagels.md proof plan): a broke player, two wrong orders, a nap with the order
+// waiting on the counter, step 1 with a plain bagel in the beak, and the quest bagel lost in the Meer, Ruffled or napped.
+const QB = 'bagel-sesame-jalapeno';
+const atBell = [{ landNear: { x: -62.9, z: 1068.15 }, alt: 10, r: 1.5, timeout: 200 }, { peck: 'bagel:bell', timeout: 30 }, { waitFor: (G) => G.menus.is('bagels'), timeout: 10 }, { wait: 0.4 }];
+const bagelOrder = (b, sm) => [...atBell, { bagelOrder: sm ? [b, sm] : 'to-go', timeout: 20 }, { waitFor: (G) => !G.menus.open, timeout: 5 }, { wait: 2.4 }];
+add('jumbo-order.s1', { mark: M.start, m: {
+  O: I.order('talk to Mama Mask with a plain bagel in the beak', (G) => [...bagelOrder('plain'), { pickItem: 'bagel', timeout: 30 }, idle()], (G) => (G.state.carried?.id === 'bagel' ? true : 'no plain bagel carried')),
+} });
+add('jumbo-order.s2', { fixture: 'jumbo-order.s2', mark: M.start, m: {
+  O: I.order('two wrong orders in a row (the second takes the first back)', (G) => [...bagelOrder('poppy', 'scallion'), { pickItem: 'bagel-poppy-scallion', timeout: 30 }, ...bagelOrder('plain', 'strawberry'), { pickItem: 'bagel-plain-strawberry', timeout: 30 }, idle()],
+    (G) => (G.state.carried?.id === 'bagel-plain-strawberry' && !G.items.world.some((w) => w.id === 'bagel-poppy-scallion') ? true : `carrying ${G.state.carried?.id}, poppy lying about: ${G.items.world.some((w) => w.id === 'bagel-poppy-scallion')}`)),
+  W: { name: '0 crumbs: the free order, then the shortfall, then a nap and free again', route: 'poke', poke: (G) => { G.state.crumbs = 0; },
+    build: (G) => [...bagelOrder('plain', 'plain'), { pickItem: 'bagel-plain-plain', timeout: 30 }, ...atBell, { wait: 1 }, { closeMenus: true }, idle(), ...napTo(G, nextPhase(G.state.phase)), idle()],
+    took: (G) => (G.state.crumbs === 0 && !G.state.phaseUsed?.['bagel.free'] ? true : `crumbs ${G.state.crumbs}, free used ${!!G.state.phaseUsed?.['bagel.free']}`) },
+  N: I.order('order the right bagel, leave it on the counter and nap', (G) => [...bagelOrder('sesame', 'jalapeno'), ...napTo(G, nextPhase(G.state.phase)), idle()],
+    (G) => (G.items.world.some((w) => w.id === QB && w.counter) ? true : 'the order is gone from the counter')),
+} });
+add('jumbo-order.s3', { mark: M.carry(QB), item: QB, m: {
+  W: I.water('Harlem Meer', 60, 1005, QB), R: I.ruffle(), N: I.nap('morning'), A: I.wander(),
+} });
+
 /** The far side of Conservatory Water from the RC tug's landing (open water, 2 m off the bank). */
 function farSide(G) {
   const c = PLACES.conservatory, land = { x: 63.2, z: 301 };
@@ -295,7 +316,7 @@ function farSide(G) {
 const Q_ROW = { 'den-ducks': 'den-ducks.s3', 'den-rats': 'den-rats.s3', 'den-cats': 'den-cats.s3', 'den-raccoons': 'den-raccoons.s3', 'sab-middle': 'sab-middle.s1',
   'part-body': 'part-body.s3', 'den-racers': 'den-racers.s2', 'part-talons': 'part-talons.s3', 'part-wings': 'part-wings.s3', 'den-biscuit': 'den-biscuit.s3',
   'den-strix': 'den-strix.s2', 'gear-pen': 'gear-pen.s2', 'gear-headlamp': 'gear-headlamp.s2', 'part-beak': 'part-beak.s2', 'truce-dogs-squirrels': 'truce-dogs-squirrels.s3',
-  'truce-cats-rats': 'truce-cats-rats.s3', 'den-rhoda': 'den-rhoda.s2', 'part-power': 'part-power.s3', 'den-meermob': 'den-meermob.s2.alt' };
+  'truce-cats-rats': 'truce-cats-rats.s3', 'den-rhoda': 'den-rhoda.s2', 'part-power': 'part-power.s3', 'den-meermob': 'den-meermob.s2.alt', 'jumbo-order': 'jumbo-order.s3' };
 for (const s of SCHEMES) {
   if (s.id === 'finale' || Q_ROW[s.id]) continue;
   if (s.id === 'part-eyes') { C.push({ key: 'part-eyes.s1', id: 'part-eyes', n: 1, goal: 'part-eyes', fixture: 'sab-middle.s2', markGoal: 'sab-middle', mark: M.flag('sab-middle'), qOnly: true, m: {} }); continue; }
@@ -634,7 +655,12 @@ export async function install() {
           const rule = G.schemes.keeperRule(item);
           if (lying.length) {
             const it = lying[0], gy = G.terrain.heightAt(it.x, it.z), y = it.y ?? gy;
-            goals.push(...(y - gy > 1.2 ? [{ climbTo: Math.min(12, y - gy + 4), timeout: 30 }, { flyTo3: { x: it.x, y, z: it.z }, r: 1.0, timeout: 150 }] : [{ landNear: { x: it.x + 0.8, z: it.z }, alt: 6, r: 1.6, timeout: 150 }]), { pickItem: it.id, near: { x: it.x, z: it.z }, timeout: 40 });
+            // #44: an item on a counter (Manny's shelf) is picked up from the pavement in front of it, not flown into
+            const foot = [[0, -1.5], [1.5, 0], [-1.5, 0], [0, 1.5]].map(([dx, dz]) => ({ x: it.x + dx, z: it.z + dz })).find((q) => { const s2 = G.collision.surface(q.x, q.z, y - 0.2); return s2.kind !== 'water' && y - s2.y <= 1.2 && y - s2.y > 0.3 && G.collision.standable(q.x, q.z) != null; });
+            const onCounter = foot && (y - gy > 1.2 || G.collision.standable(it.x, it.z) == null);
+            if (onCounter) goals.push({ landNear: foot, alt: 6, r: 0.6, timeout: 150 }, { peck: 'item:' + it.uid, timeout: 30 });   // (Peck it from wherever he lands: the shelf's edge or the pavement)
+            else goals.push(...(y - gy > 1.2 ? [{ climbTo: Math.min(12, y - gy + 4), timeout: 30 }, { flyTo3: { x: it.x, y, z: it.z }, r: 1.0, timeout: 150 }] : [{ landNear: { x: it.x + 0.8, z: it.z }, alt: 6, r: 1.6, timeout: 150 }]));
+            if (!onCounter) goals.push({ pickItem: it.id, near: { x: it.x, z: it.z }, timeout: 40 });
             how.push(`fetch the ${item} at ${it.x.toFixed(0)}, ${it.z.toFixed(0)}`);
             if (pickK >= 0) seg = seg.slice(pickK + 1);
           } else if (rule) {   // (missing, or lying in water: the keeper puts it back within a couple of seconds)
@@ -697,7 +723,7 @@ export async function install() {
         const carried = fitsItem(item, s.carried?.id);
         const lying = G.items.world.filter((w) => fitsItem(item, w.id));
         const dry = lying.filter((w) => !G.wetAt(w.x, w.z, w.y ?? 400));
-        const renew = RENEWING.includes(item) || item === 'slice';
+        const renew = RENEWING.includes(item) || item === 'slice' || (/^bagel/.test(item) && !!G.interact.get('bagel:bell'));   // #44: Manny's menu makes any bagel, any time (a free one a phase)
         const keeper = !!G.schemes.keeperRule(item);
         out.checks.item = carried ? 'carried' : dry.length ? 'lying on dry ground' : keeper ? 'keeper rule' : renew ? 'renews' : null;
         if (!out.checks.item) bad('item', `${item}: not carried, not on dry ground, no keeper rule, does not renew`);
