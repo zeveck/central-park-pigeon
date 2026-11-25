@@ -179,3 +179,7 @@ Should-fix:
 - Flicker placed away from routes.
 - No Nest step.
 All adopted (see the decisions in photo-mode.md).
+
+## Change review: #44 Super Jumbo Bagels + #45 bagel bribes (2026-11-25, 1 round)
+
+Player (0 must / 6 should / 4 nice), Builder (2 must / 8 should / nice), Art & sound (1 must / 5 should / 3 nice): design/reviews/batch-g-bagels-{player,builder,art}.md. Refiner applied 37 of 38 (1 already in the design); outcomes table at the end of design/changes/batch-g-bagels.md. Coordinator calls: new postcard + scarf count toward Completionist (with a one-time "New in the park" notice for older saves); all shop lettering drawn in code; per-crew crowd voices; bribes give a per-crew boss tip and are taught in five places. Converged: no must-fix or should-fix left.
