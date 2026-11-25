@@ -26,6 +26,10 @@ const NUDGE_AFTER = 180;   // game seconds on one step
 // places (or its targets), and a failure (a cling, a shoo, a cold slice, a wrong-place Call, a lost race or fight) brings
 // the nudge to at most AFTER_FAIL seconds away.
 const NEAR = 80, AFTER_FAIL = 60;
+// #42: an item put down within BESIDE m of the step's target keeps the compass on the target
+const BESIDE = 3;
+/** Does this item id fit what a step wants (needsReason's rule: any slice will do where a plain one is wanted)? */
+const fitsWant = (want, id) => !!id && (id === want || (want === 'slice' && id.startsWith('slice')));
 
 export class SchemeEngine {
   constructor(G) {
@@ -164,6 +168,7 @@ export class SchemeEngine {
 
   onEvent(type, e) {
     if (type === 'tick') return;
+    if (type === 'pickup') this.#noteHad();   // #42 (before the step it may complete moves on)
     for (const id of this.activeList()) {
       if (this.busy.has(id)) continue;
       const step = this.step(id);
@@ -432,7 +437,7 @@ export class SchemeEngine {
     const G = this.G;
     this.pollT += dt;
     if (this.pollT >= 0.25) { this.pollT = 0; this.#poll(); }
-    if ((this.keepT = (this.keepT || 0) + dt) >= 0.5) { if (!G.midScene?.()) this.#keep(this.keepT); this.keepT = 0; }   // fix-23
+    if ((this.keepT = (this.keepT || 0) + dt) >= 0.5) { this.#noteHad(); if (!G.midScene?.()) this.#keep(this.keepT); this.keepT = 0; }   // fix-23; #42
     // the nudge timer for the tracked step
     if (!this.st.tracked && this.activeList().includes('prologue')) this.st.tracked = 'prologue';
     const id = this.st.tracked;
@@ -499,7 +504,102 @@ export class SchemeEngine {
     const cold = this.coldSlice(step);   // fix-19: the griddle, while the slice is cold
     if (cold?.griddle) out.push({ x: cold.griddle.x, z: cold.griddle.z, y: this.G.terrain.heightAt(cold.griddle.x, cold.griddle.z) + 2.2, icon: 'target', label: 'The halal griddle' });
     if (!out.length && step.needs?.place && !this.atPlace(step.needs.place)) { const p = PLACES[step.needs.place]; out.push({ x: p.x, z: p.z, y: this.G.terrain.heightAt(p.x, p.z) + 3, icon: 'target', label: p.name }); }
+    // #42: the item the step needs isn't in Gus's beak: point where he can get one now (it replaces the delivery target
+    // when every route needs the item; beside the others when one route needs none)
+    const place = step.needs?.place && PLACES[step.needs.place];
+    const it = this.#itemTarget(id, step, place ? [...out, place] : out);
+    if (it) {
+      const every = this.#wants(step).every(Boolean);
+      return every ? [...out.filter((t) => t.sign), it] : [...out, it];
+    }
     return out;
+  }
+
+  // ------------------------------------------------------------ #42: the compass after a dropped, lost or cold item
+  /** Each option's item that must be in Gus's beak ({ item, hot }), or null for an option that needs none. Read from the
+   *  step data: needs.item, reachNeeds.item, a give's or drop's on.item, does.take.item. */
+  #wants(step) {
+    return (step.alts || [step]).map((o) => {
+      const on = o.on || {};
+      const item = o.needs?.item || o.reachNeeds?.item || (on.type === 'give' || on.type === 'drop' ? on.item : null) || o.does?.take?.item || step.does?.take?.item || null;
+      return item ? { item, hot: !!(o.needs?.hot || on.hot) } : null;
+    });
+  }
+
+  /** The items Gus has carried on each step ('scheme.sN' → [item ids]): in the save, so the compass still knows after a load
+   *  that the slice on the pavement is the one he dropped. */
+  get had() { return this.st.had || (this.st.had = {}); }
+  #noteHad() {
+    const c = this.st.carried;
+    if (!c) return;
+    for (const id of this.activeList()) {
+      const step = this.step(id);
+      if (!step || !this.#wants(step).some((w) => w && fitsWant(w.item, c.id))) continue;
+      const l = this.had[`${id}.s${this.stepIndex(id) + 1}`] ||= [];
+      if (!l.includes(c.id)) l.push(c.id);
+    }
+  }
+
+  /** Where an earlier step of this scheme had Gus pick the item up (its target, or its place), or null. */
+  #pickedAt(id, item) {
+    const s = SCHEME[id], G = this.G;
+    for (let i = this.stepIndex(id) - 1; i >= 0; i--) {
+      const st = s.steps[i];
+      const o = (st.alts || [st]).find((q) => q.on?.type === 'pickup' && fitsWant(item, q.on.item));
+      if (!o) continue;
+      const tg = st.target || {};
+      if (tg.at) return { x: tg.at.x, z: tg.at.z, label: tg.at.label };
+      const c = tg.who && G.chars?.find(tg.who);
+      if (c) return { x: c.x, z: c.z, label: CHARACTERS[tg.who].name };
+      const p = PLACES[o.needs?.place || st.needs?.place];
+      if (p) return { x: p.x, z: p.z, label: p.name };
+    }
+    return null;
+  }
+
+  /** A step's item Gus has had (carried on this step, picked up on an earlier one), that the item keeper looks after, or
+   *  that's the pizza economy (slices and boxes: always about, never the puzzle themselves). Any other item he has never
+   *  had keeps the step's own target: finding it may be the puzzle (a glint on a roof). */
+  #known(id, w) {
+    if (this.keeperRule(w.item) || this.G.items.def(w.item).slice || w.item === 'box') return true;
+    if ((this.had[`${id}.s${this.stepIndex(id) + 1}`] || []).some((q) => fitsWant(w.item, q))) return true;
+    return !!this.#pickedAt(id, w.item);
+  }
+
+  /** #42: the compass target for the step's item when Gus isn't carrying one that fits, or null (the step's own targets):
+   *    lying within reach (hot or cold)   the item (the nearest; once picked up cold, the griddle rule takes over)
+   *    lying within BESIDE m of a target  null (put down right by whoever it's for: stay on them)
+   *    an ally is fetching it             null
+   *    out of reach (water) or gone       where the item keeper puts it back (its toast's place)
+   *    gone, no keeper                    a live source (someone holding one, a Slice Line with one waiting), else where
+   *                                       an earlier step had Gus pick it up
+   *  Not counted: a different item (a plain slice where the anchovy is wanted), one still guarded (Pickles' sill, the
+   *  picnickers' tub), a huge one (haulers move those). */
+  #itemTarget(id, step, base) {
+    const G = this.G, c = this.st.carried;
+    const need = this.#wants(step).filter(Boolean);
+    if (!need.length || (c && need.some((w) => fitsWant(w.item, c.id)))) return null;   // carried: the target (or, cold, the griddle)
+    const known = need.filter((w) => this.#known(id, w));
+    if (!known.length) return null;
+    const fits = (wid) => known.some((w) => fitsWant(w.item, wid));
+    const d = (a, b) => Math.hypot(a.x - b.x, a.z - b.z), g = G.gus.position;
+    const nearest = (ps) => ps.sort((a, b) => d(a, g) - d(b, g))[0];
+    const tgt = (p, label, item, dy = 1.5) => ({ x: p.x, z: p.z, y: (p.y ?? G.terrain.heightAt(p.x, p.z)) + dy, icon: 'target', label, item });
+    const lying = G.items.world.filter((w) => fits(w.id) && !w.sill && G.items.def(w.id).cls !== 'huge' && !G.items.guardReason(w, true));
+    if (lying.some((w) => base.some((t) => d(t, w) <= BESIDE))) return null;
+    const dry = lying.filter((w) => !G.wetAt(w.x, w.z, w.y ?? 400));
+    if (dry.length) { const w = nearest(dry); return tgt(w, theItem(G.items.def(w.id).name, true), w.id, 0.9); }
+    if (known.some((w) => { const f = G.clues?.fetching?.get(w.item); return f != null && G.state.time - f < 30; })) return null;
+    for (const w of known) {
+      const r = this.keeperRule(w.item);
+      if (r) { const at = this.keeperSpot(r); return tgt(at, at.label[0].toUpperCase() + at.label.slice(1), w.item); }
+    }
+    const live = [];
+    for (const a of G.humans?.agents || []) if (a.out && a.holds && fits(a.holds)) live.push({ x: a.x, z: a.z, y: a.y, label: `Someone with ${theItem(G.items.def(a.holds).name).replace(/^the ([aeiou])?/, (m, v) => (v ? 'an ' + v : 'a '))}`, item: a.holds });
+    if (fits('slice')) for (const L of G.slices?.waitingDrops?.() || []) live.push({ ...L, item: 'slice' });
+    if (live.length) { const p = nearest(live); return tgt(p, p.label, p.item, 1.9); }
+    for (const w of known) { const p = this.#pickedAt(id, w.item); if (p) return tgt(p, p.label, w.item, 2.2); }
+    return null;
   }
 
   /** What a card shows: phase need, cost, other threads' friends. */

@@ -127,6 +127,9 @@ export class Slices {
     return true;
   }
 
+  /** #42: the Slice Line drops with a hot slice waiting right now (the compass's source for a slice that's gone). */
+  waitingDrops() { return this.lines.filter((L) => this.#waiting(L) > 0).map((L) => ({ x: L.d.x, z: L.d.z, y: L.y, label: `${L.who}'s Slice Line` })); }
+
   setPhase() { for (const L of this.lines) { L.g.visible = this.st.lines.includes(L.id); L.slice.visible = this.#waiting(L) > 0; } }
   restore() { this.setPhase(); }
   update(dt) {

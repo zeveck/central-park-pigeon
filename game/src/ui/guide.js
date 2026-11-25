@@ -124,6 +124,7 @@ export class Guide {
     const ts = E.targets(id), t = this.nearestTarget(ts);
     // a sign step: name the signs still to flip (the step's own `where` lists them all)
     if (t && ts.every((q) => q.sign)) return `${ts.length > 1 ? 'Signs' : 'The sign'} still to flip: ${ts.map((q) => q.label).join(', ')} · nearest ${this.distText(t)}`;
+    if (t?.item) return `${t.label} · ${this.distText(t)}`;   // #42: the compass is on the item (dropped, lost, gone), not the step's place
     if (t) return `${where} · ${this.distText(t)}`;
     // no target on the compass: the step's place (any alternative's) if Gus isn't there yet, else he's there
     const places = [step.needs, ...(step.alts || []).map((a) => a.needs)].map((n) => n?.place).filter((p) => PLACES[p]);

@@ -19,17 +19,14 @@ starting 4+ times, Ruffled after the mistake) · nudge (the compass, the keeper'
 | 1 | den-cats.s3 | Q: save, quit, Continue | input | yes (0.6 s) | - | 0 | 60.8 / 600 | 75 | 0 | - | - | **PASS** |
 | 1 | den-choir.s2 | Q: save, quit, Continue | input | yes (0.5 s) | - | 0 | 11.5 / 600 | 106 | 0 | - | - | **PASS** |
 | 1 | den-ducks.s3 | Q: save, quit, Continue | input | yes (0.6 s) | - | 0 | 20.6 / 600 | 100 | 0 | - | - | **PASS** |
-| 1 | den-ducks.s3 | W: drop the peas over the Lake | input | yes (7.5 s) | keeper 1 | 0 | 34.2 / 600 | 11 | 0 | - | NUDGE-WRONG: the compass points at puddles, the peas lies at 46, 293 | **PASS** |
 | 1 | den-raccoons.s2 | C: wait until the slice is cold | input | yes (61.3 s) | naps 2, helped: nap round | 3 | 154.5 / 600 | 105 | 0 | - | - | **PASS-HELPED** |
 | 1 | den-raccoons.s3 | Q: save, quit, Continue | input | yes (0.7 s) | - | 0 | 67.8 / 600 | 71 | 0 | - | - | **PASS** |
-| 1 | den-raccoons.s3 | W: drop the wrench over Turtle Pond | input | yes (7.5 s) | keeper 1 | 0 | 79.8 / 600 | 15 | 0 | - | NUDGE-WRONG: the compass points at rigby, the wrench lies at -42, 429 | **PASS** |
 | 1 | den-racers.s2 | Q: save, quit, Continue | input | yes (0.1 s) | - | 0 | 71.3 / 600 | 70 | 0 | - | - | **PASS** |
 | 1 | den-racers.s2.alt | F: stop mid-race (lose the wheels race) | input | yes (153.1 s) | keeper 1, tow 1, naps 1 | 1 | 140.1 / 600 | 156 | 0 | - | - | **PASS** |
 | 1 | den-rats.s3 | C: wait until the slice is cold | input | yes (60.2 s) | - | 0 | 79.8 / 600 | 27 | 0 | - | - | **PASS** |
 | 1 | den-rats.s3 | Q: save, quit, Continue | input | yes (0.6 s) | - | 0 | 18.6 / 600 | 55 | 0 | - | - | **PASS** |
 | 1 | den-rhoda.s2 | F: leave the Meer 75 m+ mid-fight | input | yes (12.6 s) | naps 1 | 0 | 32.1 / 600 | 70 | 0 | - | - | **PASS** |
 | 1 | den-rhoda.s2 | Q: save, quit, Continue | input | yes (-17.4 s) | naps 1 | 0 | 33.2 / 600 | 72 | 0 | - | - | **PASS** |
-| 1 | den-rhoda.s3 | C: wait until the slice is cold | input | yes (59.8 s) | naps 3, helped: nap round | 3 | 235.4 / 600 | 225 | 0 | - | compass not at the slice (lies at -125, 262) | **PASS-HELPED** |
 | 1 | den-songbirds.s2 | Q: save, quit, Continue | input | yes (0.6 s) | - | 0 | 42.7 / 600 | 71 | 0 | - | - | **PASS** |
 | 1 | den-turtles.s2 | Q: save, quit, Continue | input | yes (-6.4 s) | - | 0 | 11.1 / 600 | 98 | 0 | - | - | **PASS** |
 | 1 | gear-headlamp.s2 | Q: save, quit, Continue | input | yes (0.6 s) | naps 1 | 0 | 81.4 / 600 | 87 | 0 | - | - | **PASS** |
@@ -50,9 +47,7 @@ starting 4+ times, Ruffled after the mistake) · nudge (the compass, the keeper'
 | 1 | sab-north.s1 | Q: save, quit, Continue | input | yes (0 s) | naps 1 | 0 | 11.5 / 600 | 106 | 0 | - | - | **PASS** |
 | 1 | say-cheese.s2 | Q: save, quit, Continue | input | yes (0.1 s) | - | 0 | 23.6 / 600 | 71 | 0 | - | - | **PASS** |
 | 1 | truce-cats-rats.s3 | Q: save, quit, Continue | input | yes (0.5 s) | - | 0 | 267.7 / 600 | 178 | 0 | - | tracked scheme changed to den-songbirds | **PASS** |
-| 2 | den-biscuit.s3 | F: leave Cedar Hill mid-fight | input | yes (12 s) | - | 0 | 36.7 / 600 | 69 | 0 | - | - | **PASS** |
 | 2 | den-horses.s2 | Q: save, quit, Continue | input | yes (-3.6 s) | - | -1 | 0 / 600 | 68 | 0 | - | - | **PASS** |
-| 2 | den-meermob.s2.alt | C: wait until the slice is cold | input | yes (59.7 s) | naps 1 | 3 | 225 / 600 | 177 | 0 | - | NUDGE-WRONG: the compass points at bigsal, the slice lies at 49, 1066 | **FAIL-SCRIPT**: not finished; the oracle says the step is still doable: {"item":"renews","phase":"ok","trigger":"coo: nothing spent / slice NOT at hand"} |
 | 2 | den-meermob.s2.alt | Q: save, quit, Continue | input | yes (0.6 s) | naps 1 | 0 | 47.7 / 600 | 148 | 0 | - | NUDGE-WRONG: the compass points at bigsal, the slice lies at 49, 1066 | **PASS** |
 | 2 | den-squirrels.s2 | Q: save, quit, Continue | input | yes (0.1 s) | - | 0 | 30.6 / 600 | 67 | 0 | - | - | **PASS** |
 | 2 | den-strix.s2 | F: flap in the stealth until spotted | input | yes (3.9 s) | naps 1 | 0 | 74.8 / 600 | 21 | 0 | - | - | **PASS** |
@@ -72,12 +67,17 @@ starting 4+ times, Ruffled after the mistake) · nudge (the compass, the keeper'
 | 3 | den-racers.s2 | F: lose the race | input | yes (62.3 s) | - | 0 | 83.4 / 600 | 24 | 0 | - | - | **PASS** |
 | 3 | part-talons.s3 | V: wedge the Zamboni in a rink corner and leave it | input | yes (23.1 s) | naps 1 | 0 | 103.3 / 600 | 85 | 0 | - | - | **PASS** |
 | 3 | prologue.s2 | Q: save, quit, Continue | input | yes (-4.4 s) | - | -1 | 0 / 600 | 81 | 0 | - | - | **LEFTOVERS** |
+| 4 | den-biscuit.s3 | F: leave Cedar Hill mid-fight | input | yes (12 s) | - | 0 | 36.7 / 600 | 15 | 0 | - | - | **PASS** |
+| 4 | den-ducks.s3 | W: drop the peas over the Lake | input | yes (7.5 s) | keeper 1 | 0 | 34.2 / 600 | 17 | 0 | - | - | **PASS** |
+| 4 | den-meermob.s2.alt | C: wait until the slice is cold | input | yes (59.7 s) | naps 1 | 3 | 225 / 600 | 139 | 0 | - | - | **FAIL-SCRIPT**: not finished; the oracle says the step is still doable: {"item":"renews","phase":"ok","trigger":"coo: nothing spent / slice NOT at hand"} |
+| 4 | den-raccoons.s3 | W: drop the wrench over Turtle Pond | input | yes (7.5 s) | keeper 1 | 0 | 79.8 / 600 | 14 | 0 | - | - | **PASS** |
+| 4 | den-rhoda.s3 | C: wait until the slice is cold | input | yes (59.8 s) | naps 3, helped: nap round | 3 | 235.4 / 600 | 132 | 0 | - | - | **PASS-HELPED** |
 
 ## Not passed
 
-- **den-meermob.s2.alt C** (FAIL-SCRIPT): not finished; the oracle says the step is still doable: {"item":"renews","phase":"ok","trigger":"coo: nothing spent / slice NOT at hand"}
-  Reproduce: a job file `mistake den-meermob.s2.alt C` for `node game/tools/sf-run.mjs serve`; screenshot and save in the fail dir (den-meermob.s2.alt-C.png / .json).
-  Oracle: {"checks":{"item":"renews","phase":"ok","trigger":"coo: nothing spent / slice NOT at hand"},"fails":[],"ok":true}
 - **truce-cats-rats.s3 W** (FAIL-SCRIPT): not finished; the oracle says the step is still doable: {"item":"renews","phase":"ok","trigger":"boxOpened: nothing spent"}
   Reproduce: a job file `mistake truce-cats-rats.s3 W` for `node game/tools/sf-run.mjs serve`; screenshot and save in the fail dir (truce-cats-rats.s3-W.png / .json).
   Oracle: {"checks":{"item":"renews","phase":"ok","trigger":"boxOpened: nothing spent"},"fails":[],"ok":true}
+- **den-meermob.s2.alt C** (FAIL-SCRIPT): not finished; the oracle says the step is still doable: {"item":"renews","phase":"ok","trigger":"coo: nothing spent / slice NOT at hand"}
+  Reproduce: a job file `mistake den-meermob.s2.alt C` for `node game/tools/sf-run.mjs serve`; screenshot and save in the fail dir (den-meermob.s2.alt-C.png / .json).
+  Oracle: {"checks":{"item":"renews","phase":"ok","trigger":"coo: nothing spent / slice NOT at hand"},"fails":[],"ok":true}

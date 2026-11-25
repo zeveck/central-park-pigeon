@@ -3,7 +3,7 @@
   "den-ducks.s3|W": {
    "case": "den-ducks.s3",
    "code": "W",
-   "round": 1,
+   "round": 4,
    "fixture": "den-ducks.s3",
    "cap": 600,
    "recorded": 21,
@@ -78,14 +78,12 @@
     "repaired": null
    },
    "loops": [],
-   "nudge": [
-    "NUDGE-WRONG: the compass points at puddles, the peas lies at 46, 293"
-   ],
+   "nudge": [],
    "leftovers": {},
    "retries": 0,
    "errors": 0,
    "verdict": "PASS",
-   "wallSecs": 11,
+   "wallSecs": 17,
    "job": "001-den-ducks.s3-W.out"
   },
   "den-rats.s3|C": {
@@ -426,7 +424,7 @@
   "den-raccoons.s3|W": {
    "case": "den-raccoons.s3",
    "code": "W",
-   "round": 1,
+   "round": 4,
    "fixture": "den-raccoons.s3",
    "cap": 600,
    "recorded": 66.8,
@@ -501,15 +499,13 @@
     "repaired": null
    },
    "loops": [],
-   "nudge": [
-    "NUDGE-WRONG: the compass points at rigby, the wrench lies at -42, 429"
-   ],
+   "nudge": [],
    "leftovers": {},
    "retries": 0,
    "errors": 0,
    "verdict": "PASS",
-   "wallSecs": 15,
-   "job": "005-den-raccoons.s3-W.out"
+   "wallSecs": 14,
+   "job": "002-den-raccoons.s3-W.out"
   },
   "sab-middle.s1|W": {
    "case": "sab-middle.s1",
@@ -2146,7 +2142,7 @@
   "den-biscuit.s3|F": {
    "case": "den-biscuit.s3",
    "code": "F",
-   "round": 2,
+   "round": 4,
    "fixture": "den-biscuit.s3",
    "cap": 600,
    "recorded": 56,
@@ -2245,8 +2241,8 @@
    "retries": 0,
    "errors": 0,
    "verdict": "PASS",
-   "wallSecs": 69,
-   "job": "012-den-biscuit.s3-F.out"
+   "wallSecs": 15,
+   "job": "003-den-biscuit.s3-F.out"
   },
   "den-strix.s2|F": {
    "case": "den-strix.s2",
@@ -2356,7 +2352,7 @@
   "den-rhoda.s3|C": {
    "case": "den-rhoda.s3",
    "code": "C",
-   "round": 1,
+   "round": 4,
    "fixture": "den-rhoda.s3",
    "cap": 600,
    "recorded": 143.5,
@@ -2507,16 +2503,14 @@
     "repaired": null
    },
    "loops": [],
-   "nudge": [
-    "compass not at the slice (lies at -125, 262)"
-   ],
+   "nudge": [],
    "leftovers": {},
    "retries": 3,
    "helped": "nap round",
    "errors": 0,
    "verdict": "PASS-HELPED",
-   "wallSecs": 225,
-   "job": "032-den-rhoda.s3-C.out"
+   "wallSecs": 132,
+   "job": "001-den-rhoda.s3-C.out"
   },
   "part-power.s3|O": {
    "case": "part-power.s3",
@@ -2607,7 +2601,7 @@
   "den-meermob.s2.alt|C": {
    "case": "den-meermob.s2.alt",
    "code": "C",
-   "round": 2,
+   "round": 4,
    "fixture": "den-meermob.s2",
    "cap": 600,
    "recorded": null,
@@ -2769,14 +2763,12 @@
     "repaired": null
    },
    "loops": [],
-   "nudge": [
-    "NUDGE-WRONG: the compass points at bigsal, the slice lies at 49, 1066"
-   ],
+   "nudge": [],
    "leftovers": {},
    "retries": 3,
    "errors": 0,
-   "wallSecs": 177,
-   "job": "020-den-meermob.s2.alt-C.out"
+   "wallSecs": 139,
+   "job": "002-den-meermob.s2.alt-C.out"
   },
   "den-ducks.s3|Q": {
    "case": "den-ducks.s3",
