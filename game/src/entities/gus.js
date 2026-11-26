@@ -649,7 +649,12 @@ export class Gus {
   }
 
   #endTouchdown() {
-    const hop = this.touchdown?.hop;
+    const td = this.touchdown, hop = td?.hop;
+    // review: the wings back to the flare's stroke (a take-off or hop starts from it, not from the raised V), and an early
+    // end (a peck or take-off in the first 0.3 s) hands what's left of the drop to the stand model's ease, not a snap
+    if (td?.a0) { Object.assign(this.flyAnim, td.a0); this.wings.setStroke(td.a0.amp, td.a0.offset); }
+    const k = td?.off ? 1 - ease(Math.min(1, td.t / td.dur)) : 0;
+    this.landEase = k > 0.01 ? { t: 0, x: td.off.x * k, y: td.off.y * k, z: td.off.z * k } : null;
     this.useModel('stand');   // clears this.touchdown
     this.landSquash = this.mode === 'walk' || this.mode === 'perch' ? (hop ? 0.7 : 1) : 0;
     this.skin.replant = true;

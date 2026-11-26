@@ -155,7 +155,7 @@ export class CameraRig {
   /** Photo mode (#9): an orbit round Gus, { yaw, elev, dist (≤ 12), fov, look }, with the follow camera's push-in against
    *  solids and its ground clamp. The rig's own yaw / dist / pitch are left alone, so play resumes where it was. */
   #photoCam(gus, collision) {
-    const cam = this.camera, ph = this.photo, p = gus.position;
+    const cam = this.camera, ph = this.photo, p = gus.viewOff ? _gp.copy(gus.position).add(gus.viewOff) : gus.position;   // #47: the drawn bird
     const R = Math.min(12, Math.max(0.3, ph.dist)), e = ph.elev;
     this.target.set(p.x, p.y + (ph.look ?? 0.18), p.z);
     _pt.set(p.x - Math.sin(ph.yaw) * Math.cos(e) * R, this.target.y + Math.sin(e) * R, p.z - Math.cos(ph.yaw) * Math.cos(e) * R);
