@@ -81,6 +81,8 @@
     - #44: Super Jumbo Bagels: a bagel shop and "The Jumbo Order" quest (postcard + Everything Bagel scarf) (https://github.com/zeveck/central-park-pigeon/issues/44)
     - #45: Bagels as bribes: drop a bagel and a wary animal gets excited and tells you where its leader is (https://github.com/zeveck/central-park-pigeon/issues/45)
     - #43: Consistency pass: lines that don't match what's seen or heard (Mimi's car alarm, the ducks' tub of peas, …) (https://github.com/zeveck/central-park-pigeon/issues/43)
+33. `--fix all --publish --no-confirm` (2026-11-26; branch fix/batch10): the one open issue:
+    - #47: Landing (https://github.com/zeveck/central-park-pigeon/issues/47)
 ## Settings
 
 - 3D: yes

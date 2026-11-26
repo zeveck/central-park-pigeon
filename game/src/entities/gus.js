@@ -56,6 +56,14 @@ const BOOST_GRACE = 0.5;
 // Batch-2 (#2): the landing snap (up to 0.9 m in a dive, a perch catch) is eased on the visual root over this long (s).
 // Render-side only: gus.position, speed and every rule land exactly as before.
 const LAND_EASE = 0.24;
+// #47: the touchdown. A landing from the air used to swap straight to the standing model, which then dropped the last
+// bit (up to 0.9 m) onto the spot. Now the flight model stays on through the touchdown: it comes down that last bit
+// (eased, `dur` s; `short` when he was already at the ground), pitching up from flight to `pitch`, the bank levelling,
+// wings back-beating then folding up into a V (`fold`, a wingbeat offset: a landing pigeon's raised wings) from `foldAt` of the way, feet reaching down; the standing
+// model takes over as the feet touch, then the squash. A hop's touchdown is the fold alone (`hop` s). Render-side only:
+// gus.mode is 'walk' / 'perch' from the landing frame, and every rule lands exactly as before. Moving cuts it to half,
+// and a peck, take-off, vehicle or place() ends it at once.
+const TOUCH = { dur: 0.32, short: 0.2, hop: 0.12, pitch: 0.3, fold: 0.9, foldAt: 0.45, lift: 0 };
 // Batch-3 (#1): Gus and the water. On foot the water's edge is a low wall (a small splash, he stops). A gentle arrival on
 // the water floats him: walk mode with gus.floating (a tapped Land, or a near-stall touch at up to FLOAT.speed m/s across
 // and FLOAT.sink down); any faster touch (a glide, a carry, skimming at cruise, a dive) keeps the old splash-bounce, and
@@ -138,6 +146,8 @@ export class Gus {
     this.legacyTakeoff = false;     // Batch-2 (#5): set by main.js from G.legacyTakeoff (old replays: never hop)
     this.hopArmed = false; this.flapAgain = false; this.hopFrom = null;
     this.landEase = null;           // Batch-2 (#2): { t, x, y, z } the visual offset (data space) eased out after a landing
+    this.viewOff = new THREE.Vector3();   // #47: the drawn body's offset from gus.position (data space; the camera follows the drawn bird)
+    this.touchdown = null;          // #47: { t, dur, off: {x, y, z} | null, hop } the flight model's touchdown (looks only)
     this.floating = false;          // Batch-3 (#1): walk mode on the water's surface (see FLOAT)
     this.noFloat = false;           // Batch-3 (review): set by main.js during the Rhoda fight (water touches always bounce)
     this.fromWater = false; this.waterGrace = 0; this.edgeT = 0;
@@ -151,6 +161,7 @@ export class Gus {
 
   useModel(which) {
     const standOn = which === 'stand';
+    this.touchdown = null;   // #47: any model choice ends a touchdown
     this.standPose.visible = standOn;
     this.flyPose.visible = !standOn;
     this.root.updateMatrixWorld(true);
@@ -588,6 +599,9 @@ export class Gus {
     const pv = this._prevPos, pp = this.root.position;
     const ex = pv.x - pp.x, ey = pv.y - pp.y, ez = pv.z - pp.z;
     this.landEase = !hop && Math.hypot(ex, ey, ez) > 0.02 && Math.hypot(ex, ey, ez) < 3 ? { t: 0, x: ex, y: ey, z: ez } : null;
+    // #47: from the flight model, a touchdown on it first (the eased offset rides on flyPose), then the stand model
+    const td = this.flyPose.visible ? { t: 0, dur: hop ? TOUCH.hop : this.landEase ? TOUCH.dur : TOUCH.short, off: this.landEase, hop } : null;
+    if (td) this.landEase = null;
     this.mode = mode;
     this.modeT = 0;
     this.perch = perch ? { ...perch, r: perch.perch?.r ?? 0.15, edge: perch.perch?.t === 'edge', id: perch.perch?.id, kind: perch.perch?.kind } : null;
@@ -599,7 +613,46 @@ export class Gus {
     this.stepPhase = Math.ceil(this.stepPhase);
     this.landSquash = hop ? 0.7 : 1;
     this.skin.replant = true;   // Gus rig: he lands with both feet on their rest spots
-    this.useModel('stand');
+    if (td) this.touchdown = td;   // #47: the stand model (and the squash) once the feet are down: #endTouchdown
+    else this.useModel('stand');
+  }
+
+  /** #47: the touchdown on the flight model (see TOUCH; looks only). */
+  #poseTouchdown(dt) {
+    const td = this.touchdown;
+    td.t += dt * (this.speed > 0.3 ? 2 : 1);
+    const u = Math.min(1, td.t / td.dur);
+    let ox = 0, oy = 0, oz = 0;
+    if (td.off) {
+      const k = 1 - ease(u), le = td.off;
+      const c = Math.cos(this.yaw), s = Math.sin(this.yaw), sx = this.root.scale.x || 1;
+      ox = (le.x * c - le.z * s) * k / sx; oy = le.y * k; oz = (le.x * s + le.z * c) * k;
+      this.viewOff.set(le.x * k, le.y * k, le.z * k);
+    } else this.viewOff.set(0, 0, 0);
+    const r = Math.min(1, 14 * dt);
+    this.pitch += (TOUCH.pitch - this.pitch) * (td.hop ? r : Math.max(r, u));
+    this.bank += (0 - this.bank) * r;
+    this.flyPose.rotation.set(this.pitch, 0, this.bank, 'YXZ');
+    this.flyPose.scale.set(1, 1, 1);
+    this.flyPose.position.set(ox, GUS_FLY.bodyCenter.y * GUS_FLY.scale + oy + TOUCH.lift * u, oz);
+    // wings: the flare's back-beat, then still and raised in a V as the feet touch (the stand model's folded wings snap shut)
+    const fold = td.hop ? u : THREE.MathUtils.smoothstep(u, TOUCH.foldAt, 1);
+    const a = this.flyAnim;
+    if (!td.a0) td.a0 = { amp: a.amp, offset: a.offset, freq: a.freq };
+    a.amp = td.a0.amp * (1 - fold);
+    a.offset = td.a0.offset + (TOUCH.fold - td.a0.offset) * fold;
+    a.freq = td.a0.freq * (1 - fold);
+    this.wings.advance(dt, a.freq);
+    this.wings.setStroke(a.amp, a.offset);
+    this.skin.poseFly({ dt, modeT: 1, flare: true, lowAlt: 0, vy: -1 });
+    if (u >= 1) this.#endTouchdown();
+  }
+
+  #endTouchdown() {
+    const hop = this.touchdown?.hop;
+    this.useModel('stand');   // clears this.touchdown
+    this.landSquash = this.mode === 'walk' || this.mode === 'perch' ? (hop ? 0.7 : 1) : 0;
+    this.skin.replant = true;
   }
 
   #nearestPerch(radius, below = 0.15, above = 0.6) {
@@ -677,6 +730,12 @@ export class Gus {
       this.skin.poseFly({ dt, modeT: this.modeT, flare: this.flare, lowAlt: this.lowAlt, vy: this.vy });
       return;
     }
+    this.viewOff.set(0, 0, 0);
+    // #47: the touchdown (walk or perch); anything else (a take-off, a peck, a vehicle) ends it now
+    if (this.touchdown) {
+      if ((this.mode === 'walk' || this.mode === 'perch') && this.peckT < 0) { this.#poseTouchdown(dt); if (this.touchdown) return; }
+      else this.#endTouchdown();
+    }
     this.flare = false; this.flareK = 0;
     // ground poses: the take-off / landing squash stays on standPose; everything else is the skeleton (Gus rig)
     let sq = 0;
@@ -693,6 +752,7 @@ export class Gus {
         // data-space offset → root space (root: yaw about y, then its x mirror)
         const c = Math.cos(this.yaw), s = Math.sin(this.yaw), sx = this.root.scale.x || 1;
         ox = (le.x * c - le.z * s) * k / sx; oy = le.y * k; oz = (le.x * s + le.z * c) * k;
+        this.viewOff.set(le.x * k, le.y * k, le.z * k);   // #47
       }
     }
     if (this.landSquash > 0 && !(le && le.t < LAND_EASE * 0.7)) {

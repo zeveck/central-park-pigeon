@@ -116,7 +116,8 @@ export class CameraRig {
       if (k >= 1) { this.orbit = null; o.done?.(); }
     }
 
-    const p = gus.camTarget || gus.position;
+    // #47: on foot the camera follows the drawn bird (gus.viewOff: a landing's last bit, eased; looks only)
+    const p = gus.camTarget || (gus.viewOff ? _gp.copy(gus.position).add(gus.viewOff) : gus.position);
     const v = this.view;
     const yaw = v ? gus.yaw + v.yawOffset : this.yaw;
     const dist = v ? v.dist : this.dist;
@@ -175,4 +176,5 @@ const _look = new THREE.Vector3();
 const _pt = new THREE.Vector3();
 
 const _want = new THREE.Vector3();
+const _gp = new THREE.Vector3();   // #47
 const _up = new THREE.Vector3(0, 1, 0);
