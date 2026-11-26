@@ -126,6 +126,7 @@ Current design (round 3): 17 crews, ~700 animals, 17 bosses + 50 regulars, 5 thr
   - [x] 1. Social card + page details: design/social-card.html → design/social-card.png → game/social-card.jpg (1200×630, key art + Fredoka logo); index.html description, Open Graph + Twitter tags (image relative; canonical, absolute URLs, robots.txt, sitemap.xml left for publish per web-target.md)
   - [x] 2. README.md at the project root (making-of on: all 20 requests + the budget-raise quote verbatim; plugins, Meshy, ElevenLabs; ≈ $102.91; credit Rich Conlan); screenshots in media/screenshots/, plugin pictures in media/made-with/
   - [x] 3. Pages workflow: .github/workflows/pages.yml checked against web-target.md (complete; keeps game/tools/stamp-sw.mjs); at the game folder root, which becomes the repo root (not a git repo yet)
+- 2026-11-26: FIX #47 (landing) DONE on fix/batch10, ff to main: 453d08f + review fixes 72a5f97. The flight model carries Gus through touchdown (eased last drop, pitch up, wings back-beat then raised in a V, feet down); the stand model takes over as the feet touch; the camera and photo camera follow the drawn bird (gus.viewOff). Render-side only. Proof: frame-by-frame films (chase and side) of a tapped Land, a glide-in, a held dive, a hop and a peck right after landing, 0 console errors; raw replays den-crows, jumbo-order, truce-cats-rats complete with matching end positions; fresh code review (3 visual follow-ups, all done). $0 art.
 
 ## Resume notes (2026-11-14, for a fresh session or after compaction)
 
