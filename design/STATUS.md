@@ -83,6 +83,11 @@
     - #43: Consistency pass: lines that don't match what's seen or heard (Mimi's car alarm, the ducks' tub of peas, …) (https://github.com/zeveck/central-park-pigeon/issues/43)
 33. `--fix all --publish --no-confirm` (2026-11-26; branch fix/batch10): the one open issue:
     - #47: Landing (https://github.com/zeveck/central-park-pigeon/issues/47)
+34. `--fix all --publish --no-confirm` (2026-11-27; branch fix/batch11): the open issues:
+    - #48: Taxis (https://github.com/zeveck/central-park-pigeon/issues/48)
+    - #49: Tails (https://github.com/zeveck/central-park-pigeon/issues/49)
+    - #50: Bridge problems (https://github.com/zeveck/central-park-pigeon/issues/50)
+    - #51: Weird green semi-circles (https://github.com/zeveck/central-park-pigeon/issues/51)
 ## Settings
 
 - 3D: yes
