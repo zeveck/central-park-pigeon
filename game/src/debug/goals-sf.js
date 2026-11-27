@@ -234,7 +234,7 @@ export const GOALS_SF = {
     { sfFollow: 'dogwalker', d: 2.5, timeout: 120 }, { press: 'drop', frames: 3 }, flag('truce-dogs-squirrels', 120), idle(),
   ],
   'part-legs': () => [
-    ...go({ x: -7, z: 536 }), { call: 'strix' }, { wait: 3.8 }, { ask: 'strix' }, flag('part-legs.s1', 40), idle(),
+    { landNear: { x: -7, z: 536 }, alt: 6, r: 3 }, { walkTo: { x: -7, z: 536 }, r: 0.6 }, { call: 'strix' },   // batch 11: landNear (flyTo circled the spot for minutes, landing only by chance) { wait: 3.8 }, { ask: 'strix' }, flag('part-legs.s1', 40), idle(),
     ...napAt('nest-greatlawn', 'morning'), idle(),
     ...go({ x: -20, z: 537 }, 6, 1.5), { call: 'squirrels' }, { wait: 3.6 }, { ask: 'squirrels' }, { waitFor: 'legs.pipe1', timeout: 40 }, idle(),
     ...go({ x: 6, z: 538 }, 6, 1.5), { call: 'squirrels' }, { wait: 3.6 }, { ask: 'squirrels' }, flag('legs.dug', 40), flag('part-legs.s2', 30), idle(),

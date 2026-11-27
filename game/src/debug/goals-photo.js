@@ -19,7 +19,7 @@ export const GOALS_PHOTO = {
       { flyTo: { x: CAMERA_AT.x + 12, z: CAMERA_AT.z + 0.7 }, alt: 9, r: 4, timeout: 150 },
       { flyTo3: { x: CAMERA_AT.x - 0.1, y: CAMERA_AT.y, z: CAMERA_AT.z + 0.7 }, r: 4, timeout: 40 }, { waitFor: 'photo.distracted', timeout: 15 }, settle,
       // then Peck the old camera beside him on the ledge
-      { pickItem: 'camera', timeout: 30 }, { waitFor: 'say-cheese.s1', timeout: 10 }, settle,
+      { peck: 'saycheese:camera', timeout: 30 }, { waitFor: 'say-cheese.s1', timeout: 10 }, settle,
       // 2: Flicker loads the film
       { landNear: { x: f.x + 1.6, z: f.z - 1.2 }, alt: 9, r: 2.5, timeout: 150 }, { talk: 'flicker', timeout: 40 }, { waitFor: 'say-cheese.s2', timeout: 40 }, settle,
       // 3: photo mode (V), snap (Enter), leave (Esc)
