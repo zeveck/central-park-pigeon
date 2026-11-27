@@ -106,7 +106,9 @@ async function paintMasks(S, gen = false) {   // gen (fix-26): re-routed paths p
   for (const d of S.drives) strokeLine(A, (gen && d.genLine) || d.line, d.width, CH.b, false, 0.8);   // #50: a straightened drive placed by its old line too
   await rasterNow(A);
   // transverse road beds
-  for (const t of TRANSVERSES) fillRect(A, PARK.xMin - 1, t.z - 4.2, PARK.xMax + 1, t.z + 4.2, CH.b, 0.8);
+  // #48: a road wall to wall (it was ±4.2 m, with grass at its sides); the placement pass (gen) keeps the old band, so no
+  // tree draw changes
+  for (const t of TRANSVERSES) { const hw = gen ? 4.2 : t.halfWidth; fillRect(A, PARK.xMin - 1, t.z - hw, PARK.xMax + 1, t.z + hw, CH.b, gen ? 0.8 : 1); }
   // the city ring: avenues and side streets are asphalt (sidewalks are raised slabs built by city.js)
   const zN = PARK.zMax;
   fillRect(A, WORLD.xMin, -AVENUE, WORLD.xMax, 0, CH.b);                     // Central Park South

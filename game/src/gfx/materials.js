@@ -142,6 +142,8 @@ export function createMaterials(tex) {
   M.rubber = coded(0x2a2a2a);
   M.asphalt = coded(0x4a4a4c);
   M.kerb = coded(0xb8b2a6);
+  M.lineWhite = coded(0xe6e3da);    // #48: road markings in the transverse cuts
+  M.lineYellow = coded(0xe2b13c);
   M.tile = coded(0xd9c8a0);
   M.glassDark = coded(0x3a4d5c, { roughness: 0.6 });
   M.boards = coded(0xf4f1ea);

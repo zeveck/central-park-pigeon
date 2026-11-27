@@ -6,7 +6,7 @@
 // Also here: rocks, the transverse cuts' retaining walls and stone bridges.
 
 import * as THREE from 'three';
-import { LANDMARKS, ROCKS, TRANSVERSES, TRANSVERSE_RAMP, PARK, RINK, SUMMIT_PERCHES, BLOCK } from './layout.js';
+import { LANDMARKS, ROCKS, TRANSVERSES, TRANSVERSE_RAMP, PARK, RINK, SUMMIT_PERCHES, BLOCK, WORLD } from './layout.js';
 import { boxGeometry, scaleUV } from '../gfx/batch.js';
 import { fbm, rngFor } from '../core/rng.js';
 import { ellipsePoly, samplePolyline, smoothstep } from '../core/geo.js';
@@ -21,16 +21,39 @@ export function archSlab({ span, y0, y1, thickness, openW, springY, crownY }) {
   s.moveTo(-span / 2, y0); s.lineTo(span / 2, y0); s.lineTo(span / 2, y1); s.lineTo(-span / 2, y1); s.lineTo(-span / 2, y0);
   const hole = new THREE.Path();
   const hw = openW / 2, rise = crownY - springY;
-  hole.moveTo(-hw, y0 - 0.01);
+  // #48: the opening starts 2 cm above the slab's foot. It used to start 1 cm below it, outside the outline, and the
+  // triangulation then filled it in: every arch was drawn solid (the road cuts' bridges were blocks across the road).
+  // y0 is always below the ground or the water, so the 2 cm sill never shows.
+  const sill = y0 + 0.02;
+  hole.moveTo(-hw, sill);
   hole.lineTo(-hw, springY);
   for (let i = 1; i <= 16; i++) { const a = Math.PI - (i / 16) * Math.PI; hole.lineTo(Math.cos(a) * hw, springY + Math.sin(a) * rise); }
-  hole.lineTo(hw, y0 - 0.01);
-  hole.lineTo(-hw, y0 - 0.01);
+  hole.lineTo(hw, sill);
+  hole.lineTo(-hw, sill);
   s.holes.push(hole);
   const g = new THREE.ExtrudeGeometry(s, { depth: thickness, bevelEnabled: false, curveSegments: 4 });
   g.rotateY(Math.PI / 2);
   g.translate(-thickness / 2, 0, 0);
   return g;
+}
+
+/** #48: the stone round an open arch, as collision: each abutment, and the spandrels above the opening in three steps
+ *  that follow the arc (the opening itself stays clear, so a bird flies through). Local frame as archSlab: the span runs
+ *  along the arch's own z (after its yaw), the opening across it. */
+export function archCollision(ctx, { x, z, yaw = 0, span, y0, y1, thickness, openW, springY, crownY, deckH = 0 }) {
+  const hw = openW / 2, rise = crownY - springY, top = y1 - deckH;
+  const c = Math.cos(yaw), s = Math.sin(yaw);
+  const at = (lz) => ({ x: x + lz * s, z: z + lz * c });
+  const box = (z0, z1, b, t) => { if (t - b < 0.05 || z1 - z0 < 0.05) return; const m = at((z0 + z1) / 2); ctx.collision.addBox({ x: m.x, z: m.z, y0: b, h: t - b, w: thickness, d: z1 - z0, yaw, tag: 'arch' }); };
+  const arcY = (u) => springY + rise * Math.sqrt(Math.max(0, 1 - u * u));   // u = |z| / hw
+  for (const side of [-1, 1]) {
+    const z0 = side * hw, z1 = side * span / 2;
+    box(Math.min(z0, z1), Math.max(z0, z1), y0, top);
+    for (const [a, b] of [[0.55, 0.8], [0.8, 0.93], [0.93, 1]]) {
+      const za = side * hw * a, zb = side * hw * b;
+      box(Math.min(za, zb), Math.max(za, zb), arcY(a), top);
+    }
+  }
 }
 
 /** A flat annulus sector (r0..r1, angles a0..a1, radians from +x toward +z), h tall, standing on y = 0. */
@@ -101,8 +124,10 @@ B['stone-bridge'] = (L, ctx) => {
   const top = ctx.deckTops?.[L.id] ?? Math.max(ctx.heightAt(endA.x, endA.z), ctx.heightAt(endB.x, endB.z)) + 0.35;
   const water = ctx.collision.waterAt(L.x, L.z);
   const base = water ? water.level - 0.6 : ctx.heightAt(L.x, L.z) - 0.5;
-  const g = archSlab({ span: L.span + 3, y0: base, y1: top, thickness: L.width, openW: L.span * 0.62, springY: base + 0.6, crownY: top - 0.9 });
+  const arch = { span: L.span + 3, y0: base, y1: top, thickness: L.width, openW: L.span * 0.62, springY: base + 0.6, crownY: top - 0.9 };
+  const g = archSlab(arch);
   ctx.batch.mesh('stone', g, { x: L.x, z: L.z, yaw: L.yaw });
+  archCollision(ctx, { ...arch, x: L.x, z: L.z, yaw: L.yaw, deckH: 1.0 });   // #48: the arch is open now; its stone is solid
   for (const side of [-1, 1]) {
     const p = W(side * (L.width / 2 - 0.2), 0);
     solid(ctx, 'stoneDark', { x: p.x, z: p.z, y: top, w: 0.4, h: 0.85, d: L.span + 3, yaw: L.yaw }, { tag: 'parapet', walkable: true });
@@ -745,7 +770,11 @@ export function buildTransverses(ctx, crossings) {
     });
     // retaining walls, stepped to follow the ground above
     for (const side of [-1, 1]) {
-      const wz = t.z + side * (t.halfWidth + 0.35);
+      // #48: the wall's road-side face stands on the last ground row that is still the road (cutFace), and its back where
+      // it always was (halfWidth + 0.7): the ground used to start rising between that row and the face, a grassy
+      // sawtooth along the foot of every wall
+      const f = cutFace(t, side), thick = t.halfWidth + 0.7 - f;
+      const wz = t.z + side * (f + thick / 2), back = t.z + side * (t.halfWidth + 0.7);
       for (let xs = PARK.xMin + 1; xs < PARK.xMax - 1; xs += 6) {
         const xe = Math.min(PARK.xMax - 1, xs + 6);
         // the segment, less any shallow crossing's gap; the pieces under a deck end just below it
@@ -763,11 +792,11 @@ export function buildTransverses(ctx, crossings) {
         for (const [x, x1, cap] of pieces) {
           if (x1 - x < 0.05) continue;
           const mx = (x + x1) / 2;
-          const top = Math.min(cap, Math.max(ctx.heightAt(x, wz + side * 2.2), ctx.heightAt(x1, wz + side * 2.2), ctx.heightAt(mx, wz + side * 2.2)) + 0.3);
+          const top = Math.min(cap, Math.max(ctx.heightAt(x, back + side * 1.5), ctx.heightAt(x1, back + side * 1.5), ctx.heightAt(mx, back + side * 1.5)) + 0.3);
           const b = Math.min(bed(x), bed(x1)) - 0.3;
           if (top - b < 0.5) continue;
-          ctx.batch.box('stone', { x: mx, y: b, z: wz }, { w: x1 - x + 0.02, h: top - b, d: 0.7 });
-          ctx.collision.addBox({ x: mx, z: wz, y0: b, h: top - b, w: x1 - x, d: 0.7, tag: 'cut-wall' });
+          ctx.batch.box('stone', { x: mx, y: b, z: wz }, { w: x1 - x + 0.02, h: top - b, d: thick });
+          ctx.collision.addBox({ x: mx, z: wz, y0: b, h: top - b, w: x1 - x, d: thick, tag: 'cut-wall' });
         }
       }
     }
@@ -779,8 +808,13 @@ export function buildTransverses(ctx, crossings) {
       const w = c.width + 1.6;
       const yS = ctx.heightAt(c.x, t.z - t.halfWidth - 2.5), yN = ctx.heightAt(c.x, t.z + t.halfWidth + 2.5);
       const top = ctx.deckTops?.[`${t.id}:${Math.round(c.x * 10)}`] ?? Math.max(yS, yN) + 0.15;   // batch-3 (#17): terrain.js's deck height
-      const g = archSlab({ span: L, y0: bed(c.x) - 0.2, y1: top, thickness: w, openW: t.halfWidth * 2 - 0.6, springY: bed(c.x) + 2.6, crownY: top - 1.1 });
+      const arch = { span: L, y0: bed(c.x) - 0.2, y1: top, thickness: w, openW: t.halfWidth * 2 - 0.6, springY: bed(c.x) + 2.6, crownY: top - 1.1 };
+      const g = archSlab(arch);
       ctx.batch.mesh('stone', g, { x: c.x, z: t.z });
+      // #48: the arch is open now (a tunnel under the bridge, the road through it): its stone is solid, and a lamp hangs
+      // under the crown (it lights at dusk like the park's lamps)
+      archCollision(ctx, { ...arch, x: c.x, z: t.z, deckH: 1.1 });
+      if (arch.crownY - arch.springY > 0.6) ctx.batch.box('lamp', { x: c.x, y: arch.crownY - 0.16, z: t.z }, { w: Math.min(1.2, w * 0.3), h: 0.14, d: 0.32 });
       ctx.batch.box(c.drive ? 'asphalt' : 'gravel', { x: c.x, y: top, z: t.z }, { w: w - 0.9, h: 0.02, d: L });
       ctx.collision.addBox({ x: c.x, z: t.z, y0: top - 1.1, h: 1.1, w, d: L, tag: 'bridge' });
       for (const s of [-1, 1]) {
@@ -788,6 +822,78 @@ export function buildTransverses(ctx, crossings) {
         solid(ctx, 'stoneDark', { x: px, z: t.z, y: top, w: 0.4, h: 0.8, d: L }, { tag: 'parapet' });
       }
     }
+    roadInCut(ctx, t, bed);
+  }
+}
+
+/** #48: how far the road reaches from the cut's centre on one side: the last terrain row (2 m apart) at or inside
+ *  halfWidth. The ground is flat (the road's bed) out to that row and starts rising after it, so the wall's face
+ *  stands there. Between halfWidth - 2 and halfWidth; the same all along the cut (the rows run along x). */
+export function cutFace(t, side) {
+  const STEP = 2;
+  const edge = t.z + side * t.halfWidth;
+  const row = side > 0 ? WORLD.zMin + Math.floor((edge - WORLD.zMin) / STEP + 1e-6) * STEP : WORLD.zMin + Math.ceil((edge - WORLD.zMin) / STEP - 1e-6) * STEP;
+  return Math.abs(row - t.z);
+}
+
+/** #48: the cut is a road: asphalt wall to wall (terrain.js paints it), a raised sidewalk along each wall, a double yellow
+ *  line down the middle and a white line at each edge, all following the road's rise to street level at the park walls.
+ *  No traffic: it's a road to fly along and through the bridges' arches. */
+export const CUT_SIDEWALK = { w: 1.3, h: 0.15 };
+function roadInCut(ctx, t, bed) {
+  const x0 = PARK.xMin + 0.5, x1 = PARK.xMax - 0.5, STEPX = 1;
+  const xs = [];
+  for (let x = x0; x < x1; x += STEPX) xs.push(x);
+  xs.push(x1);
+  // a strip from z = za to zb (absolute), lifted dy above the road, as one mesh (two triangles per metre)
+  const strip = (mat, za, zb, dy, from = 0, to = xs.length - 1) => {
+    const pos = [], idx = [];
+    for (let i = from; i <= to; i++) { const y = bed(xs[i]) + dy; pos.push(xs[i], y, za, xs[i], y, zb); }
+    for (let i = 0; i < to - from; i++) { const a = i * 2; idx.push(a, a + 1, a + 3, a, a + 3, a + 2); }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    g.setIndex(idx);
+    // face up whichever way the strip was given
+    g.computeVertexNormals();
+    if (g.attributes.normal.getY(0) < 0) { const ix = g.index.array; for (let k = 0; k < ix.length; k += 3) { const q = ix[k + 1]; ix[k + 1] = ix[k + 2]; ix[k + 2] = q; } g.computeVertexNormals(); }
+    const uv = []; for (let i = from; i <= to; i++) uv.push(xs[i] / 2, 0, xs[i] / 2, (zb - za) / 2);
+    g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+    ctx.batch.mesh(mat, g, {});
+  };
+  // the kerb's face: a vertical strip along z = zk, from the road up to the sidewalk's top
+  const face = (zk, facing, from, to) => {
+    const pos = [], idx = [];
+    for (let i = from; i <= to; i++) { const y = bed(xs[i]); pos.push(xs[i], y - 0.02, zk, xs[i], y + CUT_SIDEWALK.h, zk); }
+    for (let i = 0; i < to - from; i++) { const a = i * 2; if (facing > 0) idx.push(a, a + 2, a + 3, a, a + 3, a + 1); else idx.push(a, a + 3, a + 2, a, a + 1, a + 3); }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    g.setIndex(idx); g.computeVertexNormals();
+    const uv = []; for (let i = from; i <= to; i++) uv.push(xs[i] / 2, 0, xs[i] / 2, 0.1);
+    g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+    ctx.batch.mesh('kerb', g, {});
+  };
+  // 20 m pieces, so each lands in its own batch cell like the rest of the scenery
+  const chunks = (fn) => { for (let a = 0; a < xs.length - 1; a += 20) fn(a, Math.min(xs.length - 1, a + 20)); };
+  for (const side of [-1, 1]) {
+    const fz = cutFace(t, side), inner = fz - CUT_SIDEWALK.w;
+    const zi = t.z + side * inner, zw = t.z + side * (fz + 0.02);
+    chunks((a, b) => strip('pavers', zi, zw, CUT_SIDEWALK.h, a, b));
+    chunks((a, b) => face(zi, -side, a, b));
+    // collision: the sidewalk in pieces of equal height (one long box where the road is level, metre steps on the ramps)
+    let a = 0;
+    while (a < xs.length - 1) {
+      let b = a + 1;
+      while (b < xs.length - 1 && Math.abs(bed(xs[b + 1]) - bed(xs[a])) < 0.02) b++;
+      const lo = Math.min(bed(xs[a]), bed(xs[b])), hi = Math.max(bed(xs[a]), bed(xs[b]));
+      ctx.collision.addBox({ x: (xs[a] + xs[b]) / 2, z: (zi + zw) / 2, y0: lo - 0.3, h: hi - lo + 0.3 + CUT_SIDEWALK.h, w: xs[b] - xs[a], d: Math.abs(zw - zi), tag: 'sidewalk' });
+      a = b;
+    }
+    // the white edge line, 25 cm out from the kerb
+    const ze = t.z + side * (inner - 0.25);
+    chunks((a, b) => strip('lineWhite', ze - 0.06, ze + 0.06, 0.03, a, b));
+    // the double yellow line
+    const zy = t.z + side * 0.1;
+    chunks((a, b) => strip('lineYellow', zy - 0.05, zy + 0.05, 0.03, a, b));
   }
 }
 

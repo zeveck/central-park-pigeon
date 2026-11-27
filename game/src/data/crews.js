@@ -146,8 +146,9 @@ export const CHARACTERS = {
   encore: { name: 'Encore', crew: 'choir', role: 'regular', bio: 'Always wants one more song.', at: { x: 8, z: 282, on: 'ground' }, out: 'any' },
   // Reservoir Racers
   wingate: { name: 'Coach Wingate', crew: 'racers', role: 'boss', bio: 'No roost, no training.', at: { x: 4, z: 563, on: 'roof' }, out: 'any', voice: 'wingate' },
-  sprint: { name: 'Sprint', crew: 'racers', role: 'regular', bio: 'Fastest in the park, says Sprint.', at: { x: 7, z: 562, on: 'roof' }, out: 'any' },
-  lapcount: { name: 'Lapcount', crew: 'racers', role: 'regular', bio: 'Holds the stopwatch.', at: { x: 1, z: 562, on: 'roof' }, out: 'any' },
+  // #48: Sprint and Lapcount stood just off the 86th St bridge, down on the cut's road (y -6): now on its parapets
+  sprint: { name: 'Sprint', crew: 'racers', role: 'regular', bio: 'Fastest in the park, says Sprint.', at: { x: 5.5, z: 563.4, on: 'roof' }, out: 'any' },
+  lapcount: { name: 'Lapcount', crew: 'racers', role: 'regular', bio: 'Holds the stopwatch.', at: { x: 1.3, z: 563.4, on: 'roof' }, out: 'any' },
   wheezy: { name: 'Wheezy', crew: 'racers', role: 'regular', bio: 'Never finishes a lap.', at: { x: -3, z: 563, on: 'roof' }, out: 'any' },
   // Grate Rats
   sue: { name: 'Subway Sue', crew: 'rats', role: 'boss', bio: 'Runs the grates. Wants a whole hot slice.', at: { x: -99, z: -17 }, out: 'any', voice: 'sue' },
@@ -231,7 +232,8 @@ export const CROWD_HAUNTS = {
     { kind: 'pavement', x: 61, z: 1068, r: 8, n: 8 }, { kind: 'pavement', x: -129, z: 247, r: 6, n: 6 }, { kind: 'pavement', x: 30, z: 1069, r: 16, n: 6 },
     { kind: 'pavement', x: 129, z: 319, r: 4, n: 2 }, { kind: 'pavement', x: -131, z: 257, r: 5, n: 4 }, { kind: 'trees', x: -18, z: 362, r: 40, n: 4, night: true },
   ],
-  horses: [{ kind: 'line', a: { x: -70, z: -6.5 }, b: { x: 60, z: -6.5 }, n: 12, yaw: 1.57 }, { kind: 'line', a: { x: -62, z: 40 }, b: { x: -55, z: 120 }, n: 2 }],
+  // #48: the second mounted horse stood at z 120, on the 65th St cut's road (118-131): now 14 m south of it
+  horses: [{ kind: 'line', a: { x: -70, z: -6.5 }, b: { x: 60, z: -6.5 }, n: 12, yaw: 1.57 }, { kind: 'line', a: { x: -62, z: 40 }, b: { x: -57, z: 104 }, n: 2 }],
   songbirds: [
     { kind: 'lawn', x: -50, z: 165, r: 35, n: 22 }, { kind: 'lawn', x: 6.6, z: 200, r: 30, n: 16 }, { kind: 'trees', x: -18, z: 362, r: 40, n: 30 },
     { kind: 'pavement', x: -143, z: -18, r: 8, n: 10 }, { kind: 'roof', a: { x: -131.4, z: 376 }, b: { x: -131.4, z: 398 }, n: 12, yaw: Math.PI / 2, unlessSpike: 'P3' }, { kind: 'roof', a: { x: -131.4, z: 427 }, b: { x: -131.4, z: 449 }, n: 12, yaw: Math.PI / 2, unlessSpike: 'P3' }, { kind: 'lawn', x: -6.6, z: 489, r: 36, n: 18 },

@@ -532,38 +532,6 @@ function grandArmyPlaza(ctx) {
   }
 }
 
-/** Static taxis along the avenues (one InstancedMesh): street life for the city ring. */
-export function buildTaxis(collision) {
-  const rnd = rngFor('taxis');
-  const spots = [];
-  for (let z = 6; z < zN; z += 28 + rnd() * 30) spots.push({ x: PARK.xMax + 5.6 + (rnd() < 0.5 ? 0 : 4), z, yaw: Math.PI });
-  for (let z = 14; z < zN; z += 28 + rnd() * 30) spots.push({ x: PARK.xMin - 5.6 - (rnd() < 0.5 ? 0 : 4), z, yaw: 0 });
-  for (let x = -160; x < 160; x += 26 + rnd() * 24) spots.push({ x, z: -6 - (rnd() < 0.5 ? 0 : 4), yaw: Math.PI / 2 });
-  for (let x = -160; x < 160; x += 30 + rnd() * 30) spots.push({ x, z: zN + 6 + (rnd() < 0.5 ? 0 : 4), yaw: -Math.PI / 2 });
-  const body = new THREE.BoxGeometry(1.8, 0.8, 4.4).translate(0, 0.55, 0);
-  const cab = new THREE.BoxGeometry(1.6, 0.6, 2.2).translate(0, 1.25, -0.2);
-  const sign = new THREE.BoxGeometry(0.6, 0.18, 0.2).translate(0, 1.64, -0.2);
-  const parts = [[body, 0xf2c230], [cab, 0x3a4a55], [sign, 0xf4f1ea]].map(([g, c]) => {
-    const col = new THREE.Color(c);
-    const n = g.attributes.position.count;
-    const a = new Float32Array(n * 3);
-    for (let i = 0; i < n; i++) a.set([col.r, col.g, col.b], i * 3);
-    g.setAttribute('color', new THREE.BufferAttribute(a, 3));
-    return g;
-  });
-  const geo = mergeAll(parts);
-  const mesh = new THREE.InstancedMesh(geo, new THREE.MeshStandardMaterial({ roughness: 0.85, metalness: 0, vertexColors: true }), spots.length);
-  const m = new THREE.Matrix4(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0), one = new THREE.Vector3(1, 1, 1);
-  spots.forEach((s, i) => {
-    mesh.setMatrixAt(i, m.compose(new THREE.Vector3(s.x, 0, s.z), q.setFromAxisAngle(up, s.yaw), one));
-    collision.addBox({ x: s.x, z: s.z, y0: 0, h: 1.55, w: 1.8, d: 4.4, yaw: s.yaw, tag: 'taxi' });
-  });
-  mesh.castShadow = true;
-  mesh.receiveShadow = true;
-  mesh.name = 'taxis';
-  mesh.computeBoundingSphere();
-  return mesh;
-}
 
 function mergeAll(parts) {
   const pos = [], nor = [], col = [], idx = [];

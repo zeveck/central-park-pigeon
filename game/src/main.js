@@ -579,7 +579,7 @@ import { buildWater, createWaterMaterial, waterMargin } from './world/water.js';
 import { placeTrees, addTreeCollision, TreeSystem } from './world/trees.js';
 import { placeProps, buildProps, buildWall, buildNests, buildGrates } from './world/props.js';
 import { buildLandmarks, buildTransverses, findCrossings, Streamer, onWalkway } from './world/landmarks.js';
-import { buildCity, buildTaxis } from './world/city.js';
+import { buildCity } from './world/city.js';
 import { buildFarLayer, FAR, FAR_CULL } from './world/farlayer.js';
 import { skyUniforms } from './world/sky.js';
 import { createLights, followShadow } from './world/lights.js';
@@ -820,8 +820,7 @@ async function boot() {
   G.props = props;
   G.propsData = propsData;
   treeSys.shadowRadius = preset.shadowBox / 2;
-  const taxis = buildTaxis(collision);
-  taxis.castShadow = preset.id !== 'low';   // perf pass: Low casts from Gus and near props only
+  // #48: no parked taxis (static yellow blocks in the avenues read as junk, not traffic)
 
   G.summits = {};
   for (const s of SUMMIT_PERCHES) {
@@ -842,7 +841,7 @@ async function boot() {
   world.scale.x = -1;
   scene.add(world);
   const staticGroup = batch.build();
-  world.add(terrain.mesh, water.group, staticGroup, dynamic, props, treeSys.group, taxis);
+  world.add(terrain.mesh, water.group, staticGroup, dynamic, props, treeSys.group);
   G.scene = scene; G.world = world;
 
   const far = buildFarLayer({ terrain, trees, masses: city.masses, waterBodies: water.bodies, textures, detail: preset.farDetail });
