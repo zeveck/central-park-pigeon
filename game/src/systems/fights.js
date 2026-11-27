@@ -103,21 +103,62 @@ export class Fights {
 
   #buildStealth() {
     // three merged meshes (moss, islands with their stones, leaf piles): three draw calls for the whole route
+    // #51: the moss patches and islands were flat discs at their centre's height, so on a slope half of each sank into the
+    // hill and the rest stood out as a bright green half-circle. Each one is now a ragged patch draped on the ground
+    // (every vertex at the ground under it), two-tone moss in vertex colours, and it only glows after dark (the sneak to
+    // Strix is at night; by day it is moss on the ground). Same places, same sizes: the stealth rules read RAMBLE_STEALTH.
     const G = this.G, R = RAMBLE_STEALTH;
     const y = (x, z) => G.surfaceY(x, z, G.terrain.heightAt(x, z) + 0.4) + 0.025;
     const at = (geo, x, yy, z, ry = 0) => geo.rotateY(ry).translate(x, yy, z);
+    const dark = new THREE.Color(0x34501c), light = new THREE.Color(0x6e8c34), _c = new THREE.Color();
+    // a ragged disc of radius ~r, its rim noisy (seeded by where it is), each vertex lifted onto the ground
+    const patch = (m, lift, rings = 6, seg = 30) => {
+      const seed = Math.abs(Math.sin(m.x * 12.9898 + m.z * 78.233) * 43758.5453) % 1;
+      const rim = (a) => 1 + 0.16 * Math.sin(a * 3 + seed * 6.28) + 0.09 * Math.sin(a * 5 + seed * 17) + 0.05 * Math.sin(a * 9 + seed * 31);
+      const pos = [], col = [], idx = [];
+      pos.push(m.x, y(m.x, m.z) + lift, m.z); _c.copy(light); col.push(_c.r, _c.g, _c.b);
+      for (let k = 1; k <= rings; k++) for (let j = 0; j < seg; j++) {
+        const a = (j / seg) * Math.PI * 2, rr = m.r * (k / rings) * (k === rings ? rim(a) : 1 + (rim(a) - 1) * (k / rings));
+        const x = m.x + Math.cos(a) * rr, z = m.z + Math.sin(a) * rr;
+        pos.push(x, y(x, z) + lift, z);
+        const h = Math.abs(Math.sin(x * 41.3 + z * 17.9) * 15731.7) % 1, t = (k / rings) ** 1.4 * 0.5 + 0.5 * h;   // mottled (a hash of where), darker to the rim
+        _c.copy(light).lerp(dark, Math.min(1, t)); col.push(_c.r, _c.g, _c.b);
+      }
+      const ring0 = (k) => 1 + (k - 1) * seg;
+      for (let j = 0; j < seg; j++) idx.push(0, ring0(1) + ((j + 1) % seg), ring0(1) + j);
+      for (let k = 1; k < rings; k++) for (let j = 0; j < seg; j++) {
+        const a0 = ring0(k) + j, a1 = ring0(k) + ((j + 1) % seg), b0 = ring0(k + 1) + j, b1 = ring0(k + 1) + ((j + 1) % seg);
+        idx.push(a0, a1, b1, a0, b1, b0);
+      }
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+      g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+      g.setIndex(idx); g.computeVertexNormals();
+      return g;
+    };
     const moss = [], isle = [], stones = [], leaves = [];
-    for (const m of R.moss) moss.push(at(new THREE.CircleGeometry(m.r, 18).rotateX(-Math.PI / 2), m.x, y(m.x, m.z), m.z));
+    for (const m of R.moss) moss.push(patch(m, 0));
     for (const m of R.islands) {
-      isle.push(at(new THREE.CircleGeometry(m.r, 24).rotateX(-Math.PI / 2), m.x, y(m.x, m.z) + 0.01, m.z));
-      for (let k = 0; k < 6; k++) { const a = (k / 6) * 6.28; stones.push(at(new THREE.DodecahedronGeometry(0.12, 0), m.x + Math.cos(a) * m.r, y(m.x, m.z) + 0.04, m.z + Math.sin(a) * m.r)); }
+      isle.push(patch(m, 0.01, 7, 34));
+      // the island's ring of stones, each on the ground where it sits
+      for (let k = 0; k < 6; k++) { const a = (k / 6) * 6.28, sx = m.x + Math.cos(a) * m.r, sz = m.z + Math.sin(a) * m.r; stones.push(at(new THREE.DodecahedronGeometry(0.12, 0), sx, y(sx, sz) + 0.04, sz)); }
     }
-    for (const l of R.leaves) for (let k = 0; k < 9; k++) { const a = k * 2.4, rr = (k / 9) * l.r; leaves.push(at(new THREE.IcosahedronGeometry(0.22 + (k % 3) * 0.05, 0).scale(1.3, 0.35, 1), l.x + Math.cos(a) * rr, y(l.x, l.z) + 0.05 + (k % 2) * 0.04, l.z + Math.sin(a) * rr, a)); }
-    const add = (list, mat) => { const g = mergeGeometries(list.map((q) => { const n = q.index ? q.toNonIndexed() : q; n.deleteAttribute('uv'); return n; }), false); const m = new THREE.Mesh(g, mat); m.receiveShadow = true; this.group.add(m); };
-    add(moss, ruleMaterial({ color: 0x6faa44, emissive: 0x2f6e1c, emissiveIntensity: 0.55 }));
-    add(isle, ruleMaterial({ color: 0x5f9a3c, emissive: 0x2f6e1c, emissiveIntensity: 0.45 }));
+    for (const l of R.leaves) for (let k = 0; k < 9; k++) { const a = k * 2.4, rr = (k / 9) * l.r, lx = l.x + Math.cos(a) * rr, lz = l.z + Math.sin(a) * rr; leaves.push(at(new THREE.IcosahedronGeometry(0.22 + (k % 3) * 0.05, 0).scale(1.3, 0.35, 1), lx, y(lx, lz) + 0.05 + (k % 2) * 0.04, lz, a)); }
+    const add = (list, mat) => { const g = mergeGeometries(list.map((q) => { const n = q.index ? q.toNonIndexed() : q; if (n.attributes.uv) n.deleteAttribute('uv'); return n; }), false); const m = new THREE.Mesh(g, mat); m.receiveShadow = true; this.group.add(m); return m; };
+    this.mossMats = [ruleMaterial({ color: 0xffffff, vertexColors: true, roughness: 1, emissive: 0x2a5a18, emissiveIntensity: 0 }), ruleMaterial({ color: 0xf2f2f2, vertexColors: true, roughness: 1, emissive: 0x2a5a18, emissiveIntensity: 0 })];
+    add(moss, this.mossMats[0]);
+    add(isle, this.mossMats[1]);
     add(stones, ruleMaterial({ color: 0x8d877e }));
     add(leaves, ruleMaterial({ color: 0xf07a22, emissive: 0x5a2400, emissiveIntensity: 0.6 }));
+    this.#mossGlow(G.tod?.phase);
+  }
+
+  /** #51: the moss glows softly after dark (the night sneak), and is plain moss by day. */
+  #mossGlow(phase) {
+    if (!this.mossMats || phase === this.mossPhase) return;
+    this.mossPhase = phase;
+    const k = phase === 'night' ? 0.2 : phase === 'dusk' ? 0.08 : 0;
+    this.mossMats[0].emissiveIntensity = k; this.mossMats[1].emissiveIntensity = k * 0.85;
   }
 
   // ------------------------------------------------------------ start, win, lose
@@ -228,6 +269,7 @@ export class Fights {
 
   // ------------------------------------------------------------ the fixed update
   update(dt) {
+    this.#mossGlow(this.G.tod?.phase);   // #51
     const f = this.f;
     if (!f) return;
     const G = this.G;
