@@ -322,7 +322,7 @@ export const LANDMARKS = [
   // North
   { id: 'conservatory-garden', name: 'Conservatory Garden', kind: 'formal-garden', ...P(0.9025, 104.7), w: 36, d: 52 },
   { id: 'blockhouse', name: 'The Blockhouse', kind: 'blockhouse', ...P(0.13, 109.05), yaw: 0.25 },
-  { id: 'huddlestone', name: 'Huddlestone Arch', kind: 'stone-bridge', ...P(0.585, 106.05), yaw: 0.05, span: 12, width: 8.5, rise: 1.6, road: true },
+  { id: 'huddlestone', name: 'Huddlestone Arch', kind: 'stone-bridge', ...P(0.585, 106.05), yaw: 1.57, span: 12, width: 8.5, rise: 1.6, road: true },   // #50: turned to carry the East Drive (it ran east-west through the arch, which stood north-south across it); the Loch path passes under
   { id: 'dana-center', name: 'The Meer boathouse', kind: 'kiosk', ...P(0.76, 109.55), w: 14, d: 6, h: 5 },
   { id: 'north-meadow-fields', name: 'North Meadow fields', kind: 'ballfields', ...P(0.48, 99.6), small: true },
   // City side
@@ -612,11 +612,11 @@ export const SIGNS = [
   { id: 'N1', name: 'Great Lawn, west', region: 'north', flip: 'peck', x: -52, z: 489, yaw: 1.57 },
   { id: 'N2', name: 'Great Lawn, east', region: 'north', flip: 'peck', x: 39, z: 489, yaw: -1.57 },
   { id: 'N3', name: "Cleopatra's Needle", region: 'north', flip: 'pen', x: 39, z: 459, yaw: 0.6 },
-  { id: 'N4', name: 'Reservoir south gatehouse', region: 'north', flip: 'pen', x: 23, z: 559, yaw: 0.2 },
+  { id: 'N4', name: 'Reservoir south gatehouse', region: 'north', flip: 'pen', x: 23, z: 546.5, yaw: 0.2 },   // batch 11: it stood in the 86th St road; now on the cut's south bank
   { id: 'N5', name: 'Reservoir north gatehouse', region: 'north', flip: 'pen', x: -21, z: 765, yaw: 3.0 },
   { id: 'N6', name: 'Conservatory Garden gate', region: 'north', flip: 'pen', x: 104, z: 946, yaw: -1.57 },
   { id: 'N7', name: 'Harlem Meer', region: 'north', flip: 'pen', x: 58, z: 966, yaw: 0.3 },
-  { id: 'N8', name: 'North Meadow', region: 'north', flip: 'pen', x: -4, z: 791, yaw: 0 },
+  { id: 'N8', name: 'North Meadow', region: 'north', flip: 'pen', x: -4, z: 795, yaw: 0 },   // batch 11: off the 97th St road's sidewalk, onto its north bank
   { id: 'C1', name: 'Columbus Circle', region: 'city', flip: 'pen', x: -107, z: -17.5, yaw: 0.3 },
   { id: 'C2', name: 'Grand Army Plaza fountain', region: 'city', flip: 'pen', x: 91, z: -33, yaw: 2.6 },
   { id: 'C3', name: 'Fifth Ave & 76th, sidewalk shed', region: 'city', flip: 'pen', x: 126.5, z: 357, yaw: -1.57 },

@@ -432,7 +432,9 @@ export class Gus {
           this.landLatch = LAND.max;   // Batch-3 (#1): over the water too (he floats)
           // #50: a tapped Land over a bridge brakes him onto it: the landing glide (LAND.speed) carried him across a 4 m
           // path bridge, onto its far parapet or down into the road cut, unless he came in along the deck
-          this.landBrake = below.kind === 'bridge';
+          // (review: over the deck, or about to be: a tap a moment early still counts, up to 4 m ahead along his heading)
+          const hx = Math.sin(this.yaw), hz = Math.cos(this.yaw);
+          this.landBrake = [0, 1.5, 3, 4].some((d) => this.#surface(pp.x + hx * d, pp.z + hz * d, pp.y + 0.05).kind === 'bridge');
         }
       }
       this.diveHeldT = 0;

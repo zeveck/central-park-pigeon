@@ -86,15 +86,27 @@ function straightenAtCuts(line, closed, blend) {
       while (i1 < pts.length - 1 && Math.abs(pts[i1].z - t.z) < W) i1++;
       const A = pts[i0], C = pts[i1];
       const P = { x: xc, z: t.z - s * H, straight: true }, Q = { x: xc, z: t.z + s * H, straight: true }, up = { x: 0, z: s };
-      const seg = [];
-      // ease from A into the straight run (a line that starts on the run starts there, on the bridge's line)
+      const seg = [], E = deckHalf(t) + 0.5;   // E: just past the deck's end
+      // ease from A into the straight run. A line that ends (here: starts) on the run keeps its own points beyond the
+      // deck's end (or where it turns off the bridge's line) and goes straight only to there (review: ramble-1's
+      // hand-routed last leg along Belvedere's front)
+      let head = i0;
       if ((A.z - t.z) * -s > H) seg.push(...hermite(A, dirAt(pts, i0), P, up, 6));
-      else seg.push({ x: xc, z: A.z, straight: true });
+      else {
+        let k = hit - 1; while (k > 0 && (pts[k].z - t.z) * -s <= E && Math.abs(pts[k].x - xc) < 2.5) k--;
+        if ((pts[k].z - t.z) * -s > E || Math.abs(pts[k].x - xc) >= 2.5) { head = k + 1; seg.push({ x: xc, z: Math.abs(pts[k].x - xc) >= 2.5 ? pts[k].z : t.z - s * E, straight: true }); }
+        else seg.push({ x: xc, z: A.z, straight: true });
+      }
       seg.push({ x: xc, z: t.z, straight: true });
-      // and back out of it into C (a line that ends on the run ends there)
+      // and back out of it into C (likewise for a line that ends on the run)
+      let tail = i1;
       if ((C.z - t.z) * s > H) seg.push(...hermite(Q, up, C, dirAt(pts, i1), 6));
-      else seg.push({ x: xc, z: C.z, straight: true });
-      pts = [...pts.slice(0, i0), ...seg, ...pts.slice(i1 + 1)];
+      else {
+        let k = hit; while (k < pts.length - 1 && (pts[k].z - t.z) * s <= E && Math.abs(pts[k].x - xc) < 2.5) k++;
+        if ((pts[k].z - t.z) * s > E || Math.abs(pts[k].x - xc) >= 2.5) { tail = k - 1; seg.push({ x: xc, z: Math.abs(pts[k].x - xc) >= 2.5 ? pts[k].z : t.z + s * E, straight: true }); }
+        else seg.push({ x: xc, z: C.z, straight: true });
+      }
+      pts = [...pts.slice(0, head === i0 ? i0 : head), ...seg, ...pts.slice(tail + 1)];
       changed = true;
     }
   }

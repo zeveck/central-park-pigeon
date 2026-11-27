@@ -841,7 +841,7 @@ export function cutFace(t, side) {
  *  No traffic: it's a road to fly along and through the bridges' arches. */
 export const CUT_SIDEWALK = { w: 1.3, h: 0.15 };
 function roadInCut(ctx, t, bed) {
-  const x0 = PARK.xMin + 0.5, x1 = PARK.xMax - 0.5, STEPX = 1;
+  const x0 = PARK.xMin + 0.5, x1 = PARK.xMax - 0.5, STEPX = 0.5;   // review: half-metre pieces, so a sidewalk step on the ramps stays under STEP_UP (0.3)
   const xs = [];
   for (let x = x0; x < x1; x += STEPX) xs.push(x);
   xs.push(x1);
@@ -873,7 +873,7 @@ function roadInCut(ctx, t, bed) {
     ctx.batch.mesh('kerb', g, {});
   };
   // 20 m pieces, so each lands in its own batch cell like the rest of the scenery
-  const chunks = (fn) => { for (let a = 0; a < xs.length - 1; a += 20) fn(a, Math.min(xs.length - 1, a + 20)); };
+  const chunks = (fn) => { for (let a = 0; a < xs.length - 1; a += 40) fn(a, Math.min(xs.length - 1, a + 40)); };
   for (const side of [-1, 1]) {
     const fz = cutFace(t, side), inner = fz - CUT_SIDEWALK.w;
     const zi = t.z + side * inner, zw = t.z + side * (fz + 0.02);
