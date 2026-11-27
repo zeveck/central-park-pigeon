@@ -103,7 +103,7 @@ async function paintMasks(S, gen = false) {   // gen (fix-26): re-routed paths p
     fillPoly(A, pl.poly, kind === 'path' || kind === 'garden' ? CH.r : kind === 'asphalt' ? CH.b : CH.g, 1.0);
   }
   await rasterNow(A);
-  for (const d of S.drives) strokeLine(A, d.line, d.width, CH.b, false, 0.8);
+  for (const d of S.drives) strokeLine(A, (gen && d.genLine) || d.line, d.width, CH.b, false, 0.8);   // #50: a straightened drive placed by its old line too
   await rasterNow(A);
   // transverse road beds
   for (const t of TRANSVERSES) fillRect(A, PARK.xMin - 1, t.z - 4.2, PARK.xMax + 1, t.z + 4.2, CH.b, 0.8);
@@ -309,6 +309,14 @@ function computeHeights(S, masks) {
   const edits = [];
   const keepUp = (x, z) => FLATS.some((f) => f.rect ? x > f.rect.x0 - f.edge && x < f.rect.x1 + f.edge && z > f.rect.z0 - f.edge && z < f.rect.z1 + f.edge : Math.hypot(x - f.circle.x, z - f.circle.z) < f.circle.r + f.edge)
     || LANDMARKS.some((L) => !/bridge/.test(L.kind) && Math.hypot(x - L.x, z - L.z) < 12);
+  // #50: a deck whose end lands on ground the approaches may not lower (a built place's flat, a landmark's ground)
+  // rises to meet it: the 79th St bridge to Belvedere's court stopped 0.36 m below the court (a step up off the bridge)
+  for (const d of decks) {
+    for (const e of d.ends) {
+      const ox = e.x + e.dx * 1.5, oz = e.z + e.dz * 1.5;
+      if (keepUp(ox, oz)) d.top = Math.max(d.top, sampleH(h, ox, oz) + 0.05);
+    }
+  }
   for (const d of decks) {
     for (const e of d.ends) {
       const g0 = sampleH(h, e.x + e.dx * 1, e.z + e.dz * 1);
@@ -506,7 +514,7 @@ export async function buildTerrain({ textures, onStage = () => {} }) {   // boot
   terrain.maskData = { A: masks.A.g.getImageData(0, 0, masks.w, masks.h).data, w: masks.w, h: masks.h };
   // fix-26: what tree placement tests paths against: the masks with re-routed paths where they were, so moving a path
   // doesn't re-roll the forest (trees.js then drops any tree on the new paint, after its last draw). Dropped after use.
-  if (S.paths.some((p) => p.genLine)) {
+  if (S.paths.some((p) => p.genLine) || S.drives.some((d) => d.genLine)) {
     const gm = await paintMasks(S, true);
     terrain.genMaskData = { A: gm.A.g.getImageData(0, 0, gm.w, gm.h).data, w: gm.w, h: gm.h };
   }

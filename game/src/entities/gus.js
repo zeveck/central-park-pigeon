@@ -43,7 +43,7 @@ const BODY_R = { ground: 0.12, air: 0.18 };
 // while low (within `alt` m of what's below, not over water) lands too: the
 // descent carries on after the key is up (gentler, slower forward speed) until he lands, and a perch within `perchR`
 // catches him. Flap, boost, a splash, a cutscene (locked input) or `max` seconds cancel it.
-const LAND = { tap: 0.3, calm: 0.25, alt: 10, max: 4, speed: 5, sink: 6.5, perchR: 1.0 };
+const LAND = { tap: 0.3, calm: 0.25, alt: 10, max: 4, speed: 5, sink: 6.5, perchR: 1.0, brake: 0.6, brakeRate: 9 };   // #50: brake/brakeRate: a tapped Land over a bridge deck
 // Batch-2 (#5): a quick tap of Flap on ordinary ground is a hop. The choice is made when the take-off squash ends
 // (TAKEOFF_SQUASH): Flap still held, or pressed again during the squash → the full take-off exactly as before (no added
 // delay); let go → a hop: about 1 m up and ~1.8 m forward, then walking again on the same ground. A press during the hop
@@ -139,6 +139,7 @@ export class Gus {
     this.slideV = 0; this.slideDist = 0;   // belly-sliding on the ice
     this.diveHeldT = 0;             // Land/perf: how long Land / Dive has been held (for the tap-to-land)
     this.landLatch = 0;             // Land/perf: > 0 while a tapped Land is carrying him down (s left)
+    this.landBrake = false;         // #50: a tapped Land that started over a bridge deck brakes onto it
     this.glideT = 0;                // Land/perf: seconds flying without Flap or Land (the HUD's Land prompt reads it)
     this.sinceFlap = 0;             // Land/perf: seconds since Flap was last held in the air (a tap right after a climb is a trim, not a landing)
     this.lowAlt = Infinity;         // Land/perf: height over what's below him while flying (HUD only)
@@ -427,7 +428,12 @@ export class Gus {
     else {
       if (this.diveHeldT > 0 && this.diveHeldT <= LAND.tap + 1e-6 && this.sinceFlap - this.diveHeldT >= LAND.calm - 1e-6 && !inp.scripted) {
         const pp = this.root.position, below = this.#surface(pp.x, pp.z, pp.y + 0.05);
-        if (pp.y - below.y <= LAND.alt) this.landLatch = LAND.max;   // Batch-3 (#1): over the water too (he floats)
+        if (pp.y - below.y <= LAND.alt) {
+          this.landLatch = LAND.max;   // Batch-3 (#1): over the water too (he floats)
+          // #50: a tapped Land over a bridge brakes him onto it: the landing glide (LAND.speed) carried him across a 4 m
+          // path bridge, onto its far parapet or down into the road cut, unless he came in along the deck
+          this.landBrake = below.kind === 'bridge';
+        }
       }
       this.diveHeldT = 0;
     }
@@ -436,6 +442,7 @@ export class Gus {
       if (inp.scripted || inp.held('flap') || inp.pressed('sprint') || inp.pressed('boost') || this.boostT > 0) this.landLatch = 0;
     }
     const landing = this.landLatch > 0 && !diveIn;
+    if (!landing) this.landBrake = false;
     const diving = diveIn || landing;
     this.glideT = flapping || diving ? 0 : this.glideT + dt;
     // boost: Shift (or L3) pressed in the air, or a double-tapped Flap on touch
@@ -461,10 +468,10 @@ export class Gus {
 
     const lim = this.carryLimits;
     if (lim) this.boostT = 0;   // a heavy item: low and slow
-    let targetSpeed = this.boostT > 0 ? FLY.boost : landing ? LAND.speed : diving ? FLY.dive : amount > 0.1 ? FLY.cruise : FLY.glide;
+    let targetSpeed = this.boostT > 0 ? FLY.boost : landing ? (this.landBrake ? LAND.brake : LAND.speed) : diving ? FLY.dive : amount > 0.1 ? FLY.cruise : FLY.glide;
     if (this.skyMul > 1) targetSpeed *= this.skyMul;   // Batch-2 (#13): Open sky (main.js sets it far outside the city), before the heavy clamp
     if (lim) targetSpeed = Math.min(targetSpeed, lim.maxSpeed);
-    this.speed = approach(this.speed, targetSpeed, this.boostT > 0 ? 4 : landing ? 2.5 : diving ? 1.8 : 1.6, dt);
+    this.speed = approach(this.speed, targetSpeed, this.boostT > 0 ? 4 : landing ? (this.landBrake ? LAND.brakeRate : 2.5) : diving ? 1.8 : 1.6, dt);
     const targetVy = landing ? -LAND.sink : diving ? -FLY.diveSink : flapping ? FLY.climb : -FLY.glideSink;
     this.vy = approach(this.vy, targetVy, flapping ? 3 : diving ? 2.2 : 1.5, dt);
     if (inp.pressed('flap') && canClimb) this.vy += 1.2;
