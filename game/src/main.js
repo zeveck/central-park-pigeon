@@ -654,6 +654,7 @@ import { installSayCheese } from './schemes/say-cheese.js';   // photo mode (#9)
 import { installBagelShop } from './schemes/bagel-shop.js';   // #44: Super Jumbo Bagels, The Jumbo Order
 import { installBagelBribes } from './schemes/bagel-bribes.js';   // #45: bagels as bribes
 import { installOffline } from './ui/offline.js';
+import { straightenFlockTail } from './anim/flock-tail.js';   // #49
 
 const DT = 1 / 60;
 // Land/perf: while the renderer walks the scene for a frame, a hidden subtree (pooled people and their 50-bone skeletons,
@@ -910,6 +911,7 @@ async function boot() {
   // the flock: pigeon-plain-fly with its morph array (13 painted layers)
   await stage('Colouring the pigeons', 0.4);
   const flockBase = flockFly || fly;
+  if (flockFly) G.flockTail = straightenFlockTail(flockFly.geometry);   // #49: the flock's tails on the centre line (anim/flock-tail.js)
   const flockWings = new Wingbeat(FLOCK_FLY.wings);   // #28: the flock keeps the rig it had (gus-fly was remade)
   flockWings.setStroke(0.8, -0.5);
   const flockMat = flockBase.makeMaterial();
